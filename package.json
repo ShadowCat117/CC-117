@@ -1,0 +1,18 @@
+{
+  "name": "cc-117",
+  "version": "1.0.0",
+  "description": "The Discord bot for my Wynncraft guild, Chief's of Corkus. It reads from the Wynncraft public API and uses that for many different features such as applying roles, displaying active hours for each guild and seeing when members last logged in. ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Jamie Callan",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.11.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.41.0"
+  }
+}
