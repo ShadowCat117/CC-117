@@ -18,7 +18,7 @@ async function lastLogins(interaction, force = false) {
 	
 	const guildName = await findGuild(nameToSearch, force);
 
-	if (guildName.message === 'Multiple possibilities found') {
+	if (guildName && guildName.message === 'Multiple possibilities found') {
 		let textMessage = `Multiple guilds found with the name/prefix: ${nameToSearch}.`;
 
 		for (let i = 0; i < guildName.guildNames.length; i++) {

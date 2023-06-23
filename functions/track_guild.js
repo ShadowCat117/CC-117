@@ -19,7 +19,7 @@ async function addAlly(interaction, force = false) {
     const directoryPath = path.join(__dirname, '..', 'configs');
     const filePath = path.join(directoryPath, `${guildId}.json`);
 
-    if (guildName.message === 'Multiple possibilities found') {
+    if (guildName && guildName.message === 'Multiple possibilities found') {
         try {
             let config = {};
 
