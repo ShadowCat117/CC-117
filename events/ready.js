@@ -201,7 +201,8 @@ async function updateGuilds() {
         const json = JSON.parse(data);
 
         if (json.message) {
-          resolve();
+          reject();
+          return;
         }
 
         try {

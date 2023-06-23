@@ -257,7 +257,13 @@ async function applyRoles(guild, uuid, member) {
                     }
 
                     if (rank) {
-                        const rankRole = guild.roles.cache.get(config[rank.toLowerCase() + 'Role']);
+                        let rankRole;
+                        
+                        if (rank === 'VIP+') {
+                            rankRole = guild.roles.cache.get(config['vipPlusRole']);
+                        } else {
+                            rankRole = guild.roles.cache.get(config[rank.toLowerCase() + 'Role']);
+                        }
 
                         if (rankRole && !memberRoles.has(rankRole.id)) {
                             await member.roles.add(rankRole)
