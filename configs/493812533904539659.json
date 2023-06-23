@@ -1,0 +1,42 @@
+{
+  "adminRole": "1070683775949885531",
+  "updateRanks": true,
+  "changeNicknames": true,
+  "checkDuplicateNicknames": true,
+  "logChannel": "1115593985054998593",
+  "logMessages": true,
+  "joinLeaveChannel": "493812533904539661",
+  "sendJoinLeaveMessages": true,
+  "joinMessage": "$user$ has joined the server!",
+  "leaveMessage": "$user$ has left the server.",
+  "ownerRole": "1070684329560260648",
+  "chiefRole": "1070683775949885531",
+  "strategistRole": "1070684360400977950",
+  "captainRole": "1070684396979507232",
+  "recruiterRole": "1070684421298077756",
+  "recruitRole": "1070684449370550384",
+  "allyOwnerRole": "1070684640400130159",
+  "allyRole": "1070684616287076372",
+  "championRole": "1070684476478324806",
+  "heroRole": "1070684504118804531",
+  "vipPlusRole": "1070683862872625243",
+  "vipRole": "1070684529745993831",
+  "vetRole": "1070683836754710549",
+  "veteranRole": true,
+  "verifyMembers": true,
+  "unverifiedRole": "1070684558174978058",
+  "memberOf": true,
+  "memberOfRole": "1070684587644178504",
+  "chiefThreshold": 365,
+  "strategistThreshold": 80,
+  "captainThreshold": 40,
+  "recruiterThreshold": 25,
+  "recruitThreshold": 25,
+  "guildName": "Chiefs Of Corkus",
+  "allies": [
+    "TheButteryWarriors"
+  ],
+  "trackedGuilds": [
+    null
+  ]
+}

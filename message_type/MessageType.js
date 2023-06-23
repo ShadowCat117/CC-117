@@ -1,0 +1,12 @@
+const MessageType = {
+    ACTIVE_HOURS: 'ACTIVE_HOURS',
+    ADD_ALLY: 'ADD_ALLY',
+    LAST_LOGINS: 'LAST_LOGINS',
+    REMOVE_ALLY: 'REMOVE_ALLY',
+    SET_GUILD: 'SET_GUILD',
+    TRACK_GUILD: 'TRACK_GUILD',
+    UNTRACK_GUILD: 'UNTRACK_GUILD',
+    VERIFY: 'VERIFY',
+  };
+
+  module.exports = MessageType;
