@@ -6,11 +6,10 @@ async function createConfig(client, guildId) {
   const filePath = path.join(directoryPath, `${guildId}.json`);
 
   try {
-    if (!await fs.access(directoryPath)) {
-      await fs.mkdir(directoryPath);
-    }
+    await fs.access(filePath);
 
-    if (!await fs.access(filePath)) {
+  } catch (error) {
+    if (error.code === 'ENOENT') {
       const guild = client.guilds.cache.get(guildId);
 
       const highestRole = guild.roles.cache.reduce((prev, role) => (role.position > prev.position ? role : prev));
@@ -54,11 +53,15 @@ async function createConfig(client, guildId) {
         trackedGuilds: [null],
       };
 
-      await fs.writeFile(filePath, JSON.stringify(defaultData, null, 2));
-      console.log(`Created config file for guild ${guildId}`);
+      try {
+        await fs.writeFile(filePath, JSON.stringify(defaultData, null, 2));
+        console.log(`Created config file for guild ${guildId}`);
+      } catch (err) {
+        console.log(`Error creating config file for guild ${guildId}: ${err}`);
+      }
+    } else {
+      console.log(`Error accessing config file for guild ${guildId}: ${error}`);
     }
-  } catch (error) {
-    console.log(`Error creating config file for guild ${guildId}: ${error}`);
   }
 }
 
