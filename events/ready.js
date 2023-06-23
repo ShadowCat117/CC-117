@@ -1,4 +1,4 @@
-const { Events } = require('discord.js');
+const { ActivityType, Events } = require('discord.js');
 const https = require('https');
 const sqlite3 = require('sqlite3').verbose();
 const MessageManager = require('../message_type/MessageManager');
@@ -575,6 +575,14 @@ module.exports = {
   async execute(_client) {
     client = _client;
     console.log(`Ready! Logged in as ${client.user.tag}`);
+
+    client.user.setPresence({
+      activities: [{ 
+        name: 'over Corkus Island',
+        type: ActivityType.Watching,
+      }],
+      status: 'online',
+  });
 
     for (const guild of client.guilds.cache.values()) {
       await guild.members.fetch();
