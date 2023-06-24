@@ -46,9 +46,14 @@ The bot currently features 17 commands.
 
 ## Database
 
-The database used for the bot contains 2 tables, guilds and players. The guilds table contains the name and prefix of each guild as well as the running average of players/captains online at each hour. The players table contains the UUID, username, guild name, guild rank, personal rank, veteran status, last login date and if they are currently online. It also has a date for when the players personal rank was last updated as if that is updated too often the API rate limit will be hit much sooner so it is currently only updated monthly.
+The database used for the bot contains 2 tables, guilds and players.
+
+The guilds table contains the name and prefix of each guild as well as the running average of players/captains online at each hour.
+
+The players table contains the UUID, username, guild name, guild rank, personal rank, veteran status, last login date and if they are currently online. It also has a date for when the players personal rank was last updated as if that is updated too often the API rate limit will be hit much sooner so it is currently only updated monthly.
 
 ## Wynncraft Public API
 
 The bot reads the data from the Wynncraft Public API, the docs for which are located here: https://docs.wynncraft.com/
+
 It reads data relating to guilds, and their members, including their guild rank, personal rank and last login date.
