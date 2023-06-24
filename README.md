@@ -4,6 +4,8 @@ This is a Discord bot for role management and displaying information about guild
 
 This information is then used for features such as applying roles based on in-game status and finding the least active time period for a guild so you know the perfect time to attack them!
 
+The bot does have support for multiple Discord servers, however I am currently only testing the bot on my guild's server to ensure everything works smoothly before releasing an invite link.
+
 ## Commands
 
 The bot currently features 17 commands.
