@@ -1,6 +1,5 @@
 const https = require('https');
 const sqlite3 = require('sqlite3').verbose();
-const MessageManager = require('../message_type/MessageManager');
 const db = new sqlite3.Database('database/database.db');
 const playersToUpdate = [];
 let currentGuildIndex = 0;
@@ -452,45 +451,45 @@ async function updateGuildActivity() {
         const guilds = await allAsync(query, []);
 
         for (const guild of guilds) {
-        const guildName = guild.name;
-        let averageCount = guild.averageCount;
-        const currentAverage = guild['average' + currentHour];
-        const currentCaptains = guild['captains' + currentHour];
+            const guildName = guild.name;
+            let averageCount = guild.averageCount;
+            const currentAverage = guild['average' + currentHour];
+            const currentCaptains = guild['captains' + currentHour];
 
-        const playerQuery = 'SELECT COUNT(*) as count FROM players WHERE guildName = ? AND isOnline = 1';
-        const playerResult = await getAsync(playerQuery, [guildName]);
-        const currentOnline = playerResult.count;
+            const playerQuery = 'SELECT COUNT(*) as count FROM players WHERE guildName = ? AND isOnline = 1';
+            const playerResult = await getAsync(playerQuery, [guildName]);
+            const currentOnline = playerResult.count;
 
-        const captainRanks = ['CAPTAIN', 'STRATEGIST', 'CHIEF', 'OWNER'];
-        const captainQuery = 'SELECT COUNT(*) as count FROM players WHERE guildName = ? AND isOnline = 1 AND guildRank IN (' + captainRanks.map(() => '?').join(',') + ')';
-        const captainResult = await getAsync(captainQuery, [guildName, ...captainRanks]);
-        const captainsOnline = captainResult.count;
+            const captainRanks = ['CAPTAIN', 'STRATEGIST', 'CHIEF', 'OWNER'];
+            const captainQuery = 'SELECT COUNT(*) as count FROM players WHERE guildName = ? AND isOnline = 1 AND guildRank IN (' + captainRanks.map(() => '?').join(',') + ')';
+            const captainResult = await getAsync(captainQuery, [guildName, ...captainRanks]);
+            const captainsOnline = captainResult.count;
 
-        let newAverage;
-        let newCaptains;
+            let newAverage;
+            let newCaptains;
 
-        if (averageCount > 168) {
-            averageCount = 0;
+            if (averageCount > 168) {
+                averageCount = 0;
 
-            newAverage = currentAverage + currentOnline / 2;
-            newCaptains = currentCaptains + captainsOnline / 2;
-        } else if (currentAverage > 0) {
-            newAverage = (currentAverage * averageCount + currentOnline) / (averageCount + 1);
-            newCaptains = (currentCaptains * averageCount + captainsOnline) / (averageCount + 1);
-        } else {
-            newAverage = currentOnline;
-            newCaptains = captainsOnline;
-        }
+                newAverage = currentAverage + currentOnline / 2;
+                newCaptains = currentCaptains + captainsOnline / 2;
+            } else if (currentAverage > 0) {
+                newAverage = (currentAverage * averageCount + currentOnline) / (averageCount + 1);
+                newCaptains = (currentCaptains * averageCount + captainsOnline) / (averageCount + 1);
+            } else {
+                newAverage = currentOnline;
+                newCaptains = captainsOnline;
+            }
 
-        let updateQuery = 'UPDATE guilds SET average' + currentHour + ' = ?, captains' + currentHour + ' = ?';
+            let updateQuery = 'UPDATE guilds SET average' + currentHour + ' = ?, captains' + currentHour + ' = ?';
 
-        if (currentHour === '23') {
-            updateQuery += ', averageCount = averageCount + 1';
-        }
+            if (currentHour === '23') {
+                updateQuery += ', averageCount = COALESCE(averageCount, 0) + 1';
+            }
 
-        updateQuery += ' WHERE name = ?';
+            updateQuery += ' WHERE name = ?';
 
-        await runAsync(updateQuery, [newAverage, newCaptains, guildName]);
+            await runAsync(updateQuery, [newAverage, newCaptains, guildName]);
         }
 
         return Promise.resolve();
@@ -523,10 +522,6 @@ async function runFunction() {
 
     // Update hourly
     if (now.getUTCMinutes() == 0) {
-        // Remove buttons from old message buttons.
-        console.log('Removing old buttons');
-        MessageManager.removeOldMessages();
-
         // Updates the guilds database with new guilds and removes deleted guilds.
         console.log('Updating list of all guilds.');
         await updateGuilds();

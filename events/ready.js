@@ -3,11 +3,17 @@ const updateRanks = require('../functions/update_ranks');
 const fs = require('fs');
 const path = require('path');
 const sendMessage = require('../functions/send_message');
-const { Worker } = require('worker_threads');
+const MessageManager = require('../message_type/MessageManager');
 let client;
 
-async function updateGuildRoles() {
+async function hourlyTasks() {
   let now = new Date();
+
+  if (now.getUTCMinutes() == 0) {
+    // Remove buttons from old message buttons.
+    console.log('Removing old buttons');
+    MessageManager.removeOldMessages();
+  }
 
   if (now.getUTCHours() === 0 && now.getUTCMinutes() == 0) {
       for (const guild of client.guilds.cache.values()) {
@@ -39,9 +45,9 @@ async function updateGuildRoles() {
     }
 
     now = new Date();
-    const millisecondsToNextMidnight = (24 * 60 * 60 * 1000) - (now.getTime() % (24 * 60 * 60 * 1000));
+    const timeUntilNextHour = (60 - now.getMinutes()) * 60 * 1000 - (now.getSeconds() * 1000 + now.getMilliseconds());
   
-    setTimeout(updateGuildRoles, millisecondsToNextMidnight);
+    setTimeout(hourlyTasks, timeUntilNextHour);
 }
 
 module.exports = {
@@ -64,11 +70,10 @@ module.exports = {
     }
 
     const now = new Date();
-    const secondsRemaining = 60 - now.getUTCSeconds();
+    const timeUntilNextHour = (60 - now.getMinutes()) * 60 * 1000 - (now.getSeconds() * 1000 + now.getMilliseconds());
 
     setTimeout(() => {
-      new Worker('./functions/scheduled_tasks.js');
-      updateGuildRoles();
-    }, secondsRemaining * 1000);
+      hourlyTasks();
+    }, timeUntilNextHour);
   },
 };
