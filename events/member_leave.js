@@ -33,7 +33,7 @@ module.exports = {
             if (joinLeaveChannelId) {
               guild.fetch().then(() => {
                 if (leaveMessage.includes('$user$')) {
-                  const userLeaveMessage = leaveMessage.replace('$user$', member.user);
+                  const userLeaveMessage = leaveMessage.replace('$user$', member.user.username);
                   sendMessage(guild, joinLeaveChannelId, userLeaveMessage);
                 } else {
                   sendMessage(guild, joinLeaveChannelId, leaveMessage);
