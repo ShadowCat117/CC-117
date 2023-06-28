@@ -73,8 +73,6 @@ async function activeHours(interaction, force = false, timezoneOffset = 0) {
 						resolve(new ButtonedMessage('', [], '', ['No data']));
 					}
 
-					guildActiveHours.sort((a, b) => a.compareTo(b));
-
 					let timezone;
 
 					for (const [key, val] of Object.entries(TimezoneValue)) {
@@ -93,8 +91,8 @@ async function activeHours(interaction, force = false, timezoneOffset = 0) {
 
 					guildActiveHours.sort((a, b) => a.compareTo(b));
 
-					for (const guild of guildActiveHours) {
-						message += `\n${guild.toString()}`;
+					for (const hourActivity of guildActiveHours) {
+						message += `\n${hourActivity.toString()}`;
 					}
 
 					message += '```';

@@ -34,15 +34,15 @@ class GuildActiveHours {
     }
 
     compareTo(other) {
-        if (this.averageOnline > other.averageOnline) {
+        if (parseFloat(this.averageOnline) > parseFloat(other.averageOnline)) {
             return -1;
-        } else if (this.averageOnline < other.averageOnline) {
+        } else if (parseFloat(this.averageOnline) < parseFloat(other.averageOnline)) {
             return 1;
         } else {
-            if (this.averageCaptains && !other.averageCaptains) {
-                return 1;
-            } else if (!this.averageCaptains && other.averageCaptains) {
+            if (parseFloat(this.averageCaptains) > parseFloat(other.averageCaptains)) {
                 return -1;
+            } else if (parseFloat(this.averageCaptains) < parseFloat(other.averageCaptains)) {
+                return 1;
             } else {
                 return 0;
             }
