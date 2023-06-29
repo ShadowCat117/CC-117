@@ -1,4 +1,9 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
+const {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    SlashCommandBuilder,
+} = require('discord.js');
 const createConfig = require('../../functions/create_config');
 const fs = require('fs');
 const path = require('path');
@@ -9,161 +14,164 @@ const TrackedGuild = require('../../message_objects/TrackedGuild');
 const MessageManager = require('../../message_type/MessageManager');
 
 function getAsync(query, params) {
-	return new Promise((resolve, reject) => {
-		db.get(query, params, function(err, rows) {
-			if (err) {
-				reject(err);
-			} else {
-				resolve(rows);
-			}
-		});
-	});
+    return new Promise((resolve, reject) => {
+        db.get(query, params, function(err, rows) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
 }
 
 module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('trackedguilds')
-		.setDescription('View the average number of online players for each tracked guild.'),
-	async execute(interaction) {
-		await interaction.deferReply();
+    data: new SlashCommandBuilder()
+        .setName('trackedguilds')
+        .setDescription('View the average number of online players for each tracked guild.'),
+    async execute(interaction) {
+        await interaction.deferReply();
 
-		const guildId = interaction.guild.id;
-		const directoryPath = path.join(__dirname, '..', '..', 'configs');
-		const filePath = path.join(directoryPath, `${guildId}.json`);
+        const guildId = interaction.guild.id;
+        const directoryPath = path.join(__dirname, '..', '..', 'configs');
+        const filePath = path.join(directoryPath, `${guildId}.json`);
 
-		try {
+        try {
             let config = {};
 
             if (fs.existsSync(filePath)) {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
             } else {
-				await createConfig(interaction.client, guildId);
+                await createConfig(interaction.client, guildId);
 
-				const fileData = fs.readFileSync(filePath, 'utf-8');
-				config = JSON.parse(fileData);
-			}
+                const fileData = fs.readFileSync(filePath, 'utf-8');
+                config = JSON.parse(fileData);
+            }
 
-			if (config.trackedGuilds.includes(null)) {
-				await interaction.editReply('You are not tracking any guilds.');
-				return;
-			}
+            if (config.trackedGuilds.includes(null)) {
+                await interaction.editReply('You are not tracking any guilds.');
+                return;
+            }
 
-			return new Promise((resolve, reject) => {
-				const fetchData = async () => {
-					try {
-						const trackedGuilds = [];
+            return new Promise((resolve, reject) => {
+                const fetchData = async () => {
+                    try {
+                        const trackedGuilds = [];
 
-						for (const tracked of config.trackedGuilds) {
-							let averageOnline = 0;
-							let averageCaptains = 0;
-							let divideBy = 0;
+                        for (const tracked of config.trackedGuilds) {
+                            let averageOnline = 0;
+                            let averageCaptains = 0;
+                            let divideBy = 0;
 
-							for (let i = 0; i < 24; i++) {
-								const currentHour = i.toString().padStart(2, '0');
-								const averageKey = 'average' + currentHour;
-								const captainsKey = 'captains' + currentHour;
-				
-								const query = 'SELECT ' + averageKey + ', ' + captainsKey + ' FROM guilds WHERE name = ?';
-								const params = [tracked];
-				
-								const result = await getAsync(query, params);
+                            for (let i = 0; i < 24; i++) {
+                                const currentHour = i.toString().padStart(2, '0');
+                                const averageKey = 'average' + currentHour;
+                                const captainsKey = 'captains' + currentHour;
 
-								if (result[averageKey] !== null && result[averageKey] !== -1) {
-									averageOnline += result[averageKey];
-									averageCaptains += result[captainsKey];
-									divideBy++;
-								}
-							}
+                                const query = 'SELECT ' + averageKey + ', ' + captainsKey + ' FROM guilds WHERE name = ?';
+                                const params = [tracked];
 
-							const playerQuery = 'SELECT COUNT(*) as count FROM players WHERE guildName = ? AND isOnline = 1';
-							const playerResult = await getAsync(playerQuery, [tracked]);
-							const currentOnline = playerResult.count;
+                                const result = await getAsync(query, params);
 
-							const captainRanks = ['CAPTAIN', 'STRATEGIST', 'CHIEF', 'OWNER'];
-							const captainQuery = 'SELECT COUNT(*) as count FROM players WHERE guildName = ? AND isOnline = 1 AND guildRank IN (' + captainRanks.map(() => '?').join(',') + ')';
-							const captainResult = await getAsync(captainQuery, [tracked, ...captainRanks]);
-							const captainsOnline = captainResult.count;
+                                if (result[averageKey] !== null && result[averageKey] !== -1) {
+                                    averageOnline += result[averageKey];
+                                    averageCaptains += result[captainsKey];
+                                    divideBy++;
+                                }
+                            }
 
-							if (divideBy !== 0) {
-								averageOnline /= divideBy;
-								averageCaptains /= divideBy;
+                            const playerQuery = 'SELECT COUNT(*) as count FROM players WHERE guildName = ? AND isOnline = 1';
+                            const playerResult = await getAsync(playerQuery, [tracked]);
+                            const currentOnline = playerResult.count;
 
-								trackedGuilds.push(new TrackedGuild(tracked, averageOnline, averageCaptains, currentOnline, captainsOnline));
-							} else {
-								trackedGuilds.push(new TrackedGuild(tracked, -1, -1, -1, -1));
-							}
-						}
+                            const captainRanks = ['CAPTAIN', 'STRATEGIST', 'CHIEF', 'OWNER'];
+                            const captainQuery = 'SELECT COUNT(*) as count FROM players WHERE guildName = ? AND isOnline = 1 AND guildRank IN (' + captainRanks.map(() => '?').join(',') + ')';
+                            const captainResult = await getAsync(captainQuery, [tracked, ...captainRanks]);
+                            const captainsOnline = captainResult.count;
 
-						trackedGuilds.sort((a, b) => a.compareTo(b));
+                            if (divideBy !== 0) {
+                                averageOnline /= divideBy;
+                                averageCaptains /= divideBy;
 
-						const header = '```Guild Name          Avg. Online     Avg. Captains     Current Online     Current Captains\n-----------------------------------------------------------------------------------------\n';
+                                trackedGuilds.push(new TrackedGuild(tracked, averageOnline, averageCaptains, currentOnline, captainsOnline));
+                            } else {
+                                trackedGuilds.push(new TrackedGuild(tracked, -1, -1, -1, -1));
+                            }
+                        }
 
-						const pages = [];
-						let page = header;
-						let counter = 0;
+                        trackedGuilds.sort((a, b) => a.compareTo(b));
 
-						for (const trackedGuild of trackedGuilds) {
-							if (counter < 10) {
-								page += trackedGuild.toString();
+                        const header = '```Guild Name          Avg. Online     Avg. Captains     Current Online     Current Captains\n-----------------------------------------------------------------------------------------\n';
 
-								counter++;
-							} else if (counter === 10) {
-								page += '```';
+                        const pages = [];
+                        let page = header;
+                        let counter = 0;
 
-								counter = 0;
+                        for (const trackedGuild of trackedGuilds) {
+                            if (counter < 10) {
+                                page += trackedGuild.toString();
 
-								pages.push(page);
+                                counter++;
+                            } else if (counter === 10) {
+                                page += '```';
 
-								page = header;
+                                counter = 0;
 
-								page += trackedGuild.toString();
-							}
-						}
+                                pages.push(page);
 
-						if (counter <= 10) {
-							page += '```';
+                                page = header;
 
-							pages.push(page);
-						}
+                                page += trackedGuild.toString();
+                            }
+                        }
 
-						const trackedGuildsMessage = new ButtonedMessage('', [], '', pages);
+                        if (counter <= 10) {
+                            page += '```';
 
-						if (pages.length > 1) {
-							const previousPage = new ButtonBuilder()
-								.setCustomId('previousPage')
-								.setStyle(ButtonStyle.Primary)
-								.setEmoji('⬅️');
-						
-							const nextPage = new ButtonBuilder()
-								.setCustomId('nextPage')
-								.setStyle(ButtonStyle.Primary)
-								.setEmoji('➡️');
-						
-							const row = new ActionRowBuilder().addComponents(previousPage, nextPage);
-						
-							const editedReply = await interaction.editReply({
-								content: trackedGuildsMessage.pages[0],
-								components: [row],
-							});
+                            pages.push(page);
+                        }
 
-							trackedGuildsMessage.setMessage(editedReply);
-					
-							MessageManager.addMessage(trackedGuildsMessage);
-						} else {
-							await interaction.editReply({ content: trackedGuildsMessage.pages[0], components: [] });
-						}
-					
-						resolve();
-					} catch (error) {
-						reject(error);
-					}
-				};
+                        const trackedGuildsMessage = new ButtonedMessage('', [], '', pages);
 
-				fetchData();
-			});
-		} catch (error) {
-			await interaction.editReply('Unable to show tracked guilds');
-		}
-	},
+                        if (pages.length > 1) {
+                            const previousPage = new ButtonBuilder()
+                                .setCustomId('previousPage')
+                                .setStyle(ButtonStyle.Primary)
+                                .setEmoji('⬅️');
+
+                            const nextPage = new ButtonBuilder()
+                                .setCustomId('nextPage')
+                                .setStyle(ButtonStyle.Primary)
+                                .setEmoji('➡️');
+
+                            const row = new ActionRowBuilder().addComponents(previousPage, nextPage);
+
+                            const editedReply = await interaction.editReply({
+                                content: trackedGuildsMessage.pages[0],
+                                components: [row],
+                            });
+
+                            trackedGuildsMessage.setMessage(editedReply);
+
+                            MessageManager.addMessage(trackedGuildsMessage);
+                        } else {
+                            await interaction.editReply({
+                                content: trackedGuildsMessage.pages[0],
+                                components: [],
+                            });
+                        }
+
+                        resolve();
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+
+                fetchData();
+            });
+        } catch (error) {
+            await interaction.editReply('Unable to show tracked guilds');
+        }
+    },
 };

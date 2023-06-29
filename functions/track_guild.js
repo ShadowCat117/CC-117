@@ -4,14 +4,14 @@ const findGuild = require('./find_guild');
 const ButtonedMessage = require('../message_type/ButtonedMessage');
 const MessageType = require('../message_type/MessageType');
 
-async function addAlly(interaction, force = false) {
+async function trackGuild(interaction, force = false) {
     let nameToSearch;
 
-	if (interaction.options !== undefined) {
-		nameToSearch = interaction.options.getString('guild_name');
-	} else {
-		nameToSearch = interaction.customId;
-	}
+    if (interaction.options !== undefined) {
+        nameToSearch = interaction.options.getString('guild_name');
+    } else {
+        nameToSearch = interaction.customId;
+    }
 
     let guildName = await findGuild(nameToSearch, force);
 
@@ -41,7 +41,7 @@ async function addAlly(interaction, force = false) {
 
                 for (let i = 0; i < guildName.guildNames.length; i++) {
                     const name = guildName.guildNames[i];
-                    
+
                     textMessage += `\n${i + 1}. ${name}`;
                 }
 
@@ -82,4 +82,4 @@ async function addAlly(interaction, force = false) {
     }
 }
 
-module.exports = addAlly;
+module.exports = trackGuild;

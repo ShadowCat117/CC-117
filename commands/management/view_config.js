@@ -1,38 +1,40 @@
-const { SlashCommandBuilder } = require('discord.js');
+const {
+    SlashCommandBuilder,
+} = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const createConfig = require('../../functions/create_config');
 
 module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('viewconfig')
-		.setDescription('View the config in a user friendly format.'),
-	async execute(interaction) {
+    data: new SlashCommandBuilder()
+        .setName('viewconfig')
+        .setDescription('View the config in a user friendly format.'),
+    async execute(interaction) {
         let configContent = `__${interaction.guild}'s Config__\n\n`;
 
         const guildId = interaction.guild.id;
-		const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
+        const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
 
         try {
-			let config = {};
+            let config = {};
 
-			if (fs.existsSync(filePath)) {
-				const fileData = fs.readFileSync(filePath, 'utf-8');
-				config = JSON.parse(fileData);
-			} else {
-				await createConfig(interaction.client, guildId);
+            if (fs.existsSync(filePath)) {
+                const fileData = fs.readFileSync(filePath, 'utf-8');
+                config = JSON.parse(fileData);
+            } else {
+                await createConfig(interaction.client, guildId);
 
-				const fileData = fs.readFileSync(filePath, 'utf-8');
-				config = JSON.parse(fileData);
-			}
+                const fileData = fs.readFileSync(filePath, 'utf-8');
+                config = JSON.parse(fileData);
+            }
 
             const adminRoleId = config.adminRole;
-			const memberRoles = interaction.member.roles.cache;
+            const memberRoles = interaction.member.roles.cache;
 
-			if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
-				await interaction.reply('You do not have the required permissions to run this command.');
-				return;
-			}
+            if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
+                await interaction.reply('You do not have the required permissions to run this command.');
+                return;
+            }
 
             configContent += `Guild: ${config.guildName}\n`;
             configContent += `Chief Inactivity Threshold: ${config.chiefThreshold}\n`;
@@ -52,7 +54,7 @@ module.exports = {
             } else {
                 configContent += `Leave Message: ${config.leaveMessage}\n`;
             }
-            
+
             configContent += `Update Ranks Daily: ${config.updateRanks}\n`;
             configContent += `Change nicknames to Minecraft username: ${config.changeNicknames}\n`;
             configContent += `Only allow unique nicknames: ${config.checkDuplicateNicknames}\n`;
@@ -206,10 +208,16 @@ module.exports = {
                 configContent += `Unverified role: ${config.unverifiedRole}\n`;
             }
 
-            await interaction.reply({ content: configContent, ephemeral: true });
+            await interaction.reply({
+                content: configContent,
+                ephemeral: true,
+            });
         } catch (error) {
             console.log(error);
-            await interaction.reply({ content: 'Error viewing config.', ephemeral: true });
+            await interaction.reply({
+                content: 'Error viewing config.',
+                ephemeral: true,
+            });
         }
     },
 };

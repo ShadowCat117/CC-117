@@ -1,4 +1,6 @@
-const { Events } = require('discord.js');
+const {
+    Events,
+} = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 
@@ -17,10 +19,10 @@ module.exports = {
             try {
                 fs.readFile(filePath, 'utf-8', async (error, fileData) => {
                     if (error) {
-                    console.log(`Error reading the JSON file for guild ${guildId}: ${error}`);
-                    return;
+                        console.log(`Error reading the JSON file for guild ${guildId}: ${error}`);
+                        return;
                     }
-        
+
                     try {
                         const config = JSON.parse(fileData);
 

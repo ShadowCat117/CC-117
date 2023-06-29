@@ -1,31 +1,68 @@
-const { SlashCommandBuilder } = require('discord.js');
+const {
+    SlashCommandBuilder,
+} = require('discord.js');
 
 module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('help')
-		.setDescription('Displays the help information for the selected command.')
+    data: new SlashCommandBuilder()
+        .setName('help')
+        .setDescription('Displays the help information for the selected command.')
         .addStringOption((option) =>
             option.setName('option')
-                .setDescription('The command you want to know more about.')
-                .setRequired(true)
-                .addChoices({ name: '/activehours', value: 'activeHours' },
-                { name: '/addally', value: 'addAlly' },
-                { name: '/allies', value: 'allies' },
-                { name: '/config_channels', value: 'configChannels' },
-                { name: '/config_features', value: 'configFeatures' },
-                { name: '/config_roles', value: 'configRoles' },
-                { name: '/config_values', value: 'configValues' },
-                { name: '/help', value: 'help' },
-                { name: '/lastlogins', value: 'lastLogins' },
-                { name: '/removeally', value: 'removeAlly' },
-                { name: '/setguild', value: 'setGuild' },
-                { name: '/trackedguilds', value: 'trackedGuilds' },
-                { name: '/trackguild', value: 'trackGuild' },
-                { name: '/untrackguild', value: 'untrackGuild' },
-                { name: '/updateranks', value: 'updateRanks' },
-                { name: '/verify', value: 'verify' },
-                { name: '/viewconfig', value: 'viewConfig' })),
-	async execute(interaction) {
+            .setDescription('The command you want to know more about.')
+            .setRequired(true)
+            .addChoices({
+                name: '/activehours',
+                value: 'activeHours',
+            }, {
+                name: '/addally',
+                value: 'addAlly',
+            }, {
+                name: '/allies',
+                value: 'allies',
+            }, {
+                name: '/config_channels',
+                value: 'configChannels',
+            }, {
+                name: '/config_features',
+                value: 'configFeatures',
+            }, {
+                name: '/config_roles',
+                value: 'configRoles',
+            }, {
+                name: '/config_values',
+                value: 'configValues',
+            }, {
+                name: '/help',
+                value: 'help',
+            }, {
+                name: '/lastlogins',
+                value: 'lastLogins',
+            }, {
+                name: '/removeally',
+                value: 'removeAlly',
+            }, {
+                name: '/setguild',
+                value: 'setGuild',
+            }, {
+                name: '/trackedguilds',
+                value: 'trackedGuilds',
+            }, {
+                name: '/trackguild',
+                value: 'trackGuild',
+            }, {
+                name: '/untrackguild',
+                value: 'untrackGuild',
+            }, {
+                name: '/updateranks',
+                value: 'updateRanks',
+            }, {
+                name: '/verify',
+                value: 'verify',
+            }, {
+                name: '/viewconfig',
+                value: 'viewConfig',
+            })),
+    async execute(interaction) {
         const option = interaction.options.getString('option');
 
         let message = '';
@@ -85,8 +122,11 @@ module.exports = {
             default:
                 message = 'Invalid help option.';
                 return;
-          }
+        }
 
-          await interaction.reply({ content: message, ephemeral: true });
-	},
+        await interaction.reply({
+            content: message,
+            ephemeral: true,
+        });
+    },
 };

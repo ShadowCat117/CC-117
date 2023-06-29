@@ -1,7 +1,7 @@
 const messages = [];
 
 function addMessage(message) {
-  messages.push(message);
+    messages.push(message);
 }
 
 function removeMessage(message) {
@@ -23,18 +23,26 @@ function getMessage(messageId) {
 }
 
 function getMessages() {
-  return messages;
+    return messages;
 }
 
 async function removeOldMessages() {
     try {
         for (const message of messages) {
             removeMessage(message);
-            await message.message.edit({ components: [] });
+            await message.message.edit({
+                components: [],
+            });
         }
     } catch (error) {
         console.error('Error removing components from messages:', error);
     }
 }
 
-module.exports = { addMessage, removeMessage, getMessage, getMessages, removeOldMessages };
+module.exports = {
+    addMessage,
+    removeMessage,
+    getMessage,
+    getMessages,
+    removeOldMessages,
+};

@@ -7,11 +7,11 @@ const MessageType = require('../message_type/MessageType');
 async function untrackGuild(interaction, force = false) {
     let nameToSearch;
 
-	if (interaction.options !== undefined) {
-		nameToSearch = interaction.options.getString('guild_name');
-	} else {
-		nameToSearch = interaction.customId;
-	}
+    if (interaction.options !== undefined) {
+        nameToSearch = interaction.options.getString('guild_name');
+    } else {
+        nameToSearch = interaction.customId;
+    }
 
     let guildName = await findGuild(nameToSearch, force);
 
@@ -41,7 +41,7 @@ async function untrackGuild(interaction, force = false) {
 
                 for (let i = 0; i < guildName.guildNames.length; i++) {
                     const name = guildName.guildNames[i];
-                    
+
                     textMessage += `\n${i + 1}. ${name}`;
                 }
 
@@ -58,22 +58,22 @@ async function untrackGuild(interaction, force = false) {
         try {
             let config = {};
 
-				if (fs.existsSync(filePath)) {
-					const fileData = fs.readFileSync(filePath, 'utf-8');
-					config = JSON.parse(fileData);
-				}
+            if (fs.existsSync(filePath)) {
+                const fileData = fs.readFileSync(filePath, 'utf-8');
+                config = JSON.parse(fileData);
+            }
 
-				if (!config.trackedGuilds.includes(guildName)) {
-					return new ButtonedMessage('', [], '', [`${guildName} is not being tracked.`]);
-				}
+            if (!config.trackedGuilds.includes(guildName)) {
+                return new ButtonedMessage('', [], '', [`${guildName} is not being tracked.`]);
+            }
 
-				config.trackedGuilds = config.trackedGuilds.filter(item => item !== guildName);
+            config.trackedGuilds = config.trackedGuilds.filter(item => item !== guildName);
 
-				if (config.trackedGuilds.length === 0) {
-					config.trackedGuilds.push(null);
-				}
+            if (config.trackedGuilds.length === 0) {
+                config.trackedGuilds.push(null);
+            }
 
-				fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
+            fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
             return new ButtonedMessage('', [], '', [`${guildName} is no longer being tracked.`]);
         } catch (error) {

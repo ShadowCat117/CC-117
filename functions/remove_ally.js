@@ -7,11 +7,11 @@ const MessageType = require('../message_type/MessageType');
 async function removeAlly(interaction, force = false) {
     let nameToSearch;
 
-	if (interaction.options !== undefined) {
-		nameToSearch = interaction.options.getString('guild_name');
-	} else {
-		nameToSearch = interaction.customId;
-	}
+    if (interaction.options !== undefined) {
+        nameToSearch = interaction.options.getString('guild_name');
+    } else {
+        nameToSearch = interaction.customId;
+    }
 
     let guildName = await findGuild(nameToSearch, force);
 
@@ -41,7 +41,7 @@ async function removeAlly(interaction, force = false) {
 
                 for (let i = 0; i < guildName.guildNames.length; i++) {
                     const name = guildName.guildNames[i];
-                    
+
                     textMessage += `\n${i + 1}. ${name}`;
                 }
 
@@ -58,22 +58,22 @@ async function removeAlly(interaction, force = false) {
         try {
             let config = {};
 
-				if (fs.existsSync(filePath)) {
-					const fileData = fs.readFileSync(filePath, 'utf-8');
-					config = JSON.parse(fileData);
-				}
+            if (fs.existsSync(filePath)) {
+                const fileData = fs.readFileSync(filePath, 'utf-8');
+                config = JSON.parse(fileData);
+            }
 
-				if (!config.allies.includes(guildName)) {
-					return new ButtonedMessage('', [], '', [`${guildName} is not an ally.`]);
-				}
+            if (!config.allies.includes(guildName)) {
+                return new ButtonedMessage('', [], '', [`${guildName} is not an ally.`]);
+            }
 
-				config.allies = config.allies.filter(item => item !== guildName);
+            config.allies = config.allies.filter(item => item !== guildName);
 
-				if (config.allies.length === 0) {
-					config.allies.push(null);
-				}
+            if (config.allies.length === 0) {
+                config.allies.push(null);
+            }
 
-				fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
+            fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
             return new ButtonedMessage('', [], '', [`Removed ${guildName} as an ally.`]);
         } catch (error) {

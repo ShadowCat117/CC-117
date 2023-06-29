@@ -25,9 +25,9 @@ class GuildActiveHours {
         } else {
             hour += ':00';
         }
-        
+
         hour = hour.padEnd(12, ' ');
-        
+
         const averageOnline = this.averageOnline.toString().padEnd(16, ' ');
 
         return `${hour}${averageOnline}${this.averageCaptains}`;

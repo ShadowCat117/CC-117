@@ -7,176 +7,175 @@ let currentGuildIndex = 0;
 function runAsync(query, params) {
     return new Promise((resolve, reject) => {
         db.run(query, params, function(err) {
-        if (err) {
-            reject(err);
-        } else {
-            resolve(this);
-        }
+            if (err) {
+                reject(err);
+            } else {
+                resolve(this);
+            }
         });
     });
 }
 
-    function getAsync(query, params) {
+function getAsync(query, params) {
     return new Promise((resolve, reject) => {
         db.get(query, params, function(err, rows) {
-        if (err) {
-            reject(err);
-        } else {
-            resolve(rows);
-        }
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
         });
     });
 }
 
-    function allAsync(query, params) {
+function allAsync(query, params) {
     return new Promise((resolve, reject) => {
         db.all(query, params, function(err, rows) {
-        if (err) {
-            reject(err);
-        } else {
-            resolve(rows);
-        }
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
         });
     });
 }
 
-    async function updateOnlinePlayers() {
+async function updateOnlinePlayers() {
     return new Promise((resolve, reject) => {
         https.get('https://api-legacy.wynncraft.com/public_api.php?action=onlinePlayers', async (resp) => {
-        let data = '';
+            let data = '';
 
-        resp.on('data', (chunk) => {
-            data += chunk;
-        });
+            resp.on('data', (chunk) => {
+                data += chunk;
+            });
 
-        resp.on('end', async () => {
-            const json = JSON.parse(data);
+            resp.on('end', async () => {
+                const json = JSON.parse(data);
 
-            try {
-            await runAsync('UPDATE players SET isOnline = 0');
+                try {
+                    await runAsync('UPDATE players SET isOnline = 0');
 
-            const playersToUpdateNow = await updatePlayerStatus(json);
+                    const playersToUpdateNow = await updatePlayerStatus(json);
 
-            let processedCount = 0;
+                    let processedCount = 0;
 
-            for (const username of playersToUpdateNow) {
-                https.get(`https://api.wynncraft.com/v2/player/${username}/stats`, (playerResp) => {
-                let playerData = '';
+                    for (const username of playersToUpdateNow) {
+                        https.get(`https://api.wynncraft.com/v2/player/${username}/stats`, (playerResp) => {
+                            let playerData = '';
 
-                playerResp.on('data', (chunk) => {
-                    playerData += chunk;
-                });
+                            playerResp.on('data', (chunk) => {
+                                playerData += chunk;
+                            });
 
-                playerResp.on('end', () => {
-                    const playerJson = JSON.parse(playerData);
+                            playerResp.on('end', () => {
+                                const playerJson = JSON.parse(playerData);
 
-                    if (playerJson.data && playerJson.data.length > 0) {
-                    const player = playerJson.data[0];
+                                if (playerJson.data && playerJson.data.length > 0) {
+                                    const player = playerJson.data[0];
 
-                    db.run(
-                        'INSERT OR REPLACE INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, lastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                        [
-                        player.uuid,
-                        player.username,
-                        null,
-                        null,
-                        player.meta.tag.value,
-                        player.meta.veteran,
-                        player.meta.lastJoin.split('T')[0],
-                        player.meta.location.online,
-                        new Date().toISOString().split('T')[0],
-                        ],
-                        (err) => {
-                        if (err) {
-                            console.error('Failed to insert player:', err);
-                        }
-                        },
-                    );
+                                    db.run(
+                                        'INSERT OR REPLACE INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, lastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+                                            player.uuid,
+                                            player.username,
+                                            null,
+                                            null,
+                                            player.meta.tag.value,
+                                            player.meta.veteran,
+                                            player.meta.lastJoin.split('T')[0],
+                                            player.meta.location.online,
+                                            new Date().toISOString().split('T')[0],
+                                        ],
+                                        (err) => {
+                                            if (err) {
+                                                console.error('Failed to insert player:', err);
+                                            }
+                                        },
+                                    );
+                                }
+
+                                processedCount++;
+                                if (processedCount === playersToUpdateNow.length) {
+                                    resolve();
+                                }
+                            });
+
+                        }).on('error', (err) => {
+                            console.log('Error: ' + err.message);
+                            processedCount++;
+                            if (processedCount === playersToUpdateNow.length) {
+                                resolve();
+                            }
+                        });
                     }
-
-                    processedCount++;
-                    if (processedCount === playersToUpdateNow.length) {
-                    resolve();
-                    }
-                });
-
-                }).on('error', (err) => {
-                console.log('Error: ' + err.message);
-                processedCount++;
-                if (processedCount === playersToUpdateNow.length) {
-                    resolve();
+                } catch (err) {
+                    reject(err);
                 }
-                });
-            }
-            } catch (err) {
-            reject(err);
-            }
-        });
+            });
         }).on('error', (err) => {
-        reject(err);
+            reject(err);
         });
     });
 }
 
-    function updatePlayerStatus(json) {
+function updatePlayerStatus(json) {
     return new Promise((resolve, reject) => {
         const playersToUpdateNow = [];
 
         let processedCount = 0;
 
         const processPlayer = (playerName) => {
-        db.get('SELECT * FROM players WHERE username = ?', playerName, (err, row) => {
-            if (err) {
-            reject(err);
-            return;
-            }
-
-            if (row) {
-            const currentDate = new Date().toISOString().split('T')[0];
-            db.run('UPDATE players SET isOnline = 1, lastJoin = ? WHERE username = ?', [currentDate, playerName], (err) => {
+            db.get('SELECT * FROM players WHERE username = ?', playerName, (err, row) => {
                 if (err) {
-                reject(err);
-                return;
+                    reject(err);
+                    return;
                 }
 
-                const lastUpdatedDate = new Date(row.lastUpdated).toISOString().split('T')[0];
-                const monthAgo = new Date();
-                monthAgo.setDate(monthAgo.getDate() - 28);
-                const outdatedDate = monthAgo.toISOString().split('T')[0];
+                if (row) {
+                    const currentDate = new Date().toISOString().split('T')[0];
+                    db.run('UPDATE players SET isOnline = 1, lastJoin = ? WHERE username = ?', [currentDate, playerName], (err) => {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
 
-                if (lastUpdatedDate <= outdatedDate) {
-                if (!playersToUpdate.includes(playerName)) {
-                    playersToUpdate.push(playerName);
-                }
-                }
+                        const lastUpdatedDate = new Date(row.lastUpdated).toISOString().split('T')[0];
+                        const monthAgo = new Date();
+                        monthAgo.setDate(monthAgo.getDate() - 28);
+                        const outdatedDate = monthAgo.toISOString().split('T')[0];
 
-                processedCount++;
-                if (processedCount === playersCount) {
-                resolve(playersToUpdateNow);
+                        if (lastUpdatedDate <= outdatedDate) {
+                            if (!playersToUpdate.includes(playerName)) {
+                                playersToUpdate.push(playerName);
+                            }
+                        }
+
+                        processedCount++;
+                        if (processedCount === playersCount) {
+                            resolve(playersToUpdateNow);
+                        }
+                    });
+                } else {
+                    if (!playersToUpdate.includes(playerName)) {
+                        playersToUpdateNow.push(playerName);
+                    }
+
+                    processedCount++;
+                    if (processedCount === playersCount) {
+                        resolve(playersToUpdateNow);
+                    }
                 }
             });
-            } else {
-            if (!playersToUpdate.includes(playerName)) {
-                playersToUpdateNow.push(playerName);
-            }
-
-            processedCount++;
-            if (processedCount === playersCount) {
-                resolve(playersToUpdateNow);
-            }
-            }
-        });
         };
 
         let playersCount = 0;
         for (const serverKey in json) {
-        const serverData = json[serverKey];
-        if (Array.isArray(serverData)) {
-            playersCount += serverData.length;
-            for (const playerName of serverData) {
-            processPlayer(playerName);
+            const serverData = json[serverKey];
+            if (Array.isArray(serverData)) {
+                playersCount += serverData.length;
+                for (const playerName of serverData) {
+                    processPlayer(playerName);
+                }
             }
-        }
         }
     });
 }
@@ -184,54 +183,54 @@ function runAsync(query, params) {
 async function updateGuilds() {
     return new Promise((resolve, reject) => {
         https.get('https://api.wynncraft.com/public_api.php?action=guildList', async (resp) => {
-        let data = '';
+            let data = '';
 
-        resp.on('data', (chunk) => {
-            data += chunk;
-        });
+            resp.on('data', (chunk) => {
+                data += chunk;
+            });
 
-        resp.on('end', async () => {
-            const json = JSON.parse(data);
+            resp.on('end', async () => {
+                const json = JSON.parse(data);
 
-            if (json.message) {
-            resolve();
-            return;
-            }
+                if (json.message) {
+                    resolve();
+                    return;
+                }
 
-            try {
-            const query = 'SELECT name FROM guilds';
-            const rows = await allAsync(query, []);
+                try {
+                    const query = 'SELECT name FROM guilds';
+                    const rows = await allAsync(query, []);
 
-            const existingGuildNames = rows.map((row) => row.name);
+                    const existingGuildNames = rows.map((row) => row.name);
 
-            const guildsNotInTable = json.guilds.filter(
-                (name) => !existingGuildNames.includes(name),
-            );
+                    const guildsNotInTable = json.guilds.filter(
+                        (name) => !existingGuildNames.includes(name),
+                    );
 
-            const guildsToDelete = existingGuildNames.filter(
-                (name) => !json.guilds.includes(name),
-            );
+                    const guildsToDelete = existingGuildNames.filter(
+                        (name) => !json.guilds.includes(name),
+                    );
 
-            for (const guildName of guildsToDelete) {
-                const deleteQuery = 'DELETE FROM guilds WHERE name = ?';
-                await runAsync(deleteQuery, [guildName]);
-                console.log(`Deleted guild '${guildName}' from the 'guilds' table.`);
+                    for (const guildName of guildsToDelete) {
+                        const deleteQuery = 'DELETE FROM guilds WHERE name = ?';
+                        await runAsync(deleteQuery, [guildName]);
+                        console.log(`Deleted guild '${guildName}' from the 'guilds' table.`);
 
-                const updateQuery = 'UPDATE players SET guildName = NULL, guildRank = NULL WHERE guildName = ?';
-                await runAsync(updateQuery, [guildName]);
-            }
+                        const updateQuery = 'UPDATE players SET guildName = NULL, guildRank = NULL WHERE guildName = ?';
+                        await runAsync(updateQuery, [guildName]);
+                    }
 
-            for (const guildName of guildsNotInTable) {
-                await updateGuild(guildName);
-            }
-            
-            resolve();
-            } catch (err) {
-            console.error(err);
-            }
-        });
+                    for (const guildName of guildsNotInTable) {
+                        await updateGuild(guildName);
+                    }
+
+                    resolve();
+                } catch (err) {
+                    console.error(err);
+                }
+            });
         }).on('error', (err) => {
-        reject(err);
+            reject(err);
         });
     });
 }
@@ -241,50 +240,49 @@ async function updateGuild(guildName) {
 
     return new Promise((resolve, reject) => {
         https.get(`https://api.wynncraft.com/public_api.php?action=guildStats&command=${encodedGuildName}`, async (resp) => {
-        let data = '';
+            let data = '';
 
-        resp.on('data', (chunk) => {
-            data += chunk;
-        });
+            resp.on('data', (chunk) => {
+                data += chunk;
+            });
 
-        resp.on('end', async () => {
-            const json = JSON.parse(data);
+            resp.on('end', async () => {
+                const json = JSON.parse(data);
 
-            if (json && json.members) {
-            db.run(
-                `INSERT OR IGNORE INTO guilds (name, prefix,
-                average00, captains00, average01, captains01, average02, captains02, 
-                average03, captains03, average04, captains04, average05, captains05, 
-                average06, captains06, average07, captains07, average08, captains08, 
-                average09, captains09, average10, captains10, average11, captains11, 
-                average12, captains12, average13, captains13, average14, captains14, 
-                average15, captains15, average16, captains16, average17, captains17, 
-                average18, captains18, average19, captains19, average20, captains20, 
-                average21, captains21, average22, captains22, average23, captains23,
-                averageCount) 
-                VALUES (?, ?, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0)`,
-                [json.name, json.prefix],
-                (err) => {
-                if (err) {
-                    console.error('Failed to insert guild:', err);
+                if (json && json.members) {
+                    db.run(
+                        `INSERT OR IGNORE INTO guilds (name, prefix,
+                        average00, captains00, average01, captains01, average02, captains02, 
+                        average03, captains03, average04, captains04, average05, captains05, 
+                        average06, captains06, average07, captains07, average08, captains08, 
+                        average09, captains09, average10, captains10, average11, captains11, 
+                        average12, captains12, average13, captains13, average14, captains14, 
+                        average15, captains15, average16, captains16, average17, captains17, 
+                        average18, captains18, average19, captains19, average20, captains20, 
+                        average21, captains21, average22, captains22, average23, captains23,
+                        averageCount) 
+                        VALUES (?, ?, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
+                        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
+                        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0)`, [json.name, json.prefix],
+                        (err) => {
+                            if (err) {
+                                console.error('Failed to insert guild:', err);
+                                resolve(true);
+                            }
+                        },
+                    );
+
+                    for (const member of json.members) {
+                        await updatePlayersGuild(member.uuid, member.name, json.name, member.rank);
+                    }
+
+                    // false as API limit not hit
+                    resolve(false);
+                } else {
+                    // true as API limit hit
                     resolve(true);
                 }
-                },
-            );
-
-            for (const member of json.members) {
-                await updatePlayersGuild(member.uuid, member.name, json.name, member.rank);
-            }
-
-            // false as API limit not hit
-            resolve(false);
-            } else {
-            // true as API limit hit
-            resolve(true);
-            }
-        });
+            });
         }).on('error', (err) => {
             if (err.code === 'ETIMEDOUT') {
                 console.error('Connection to API timed out. Skipping...');
@@ -306,26 +304,28 @@ async function updatePlayersGuild(playerUuid, playerName, guildName, guildRank) 
         const selectParams = [playerUuid];
 
         getAsync(selectQuery, selectParams)
-        .then((result) => {
-            const { count } = result;
+            .then((result) => {
+                const {
+                    count,
+                } = result;
 
-            if (count > 0) {
-            const updateQuery = 'UPDATE players SET guildName = ?, guildRank = ? WHERE UUID = ?';
-            const updateParams = [guildName, guildRank, playerUuid];
-            return runAsync(updateQuery, updateParams);
-            } else {
-            const insertQuery = `INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, lastUpdated)
+                if (count > 0) {
+                    const updateQuery = 'UPDATE players SET guildName = ?, guildRank = ? WHERE UUID = ?';
+                    const updateParams = [guildName, guildRank, playerUuid];
+                    return runAsync(updateQuery, updateParams);
+                } else {
+                    const insertQuery = `INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, lastUpdated)
                                 VALUES (?, ?, ?, ?, null, 0, ?, 0, ?)`;
-            const insertParams = [playerUuid, playerName, guildName, guildRank, outdatedDateString, outdatedDateString];
-            return runAsync(insertQuery, insertParams);
-            }
-        })
-        .then(() => {
-            resolve();
-        })
-        .catch((error) => {
-            reject(error);
-        });
+                    const insertParams = [playerUuid, playerName, guildName, guildRank, outdatedDateString, outdatedDateString];
+                    return runAsync(insertQuery, insertParams);
+                }
+            })
+            .then(() => {
+                resolve();
+            })
+            .catch((error) => {
+                reject(error);
+            });
     });
 }
 
@@ -342,55 +342,55 @@ async function updatePlayerStats() {
 async function updatePlayer(playerName) {
     return new Promise((resolve, reject) => {
         https.get(`https://api.wynncraft.com/v2/player/${playerName}/stats`, (playerResp) => {
-        let playerData = '';
+            let playerData = '';
 
-        playerResp.on('data', (chunk) => {
-            playerData += chunk;
-        });
+            playerResp.on('data', (chunk) => {
+                playerData += chunk;
+            });
 
-        playerResp.on('end', async () => {
-            const playerJson = JSON.parse(playerData);
+            playerResp.on('end', async () => {
+                const playerJson = JSON.parse(playerData);
 
-            if (playerJson.data && playerJson.data.length > 0) {
-            const player = playerJson.data[0];
+                if (playerJson.data && playerJson.data.length > 0) {
+                    const player = playerJson.data[0];
 
-            const selectQuery = 'SELECT * FROM players WHERE username = ?';
-            const selectParams = [player.username];
+                    const selectQuery = 'SELECT * FROM players WHERE username = ?';
+                    const selectParams = [player.username];
 
-            const row = await getAsync(selectQuery, selectParams);
+                    const row = await getAsync(selectQuery, selectParams);
 
-            const guildName = row && row.guildName !== null ? row.guildName : player.guild.name;
-            const guildRank = row && row.guildRank !== null ? row.guildRank : player.guild.rank;
+                    const guildName = row && row.guildName !== null ? row.guildName : player.guild.name;
+                    const guildRank = row && row.guildRank !== null ? row.guildRank : player.guild.rank;
 
-            const insertQuery = `
+                    const insertQuery = `
                 INSERT OR REPLACE INTO players
                 (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, lastUpdated)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             `;
 
-            const insertParams = [
-                player.uuid,
-                player.username,
-                guildName,
-                guildRank,
-                player.meta.tag.value,
-                player.meta.veteran,
-                player.meta.lastJoin.split('T')[0],
-                player.meta.location.online,
-                new Date().toISOString().split('T')[0],
-            ];
+                    const insertParams = [
+                        player.uuid,
+                        player.username,
+                        guildName,
+                        guildRank,
+                        player.meta.tag.value,
+                        player.meta.veteran,
+                        player.meta.lastJoin.split('T')[0],
+                        player.meta.location.online,
+                        new Date().toISOString().split('T')[0],
+                    ];
 
-            await runAsync(insertQuery, insertParams);
+                    await runAsync(insertQuery, insertParams);
 
-            playersToUpdate.pop(playerName);
+                    playersToUpdate.pop(playerName);
 
-            resolve();
-            }
+                    resolve();
+                }
 
-            resolve();
-        });
+                resolve();
+            });
         }).on('error', (err) => {
-        reject(err);
+            reject(err);
         });
     });
 }
@@ -421,19 +421,19 @@ async function updatePlayerGuilds() {
         let hitLimit = false;
 
         while (!hitLimit) {
-        const name = existingGuildNames[currentGuildIndex];
-        
-        hitLimit = await updateGuild(name);
+            const name = existingGuildNames[currentGuildIndex];
 
-        if (hitLimit) {
-            return Promise.resolve();
-        }
+            hitLimit = await updateGuild(name);
 
-        currentGuildIndex++;
+            if (hitLimit) {
+                return Promise.resolve();
+            }
 
-        if (currentGuildIndex > endIndex) {
-            currentGuildIndex = 0;
-        }
+            currentGuildIndex++;
+
+            if (currentGuildIndex > endIndex) {
+                currentGuildIndex = 0;
+            }
         }
 
         return Promise.resolve();
@@ -468,7 +468,7 @@ async function updateGuildActivity() {
             let newAverage;
             let newCaptains;
 
-            if (averageCount > 168) {
+            if (averageCount > 7) {
                 averageCount = 0;
 
                 newAverage = currentAverage + currentOnline / 2;
@@ -525,7 +525,7 @@ async function runFunction() {
         // Updates the guilds database with new guilds and removes deleted guilds.
         console.log('Updating list of all guilds.');
         await updateGuilds();
-        
+
         // Updates the guild and guild rank for each member of each guild.
         console.log('Updating guild members');
         await updatePlayerGuilds();
