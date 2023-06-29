@@ -128,12 +128,10 @@ module.exports = {
                                 );
 
                             row.addComponents(timezoneSelection);
-                            const editedReply = await interaction.update({
+                            await interaction.update({
                                 content: result.pages[0],
                                 components: [row],
                             });
-
-                            message.setMessage(editedReply);
                         }
 
                         break;
