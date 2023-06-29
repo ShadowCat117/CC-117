@@ -134,8 +134,6 @@ module.exports = {
                             });
 
                             message.setMessage(editedReply);
-
-                            MessageManager.addMessage(message);
                         }
 
                         break;
@@ -343,14 +341,10 @@ module.exports = {
 
             row.addComponents(timezoneSelection);
 
-            const editedReply = interaction.update({
+            interaction.update({
                 content: result.pages[0],
                 components: [row],
             });
-
-            message.setMessage(editedReply);
-
-            MessageManager.addMessage(message);
         }
     },
 };

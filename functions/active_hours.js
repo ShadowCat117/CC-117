@@ -23,13 +23,13 @@ async function activeHours(interaction, force = false, timezoneOffset = 0) {
 
     if (interaction.options !== undefined) {
         nameToSearch = interaction.options.getString('guild_name');
-    } else if (interaction.message.content) {
+    } else if (interaction.customId && interaction.customId !== 'timezone') {
+        nameToSearch = interaction.customId;
+    } else {
         const content = interaction.message.content;
         const regex = /```Active hours for (.*?) \(/;
         const match = content.match(regex);
         nameToSearch = match ? match[1] : null;
-    } else {
-        nameToSearch = interaction.customId;
     }
 
     const guildName = await findGuild(nameToSearch, force);
