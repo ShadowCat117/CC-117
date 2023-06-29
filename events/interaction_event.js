@@ -128,10 +128,14 @@ module.exports = {
                                 );
 
                             row.addComponents(timezoneSelection);
-                            interaction.update({
+                            const editedReply = await interaction.update({
                                 content: result.pages[0],
                                 components: [row],
                             });
+
+                            message.setMessage(editedReply);
+
+                            MessageManager.addMessage(message);
                         }
 
                         break;
@@ -257,6 +261,16 @@ module.exports = {
                 }
             }
         } else if (interaction.isStringSelectMenu()) {
+            const message = MessageManager.getMessage(interaction.message.id);
+
+            if (!message) {
+                interaction.update({
+                    content: 'Data expired.',
+                    components: [],
+                });
+                return;
+            }
+
             const result = await activeHours(interaction, true, interaction.values);
 
             const row = new ActionRowBuilder();
@@ -329,10 +343,14 @@ module.exports = {
 
             row.addComponents(timezoneSelection);
 
-            interaction.update({
+            const editedReply = interaction.update({
                 content: result.pages[0],
                 components: [row],
             });
+
+            message.setMessage(editedReply);
+
+            MessageManager.addMessage(message);
         }
     },
 };

@@ -117,10 +117,14 @@ module.exports = {
 
             row.addComponents(timezoneSelection);
 
-            await interaction.editReply({
+            const editedReply = await interaction.editReply({
                 content: response.pages[0],
                 components: [row],
             });
+
+            response.setMessage(editedReply);
+
+            MessageManager.addMessage(response);
         }
     },
 };
