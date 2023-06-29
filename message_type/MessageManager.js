@@ -1,4 +1,4 @@
-const messages = [];
+let messages = [];
 
 function addMessage(message) {
     messages.push(message);
@@ -29,7 +29,6 @@ function getMessages() {
 async function removeOldMessages() {
     try {
         for (const message of messages) {
-            removeMessage(message);
             await message.message.edit({
                 components: [],
             });
@@ -37,6 +36,8 @@ async function removeOldMessages() {
     } catch (error) {
         console.error('Error removing components from messages:', error);
     }
+
+    messages = [];
 }
 
 module.exports = {
