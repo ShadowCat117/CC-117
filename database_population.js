@@ -153,6 +153,11 @@ async function updatePlayer(playerName) {
             }
         });
 
+        if (!playerJson) {
+            hitLimit = true;
+            return;
+        }
+
         const selectQuery = 'SELECT * FROM players WHERE username = ?';
         const selectParams = [playerJson.name];
 
@@ -199,6 +204,11 @@ async function updateGuilds() {
                 return;
             }
         });
+
+        if (!response) {
+            hitLimit = true;
+            return;
+        }
 
         const allGuilds = response.list;
 
@@ -247,6 +257,11 @@ async function updateGuild(guildName) {
                 return;
             }
         });
+
+        if (!guild) {
+            hitLimit = true;
+            return;
+        }
 
         db.run(
             `INSERT OR IGNORE INTO guilds (name, prefix,
