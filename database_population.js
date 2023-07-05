@@ -77,17 +77,6 @@ async function updatePlayerStatus(worldData) {
                             return;
                         }
 
-                        const lastUpdatedDate = new Date(row.lastUpdated).toISOString().split('T')[0];
-                        const fortnightAgo = new Date();
-                        fortnightAgo.setDate(fortnightAgo.getDate() - 14);
-                        const outdatedDate = fortnightAgo.toISOString().split('T')[0];
-
-                        if (lastUpdatedDate <= outdatedDate) {
-                            if (!playersToUpdate.includes(playerName)) {
-                                playersToUpdate.push(playerName);
-                            }
-                        }
-
                         processedCount++;
 
                         if (processedCount === playersCount) {
@@ -318,8 +307,6 @@ async function updateGuild(guildName) {
         for (const member of guild.members) {
             if (hitLimit) return;
             
-            console.log(`adding guild of ${member.name}`);
-
             await updatePlayersGuild(member.uuid, member.name, guild.name, member.rank);
         }
     } catch (error) {
@@ -340,7 +327,6 @@ async function updatePlayersGuild(playerUuid, playerName, guildName, guildRank) 
 
     try {
         await runAsync(query, [playerUuid, playerName, guildName, guildRank, outdatedDateString, outdatedDateString]);
-        console.log(`Updated player ${playerName} guild information.`);
     } catch (error) {
         console.error(`Error updating player ${playerName} guild information:`, error);
     }
