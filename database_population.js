@@ -164,8 +164,8 @@ async function updatePlayer(playerName) {
             return;
         }
 
-        const selectQuery = 'SELECT * FROM players WHERE username = ?';
-        const selectParams = [playerJson.name];
+        const selectQuery = 'SELECT * FROM players WHERE UUID = ?';
+        const selectParams = [playerJson.uuid];
 
         const row = await getAsync(selectQuery, selectParams);
 
