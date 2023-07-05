@@ -47,7 +47,13 @@ async function updateOnlinePlayers() {
 
     await runAsync('UPDATE players SET isOnline = 0, onlineWorld = NULL');
 
-    await updatePlayerStatus(worlds);
+    const newPlayers = await updatePlayerStatus(worlds);
+
+    if (newPlayers) {
+        for (const newPlayer of newPlayers) {
+            await updatePlayer(newPlayer);
+        }
+    }
 }
 
 async function updatePlayerStatus(worldData) {
@@ -163,31 +169,55 @@ async function updatePlayer(playerName) {
 
         const row = await getAsync(selectQuery, selectParams);
 
-        const guildName = row && row.guildName !== null ? row.guildName : playerJson.guild.name;
-        const guildRank = row && row.guildRank !== null ? row.guildRank : playerJson.guild.rank;
-        const isOnline = row ? row.isOnline : 0;
-        const worldNumber = playerJson.world !== null ? parseInt(playerJson.world.slice(2)) : null;
+        if (row) {
+            const guildName = row && row.guildName !== null ? row.guildName : playerJson.guild.name;
+            const guildRank = row && row.guildRank !== null ? row.guildRank : playerJson.guild.rank;
+            const isOnline = row ? row.isOnline : 0;
+            const worldNumber = playerJson.world !== null ? parseInt(playerJson.world.slice(2)) : null;
 
-        const insertQuery = 'INSERT OR REPLACE INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, lastUpdated, onlineWorld) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            const insertQuery = 'INSERT OR REPLACE INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, lastUpdated, onlineWorld) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
-        const insertParams = [
-            playerJson.uuid,
-            playerJson.name,
-            guildName,
-            guildRank,
-            playerJson.rank.donatorRank,
-            playerJson.rank.veteran,
-            JSON.stringify(playerJson.lastJoin).split('T')[0].slice(1, -1),
-            isOnline,
-            new Date().toISOString().split('T')[0],
-            worldNumber,
-        ];
+            const insertParams = [
+                playerJson.uuid,
+                playerJson.name,
+                guildName,
+                guildRank,
+                playerJson.rank.donatorRank,
+                playerJson.rank.veteran,
+                JSON.stringify(playerJson.lastJoin).split('T')[0].slice(1, -1),
+                isOnline,
+                new Date().toISOString().split('T')[0],
+                worldNumber,
+            ];
 
-        await runAsync(insertQuery, insertParams);
+            await runAsync(insertQuery, insertParams);
 
-        playersToUpdate.pop(playerName);
+            playersToUpdate.pop(playerName);
 
-        return;
+            return;
+        } else {
+            const isOnline = row ? row.isOnline : 0;
+            const worldNumber = playerJson.world !== null ? parseInt(playerJson.world.slice(2)) : null;
+
+            const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, lastUpdated, onlineWorld) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+
+            const insertParams = [
+                playerJson.uuid,
+                playerJson.name,
+                null,
+                null,
+                playerJson.rank.donatorRank,
+                playerJson.rank.veteran,
+                JSON.stringify(playerJson.lastJoin).split('T')[0].slice(1, -1),
+                isOnline,
+                new Date().toISOString().split('T')[0],
+                worldNumber,
+            ];
+
+            await runAsync(insertQuery, insertParams);
+
+            return;
+        }
     } catch (error) {
         console.error(`Error fetching ${playerName}:`, error);
         return;
