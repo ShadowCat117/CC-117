@@ -177,7 +177,7 @@ async function updatePlayer(playerName) {
             guildRank,
             playerJson.rank.donatorRank,
             playerJson.rank.veteran,
-            JSON.stringify(playerJson.lastJoin).split('T')[0],
+            JSON.stringify(playerJson.lastJoin).split('T')[0].slice(1, -1),
             isOnline,
             new Date().toISOString().split('T')[0],
             worldNumber,
