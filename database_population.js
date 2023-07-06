@@ -329,6 +329,14 @@ async function updatePriorityGuilds() {
     
                 if (!hitLimit) {
                     updateGuildsFile.guilds = updateGuildsFile.guilds.filter(guild => guild !== priorityGuild);
+
+                    const memberUuids = await allAsync('SELECT UUID FROM players WHERE guildName = ?', [priorityGuild]);
+
+                    const uuids = memberUuids.map(row => row.UUID);
+                    
+                    for (const uuid of uuids) {
+                        await addPlayerToPriority(uuid);
+                    }
                 }
             }
     
@@ -339,6 +347,30 @@ async function updatePriorityGuilds() {
         }
     } catch (error) {
         console.error('Error updating priority guilds', error);
+    }
+}
+
+async function addPlayerToPriority(playerUuid) {
+    const filePath = path.join(__dirname, 'updatePlayers.json');
+
+    try {
+        let updatePlayersFile = {};
+    
+        if (fs.existsSync(filePath)) {
+            const fileData = fs.readFileSync(filePath, 'utf-8');
+            updatePlayersFile = JSON.parse(fileData);
+        }
+    
+        updatePlayersFile.players = updatePlayersFile.players.filter(item => item !== null);
+    
+        if (!updatePlayersFile.players.includes(playerUuid)) {
+            updatePlayersFile.players.push(playerUuid);
+            fs.writeFileSync(filePath, JSON.stringify(updatePlayersFile, null, 2), 'utf-8');
+
+            return;
+        }
+    } catch (error) {
+        console.error('Error adding player to priority', error);
     }
 }
 
@@ -395,7 +427,7 @@ async function updatePlayersGuild(playerUuid, playerName, guildName, guildRank) 
     const row = await getAsync(selectQuery, [playerUuid]);
 
     if (row) {
-        const updateQuery = `UPDATE players SET guildName = ?, guildRank = ? WHERE UUID = ${playerUuid}`;
+        const updateQuery = `UPDATE players SET guildName = ?, guildRank = ? WHERE UUID = '${playerUuid}'`;
         await runAsync(updateQuery, [guildName, guildRank]);
     } else {
         const outdatedDate = new Date();
