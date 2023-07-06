@@ -1,6 +1,8 @@
 const wynnAPI = require('gavel-gateway-js');
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('database/database.db');
+const fs = require('fs');
+const path = require('path');
 let playersToUpdate = [];
 let currentGuildIndex = 0;
 let hitLimit = false;
@@ -137,6 +139,36 @@ async function updateOutdatedPlayers() {
     }
 }
 
+async function updatePriorityPlayers() {
+    const filePath = path.join(__dirname, 'updatePlayers.json');
+
+    try {
+        let updatePlayersFile = {};
+
+        if (fs.existsSync(filePath)) {
+            const fileData = fs.readFileSync(filePath, 'utf-8');
+            updatePlayersFile = JSON.parse(fileData);
+        }
+
+        const priorityPlayers = updatePlayersFile.players;
+
+        for (const priorityPlayer of priorityPlayers) {
+            if (hitLimit) break;
+
+            await updatePlayer(priorityPlayer);
+
+            if (!hitLimit) {
+                updatePlayersFile.players = updatePlayersFile.players.filter(player => player !== priorityPlayer);
+            }
+        }
+
+        const updatedData = JSON.stringify(updatePlayersFile);
+        fs.writeFileSync(filePath, updatedData, 'utf-8');
+    } catch (error) {
+        console.error('Error updating priority players', error);
+    }
+}
+
 async function updatePlayer(playerName) {
     if (hitLimit) return;
 
@@ -265,6 +297,36 @@ async function updateGuilds() {
     } catch (error) {
         console.error('Error fetching guild list: ', error);
         return;
+    }
+}
+
+async function updatePriorityGuilds() {
+    const filePath = path.join(__dirname, 'updateGuilds.json');
+
+    try {
+        let updateGuildsFile = {};
+
+        if (fs.existsSync(filePath)) {
+            const fileData = fs.readFileSync(filePath, 'utf-8');
+            updateGuildsFile = JSON.parse(fileData);
+        }
+
+        const priorityGuilds = updateGuildsFile.guilds;
+
+        for (const priorityGuild of priorityGuilds) {
+            if (hitLimit) break;
+
+            await updateGuild(priorityGuild);
+
+            if (!hitLimit) {
+                updateGuildsFile.guilds = updateGuildsFile.guilds.filter(guild => guild !== priorityGuild);
+            }
+        }
+
+        const updatedData = JSON.stringify(updateGuildsFile);
+        fs.writeFileSync(filePath, updatedData, 'utf-8');
+    } catch (error) {
+        console.error('Error updating priority guilds', error);
     }
 }
 
@@ -434,6 +496,14 @@ async function runFunction() {
 
         console.log('Completed tasks for every 10 minutes');
     }
+
+    // Update the list of priority players
+    console.log('Updating priority players');
+    await updatePriorityPlayers();
+
+    // Update the list of priority guilds
+    console.log('Updating priority guilds.');
+    await updatePriorityGuilds();
 
     // Update every 20 mins
     if (now.getUTCMinutes() % 20 == 0) {

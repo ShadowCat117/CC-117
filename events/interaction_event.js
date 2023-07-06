@@ -16,6 +16,7 @@ const untrackGuild = require('../functions/untrack_guild');
 const setGuild = require('../functions/set_guild');
 const activeHours = require('../functions/active_hours');
 const applyRoles = require('../functions/apply_roles');
+const updateGuild = require('../functions/update_guild');
 
 module.exports = {
     name: Events.InteractionCreate,
@@ -218,6 +219,17 @@ module.exports = {
                         break;
                     case MessageType.UNTRACK_GUILD:
                         result = await untrackGuild(interaction, true);
+
+                        interaction.update({
+                            content: result.pages[0],
+                            components: [],
+                        });
+
+                        MessageManager.removeMessage(message);
+
+                        break;
+                    case MessageType.UPDATE_GUILD:
+                        result = await updateGuild(interaction, true);
 
                         interaction.update({
                             content: result.pages[0],
