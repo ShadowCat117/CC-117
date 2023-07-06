@@ -38,6 +38,10 @@ The bot currently features 17 commands.
 
 /untrackguild takes in 1 input which is the name of the guild you no longer want to track, this will make them no longer appear in the list when running /trackedguilds.
 
+/updateguild takes in 1 input which is the name of the guild you want to update, this will prioritise them so it and its members will be updated sooner.
+
+/updateplayer takes in 1 input which is the name/UUID of the player you want to update, this will prioritise them so they will be updated sooner.
+
 /updateranks will update the roles for every member of your server by looking at their username/nickname and seeing if it matches someone in the database who is a part of your guild or any of your allies.
 
 /viewconfig will display a user friendly version of the config. For any roles/channels set it will properly display them and not just their ID so you can clearly see if they work.
@@ -57,3 +61,9 @@ The players table contains the UUID, username, guild name, guild rank, personal 
 The bot reads the data from the Wynncraft Public API, the docs for which are located here: https://docs.wynncraft.com/
 
 It reads data relating to guilds, and their members, including their guild rank, personal rank and last login date.
+
+## gavel-gateway-js
+
+The database populator uses the API Wrapper gavel-gateway-js to make requests to the Wynncraft API.
+
+The repository for the wrapper is available here: https://github.com/Mahakadema/gavel-gateway-js
