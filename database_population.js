@@ -231,8 +231,8 @@ async function updatePlayer(playerName) {
             const insertParams = [
                 playerJson.uuid,
                 playerJson.name,
-                null,
-                null,
+                playerJson.guild.name,
+                playerJson.guild.rank,
                 playerJson.rank.donatorRank,
                 playerJson.rank.veteran,
                 JSON.stringify(playerJson.lastJoin).split('T')[0].slice(1, -1),
@@ -390,19 +390,19 @@ async function updateGuild(guildName) {
 }
 
 async function updatePlayersGuild(playerUuid, playerName, guildName, guildRank) {
-    const outdatedDate = new Date();
-    outdatedDate.setDate(outdatedDate.getDate() - 14);
-    const outdatedDateString = outdatedDate.toISOString().split('T')[0];
+    const selectQuery = 'SELECT * FROM players WHERE UUID = ?';
 
-    const query = `
-        INSERT OR REPLACE INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, lastUpdated, onlineWorld)
-        VALUES (?, ?, ?, ?, null, 0, ?, 0, ?, null)
-        `;
+    const row = await getAsync(selectQuery, [playerUuid]);
 
-    try {
-        await runAsync(query, [playerUuid, playerName, guildName, guildRank, outdatedDateString, outdatedDateString]);
-    } catch (error) {
-        console.error(`Error updating player ${playerName} guild information:`, error);
+    if (row) {
+        const updateQuery = `UPDATE players SET guildName = ?, guildRank = ? WHERE UUID = ${playerUuid}`;
+        await runAsync(updateQuery, [guildName, guildRank]);
+    } else {
+        const outdatedDate = new Date();
+        outdatedDate.setDate(outdatedDate.getDate() - 14);
+        const outdatedDateString = outdatedDate.toISOString().split('T')[0];
+        const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, lastUpdated, onlineWorld) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        await runAsync(insertQuery, [playerUuid, playerName, guildName, guildRank, null, 0, outdatedDateString, 0, outdatedDateString, null]);
     }
 }
 
