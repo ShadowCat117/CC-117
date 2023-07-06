@@ -53,6 +53,12 @@ module.exports = {
                 name: '/untrackguild',
                 value: 'untrackGuild',
             }, {
+                name: '/updateguild',
+                value: 'updateGuild',
+            }, {
+                name: '/updateplayer',
+                value: 'updatePlayer',
+            }, {
                 name: '/updateranks',
                 value: 'updateRanks',
             }, {
@@ -109,6 +115,12 @@ module.exports = {
                 break;
             case 'untrackGuild':
                 message = '```/untrackguild <guild> takes in the name of the guild you no longer want to track. Next time someone runs /trackedguilds in your server, this guilld will no longer appear in that list.```';
+                break;
+            case 'updateGuild':
+                message = '```/updateGuild <guild> will add the selected guild to a priority list for their members to be updated. This will update their guild rank as well as their personal rank and last login date in the database.```';
+                break;
+            case 'updatePlayer':
+                message = '```/updatePlayer <player> will add the given player to a priority list for them to be updated. This will update their personal rank, last login date etc in the database.```';
                 break;
             case 'updateRanks':
                 message = '```/updateranks will check all of your server members and attempt to find their Wynncraft account based on their username and/or nickname. This is case sensitive so if your username doesn\'t match the casing of your Wynncraft account, better change that. It will apply all relevant roles you have selected with /config_roles and some extra ones too if you enabled them with /config_features. If you have the change nicknames feature enabled, allies will be renamed to have their guild\'s prefix as a suffix to their nickname, for example, "ShadowCat117 [HOC]".```';
