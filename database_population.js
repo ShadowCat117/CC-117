@@ -152,18 +152,24 @@ async function updatePriorityPlayers() {
 
         const priorityPlayers = updatePlayersFile.players;
 
-        for (const priorityPlayer of priorityPlayers) {
-            if (hitLimit) break;
+        if (priorityPlayers.length > 0) {
+            console.log('Updating priority players');
 
-            await updatePlayer(priorityPlayer);
-
-            if (!hitLimit) {
-                updatePlayersFile.players = updatePlayersFile.players.filter(player => player !== priorityPlayer);
+            for (const priorityPlayer of priorityPlayers) {
+                if (hitLimit) break;
+    
+                await updatePlayer(priorityPlayer);
+    
+                if (!hitLimit) {
+                    updatePlayersFile.players = updatePlayersFile.players.filter(player => player !== priorityPlayer);
+                }
             }
-        }
+    
+            const updatedData = JSON.stringify(updatePlayersFile);
+            fs.writeFileSync(filePath, updatedData, 'utf-8');
 
-        const updatedData = JSON.stringify(updatePlayersFile);
-        fs.writeFileSync(filePath, updatedData, 'utf-8');
+            console.log('Updated priority players.');
+        }
     } catch (error) {
         console.error('Error updating priority players', error);
     }
@@ -313,18 +319,24 @@ async function updatePriorityGuilds() {
 
         const priorityGuilds = updateGuildsFile.guilds;
 
-        for (const priorityGuild of priorityGuilds) {
-            if (hitLimit) break;
+        if (priorityGuilds.length > 0) {
+            console.log('Updating priority guilds.');
 
-            await updateGuild(priorityGuild);
-
-            if (!hitLimit) {
-                updateGuildsFile.guilds = updateGuildsFile.guilds.filter(guild => guild !== priorityGuild);
+            for (const priorityGuild of priorityGuilds) {
+                if (hitLimit) break;
+    
+                await updateGuild(priorityGuild);
+    
+                if (!hitLimit) {
+                    updateGuildsFile.guilds = updateGuildsFile.guilds.filter(guild => guild !== priorityGuild);
+                }
             }
-        }
+    
+            const updatedData = JSON.stringify(updateGuildsFile);
+            fs.writeFileSync(filePath, updatedData, 'utf-8');
 
-        const updatedData = JSON.stringify(updateGuildsFile);
-        fs.writeFileSync(filePath, updatedData, 'utf-8');
+            console.log('Updated priority guilds.');
+        }
     } catch (error) {
         console.error('Error updating priority guilds', error);
     }
@@ -498,11 +510,9 @@ async function runFunction() {
     }
 
     // Update the list of priority players
-    console.log('Updating priority players');
     await updatePriorityPlayers();
 
     // Update the list of priority guilds
-    console.log('Updating priority guilds.');
     await updatePriorityGuilds();
 
     // Update every 20 mins
