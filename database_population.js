@@ -199,8 +199,8 @@ async function updatePlayer(playerName) {
         if (row) {
             const guildName = row && row.guildName !== null ? row.guildName : playerJson.guild.name;
             const guildRank = row && row.guildRank !== null ? row.guildRank : playerJson.guild.rank;
-            const isOnline = row ? row.isOnline : 0;
             const worldNumber = playerJson.world !== null ? parseInt(playerJson.world.slice(2)) : null;
+            const isOnline = worldNumber ? 1 : 0;
 
             const insertQuery = 'INSERT OR REPLACE INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, lastUpdated, onlineWorld) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
@@ -223,8 +223,8 @@ async function updatePlayer(playerName) {
 
             return;
         } else {
-            const isOnline = row ? row.isOnline : 0;
             const worldNumber = playerJson.world !== null ? parseInt(playerJson.world.slice(2)) : null;
+            const isOnline = worldNumber ? 1 : 0;
 
             const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, lastUpdated, onlineWorld) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
