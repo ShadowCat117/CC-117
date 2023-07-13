@@ -496,9 +496,7 @@ async function updateGuildActivity() {
             let newAverage;
             let newCaptains;
 
-            if (averageCount > 7) {
-                averageCount = 0;
-
+            if (averageCount >= 7) {
                 newAverage = currentAverage + currentOnline / 2;
                 newCaptains = currentCaptains + captainsOnline / 2;
             } else if (currentAverage > 0) {
@@ -509,15 +507,17 @@ async function updateGuildActivity() {
                 newCaptains = captainsOnline;
             }
 
-            let updateQuery = 'UPDATE guilds SET average' + currentHour + ' = ?, captains' + currentHour + ' = ?';
-
             if (currentHour === '23') {
-                updateQuery += ', averageCount = COALESCE(averageCount, 0) + 1';
-            }
+                if (averageCount >= 7) {
+                    averageCount = 1;
+                } else {
+                    averageCount += 1;
+                }
+            }            
 
-            updateQuery += ' WHERE name = ?';
+            const updateQuery = 'UPDATE guilds SET average' + currentHour + ' = ?, captains' + currentHour + ' = ?, averageCount = ? WHERE name = ?';
 
-            await runAsync(updateQuery, [newAverage, newCaptains, guildName]);
+            await runAsync(updateQuery, [newAverage, newCaptains, averageCount, guildName]);
         }
 
         return Promise.resolve();
