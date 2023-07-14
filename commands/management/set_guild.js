@@ -49,7 +49,7 @@ module.exports = {
 
         } catch (error) {
             console.log(error);
-            await interaction.editReply('Error adding ally.');
+            await interaction.editReply('Error setting guild.');
             return;
         }
 

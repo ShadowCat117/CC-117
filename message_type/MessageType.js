@@ -8,6 +8,7 @@ const MessageType = {
   UNTRACK_GUILD: 'UNTRACK_GUILD',
   UPDATE_GUILD: 'UPDATE_GUILD',
   VERIFY: 'VERIFY',
+  WORLD_ACTIVITY: 'WORLD_ACTIVITY',
 };
 
 module.exports = MessageType;

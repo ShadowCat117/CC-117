@@ -17,6 +17,7 @@ const setGuild = require('../functions/set_guild');
 const activeHours = require('../functions/active_hours');
 const applyRoles = require('../functions/apply_roles');
 const updateGuild = require('../functions/update_guild');
+const worldActivity = require('../functions/world_activity');
 
 module.exports = {
     name: Events.InteractionCreate,
@@ -262,6 +263,17 @@ module.exports = {
                                 });
                                 break;
                         }
+
+                        MessageManager.removeMessage(message);
+
+                        break;
+                    case MessageType.WORLD_ACTIVITY:
+                        result = await worldActivity(interaction, true);
+
+                        interaction.update({
+                            content: result.pages[0],
+                            components: [],
+                        });
 
                         MessageManager.removeMessage(message);
 
