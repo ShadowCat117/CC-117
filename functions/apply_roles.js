@@ -113,6 +113,13 @@ async function applyRoles(guild, uuid, member) {
                                 });
                         }
 
+                        let response = 0;
+
+                        if (hasUpdated) {
+                            response = true;
+                        }
+
+                        resolve(response);
                         return;
                     }
 

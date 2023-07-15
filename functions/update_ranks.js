@@ -73,8 +73,6 @@ async function updateRanks(guild) {
                             }
                         }
 
-                        verifiedServerMembers.push(serverMember.user.username);
-
                         if (verifiedServerMembers.indexOf(serverMember.user.username) === -1) {
                             verifiedServerMembers.push(serverMember.user.username);
                         }
@@ -118,8 +116,6 @@ async function updateRanks(guild) {
                                     messageStart = `Updated roles for ${updatedMembers} member.`;
                                 }
                             }
-
-                            verifiedServerMembers.push(serverMember.user.username);
 
                             if (verifiedServerMembers.indexOf(serverMember.user.username) === -1) {
                                 verifiedServerMembers.push(serverMember.user.username);
