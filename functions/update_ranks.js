@@ -52,8 +52,8 @@ async function updateRanks(guild) {
 
                     let nickname = undefined;
 
-                    if (serverMember.nickname) {
-                        nickname = serverMember.nickname.split(' [')[0];
+                    if (serverMember.displayName) {
+                        nickname = serverMember.displayName.split(' [')[0];
                     }
 
                     if (guildMember.username === serverMember.user.username || guildMember.username === nickname) {
@@ -96,8 +96,8 @@ async function updateRanks(guild) {
 
                         let nickname = undefined;
 
-                        if (serverMember.nickname) {
-                            nickname = serverMember.nickname.split(' [')[0];
+                        if (serverMember.displayName) {
+                            nickname = serverMember.displayName.split(' [')[0];
                         }
 
                         if (guildMember.username === serverMember.user.username || guildMember.username === nickname) {
