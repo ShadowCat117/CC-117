@@ -410,13 +410,40 @@ async function updateGuild(guildName) {
             },
         );
 
+        await removeGuildMembers(guildName, guild.members);
+
         for (const member of guild.members) {
             if (hitLimit) return;
             
             await updatePlayersGuild(member.uuid, member.name, guild.name, member.rank);
         }
     } catch (error) {
-        console.error('Error adding new guild: ', error);
+        console.error('Error updating guild: ', error);
+        return;
+    }
+}
+
+async function removeGuildMembers(guildName, members) {
+    const selectQuery = 'SELECT UUID FROM players WHERE guildName = ?';
+
+    const rows = await allAsync(selectQuery, [guildName]);
+
+    if (rows) {
+        const uuids = rows.map((row) => row.UUID);
+
+        for (const uuid of uuids) {
+            const memberToCheck = members.find((member) => member.uuid === uuid);
+      
+            if (memberToCheck) {
+              continue;
+            }
+
+            const updateQuery = 'UPDATE players SET guildName = NULL, guildRank = NULL WHERE UUID = ?';
+            await runAsync(updateQuery, [uuid]);
+        }
+
+        return;
+    } else {
         return;
     }
 }
