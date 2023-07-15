@@ -40,6 +40,8 @@ async function updateRanks(guild) {
         try {
             const rows = await allAsync('SELECT UUID, username FROM players WHERE guildName = ?', [guildName]);
 
+            const verifiedServerMembers = [];
+
             for (const serverMember of guild.members.cache.values()) {
                 if (serverMember.user.bot) {
                     continue;
@@ -69,6 +71,12 @@ async function updateRanks(guild) {
                                 updatedMembers++;
                                 messageStart = `Updated roles for ${updatedMembers} member.`;
                             }
+                        }
+
+                        verifiedServerMembers.push(serverMember.user.username);
+
+                        if (verifiedServerMembers.indexOf(serverMember.user.username) === -1) {
+                            verifiedServerMembers.push(serverMember.user.username);
                         }
 
                         rows.splice(i, 1);
@@ -111,9 +119,37 @@ async function updateRanks(guild) {
                                 }
                             }
 
+                            verifiedServerMembers.push(serverMember.user.username);
+
+                            if (verifiedServerMembers.indexOf(serverMember.user.username) === -1) {
+                                verifiedServerMembers.push(serverMember.user.username);
+                            }
+
                             allyRows.splice(i, 1);
                             break;
                         }
+                    }
+                }
+            }
+
+            for (const serverMember of guild.members.cache.values()) {
+                if (verifiedServerMembers.includes(serverMember.user.username) || serverMember.user.bot) {
+                    continue;
+                }
+
+                const updated = await applyRoles(guild, null, serverMember);
+
+                if (updated > 0) {
+                    if (updatedMembers > 0) {
+                        messageEnd += `, ${serverMember.user.username}`;
+
+                        updatedMembers++;
+                        messageStart = `Updated roles for ${updatedMembers} members.`;
+                    } else {
+                        messageEnd += `\n(${serverMember.user.username}`;
+
+                        updatedMembers++;
+                        messageStart = `Updated roles for ${updatedMembers} member.`;
                     }
                 }
             }
