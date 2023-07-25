@@ -52,11 +52,11 @@ async function updateRanks(guild) {
 
                     let nickname = undefined;
 
-                    if (serverMember.displayName) {
-                        nickname = serverMember.displayName.split(' [')[0];
+                    if (serverMember.nickname) {
+                        nickname = serverMember.nickname.split(' [')[0];
                     }
 
-                    if (guildMember.username === serverMember.user.username || guildMember.username === nickname) {
+                    if (guildMember.username === serverMember.user.username || guildMember.username === serverMember.user.globalName || guildMember.username === nickname) {
                         const updated = await applyRoles(guild, guildMember.UUID, serverMember);
 
                         if (updated > 0) {
@@ -96,11 +96,11 @@ async function updateRanks(guild) {
 
                         let nickname = undefined;
 
-                        if (serverMember.displayName) {
-                            nickname = serverMember.displayName.split(' [')[0];
+                        if (serverMember.nickname) {
+                            nickname = serverMember.nickname.split(' [')[0];
                         }
 
-                        if (guildMember.username === serverMember.user.username || guildMember.username === nickname) {
+                        if (guildMember.username === serverMember.user.username || guildMember.username === serverMember.user.globalName || guildMember.username === nickname) {
                             const updated = await applyRoles(guild, guildMember.UUID, serverMember);
 
                             if (updated > 0) {
