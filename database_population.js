@@ -673,8 +673,8 @@ async function runFunction() {
         console.log('Completed hourly tasks');
     }
 
-    // Update midnightly
-    if (now.getUTCHours() == 0 && now.getUTCMinutes() == 0) {
+    // Update daily
+    if (now.getUTCHours() == 23 && now.getUTCMinutes() == 0) {
         // Adds all set, allied and tracked guilds to priority as they are used more often.
         console.log('Adding used guilds to priority');
         await addPriorityGuilds();
