@@ -1,7 +1,7 @@
 const wynnAPI = require('gavel-gateway-js');
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('database/database.db');
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 let playersToUpdate = [];
 let currentGuildIndex = 0;
@@ -139,15 +139,20 @@ async function updateOutdatedPlayers() {
     }
 }
 
+
 async function updatePriorityPlayers() {
     const filePath = path.join(__dirname, 'updatePlayers.json');
 
     try {
         let updatePlayersFile = {};
 
-        if (fs.existsSync(filePath)) {
-            const fileData = fs.readFileSync(filePath, 'utf-8');
+        try {
+            await fs.access(filePath);
+            const fileData = await fs.readFile(filePath, 'utf-8');
             updatePlayersFile = JSON.parse(fileData);
+        } catch (err) {
+            console.log('Priority players file does not exist.');
+            return;
         }
 
         const priorityPlayers = updatePlayersFile.players;
@@ -157,16 +162,16 @@ async function updatePriorityPlayers() {
 
             for (const priorityPlayer of priorityPlayers) {
                 if (hitLimit) break;
-    
+
                 await updatePlayer(priorityPlayer);
-    
+
                 if (!hitLimit) {
                     updatePlayersFile.players = updatePlayersFile.players.filter(player => player !== priorityPlayer);
                 }
             }
-    
+
             const updatedData = JSON.stringify(updatePlayersFile);
-            fs.writeFileSync(filePath, updatedData, 'utf-8');
+            await fs.writeFile(filePath, updatedData, 'utf-8');
 
             console.log('Updated priority players.');
         }
@@ -312,9 +317,13 @@ async function updatePriorityGuilds() {
     try {
         let updateGuildsFile = {};
 
-        if (fs.existsSync(filePath)) {
-            const fileData = fs.readFileSync(filePath, 'utf-8');
+        try {
+            await fs.access(filePath);
+            const fileData = await fs.readFile(filePath, 'utf-8');
             updateGuildsFile = JSON.parse(fileData);
+        } catch (err) {
+            console.log('Priority guilds file does not exist.');
+            return;
         }
 
         const priorityGuilds = updateGuildsFile.guilds;
@@ -324,24 +333,24 @@ async function updatePriorityGuilds() {
 
             for (const priorityGuild of priorityGuilds) {
                 if (hitLimit) break;
-    
+
                 await updateGuild(priorityGuild);
-    
+
                 if (!hitLimit) {
                     updateGuildsFile.guilds = updateGuildsFile.guilds.filter(guild => guild !== priorityGuild);
 
                     const memberUuids = await allAsync('SELECT UUID FROM players WHERE guildName = ?', [priorityGuild]);
 
                     const uuids = memberUuids.map(row => row.UUID);
-                    
+ 
                     for (const uuid of uuids) {
                         await addPlayerToPriority(uuid);
                     }
                 }
             }
-    
+
             const updatedData = JSON.stringify(updateGuildsFile);
-            fs.writeFileSync(filePath, updatedData, 'utf-8');
+            await fs.writeFile(filePath, updatedData, 'utf-8');
 
             console.log('Updated priority guilds.');
         }
@@ -355,17 +364,23 @@ async function addPlayerToPriority(playerUuid) {
 
     try {
         let updatePlayersFile = {};
-    
-        if (fs.existsSync(filePath)) {
-            const fileData = fs.readFileSync(filePath, 'utf-8');
+
+        try {
+            await fs.access(filePath);
+            const fileData = await fs.readFile(filePath, 'utf-8');
             updatePlayersFile = JSON.parse(fileData);
+        } catch (err) {
+            console.log('Priority players file does not exist.');
+            return;
         }
-    
+
         updatePlayersFile.players = updatePlayersFile.players.filter(item => item !== null);
-    
+
         if (!updatePlayersFile.players.includes(playerUuid)) {
             updatePlayersFile.players.push(playerUuid);
-            fs.writeFileSync(filePath, JSON.stringify(updatePlayersFile, null, 2), 'utf-8');
+
+            const updatedData = JSON.stringify(updatePlayersFile, null, 2);
+            await fs.writeFile(filePath, updatedData, 'utf-8');
 
             return;
         }
@@ -553,6 +568,60 @@ async function updateGuildActivity() {
         return Promise.reject(err);
     }
 }
+
+async function addPriorityGuilds() {
+    const configsPath = path.join(__dirname, 'configs');
+
+    const uniqueGuildNames = [];
+
+    try {
+        const files = await fs.readdir(configsPath);
+
+        for (const file of files) {
+            const filePath = path.join(configsPath, file);
+
+            const data = await fs.readFile(filePath, 'utf8');
+            const config = JSON.parse(data);
+
+            if (config.guildName && !uniqueGuildNames.includes(config.guildName)) {
+                uniqueGuildNames.push(config.guildName);
+            }
+
+            config.allies.forEach(name => {
+                if (name && !uniqueGuildNames.includes(name)) {
+                    uniqueGuildNames.push(name);
+                }
+            });
+
+            config.trackedGuilds.forEach(name => {
+                if (name && !uniqueGuildNames.includes(name)) {
+                    uniqueGuildNames.push(name);
+                }
+            });
+        }
+
+        const filePath = path.join(__dirname, 'updateGuilds.json');
+        let updateGuildsFile = {};
+
+        try {
+            await fs.access(filePath);
+            const fileData = await fs.readFile(filePath, 'utf-8');
+            updateGuildsFile = JSON.parse(fileData);
+        } catch (err) {
+            console.log('Priority guilds file does not exist.');
+            return;
+        }
+
+        updateGuildsFile.guilds = updateGuildsFile.guilds.filter(name => !uniqueGuildNames.includes(name));
+
+        updateGuildsFile.guilds.push(...uniqueGuildNames);
+
+        const updatedData = JSON.stringify(updateGuildsFile, null, 2);
+        await fs.writeFile(filePath, updatedData, 'utf-8');
+    } catch (err) {
+        console.error('Error adding priority guilds:', err);
+    }
+}
   
 async function runFunction() {
     hitLimit = false;
@@ -602,6 +671,15 @@ async function runFunction() {
         await updateGuildActivity();
 
         console.log('Completed hourly tasks');
+    }
+
+    // Update midnightly
+    if (now.getUTCHours() == 0 && now.getUTCMinutes() == 0) {
+        // Adds all set, allied and tracked guilds to priority as they are used more often.
+        console.log('Adding used guilds to priority');
+        await addPriorityGuilds();
+
+        console.log('Completed daily tasks');
     }
 
     now = new Date();
