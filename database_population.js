@@ -44,17 +44,21 @@ async function allAsync(query, params) {
 }
 
 async function updateOnlinePlayers() {
-    const onlinePlayers = await wynnAPI.fetchOnlinePlayers();
-    const worlds = onlinePlayers.list;
+    try {
+        const onlinePlayers = await wynnAPI.fetchOnlinePlayers();
+        const worlds = onlinePlayers.list;
 
-    await runAsync('UPDATE players SET isOnline = 0, onlineWorld = NULL');
+        await runAsync('UPDATE players SET isOnline = 0, onlineWorld = NULL');
 
-    const newPlayers = await updatePlayerStatus(worlds);
+        const newPlayers = await updatePlayerStatus(worlds);
 
-    if (newPlayers) {
-        for (const newPlayer of newPlayers) {
-            await updatePlayer(newPlayer);
+        if (newPlayers) {
+            for (const newPlayer of newPlayers) {
+                await updatePlayer(newPlayer);
+            }
         }
+    } catch (error) {
+        console.error(`Error updating online players: ${error}`);
     }
 }
 
@@ -637,11 +641,15 @@ async function runFunction() {
         console.log('Completed tasks for every 10 minutes');
     }
 
-    // Update the list of priority players
-    await updatePriorityPlayers();
+    // Update every minute, but only when the minute ends with 0-5
+    // Hopefully will allow rate limit to expire for when updateOnlinePlayers is ran
+    if (now.getUTCMinutes() % 10 <= 5) {
+        // Update the list of priority players
+        await updatePriorityPlayers();
 
-    // Update the list of priority guilds
-    await updatePriorityGuilds();
+        // Update the list of priority guilds
+        await updatePriorityGuilds();
+    }
 
     // Update every 20 mins
     if (now.getUTCMinutes() % 20 == 0) {
