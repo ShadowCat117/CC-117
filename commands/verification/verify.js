@@ -128,7 +128,7 @@ module.exports = {
                         }
 
                         if (checkForAlly) {
-                            let lookupAPI = false;
+                            let notFound = false;
 
                             for (const ally of config.allies) {
                                 const allyRows = await new Promise((allyResolve, allyReject) => {
@@ -147,7 +147,7 @@ module.exports = {
                                 });
 
                                 if (allyRows.length === 0) {
-                                    lookupAPI = true;
+                                    notFound = true;
                                 } else if (allyRows.length > 1) {
                                     let message = `Multiple ${username}'s found.\n`;
                                     let counter = 1;
@@ -199,8 +199,8 @@ module.exports = {
                                     return;
                                 }
 
-                                if (lookupAPI) {
-                                    await interaction.editReply('Unable to find in database. Please make sure you entered the name correctly.\n\nIf you are still unably to verify, then please log in to Wynncraft for a few minutes and allow me to add you to the database.');
+                                if (notFound) {
+                                    await interaction.editReply(`Unable to verify you as ${username}.\n\nYou may not be updated as a guild member in the database, run /updateguild <guild_name> to update the members of your guild, it may still take a few minutes to update.`);
                                     await applyRoles(interaction.guild, undefined, interaction.member);
                                     resolve();
                                     return;
