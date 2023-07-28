@@ -56,6 +56,37 @@ module.exports = {
                                 sendMessage(guild, config.logChannel, `Unable to apply unverified role to ${member.displayName}. You have not set the unverified role with /config_roles Unverified Role <role>`);
                             }
                         }
+
+                        const guildNames = [];
+
+                        if (config.guildName) {
+                            guildNames.push(config.guildName);
+                        }
+
+                        config.allies.forEach(name => {
+                            if (name) {
+                                guildNames.push(name);
+                            }
+                        });
+            
+                        const priorityGuildsPath = path.join(__dirname, '..', 'updateGuilds.json');
+
+                        if (fs.existsSync(priorityGuildsPath)) {
+                            try {
+                                const priorityGuildsData = await fs.promises.readFile(priorityGuildsPath, 'utf-8');
+                                const updateGuildsFile = JSON.parse(priorityGuildsData);
+
+                                updateGuildsFile.guilds = updateGuildsFile.guilds.filter(name => !guildNames.includes(name));
+                                updateGuildsFile.guilds.push(...guildNames);
+
+                                const updatedData = JSON.stringify(updateGuildsFile, null, 2);
+                                await fs.promises.writeFile(priorityGuildsPath, updatedData, 'utf-8');
+                            } catch (err) {
+                                console.log(`Error parsing the JSON file for priority guilds file ${err}`);
+                            }
+                        } else {
+                            console.log('Priority guilds file not found');
+                        }
                     } catch (parseError) {
                         console.log(`Error parsing the JSON file for guild ${guildId}: ${parseError}`);
                     }
