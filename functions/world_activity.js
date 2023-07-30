@@ -52,17 +52,16 @@ async function worldActivity(interaction, force = false) {
 
         try {
             const results = await allAsync(query, [guildName]);
-        
-            let activeWorlds = [];
-            let maxCount = 0;
 
             if (results.length === 0) {
                 return new ButtonedMessage('Nobody online', [], '', [`Nobody online in ${guildName}`]);
             }
-        
+
+            let activeWorlds = [];
+            let maxCount = 0;
+
             results.forEach((row) => {
                 const { onlineWorld, count } = row;
-        
                 if (count > maxCount) {
                     activeWorlds = [onlineWorld];
                     maxCount = count;
@@ -72,8 +71,16 @@ async function worldActivity(interaction, force = false) {
             });
 
             activeWorlds.sort((a, b) => a - b);
-        
-            return new ButtonedMessage('', [], '', [`${guildName} is most active on world ${activeWorlds.join('/')}`]);
+
+            let message;
+
+            if (maxCount > 1) {
+                message = `${guildName} is most active on world ${activeWorlds.join('/')} with ${maxCount} players`;
+            } else {
+                message = `${guildName} is most active on world ${activeWorlds.join('/')} with ${maxCount} player`;
+            }
+
+            return new ButtonedMessage('', [], '', [message]);
         } catch (err) {
             console.error('Error executing the query: ', err);
             return new ButtonedMessage('', [], '', [`Error occurred while searching for world activity of ${guildName}`]);
