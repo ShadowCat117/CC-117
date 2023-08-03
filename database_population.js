@@ -205,13 +205,22 @@ async function updatePlayer(playerName) {
 
         const row = await getAsync(selectQuery, selectParams);
 
+        let highestClassLevel = 1;
+
+        for (const playerClass of playerJson.classes) {
+            if (playerClass.levels.combat.level > highestClassLevel) {
+                highestClassLevel = playerClass.levels.combat.level;
+            }
+        }
+
         if (row) {
-            const guildName = row && row.guildName !== null ? row.guildName : playerJson.guild.name;
-            const guildRank = row && row.guildRank !== null ? row.guildRank : playerJson.guild.rank;
+            const guildName = row.guildName !== null ? row.guildName : playerJson.guild.name;
+            const guildRank = row.guildRank !== null ? row.guildRank : playerJson.guild.rank;
             const worldNumber = playerJson.world !== null ? parseInt(playerJson.world.slice(2)) : null;
             const isOnline = worldNumber ? 1 : 0;
+            const contributedGuildXP = row.contributedGuildXP !== null ? row.contributedGuildXP : null;
 
-            const insertQuery = 'INSERT OR REPLACE INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, lastUpdated, onlineWorld) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            const insertQuery = 'INSERT OR REPLACE INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, lastUpdated, onlineWorld, contributedGuildXP, highestClassLevel) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
             const insertParams = [
                 playerJson.uuid,
@@ -224,6 +233,8 @@ async function updatePlayer(playerName) {
                 isOnline,
                 new Date().toISOString().split('T')[0],
                 worldNumber,
+                contributedGuildXP,
+                highestClassLevel,
             ];
 
             await runAsync(insertQuery, insertParams);
@@ -235,7 +246,7 @@ async function updatePlayer(playerName) {
             const worldNumber = playerJson.world !== null ? parseInt(playerJson.world.slice(2)) : null;
             const isOnline = worldNumber ? 1 : 0;
 
-            const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, lastUpdated, onlineWorld) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, lastUpdated, onlineWorld, contributedGuildXP, highestClassLevel) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
             const insertParams = [
                 playerJson.uuid,
@@ -248,6 +259,8 @@ async function updatePlayer(playerName) {
                 isOnline,
                 new Date().toISOString().split('T')[0],
                 worldNumber,
+                0,
+                highestClassLevel,
             ];
 
             await runAsync(insertQuery, insertParams);
@@ -297,7 +310,7 @@ async function updateGuilds() {
                 await runAsync(deleteQuery, [guildName]);
                 console.log(`Deleted guild '${guildName}' from the 'guilds' table.`);
 
-                const updateQuery = 'UPDATE players SET guildName = NULL, guildRank = NULL WHERE guildName = ?';
+                const updateQuery = 'UPDATE players SET guildName = NULL, guildRank = NULL, contributedGuildXP = 0 WHERE guildName = ?';
                 await runAsync(updateQuery, [guildName]);
             }
 
@@ -434,7 +447,7 @@ async function updateGuild(guildName) {
         for (const member of guild.members) {
             if (hitLimit) return;
             
-            await updatePlayersGuild(member.uuid, member.name, guild.name, member.rank);
+            await updatePlayersGuild(member.uuid, member.name, guild.name, member.rank, member.xp);
         }
     } catch (error) {
         console.error('Error updating guild: ', error);
@@ -457,7 +470,7 @@ async function removeGuildMembers(guildName, members) {
               continue;
             }
 
-            const updateQuery = 'UPDATE players SET guildName = NULL, guildRank = NULL WHERE UUID = ?';
+            const updateQuery = 'UPDATE players SET guildName = NULL, guildRank = NULL, contributedGuildXP = 0 WHERE UUID = ?';
             await runAsync(updateQuery, [uuid]);
         }
 
@@ -467,20 +480,20 @@ async function removeGuildMembers(guildName, members) {
     }
 }
 
-async function updatePlayersGuild(playerUuid, playerName, guildName, guildRank) {
+async function updatePlayersGuild(playerUuid, playerName, guildName, guildRank, contributedGuildXP) {
     const selectQuery = 'SELECT * FROM players WHERE UUID = ?';
 
     const row = await getAsync(selectQuery, [playerUuid]);
 
     if (row) {
-        const updateQuery = `UPDATE players SET guildName = ?, guildRank = ? WHERE UUID = '${playerUuid}'`;
-        await runAsync(updateQuery, [guildName, guildRank]);
+        const updateQuery = `UPDATE players SET guildName = ?, guildRank = ?, contributedGuildXP = ? WHERE UUID = '${playerUuid}'`;
+        await runAsync(updateQuery, [guildName, guildRank, contributedGuildXP]);
     } else {
         const outdatedDate = new Date();
         outdatedDate.setDate(outdatedDate.getDate() - 14);
         const outdatedDateString = outdatedDate.toISOString().split('T')[0];
-        const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, lastUpdated, onlineWorld) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        await runAsync(insertQuery, [playerUuid, playerName, guildName, guildRank, null, 0, outdatedDateString, 0, outdatedDateString, null]);
+        const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, lastUpdated, onlineWorld, contributedGuildXP, highestClassLevel) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        await runAsync(insertQuery, [playerUuid, playerName, guildName, guildRank, null, 0, outdatedDateString, 0, outdatedDateString, null, contributedGuildXP, 1]);
     }
 }
 
@@ -638,17 +651,13 @@ async function runFunction() {
         console.log('Updating all online players.');
         await updateOnlinePlayers();
 
-        console.log('Completed tasks for every 10 minutes');
-    }
-
-    // Update every minute, but only when the minute ends with 0-5
-    // Hopefully will allow rate limit to expire for when updateOnlinePlayers is ran
-    if (now.getUTCMinutes() % 10 <= 5) {
         // Update the list of priority players
         await updatePriorityPlayers();
 
         // Update the list of priority guilds
         await updatePriorityGuilds();
+
+        console.log('Completed tasks for every 10 minutes');
     }
 
     // Update every 20 mins
