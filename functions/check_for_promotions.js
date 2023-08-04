@@ -3,6 +3,19 @@ const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const ButtonedMessage = require('../message_type/ButtonedMessage');
 const db = new sqlite3.Database('database/database.db');
+const GuildMemberPromotion = require('../message_objects/GuildMemberPromotion');
+
+async function allAsync(query, params) {
+    return new Promise((resolve, reject) => {
+        db.all(query, params, function(err, rows) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+}
 
 async function checkForPromotions(guildId) {
     const directoryPath = path.join(__dirname, '..', 'configs');
@@ -16,94 +29,108 @@ async function checkForPromotions(guildId) {
             config = JSON.parse(fileData);
         }
 
+        const guildName = config.guildName;
+        const chiefPromotionRequirement = config.chiefPromotionRequirement;
+        const strategistPromotionRequirement = config.strategistPromotionRequirement;
+        const captainPromotionRequirement = config.captainPromotionRequirement;
+        const recruiterPromotionRequirement = config.recruiterPromotionRequirement;
         const chiefXPRequirement = config.chiefXPRequirement;
         const chiefLevelRequirement = config.chiefLevelRequirement;
+        const chiefContributorRequirement = config.chiefContributorRequirement;
         const strategistXPRequirement = config.strategistXPRequirement;
         const strategistLevelRequirement = config.strategistLevelRequirement;
+        const strategistContributorRequirement = config.strategistContributorRequirement;
         const captainXPRequirement = config.captainXPRequirement;
         const captainLevelRequirement = config.captainLevelRequirement;
+        const captainContributorRequirement = config.captainContributorRequirement;
         const recruiterXPRequirement = config.recruiterXPRequirement;
         const recruiterLevelRequirement = config.recruiterLevelRequirement;
+        const recruiterContributorRequirement = config.recruiterContributorRequirement;
 
-        return new Promise((resolve, reject) => {
-            db.all(
-                'SELECT username, guildRank, lastJoin, isOnline FROM players WHERE guildName = ?', [guildName],
-                async (err, rows) => {
-                    if (err) {
-                        console.error('Error retrieving player data:', err);
-                        reject(err);
-                    }
+        if (!guildName) {
+            return new ButtonedMessage('', [], '', ['You have not set a guild.']);
+        }
 
-                    const playerLastLogins = rows.map(row => {
-                        const {
-                            username,
-                            guildRank,
-                            lastJoin,
-                            isOnline,
-                        } = row;
-                        const displayColours = true;
-                        let inactiveThreshold;
+        const promotionRequirements = [chiefPromotionRequirement, strategistPromotionRequirement, captainPromotionRequirement, recruiterPromotionRequirement];
+        const chiefRequirements = [chiefXPRequirement, chiefLevelRequirement, chiefContributorRequirement];
+        const strategistRequirements = [strategistXPRequirement, strategistLevelRequirement, strategistContributorRequirement];
+        const captainRequirements = [captainXPRequirement, captainLevelRequirement, captainContributorRequirement];
+        const recruiterRequirements = [recruiterXPRequirement, recruiterLevelRequirement, recruiterContributorRequirement];
 
-                        switch (guildRank) {
-                            case 'CHIEF':
-                                inactiveThreshold = chiefThreshold;
-                                break;
-                            case 'STRATEGIST':
-                                inactiveThreshold = strategistThreshold;
-                                break;
-                            case 'CAPTAIN':
-                                inactiveThreshold = captainThreshold;
-                                break;
-                            case 'RECRUITER':
-                                inactiveThreshold = recruiterThreshold;
-                                break;
-                            case 'RECRUIT':
-                                inactiveThreshold = recruitThreshold;
-                                break;
-                            default:
-                                inactiveThreshold = Number.MAX_SAFE_INTEGER;
-                                break;
-                        }
+        const originalRows = await allAsync('SELECT username, guildRank, contributedGuildXP, highestClassLevel FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
 
-                        const currentDate = new Date();
-                        const lastJoinDate = new Date(lastJoin);
-                        const timeDiff = currentDate.getTime() - lastJoinDate.getTime();
-                        const daysSinceLastLogin = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+        let filteredRows = originalRows.filter(player => player.guildRank !== 'OWNER' && player.guildRank !== 'CHIEF');
+        let checkForChiefPromotion = true;
+        let checkForStrategistPromotion = true;
+        let checkForCaptainPromotion = true;
 
-                        return new PlayerLastLogin(username, guildRank, daysSinceLastLogin, isOnline, displayColours, inactiveThreshold);
-                    });
+        if (promotionRequirements[0].includes('NONE')) {
+            filteredRows = filteredRows.filter(player => player.guildRank !== 'STRATEGIST');
+            checkForChiefPromotion = false;
+        }
 
-                    playerLastLogins.sort((a, b) => a.compareTo(b));
+        if (promotionRequirements[1].includes('NONE') && !checkForChiefPromotion) {
+            filteredRows = filteredRows.filter(player => player.guildRank !== 'CAPTAIN');
+            checkForStrategistPromotion = false;
+        }
 
-                    const pages = [];
-                    let lastLoginsPage = '```diff\n';
-                    let counter = 0;
+        if (promotionRequirements[2].includes('NONE') && !checkForChiefPromotion && !checkForStrategistPromotion) {
+            filteredRows = filteredRows.filter(player => player.guildRank !== 'RECRUITER');
+            checkForCaptainPromotion = false;
+        }
 
-                    playerLastLogins.forEach((player) => {
-                        if (counter === 30) {
-                            lastLoginsPage += '```';
-                            pages.push(lastLoginsPage);
-                            lastLoginsPage = '```diff\n' + player.toString();
-                            counter = 1;
-                        } else {
-                            lastLoginsPage += player.toString();
-                            counter++;
-                        }
-                    });
+        if (promotionRequirements[3].includes('NONE') && !checkForChiefPromotion && !checkForStrategistPromotion && !checkForCaptainPromotion) {
+            filteredRows = filteredRows.filter(player => player.guildRank !== 'RECRUIT');
+        }
 
-                    if (counter !== 30) {
-                        lastLoginsPage += '```';
-                        pages.push(lastLoginsPage);
-                    }
+        if (filteredRows.length === 0) {
+            return new ButtonedMessage('', [], '', [`No members of ${guildName} need promoting`]);
+        }
 
-                    const lastLoginsMessage = new ButtonedMessage('', [], '', pages);
+        let contributionPosition = 0;
 
-                    resolve(lastLoginsMessage);
-                },
-            );
+        let promoteGuildMembers = originalRows.map(row => {
+            contributionPosition++;
+
+            if (filteredRows.includes(row)) {
+                const {
+                    username,
+                    guildRank,
+                    contributedGuildXP,
+                    highestClassLevel,
+                } = row;
+
+                return new GuildMemberPromotion(username, guildRank, contributedGuildXP, highestClassLevel, contributionPosition, promotionRequirements, chiefRequirements, strategistRequirements, captainRequirements, recruiterRequirements);
+            }
         });
+
+        promoteGuildMembers = promoteGuildMembers.filter(player => player !== undefined).filter(player => player.toString() !== '');
+
+        const pages = [];
+        let promoteMembersPage = '```\n';
+        let counter = 0;
+
+        promoteGuildMembers.forEach((player) => {
+            if (counter === 20) {
+                promoteMembersPage += '```';
+                pages.push(promoteMembersPage);
+                promoteMembersPage = '```\n' + player.toString();
+                counter = 1;
+            } else {
+                promoteMembersPage += player.toString();
+                counter++;
+            }
+        });
+
+        if (counter !== 20) {
+            promoteMembersPage += '```';
+            pages.push(promoteMembersPage);
+        }
+
+        return new ButtonedMessage('', [], '', pages);
     } catch (error) {
-        return new ButtonedMessage('', [], '', [`Error checking last login stats for ${guildName}.`]);
+        console.log(error);
+        return new ButtonedMessage('', [], '', ['Error checking for guild promotions.']);
     }
 }
 

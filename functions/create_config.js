@@ -51,6 +51,22 @@ async function createConfig(client, guildId) {
                 guildName: null,
                 allies: [null],
                 trackedGuilds: [null],
+                chiefPromotionRequirement: ['NONE'],
+                strategistPromotionRequirement: ['NONE'],
+                captainPromotionRequirement: ['NONE'],
+                recruiterPromotionRequirement: ['NONE'],
+                chiefXPRequirement: 0,
+                chiefLevelRequirement: 0,
+                chiefContributorRequirement: 0,
+                strategistXPRequirement: 0,
+                strategistLevelRequirement: 0,
+                strategistContributorRequirement: 0,
+                captainXPRequirement: 0,
+                captainLevelRequirement: 0,
+                captainContributorRequirement: 0,
+                recruiterXPRequirement: 0,
+                recruiterLevelRequirement: 0,
+                recruiterContributorRequirement: 0,
             };
 
             try {

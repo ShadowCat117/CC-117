@@ -42,7 +42,7 @@ module.exports = {
             MessageManager.addMessage(response);
         } else if (response.pages[0] === '```\n```') {
             interaction.editReply({
-                content: 'No players found in the guild in your guild.',
+                content: 'No players found in your guild that need promoting.',
                 components: [],
             });
         } else {

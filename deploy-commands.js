@@ -3,15 +3,15 @@ const {
     Routes,
 } = require('discord.js');
 // Real bot
-// const {
-//     clientId,
-//     token,
-// } = require('./config.json');
-// Test bot
 const {
     clientId,
     token,
-} = require('./testConfig.json');
+} = require('./config.json');
+// Test bot
+// const {
+//     clientId,
+//     token,
+// } = require('./testConfig.json');
 const fs = require('node:fs');
 const path = require('node:path');
 

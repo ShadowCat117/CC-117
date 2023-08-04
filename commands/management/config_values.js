@@ -185,7 +185,6 @@ module.exports = {
                 }
 
                 break;
-
             default:
                 await interaction.reply({
                     content: 'Invalid configuration option.',
