@@ -7,13 +7,13 @@ const {
     GatewayIntentBits,
 } = require('discord.js');
 // Real bot
-const {
-    token,
-} = require('./config.json');
-// Test bot
 // const {
 //     token,
-// } = require('./testConfig.json');
+// } = require('./config.json');
+// Test bot
+const {
+    token,
+} = require('./testConfig.json');
 
 const client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],

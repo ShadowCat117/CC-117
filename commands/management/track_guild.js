@@ -16,8 +16,8 @@ module.exports = {
         .setDescription('Track a guild to see its average online players.')
         .addStringOption(option =>
             option.setName('guild_name')
-            .setDescription('The name of the guild you want to track.')
-            .setRequired(true)),
+                .setDescription('The name of the guild you want to track.')
+                .setRequired(true)),
     async execute(interaction) {
         await interaction.deferReply({
             ephemeral: true,

@@ -13,8 +13,8 @@ module.exports = {
         .setDescription('Prioritises a guild to be updated in the database.')
         .addStringOption(option =>
             option.setName('guild_name')
-            .setDescription('The name of the guild you want to be updated.')
-            .setRequired(true)),
+                .setDescription('The name of the guild you want to be updated.')
+                .setRequired(true)),
     async execute(interaction) {
         await interaction.deferReply({
             ephemeral: true,

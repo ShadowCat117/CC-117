@@ -3,15 +3,15 @@ const {
     Routes,
 } = require('discord.js');
 // Real bot
+// const {
+//     clientId,
+//     token,
+// } = require('./config.json');
+// Test bot
 const {
     clientId,
     token,
-} = require('./config.json');
-// Test bot
-// const {
-// 	clientId,
-// 	token,
-// } = require('./testConfig.json');
+} = require('./testConfig.json');
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -41,8 +41,8 @@ const rest = new REST().setToken(token);
 
         const data = await rest.put(
             Routes.applicationCommands(clientId), {
-                body: commands,
-            },
+            body: commands,
+        },
         );
 
         console.log(`Successfully reloaded ${data.length} application (/) commands.`);

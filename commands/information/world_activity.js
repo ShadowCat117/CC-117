@@ -13,8 +13,8 @@ module.exports = {
         .setDescription('View which world a guild is most active in currently.')
         .addStringOption(option =>
             option.setName('guild_name')
-            .setDescription('The name of the guild you want to see the active world for.')
-            .setRequired(true)),
+                .setDescription('The name of the guild you want to see the active world for.')
+                .setRequired(true)),
     async execute(interaction) {
         await interaction.deferReply();
 

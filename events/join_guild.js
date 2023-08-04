@@ -7,6 +7,6 @@ module.exports = {
   name: Events.GuildCreate,
   once: false,
   execute(guild) {
-      createConfig(guild.client, guild.id);
+    createConfig(guild.client, guild.id);
   },
 };

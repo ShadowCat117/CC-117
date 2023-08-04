@@ -32,9 +32,9 @@ function findGuild(input, force = false) {
                             } else {
                                 db.run(
                                     'INSERT INTO guilds (name, prefix) VALUES (?, ?)', [
-                                        json.name,
-                                        json.prefix,
-                                    ],
+                                    json.name,
+                                    json.prefix,
+                                ],
                                     (err) => {
                                         if (err) {
                                             console.error('Failed to insert guild:', err);

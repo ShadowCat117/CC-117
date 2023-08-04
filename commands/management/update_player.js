@@ -10,8 +10,8 @@ module.exports = {
         .setDescription('Prioritises a player to be updated in the database.')
         .addStringOption(option =>
             option.setName('player')
-            .setDescription('The name/UUID of the player you want to be updated. UUID is preferred.')
-            .setRequired(true)),
+                .setDescription('The name/UUID of the player you want to be updated. UUID is preferred.')
+                .setRequired(true)),
     async execute(interaction) {
         await interaction.deferReply({
             ephemeral: true,

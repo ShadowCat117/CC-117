@@ -68,7 +68,7 @@ module.exports = {
                                 guildNames.push(name);
                             }
                         });
-            
+
                         const priorityGuildsPath = path.join(__dirname, '..', 'updateGuilds.json');
 
                         if (fs.existsSync(priorityGuildsPath)) {

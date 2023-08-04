@@ -21,8 +21,8 @@ module.exports = {
         .setDescription('Updates your rank based on the given username.')
         .addStringOption(option =>
             option.setName('username')
-            .setDescription('The name of the player you want to verify as.')
-            .setRequired(true)),
+                .setDescription('The name of the player you want to verify as.')
+                .setRequired(true)),
     async execute(interaction) {
         await interaction.deferReply({
             ephemeral: true,

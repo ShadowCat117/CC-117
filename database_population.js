@@ -359,7 +359,7 @@ async function updatePriorityGuilds() {
                     const memberUuids = await allAsync('SELECT UUID FROM players WHERE guildName = ?', [priorityGuild]);
 
                     const uuids = memberUuids.map(row => row.UUID);
- 
+
                     for (const uuid of uuids) {
                         await addPlayerToPriority(uuid);
                     }
@@ -446,7 +446,7 @@ async function updateGuild(guildName) {
 
         for (const member of guild.members) {
             if (hitLimit) return;
-            
+
             await updatePlayersGuild(member.uuid, member.name, guild.name, member.rank, member.xp);
         }
     } catch (error) {
@@ -465,9 +465,9 @@ async function removeGuildMembers(guildName, members) {
 
         for (const uuid of uuids) {
             const memberToCheck = members.find((member) => member.uuid === uuid);
-      
+
             if (memberToCheck) {
-              continue;
+                continue;
             }
 
             const updateQuery = 'UPDATE players SET guildName = NULL, guildRank = NULL, contributedGuildXP = 0 WHERE UUID = ?';
@@ -572,7 +572,7 @@ async function updateGuildActivity() {
                 } else {
                     averageCount += 1;
                 }
-            }            
+            }
 
             const updateQuery = 'UPDATE guilds SET average' + currentHour + ' = ?, captains' + currentHour + ' = ?, averageCount = ? WHERE name = ?';
 
@@ -639,7 +639,7 @@ async function addPriorityGuilds() {
         console.error('Error adding priority guilds:', err);
     }
 }
-  
+
 async function runFunction() {
     hitLimit = false;
 

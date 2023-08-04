@@ -16,8 +16,8 @@ module.exports = {
         .setDescription('No longer track a guild\'s online players.')
         .addStringOption(option =>
             option.setName('guild_name')
-            .setDescription('The name of the guild you no longer want to track.')
-            .setRequired(true)),
+                .setDescription('The name of the guild you no longer want to track.')
+                .setRequired(true)),
     async execute(interaction) {
         await interaction.deferReply({
             ephemeral: true,

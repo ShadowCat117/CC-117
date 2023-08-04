@@ -16,8 +16,8 @@ module.exports = {
         .setDescription('Removes an ally Guild.')
         .addStringOption(option =>
             option.setName('guild_name')
-            .setDescription('The name of the guild you want to remove as an ally.')
-            .setRequired(true)),
+                .setDescription('The name of the guild you want to remove as an ally.')
+                .setRequired(true)),
     async execute(interaction) {
         await interaction.deferReply({
             ephemeral: true,
