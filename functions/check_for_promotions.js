@@ -122,7 +122,7 @@ async function checkForPromotions(guildId) {
             }
         });
 
-        if (counter !== 20) {
+        if (counter <= 20) {
             promoteMembersPage += '```';
             pages.push(promoteMembersPage);
         }

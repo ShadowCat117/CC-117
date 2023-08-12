@@ -118,7 +118,7 @@ async function lastLogins(interaction, force = false) {
                                 }
                             });
 
-                            if (counter !== 30) {
+                            if (counter <= 30) {
                                 lastLoginsPage += '```';
                                 pages.push(lastLoginsPage);
                             }
