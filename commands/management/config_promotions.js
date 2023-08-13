@@ -64,9 +64,8 @@ module.exports = {
                     value: 'recruiterContributorRequirement',
                 }))
         .addStringOption((option) =>
-            option.setName('value')
-                .setDescription('The value to set for the promotion option. Promotion requirements require a specific input.')
-                .setRequired(true)
+            option.setName('requirement')
+                .setDescription('The value to set for the promotion option.')
                 .addChoices({
                     name: 'None',
                     value: 'NONE',
@@ -80,6 +79,10 @@ module.exports = {
                     name: 'Top Contributor Requirement',
                     value: 'TOP',
                 }),
+        )
+        .addIntegerOption((option) =>
+            option.setName('requirement_number')
+                .setDescription('How much of the promotion requirement you need to achieve this promotion..'),
         ),
     async execute(interaction) {
         try {
@@ -113,19 +116,20 @@ module.exports = {
         }
 
         const option = interaction.options.getString('option');
-        const valueStr = interaction.options.getString('value');
+        const requirementStr = interaction.options.getString('requirement');
+        const requirementNum = interaction.options.getInteger('requirement_number');
         let number;
 
         switch (option) {
             case 'chiefPromotionRequirement':
-                if (valueStr == null) {
+                if (requirementStr == null) {
                     await interaction.reply({
                         content: 'Chief Promotion Requirement requires a <value> input.',
                         ephemeral: true,
                     });
 
                     return;
-                } else if (!containsPromotionValue(valueStr)) {
+                } else if (!containsPromotionValue(requirementStr)) {
                     await interaction.reply({
                         content: 'Chief Promotion Requirement requires the <value> input to be one of the presented options.',
                         ephemeral: true,
@@ -136,14 +140,14 @@ module.exports = {
 
                 break;
             case 'strategistPromotionRequirement':
-                if (valueStr == null) {
+                if (requirementStr == null) {
                     await interaction.reply({
                         content: 'Strategist Promotion Requirement requires a <value> input.',
                         ephemeral: true,
                     });
 
                     return;
-                } else if (!containsPromotionValue(valueStr)) {
+                } else if (!containsPromotionValue(requirementStr)) {
                     await interaction.reply({
                         content: 'Strategist Promotion Requirement requires the <value> input to be one of the presented options.',
                         ephemeral: true,
@@ -154,14 +158,14 @@ module.exports = {
 
                 break;
             case 'captainPromotionRequirement':
-                if (valueStr == null) {
+                if (requirementStr == null) {
                     await interaction.reply({
                         content: 'Captain Promotion Requirement requires a <value> input.',
                         ephemeral: true,
                     });
 
                     return;
-                } else if (!containsPromotionValue(valueStr)) {
+                } else if (!containsPromotionValue(requirementStr)) {
                     await interaction.reply({
                         content: 'Captain Promotion Requirement requires the <value> input to be one of the presented options.',
                         ephemeral: true,
@@ -172,14 +176,14 @@ module.exports = {
 
                 break;
             case 'recruiterPromotionRequirement':
-                if (valueStr == null) {
+                if (requirementStr == null) {
                     await interaction.reply({
                         content: 'Recruiter Promotion Requirement requires a <value> input.',
                         ephemeral: true,
                     });
 
                     return;
-                } else if (!containsPromotionValue(valueStr)) {
+                } else if (!containsPromotionValue(requirementStr)) {
                     await interaction.reply({
                         content: 'Recruiter Promotion Requirement requires the <value> input to be one of the presented options.',
                         ephemeral: true,
@@ -190,218 +194,146 @@ module.exports = {
 
                 break;
             case 'chiefXPRequirement':
-                if (!valueStr) {
+                if (!requirementNum) {
                     await interaction.reply({
                         content: 'Chief XP Requirement requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
-                } else if (isNaN(valueStr)) {
-                    await interaction.reply({
-                        content: 'Chief XP Requirement requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
-                    return;
                 } else {
-                    number = parseInt(valueStr);
+                    number = parseInt(requirementNum);
                 }
 
                 break;
             case 'chiefLevelRequirement':
-                if (!valueStr) {
+                if (!requirementNum) {
                     await interaction.reply({
                         content: 'Chief Level Requirement requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
-                } else if (isNaN(valueStr)) {
-                    await interaction.reply({
-                        content: 'Chief Level Requirement requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
-                    return;
                 } else {
-                    number = parseInt(valueStr);
+                    number = parseInt(requirementNum);
                 }
 
                 break;
             case 'chiefContributorRequirement':
-                if (!valueStr) {
+                if (!requirementNum) {
                     await interaction.reply({
                         content: 'Chief Contributor Requirement requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
-                } else if (isNaN(valueStr)) {
-                    await interaction.reply({
-                        content: 'Chief Contributor Requirement requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
-                    return;
                 } else {
-                    number = parseInt(valueStr);
+                    number = parseInt(requirementNum);
                 }
 
                 break;
             case 'strategistXPRequirement':
-                if (!valueStr) {
+                if (!requirementNum) {
                     await interaction.reply({
                         content: 'Strategist XP Requirement requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
-                } else if (isNaN(valueStr)) {
-                    await interaction.reply({
-                        content: 'Strategist XP Requirement requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
-                    return;
                 } else {
-                    number = parseInt(valueStr);
+                    number = parseInt(requirementNum);
                 }
 
                 break;
             case 'strategistLevelRequirement':
-                if (!valueStr) {
+                if (!requirementNum) {
                     await interaction.reply({
                         content: 'Strategist Level Requirement requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
-                } else if (isNaN(valueStr)) {
-                    await interaction.reply({
-                        content: 'Strategist Level Requirement requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
-                    return;
                 } else {
-                    number = parseInt(valueStr);
+                    number = parseInt(requirementNum);
                 }
 
                 break;
             case 'strategistContributorRequirement':
-                if (!valueStr) {
+                if (!requirementNum) {
                     await interaction.reply({
                         content: 'Strategist Contributor Requirement requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
-                } else if (isNaN(valueStr)) {
-                    await interaction.reply({
-                        content: 'Strategist Contributor Requirement requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
-                    return;
                 } else {
-                    number = parseInt(valueStr);
+                    number = parseInt(requirementNum);
                 }
 
                 break;
             case 'captainXPRequirement':
-                if (!valueStr) {
+                if (!requirementNum) {
                     await interaction.reply({
                         content: 'Captain XP Requirement requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
-                } else if (isNaN(valueStr)) {
-                    await interaction.reply({
-                        content: 'Captain XP Requirement requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
-                    return;
                 } else {
-                    number = parseInt(valueStr);
+                    number = parseInt(requirementNum);
                 }
 
                 break;
             case 'captainLevelRequirement':
-                if (!valueStr) {
+                if (!requirementNum) {
                     await interaction.reply({
                         content: 'Captain Level Requirement requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
-                } else if (isNaN(valueStr)) {
-                    await interaction.reply({
-                        content: 'Captain Level Requirement requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
-                    return;
                 } else {
-                    number = parseInt(valueStr);
+                    number = parseInt(requirementNum);
                 }
 
                 break;
             case 'captainContributorRequirement':
-                if (!valueStr) {
+                if (!requirementNum) {
                     await interaction.reply({
                         content: 'Captain Contributor Requirement requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
-                } else if (isNaN(valueStr)) {
-                    await interaction.reply({
-                        content: 'Captain Contributor Requirement requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
-                    return;
                 } else {
-                    number = parseInt(valueStr);
+                    number = parseInt(requirementNum);
                 }
 
                 break;
             case 'recruiterXPRequirement':
-                if (!valueStr) {
+                if (!requirementNum) {
                     await interaction.reply({
                         content: 'Recruiter XP Requirement requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
-                } else if (isNaN(valueStr)) {
-                    await interaction.reply({
-                        content: 'Recruiter XP Requirement requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
-                    return;
                 } else {
-                    number = parseInt(valueStr);
+                    number = parseInt(requirementNum);
                 }
 
                 break;
             case 'recruiterLevelRequirement':
-                if (!valueStr) {
+                if (!requirementNum) {
                     await interaction.reply({
                         content: 'Recruiter Level Requirement requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
-                } else if (isNaN(valueStr)) {
-                    await interaction.reply({
-                        content: 'Recruiter Level Requirement requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
-                    return;
                 } else {
-                    number = parseInt(valueStr);
+                    number = parseInt(requirementNum);
                 }
 
                 break;
             case 'recruiterContributorRequirement':
-                if (!valueStr) {
+                if (!requirementNum) {
                     await interaction.reply({
                         content: 'Recruiter Contributor Requirement requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
-                } else if (isNaN(valueStr)) {
-                    await interaction.reply({
-                        content: 'Recruiter Contributor Requirement requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
-                    return;
                 } else {
-                    number = parseInt(valueStr);
+                    number = parseInt(requirementNum);
                 }
 
                 break;
@@ -443,7 +375,7 @@ module.exports = {
                 case 'strategistPromotionRequirement':
                 case 'captainPromotionRequirement':
                 case 'recruiterPromotionRequirement':
-                    if (valueStr === 'NONE') {
+                    if (requirementStr === 'NONE') {
                         if (config[option].includes('NONE')) {
                             await interaction.reply({
                                 content: `Configuration option \`${option}\` is already NONE.`,
@@ -452,19 +384,19 @@ module.exports = {
 
                             return;
                         } else {
-                            config[option] = [valueStr];
+                            config[option] = [requirementStr];
                         }
                     } else {
-                        if (config[option].includes(valueStr)) {
+                        if (config[option].includes(requirementStr)) {
                             await interaction.reply({
-                                content: `Configuration option \`${option}\` already includes ${valueStr}.`,
+                                content: `Configuration option \`${option}\` already includes ${requirementStr}.`,
                                 ephemeral: true,
                             });
 
                             return;
                         } else {
                             config[option] = config[option].filter(item => item !== 'NONE');
-                            config[option].push(valueStr);
+                            config[option].push(requirementStr);
                         }
                     }
 
@@ -473,15 +405,15 @@ module.exports = {
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
-            if (valueStr) {
-                if (valueStr === 'NONE') {
+            if (requirementStr) {
+                if (requirementStr === 'NONE') {
                     await interaction.reply({
                         content: `Configuration option \`${option}\` updated successfully to NONE.`,
                         ephemeral: true,
                     });
                 } else {
                     await interaction.reply({
-                        content: `Configuration option \`${option}\` updated successfully to include ${valueStr}.`,
+                        content: `Configuration option \`${option}\` updated successfully to include ${requirementStr}.`,
                         ephemeral: true,
                     });
                 }
