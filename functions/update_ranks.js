@@ -42,6 +42,8 @@ async function updateRanks(guild) {
 
             const verifiedServerMembers = [];
 
+            const serverMembersToIgnore = [];
+
             for (const serverMember of guild.members.cache.values()) {
                 if (serverMember.user.bot) {
                     continue;
@@ -56,8 +58,10 @@ async function updateRanks(guild) {
                         nickname = serverMember.nickname.split(' [')[0];
                     }
 
-                    if (guildMember.username === serverMember.user.username || guildMember.username === serverMember.user.globalName || guildMember.username === nickname) {
+                    if (guildMember.username === nickname || guildMember.username === serverMember.user.globalName || guildMember.username === serverMember.user.username) {
                         const updated = await applyRoles(guild, guildMember.UUID, serverMember);
+
+                        serverMembersToIgnore.push(serverMember.user.username);
 
                         if (updated > 0) {
                             if (updatedMembers > 0) {
@@ -87,7 +91,7 @@ async function updateRanks(guild) {
                 const allyRows = await allAsync('SELECT UUID, username FROM players WHERE guildName = ?', [allyGuild]);
 
                 for (const serverMember of guild.members.cache.values()) {
-                    if (serverMember.user.bot) {
+                    if (serverMember.user.bot || serverMembersToIgnore.includes(serverMember.user.username)) {
                         continue;
                     }
 
@@ -100,7 +104,7 @@ async function updateRanks(guild) {
                             nickname = serverMember.nickname.split(' [')[0];
                         }
 
-                        if (guildMember.username === serverMember.user.username || guildMember.username === serverMember.user.globalName || guildMember.username === nickname) {
+                        if (guildMember.username === nickname || guildMember.username === serverMember.user.globalName || guildMember.username === serverMember.user.username) {
                             const updated = await applyRoles(guild, guildMember.UUID, serverMember);
 
                             if (updated > 0) {
