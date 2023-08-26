@@ -48,6 +48,8 @@ async function createConfig(client, guildId) {
                 captainThreshold: 40,
                 recruiterThreshold: 25,
                 recruitThreshold: 25,
+                levelRequirement: 100,
+                inactiveMultiplier: 1,
                 guildName: null,
                 allies: [null],
                 trackedGuilds: [null],

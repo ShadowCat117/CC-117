@@ -34,6 +34,12 @@ module.exports = {
                 }, {
                     name: 'Recruit Inactive Threshold',
                     value: 'recruitThreshold',
+                }, {
+                    name: 'Inactivity Full Level Requirement',
+                    value: 'levelRequirement',
+                }, {
+                    name: 'Inactivity Multiplier',
+                    value: 'inactiveMultiplier',
                 }))
         .addStringOption((option) =>
             option.setName('value')
@@ -170,6 +176,42 @@ module.exports = {
             case 'recruitThreshold':
                 if (!valueStr) {
                     await interaction.reply({
+                        content: 'Inactivity Full Level Requirement requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else if (isNaN(valueStr)) {
+                    await interaction.reply({
+                        content: 'Inactivity Full Level Requirement requires <value> to be a number input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseFloat(valueStr);
+                }
+
+                break;
+            case 'levelRequirement':
+                if (!valueStr) {
+                    await interaction.reply({
+                        content: 'Inactivity Multiplier requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else if (isNaN(valueStr)) {
+                    await interaction.reply({
+                        content: 'Inactivity Multiplier requires <value> to be a number input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseFloat(valueStr);
+                }
+
+                break;
+            case 'inactiveMultiplier':
+                if (!valueStr) {
+                    await interaction.reply({
                         content: 'Recruit Inactive Threshold requires a <value> input.',
                         ephemeral: true,
                     });
@@ -213,6 +255,8 @@ module.exports = {
                 case 'captainThreshold':
                 case 'recruiterThreshold':
                 case 'recruitThreshold':
+                case 'levelRequirement':
+                case 'inactiveMultiplier':
                     config[option] = number;
                     break;
             }

@@ -1,7 +1,8 @@
 class PlayerLastLogin {
-    constructor(playerName, guildRank, daysSinceLastLogin, isOnline, displayColours, inactiveThreshold) {
+    constructor(playerName, guildRank, highestClassLevel, daysSinceLastLogin, isOnline, displayColours, inactiveThreshold) {
         this.playerName = playerName;
         this.guildRank = guildRank;
+        this.highestClassLevel = highestClassLevel;
         this.daysSinceLastLogin = daysSinceLastLogin;
         this.isOnline = isOnline;
         this.displayColours = displayColours;
@@ -13,23 +14,23 @@ class PlayerLastLogin {
             const colour = this.getColour();
 
             if (this.isOnline) {
-                return `${colour} ${this.playerName.padEnd(16)} (${this.guildRank}) is currently online!\n`;
+                return `${colour} ${this.playerName.padEnd(16)} (${this.guildRank}, ${this.highestClassLevel}) is currently online!\n`;
             } else if (this.daysSinceLastLogin == 1) {
-                return `${colour} ${this.playerName.padEnd(16)} (${this.guildRank}) has been inactive for ${this.daysSinceLastLogin} day!\n`;
+                return `${colour} ${this.playerName.padEnd(16)} (${this.guildRank}, ${this.highestClassLevel}) has been inactive for ${this.daysSinceLastLogin} day!\n`;
             } else if (this.daysSinceLastLogin == 0) {
-                return `${colour} ${this.playerName.padEnd(16)} (${this.guildRank}) was last online today!\n`;
+                return `${colour} ${this.playerName.padEnd(16)} (${this.guildRank}, ${this.highestClassLevel}) was last online today!\n`;
             } else {
-                return `${colour} ${this.playerName.padEnd(16)} (${this.guildRank}) has been inactive for ${this.daysSinceLastLogin} days!\n`;
+                return `${colour} ${this.playerName.padEnd(16)} (${this.guildRank}, ${this.highestClassLevel}) has been inactive for ${this.daysSinceLastLogin} days!\n`;
             }
         } else {
             if (this.isOnline) {
-                return `${this.playerName.padEnd(16)} (${this.guildRank}) is currently online!\n`;
+                return `${this.playerName.padEnd(16)} (${this.guildRank}, ${this.highestClassLevel}) is currently online!\n`;
             } else if (this.daysSinceLastLogin == 1) {
-                return `${this.playerName.padEnd(16)} (${this.guildRank}) has been inactive for ${this.daysSinceLastLogin} day!\n`;
+                return `${this.playerName.padEnd(16)} (${this.guildRank}, ${this.highestClassLevel}) has been inactive for ${this.daysSinceLastLogin} day!\n`;
             } else if (this.daysSinceLastLogin == 0) {
-                return `${this.playerName.padEnd(16)} (${this.guildRank}) was last online today!\n`;
+                return `${this.playerName.padEnd(16)} (${this.guildRank}, ${this.highestClassLevel}) was last online today!\n`;
             } else {
-                return `${this.playerName.padEnd(16)} (${this.guildRank}) has been inactive for ${this.daysSinceLastLogin} days!\n`;
+                return `${this.playerName.padEnd(16)} (${this.guildRank}, ${this.highestClassLevel}) has been inactive for ${this.daysSinceLastLogin} days!\n`;
             }
         }
     }

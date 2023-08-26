@@ -51,10 +51,13 @@ async function lastLogins(interaction, force = false) {
                 const captainThreshold = config.captainThreshold;
                 const recruiterThreshold = config.recruiterThreshold;
                 const recruitThreshold = config.recruitThreshold;
+                // Added after the bot has released so won't be in old config files
+                const levelRequirement = config.levelRequirement || 100;
+                const inactiveMultiplier = config.inactiveMultiplier || 1;
 
                 return new Promise((resolve, reject) => {
                     db.all(
-                        'SELECT username, guildRank, lastJoin, isOnline FROM players WHERE guildName = ?', [guildName],
+                        'SELECT username, guildRank, lastJoin, isOnline, highestClassLevel FROM players WHERE guildName = ?', [guildName],
                         async (err, rows) => {
                             if (err) {
                                 console.error('Error retrieving player data:', err);
@@ -67,25 +70,51 @@ async function lastLogins(interaction, force = false) {
                                     guildRank,
                                     lastJoin,
                                     isOnline,
+                                    highestClassLevel,
                                 } = row;
                                 const displayColours = true;
                                 let inactiveThreshold;
 
                                 switch (guildRank) {
                                     case 'CHIEF':
-                                        inactiveThreshold = chiefThreshold;
+                                        if (highestClassLevel >= levelRequirement) {
+                                            inactiveThreshold = chiefThreshold;
+                                        } else {
+                                            inactiveThreshold = chiefThreshold * inactiveMultiplier;
+                                        }
+                                        
                                         break;
                                     case 'STRATEGIST':
-                                        inactiveThreshold = strategistThreshold;
+                                        if (highestClassLevel >= levelRequirement) {
+                                            inactiveThreshold = strategistThreshold;
+                                        } else {
+                                            inactiveThreshold = strategistThreshold * inactiveMultiplier;
+                                        }
+
                                         break;
                                     case 'CAPTAIN':
-                                        inactiveThreshold = captainThreshold;
+                                        if (highestClassLevel >= levelRequirement) {
+                                            inactiveThreshold = captainThreshold;
+                                        } else {
+                                            inactiveThreshold = captainThreshold * inactiveMultiplier;
+                                        }
+
                                         break;
                                     case 'RECRUITER':
-                                        inactiveThreshold = recruiterThreshold;
+                                        if (highestClassLevel >= levelRequirement) {
+                                            inactiveThreshold = recruiterThreshold;
+                                        } else {
+                                            inactiveThreshold = recruiterThreshold * inactiveMultiplier;
+                                        }
+
                                         break;
                                     case 'RECRUIT':
-                                        inactiveThreshold = recruitThreshold;
+                                        if (highestClassLevel >= levelRequirement) {
+                                            inactiveThreshold = recruitThreshold;
+                                        } else {
+                                            inactiveThreshold = recruitThreshold * inactiveMultiplier;
+                                        }
+
                                         break;
                                     default:
                                         inactiveThreshold = Number.MAX_SAFE_INTEGER;
@@ -97,7 +126,7 @@ async function lastLogins(interaction, force = false) {
                                 const timeDiff = currentDate.getTime() - lastJoinDate.getTime();
                                 const daysSinceLastLogin = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
 
-                                return new PlayerLastLogin(username, guildRank, daysSinceLastLogin, isOnline, displayColours, inactiveThreshold);
+                                return new PlayerLastLogin(username, guildRank, highestClassLevel, daysSinceLastLogin, isOnline, displayColours, inactiveThreshold);
                             });
 
                             playerLastLogins.sort((a, b) => a.compareTo(b));
