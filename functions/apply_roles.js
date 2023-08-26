@@ -81,7 +81,7 @@ async function applyRoles(guild, uuid, member) {
                                     .catch(() => {
                                         errorMessage += `Failed to remove rank role ${role.name} from ${member.user.username}.\n`;
                                     });
-                            } else if (memberRoles.has(veteranRole.id)) {
+                            } else if (veteranRole && memberRoles.has(veteranRole.id)) {
                                 await member.roles.remove(veteranRole)
                                     .then(() => {
                                         console.log(`Removed veteran role from ${member.user.username}`);
@@ -90,7 +90,7 @@ async function applyRoles(guild, uuid, member) {
                                     .catch(() => {
                                         errorMessage += `Failed to remove veteran role from ${member.user.username}.\n`;
                                     });
-                            } else if (memberRoles.has(memberOfRole.id)) {
+                            } else if (memberOfRole && memberRoles.has(memberOfRole.id)) {
                                 await member.roles.remove(memberOfRole)
                                     .then(() => {
                                         console.log(`Removed member of role from ${member.user.username}`);
@@ -102,7 +102,7 @@ async function applyRoles(guild, uuid, member) {
                             }
                         }
 
-                        if (config.verifyMembers && !memberRoles.has(unverifiedRole.id)) {
+                        if (config.verifyMembers && (unverifiedRole && !memberRoles.has(unverifiedRole.id))) {
                             await member.roles.add(unverifiedRole)
                                 .then(() => {
                                     console.log(`Added unverified role to ${member.user.username}`);
