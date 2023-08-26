@@ -223,9 +223,7 @@ module.exports = {
                     });
                     return;
                 } else {
-                    console.log(valueStr);
                     number = parseFloat(valueStr);
-                    console.log(number);
                 }
 
                 break;
