@@ -176,6 +176,24 @@ module.exports = {
             case 'recruitThreshold':
                 if (!valueStr) {
                     await interaction.reply({
+                        content: 'Recruit Inactive Threshold requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else if (isNaN(valueStr)) {
+                    await interaction.reply({
+                        content: 'Recruit Inactive Threshold requires <value> to be a number input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseFloat(valueStr);
+                }
+
+                break;
+            case 'levelRequirement':
+                if (!valueStr) {
+                    await interaction.reply({
                         content: 'Inactivity Full Level Requirement requires a <value> input.',
                         ephemeral: true,
                     });
@@ -187,11 +205,11 @@ module.exports = {
                     });
                     return;
                 } else {
-                    number = parseFloat(valueStr);
+                    number = parseInt(valueStr);
                 }
 
                 break;
-            case 'levelRequirement':
+            case 'inactiveMultiplier':
                 if (!valueStr) {
                     await interaction.reply({
                         content: 'Inactivity Multiplier requires a <value> input.',
@@ -205,25 +223,9 @@ module.exports = {
                     });
                     return;
                 } else {
+                    console.log(valueStr);
                     number = parseFloat(valueStr);
-                }
-
-                break;
-            case 'inactiveMultiplier':
-                if (!valueStr) {
-                    await interaction.reply({
-                        content: 'Recruit Inactive Threshold requires a <value> input.',
-                        ephemeral: true,
-                    });
-                    return;
-                } else if (isNaN(valueStr)) {
-                    await interaction.reply({
-                        content: 'Recruit Inactive Threshold requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
-                    return;
-                } else {
-                    number = parseInt(valueStr);
+                    console.log(number);
                 }
 
                 break;
