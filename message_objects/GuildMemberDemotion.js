@@ -78,7 +78,7 @@ class GuildMemberDemotion {
                 } else {
                     reason += `, highest class level is lower than ${rankRequirements[1]}`;
                 }
-            } else if (this.demotionStatus !== '') {
+            } else if (demote) {
                 return '';
             }
         }
@@ -91,7 +91,7 @@ class GuildMemberDemotion {
                 } else {
                     reason += `, contribution position lower than ${rankRequirements[2]}`;
                 }
-            } else if (this.demotionStatus !== '') {
+            } else if (demote) {
                 return '';
             }
         }
