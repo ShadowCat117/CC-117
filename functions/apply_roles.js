@@ -35,14 +35,27 @@ async function applyRoles(guild, uuid, member) {
         const allyRole = guild.roles.cache.get(config['allyRole']);
         const memberOfRole = guild.roles.cache.get(config['memberOfRole']);
         const veteranRole = guild.roles.cache.get(config['vetRole']);
+        const levelRoleOne = guild.roles.cache.get(config['levelRoleOne']);
+        const levelRoleTwo = guild.roles.cache.get(config['levelRoleTwo']);
+        const levelRoleThree = guild.roles.cache.get(config['levelRoleThree']);
+        const levelRoleFour = guild.roles.cache.get(config['levelRoleFour']);
+        const levelRoleFive = guild.roles.cache.get(config['levelRoleFive']);
+        const levelRoleSix = guild.roles.cache.get(config['levelRoleSix']);
+        const levelRoleSeven = guild.roles.cache.get(config['levelRoleSeven']);
+        const levelRoleEight = guild.roles.cache.get(config['levelRoleEight']);
+        const levelRoleNine = guild.roles.cache.get(config['levelRoleNine']);
+        const levelRoleTen = guild.roles.cache.get(config['levelRoleTen']);
 
         const guildRoles = [ownerRole, chiefRole, strategistRole, captainRole, recruiterRole, recruitRole];
         const rankRoles = [championRole, heroRole, vipPlusRole, vipRole];
         const allyRoles = [allyOwnerRole, allyRole];
+        const levelRoles = [levelRoleOne, levelRoleTwo, levelRoleThree, levelRoleFour, levelRoleFive, levelRoleSix, levelRoleSeven, levelRoleEight, levelRoleNine, levelRoleTen];
+
+        const levelRoleLevels = [config['levelRoleOneLevel'], config['levelRoleTwoLevel'], config['levelRoleThreeLevel'], config['levelRoleFourLevel'], config['levelRoleFiveLevel'], config['levelRoleSixLevel'], config['levelRoleSevenLevel'], config['levelRoleEightLevel'], config['levelRoleNineLevel'], config['levelRoleTenLevel']];
 
         return new Promise((resolve, reject) => {
             db.get(
-                'SELECT username, guildName, guildRank, rank, veteran FROM players WHERE UUID = ?', [uuid],
+                'SELECT username, guildName, guildRank, rank, veteran, highestClassLevel FROM players WHERE UUID = ?', [uuid],
                 async (err, row) => {
                     if (err) {
                         console.error('Error retrieving player data:', err);
@@ -98,6 +111,15 @@ async function applyRoles(guild, uuid, member) {
                                     })
                                     .catch(() => {
                                         errorMessage += `Failed to remove member of role from ${member.user.username}.\n`;
+                                    });
+                            } else if (levelRoles.includes(role)) {
+                                await member.roles.remove(role)
+                                    .then(() => {
+                                        console.log(`Removed level role ${role.name} from ${member.user.username}`);
+                                        hasUpdated = true;
+                                    })
+                                    .catch(() => {
+                                        errorMessage += `Failed to remove level role ${role.name} from ${member.user.username}.\n`;
                                     });
                             }
                         }
@@ -334,6 +356,44 @@ async function applyRoles(guild, uuid, member) {
                                     })
                                     .catch(() => {
                                         errorMessage += `Failed to remove veteran role from ${member.user.username}.\n`;
+                                    });
+                            }
+                        }
+                    }
+
+                    if (config.levelRoles) {
+                        let levelRoleToApply;
+
+                        for (let i = 0; i < levelRoles.length; i++) {
+                            if (levelRoleLevels[i] && row.highestClassLevel >= levelRoleLevels[i]) {
+                                if (levelRoles[i] && !memberRoles.has(levelRoles[i].id)) {
+                                    levelRoleToApply = levelRoles[i];
+
+                                    await member.roles.add(levelRoles[i])
+                                        .then(() => {
+                                            console.log(`Added level role to ${member.user.username}`);
+                                            hasUpdated = true;
+                                        })
+                                        .catch(() => {
+                                            errorMessage += `Failed to add level role to ${member.user.username}.\n`;
+                                        });
+
+                                        break;
+                                } else if (!veteranRole) {
+                                    errorMessage += `Level role ${i + 1} is not defined in the config or is invalid.\n`;
+                                }
+                            }
+                        }
+
+                        for (const role of memberRoles.values()) {
+                            if (levelRoles.includes(role) && role !== levelRoleToApply) {
+                                await member.roles.remove(role)
+                                    .then(() => {
+                                        console.log(`Removed level role ${role.name} from ${member.user.username}`);
+                                        hasUpdated = true;
+                                    })
+                                    .catch(() => {
+                                        errorMessage += `Failed to remove level role ${role.name} from ${member.user.username}.\n`;
                                     });
                             }
                         }

@@ -7,43 +7,46 @@ const createConfig = require('../../functions/create_config');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('config_features')
-        .setDescription('Update configuration options')
+        .setName('config_levelroles')
+        .setDescription('Update level role configurations')
         .addStringOption((option) =>
             option.setName('option')
                 .setDescription('The configuration option to update')
                 .setRequired(true)
                 .addChoices({
-                    name: 'Update Ranks',
-                    value: 'updateRanks',
+                    name: 'Level Role One',
+                    value: 'levelRoleOne',
                 }, {
-                    name: 'Change Nicknames',
-                    value: 'changeNicknames',
+                    name: 'Level Role Two',
+                    value: 'levelRoleTwo',
                 }, {
-                    name: 'Check Duplicate Nicknames',
-                    value: 'checkDuplicateNicknames',
+                    name: 'Level Role Three',
+                    value: 'levelRoleThree',
                 }, {
-                    name: 'Send Log Messages',
-                    value: 'logMessages',
+                    name: 'Level Role Four',
+                    value: 'levelRoleFour',
                 }, {
-                    name: 'Send Join/Leave Messages',
-                    value: 'sendJoinLeaveMessages',
+                    name: 'Level Role Five',
+                    value: 'levelRoleFive',
                 }, {
-                    name: 'Add Unverified Role',
-                    value: 'verifyMembers',
+                    name: 'Level Role Six',
+                    value: 'levelRoleSix',
                 }, {
-                    name: 'Add Veteran Role',
-                    value: 'veteranRole',
+                    name: 'Level Role Seven',
+                    value: 'levelRoleSeven',
                 }, {
-                    name: 'Member of Role',
-                    value: 'memberOf',
+                    name: 'Level Role Eight',
+                    value: 'levelRoleEight',
                 }, {
-                    name: 'Level Roles',
-                    value: 'levelRoles',
+                    name: 'Level Role Nine',
+                    value: 'levelRoleNine',
+                }, {
+                    name: 'Level Role Ten',
+                    value: 'levelRoleTen',
                 }))
-        .addBooleanOption((option) =>
-            option.setName('enabled')
-                .setDescription('Enable or disable this feature.'),
+        .addRoleOption((option) =>
+            option.setName('role')
+                .setDescription('The role value to set for the configuration option'),
         ),
     async execute(interaction) {
         try {
@@ -66,7 +69,10 @@ module.exports = {
             const memberRoles = interaction.member.roles.cache;
 
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
-                await interaction.reply('You do not have the required permissions to run this command.');
+                await interaction.reply({
+                    content: 'You do not have the required permissions to run this command.',
+                    ephemeral: true,
+                });
                 return;
             }
 
@@ -77,93 +83,103 @@ module.exports = {
         }
 
         const option = interaction.options.getString('option');
-        const enabled = interaction.options.getBoolean('enabled');
+        const role = interaction.options.getRole('role');
 
         switch (option) {
-            case 'updateRanks':
-                if (enabled == null) {
+            case 'levelRoleOne':
+                if (role == null) {
                     await interaction.reply({
-                        content: 'Update Ranks requires an <enabled> input.',
+                        content: 'Level Role One requires a <role> input.',
                         ephemeral: true,
                     });
                     return;
                 }
 
                 break;
-            case 'changeNicknames':
-                if (enabled == null) {
+            case 'levelRoleTwo':
+                if (role == null) {
                     await interaction.reply({
-                        content: 'Change Nicknames requires an <enabled> input.',
+                        content: 'Level Role Two requires a <role> input.',
                         ephemeral: true,
                     });
                     return;
                 }
 
                 break;
-            case 'checkDuplicateNicknames':
-                if (enabled == null) {
+            case 'levelRoleThree':
+                if (role == null) {
                     await interaction.reply({
-                        content: 'Check Duplicate Nicknames requires an <enabled> input.',
+                        content: 'Level Role Three requires a <role> input.',
                         ephemeral: true,
                     });
                     return;
                 }
 
                 break;
-            case 'logMessages':
-                if (enabled == null) {
+            case 'levelRoleFour':
+                if (role == null) {
                     await interaction.reply({
-                        content: 'Send Log Messages requires an <enabled> input.',
+                        content: 'Level Role Four requires a <role> input.',
                         ephemeral: true,
                     });
                     return;
                 }
 
                 break;
-            case 'sendJoinLeaveMessages':
-                if (enabled == null) {
+            case 'levelRoleFive':
+                if (role == null) {
                     await interaction.reply({
-                        content: 'Send Join/Leave Messages requires an <enabled> input.',
+                        content: 'Level Role Five requires a <role> input.',
                         ephemeral: true,
                     });
                     return;
                 }
 
                 break;
-            case 'verifyMembers':
-                if (enabled == null) {
+            case 'levelRoleSix':
+                if (role == null) {
                     await interaction.reply({
-                        content: 'Verified Roles requires an <enabled> input.',
+                        content: 'Level Role Six requires a <role> input.',
                         ephemeral: true,
                     });
                     return;
                 }
 
                 break;
-            case 'veteranRole':
-                if (enabled == null) {
+            case 'levelRoleSeven':
+                if (role == null) {
                     await interaction.reply({
-                        content: 'Veteran Role requires an <enabled> input.',
+                        content: 'Level Role Seven requires a <role> input.',
                         ephemeral: true,
                     });
                     return;
                 }
 
                 break;
-            case 'memberOf':
-                if (enabled == null) {
+            case 'levelRoleEight':
+                if (role == null) {
                     await interaction.reply({
-                        content: 'Member of Role requires an <enabled> input.',
+                        content: 'Level Role Eight requires a <role> input.',
                         ephemeral: true,
                     });
                     return;
                 }
 
                 break;
-            case 'levelRoles':
-                if (enabled == null) {
+            case 'levelRoleNine':
+                if (role == null) {
                     await interaction.reply({
-                        content: 'Level Roles requires an <enabled> input.',
+                        content: 'Level Role Nine requires a <role> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                }
+
+                break;
+            case 'levelRoleTen':
+                if (role == null) {
+                    await interaction.reply({
+                        content: 'Level Role Ten requires a <role> input.',
                         ephemeral: true,
                     });
                     return;
@@ -183,29 +199,46 @@ module.exports = {
 
         try {
             let config = {};
+
             if (fs.existsSync(filePath)) {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
             }
 
+            const guild = interaction.guild;
+            const botRole = guild.roles.cache.find(roleSearch => roleSearch.managed && roleSearch.members.has(interaction.client.user.id));
+
+            let message;
+
+            if (botRole) {
+                if (role.comparePositionTo(botRole) > 0) {
+                    message = `Configuration option \`${option}\` updated successfully to ${role}.\n\nThe ${role} role is currently above the ${botRole} role in your hierarchy, this means that I will not be able to add that role to members, please change this so I can add the role correctly!`;
+                } else {
+                    message = `Configuration option \`${option}\` updated successfully to ${role}.`;
+                }
+            } else {
+                message = `Configuration option \`${option}\` updated successfully to ${role}.\nFor some reason my role was not found on your server. Please try kicking and inviting me again to try and fix this. Your config options will be saved.`;
+            }
+
             switch (option) {
-                case 'updateRanks':
-                case 'changeNicknames':
-                case 'checkDuplicateNicknames':
-                case 'logMessages':
-                case 'sendJoinLeaveMessages':
-                case 'verifyMembers':
-                case 'veteranRole':
-                case 'memberOf':
-                case 'levelRoles':
-                    config[option] = enabled;
+                case 'levelRoleOne':
+                case 'levelRoleTwo':
+                case 'levelRoleThree':
+                case 'levelRoleFour':
+                case 'levelRoleFive':
+                case 'levelRoleSix':
+                case 'levelRoleSeven':
+                case 'levelRoleEight':
+                case 'levelRoleNine':
+                case 'levelRoleTen':
+                    config[option] = role.id;
                     break;
             }
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
             await interaction.reply({
-                content: `Configuration option \`${option}\` updated successfully to ${enabled}.`,
+                content: message,
                 ephemeral: true,
             });
         } catch (error) {
