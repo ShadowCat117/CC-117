@@ -68,6 +68,10 @@ module.exports = {
                                 .setPlaceholder('Select timezone!')
                                 .addOptions(
                                     new StringSelectMenuOptionBuilder()
+                                        .setLabel('PST')
+                                        .setDescription('UTC-8')
+                                        .setValue('-8'),
+                                    new StringSelectMenuOptionBuilder()
                                         .setLabel('PDT')
                                         .setDescription('UTC-7')
                                         .setValue('-7'),
@@ -299,6 +303,10 @@ module.exports = {
                 .setCustomId('timezone')
                 .setPlaceholder('Select timezone!')
                 .addOptions(
+                    new StringSelectMenuOptionBuilder()
+                        .setLabel('PST')
+                        .setDescription('UTC-8')
+                        .setValue('-8'),
                     new StringSelectMenuOptionBuilder()
                         .setLabel('PDT')
                         .setDescription('UTC-7')

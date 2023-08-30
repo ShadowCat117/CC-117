@@ -1,4 +1,5 @@
 const TimezoneValue = {
+  PST: -8,
   PDT: -7,
   MDT: -6,
   CDT: -5,
