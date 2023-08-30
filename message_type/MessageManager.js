@@ -22,6 +22,14 @@ function getMessage(messageId) {
     return null;
 }
 
+function setMessagePages(message, pages) {
+    const index = messages.indexOf(message);
+
+    if (index !== -1) {
+        messages[index].setPages(pages);
+    }
+}
+
 function getMessages() {
     return messages;
 }
@@ -44,6 +52,7 @@ module.exports = {
     addMessage,
     removeMessage,
     getMessage,
+    setMessagePages,
     getMessages,
     removeOldMessages,
 };

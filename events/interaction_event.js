@@ -174,6 +174,8 @@ module.exports = {
                                 content: result.pages[0],
                                 components: [row],
                             });
+
+                            MessageManager.setMessagePages(message, result.pages);
                         } else {
                             if (result.pages[0] === '```\n```') {
                                 interaction.update({

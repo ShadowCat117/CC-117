@@ -20,6 +20,11 @@ class ButtonedMessage {
         this.message = message;
     }
 
+    setPages(pages) {
+        this.pages = pages;
+        this.pageCount = this.pages.length;
+    }
+
     getNextPage() {
         if (this.currentPage == this.pageCount - 1) {
             this.currentPage = 0;
