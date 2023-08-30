@@ -180,7 +180,7 @@ async function lastLogins(interaction, force = false) {
                                 const timeDiff = currentDate.getTime() - lastJoinDate.getTime();
                                 const daysSinceLastLogin = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
 
-                                return new PlayerLastLogin(username, guildRank, daysSinceLastLogin, isOnline, false, 0);
+                                return new PlayerLastLogin(username, guildRank, 0, daysSinceLastLogin, isOnline, false, 0);
                             });
 
                             playerLastLogins.sort((a, b) => a.compareTo(b));
