@@ -379,8 +379,11 @@ async function applyRoles(guild, uuid, member) {
                                         });
 
                                         break;
-                                } else if (!veteranRole) {
+                                } else if (!levelRoles[i]) {
                                     errorMessage += `Level role ${i + 1} is not defined in the config or is invalid.\n`;
+                                } else if (memberRoles.has(levelRoles[i].id)) {
+                                    levelRoleToApply = levelRoles[i];
+                                    break;
                                 }
                             }
                         }
