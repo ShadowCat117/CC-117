@@ -72,7 +72,6 @@ async function lastLogins(interaction, force = false) {
                                     isOnline,
                                     highestClassLevel,
                                 } = row;
-                                const displayColours = true;
                                 let inactiveThreshold;
 
                                 switch (guildRank) {
@@ -126,7 +125,7 @@ async function lastLogins(interaction, force = false) {
                                 const timeDiff = currentDate.getTime() - lastJoinDate.getTime();
                                 const daysSinceLastLogin = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
 
-                                return new PlayerLastLogin(username, guildRank, highestClassLevel, daysSinceLastLogin, isOnline, displayColours, inactiveThreshold);
+                                return new PlayerLastLogin(username, guildRank, highestClassLevel, daysSinceLastLogin, isOnline, true, inactiveThreshold);
                             });
 
                             playerLastLogins.sort((a, b) => a.compareTo(b));
