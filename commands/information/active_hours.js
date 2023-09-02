@@ -41,9 +41,9 @@ module.exports = {
             response.setMessage(editedReply);
 
             MessageManager.addMessage(response);
-        } else if (response.pages[0] === 'No data') {
+        } else if (response.pages[0] === 'No data' || response.pages[0] === `${interaction.options.getString('guild_name')} not found, try using the full exact guild name.`) {
             interaction.editReply({
-                content: `No activity data found for ${interaction.options.getString('guild_name')}`,
+                content: `No activity data found for guild: ${interaction.options.getString('guild_name')}`,
                 components: [],
             });
         } else {
