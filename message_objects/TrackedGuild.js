@@ -3,8 +3,8 @@ class TrackedGuild {
         this.guildName = guildName;
         this.averageOnline = typeof averageOnline === 'number' ? averageOnline.toFixed(2) : averageOnline;
         this.averageCaptains = typeof averageCaptains === 'number' ? averageCaptains.toFixed(2) : averageCaptains;
-        this.currentOnline = typeof currentOnline === 'number' ? currentOnline.toFixed(2) : currentOnline;
-        this.currentCaptains = typeof currentCaptains === 'number' ? currentCaptains.toFixed(2) : currentCaptains;
+        this.currentOnline = typeof currentOnline === 'number' ? Math.trunc(currentOnline) : currentOnline;
+        this.currentCaptains = typeof currentCaptains === 'number' ? Math.trunc(currentCaptains) : currentCaptains;
     }
 
     toString() {

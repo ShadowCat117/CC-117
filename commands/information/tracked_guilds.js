@@ -69,15 +69,20 @@ module.exports = {
                                 const averageKey = 'average' + currentHour;
                                 const captainsKey = 'captains' + currentHour;
 
-                                const query = 'SELECT ' + averageKey + ', ' + captainsKey + ' FROM guilds WHERE name = ?';
-                                const params = [tracked];
+                                for (let j = 0; j < 6; j++) {
+                                    const minuteAverageKey = averageKey + `${j}0`;
+                                    const minuteCaptainsKey = captainsKey + `${j}0`;
 
-                                const result = await getAsync(query, params);
-
-                                if (result[averageKey] !== null && result[averageKey] !== -1) {
-                                    averageOnline += result[averageKey];
-                                    averageCaptains += result[captainsKey];
-                                    divideBy++;
+                                    const query = 'SELECT ' + minuteAverageKey + ', ' + minuteCaptainsKey + ' FROM guilds WHERE name = ?';
+                                    const params = [tracked];
+    
+                                    const result = await getAsync(query, params);
+    
+                                    if (result[minuteAverageKey] !== null && result[minuteAverageKey] !== -1) {
+                                        averageOnline += result[minuteAverageKey];
+                                        averageCaptains += result[minuteCaptainsKey];
+                                        divideBy++;
+                                    }
                                 }
                             }
 
