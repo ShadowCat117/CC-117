@@ -40,6 +40,12 @@ module.exports = {
                 }, {
                     name: 'Inactivity Multiplier',
                     value: 'inactiveMultiplier',
+                }, {
+                    name: 'War Message',
+                    value: 'warMessage',
+                }, {
+                    name: 'War Class Message',
+                    value: 'warClassMessage',
                 }))
         .addStringOption((option) =>
             option.setName('value')
@@ -227,6 +233,26 @@ module.exports = {
                 }
 
                 break;
+            case 'warMessage':
+                if (valueStr == null) {
+                    await interaction.reply({
+                        content: 'War Message requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                }
+
+                break;
+            case 'warClassMessage':
+                if (valueStr == null) {
+                    await interaction.reply({
+                        content: 'War Class Message requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                }
+
+                break;
             default:
                 await interaction.reply({
                     content: 'Invalid configuration option.',
@@ -248,6 +274,8 @@ module.exports = {
             switch (option) {
                 case 'joinMessage':
                 case 'leaveMessage':
+                case 'warMessage':
+                case 'warClassMessage':
                     config[option] = valueStr;
                     break;
                 case 'chiefThreshold':

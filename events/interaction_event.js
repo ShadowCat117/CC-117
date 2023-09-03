@@ -18,6 +18,9 @@ const activeHours = require('../functions/active_hours');
 const applyRoles = require('../functions/apply_roles');
 const updateGuild = require('../functions/update_guild');
 const worldActivity = require('../functions/world_activity');
+const fs = require('fs');
+const path = require('path');
+const sendMessage = require('../functions/send_message');
 
 module.exports = {
     name: Events.InteractionCreate,
@@ -27,28 +30,260 @@ module.exports = {
             return;
         }
 
+        const guildId = interaction.guild.id;
+        const directoryPath = path.join(__dirname, '..', 'configs');
+        const filePath = path.join(directoryPath, `${guildId}.json`);
+
+        let config = {};
+
+        if (fs.existsSync(filePath)) {
+            const fileData = fs.readFileSync(filePath, 'utf-8');
+            config = JSON.parse(fileData);
+        }
+
         if (interaction.isButton()) {
             const message = MessageManager.getMessage(interaction.message.id);
 
-            if (!message) {
-                interaction.update({
-                    content: 'Data expired.',
-                    components: [],
-                });
-                return;
-            }
-
             if (interaction.customId === 'nextPage') {
+                if (!message) {
+                    interaction.update({
+                        content: 'Data expired.',
+                        components: [],
+                    });
+
+                    return;
+                }
+
                 const nextPage = message.getNextPage();
+
                 interaction.update({
                     content: nextPage,
                 });
             } else if (interaction.customId === 'previousPage') {
+                if (!message) {
+                    interaction.update({
+                        content: 'Data expired.',
+                        components: [],
+                    });
+
+                    return;
+                }
+
                 const previousPage = message.getPreviousPage();
+
                 interaction.update({
                     content: previousPage,
                 });
+            } else if (interaction.customId === 'war') {
+                const warRole = interaction.guild.roles.cache.get(config['warRole']);
+
+                const memberRoles = await interaction.member.roles.cache;
+
+                if (memberRoles.has(warRole.id)) {
+                    const tankRole = interaction.guild.roles.cache.get(config['tankRole']);
+                    const healerRole = interaction.guild.roles.cache.get(config['healerRole']);
+                    const damageRole = interaction.guild.roles.cache.get(config['damageRole']);
+                    const soloRole = interaction.guild.roles.cache.get(config['soloRole']);
+
+                    const warRoles = [warRole, tankRole, healerRole, damageRole, soloRole];
+
+                    for (const role of memberRoles.values()) {
+                        if (warRoles.includes(role)) {
+                            await interaction.member.roles.remove(role)
+                                .then(() => {
+                                    console.log(`Removed war role ${role.name} from ${interaction.member.user.username}`);
+                                })
+                                .catch(() => {
+                                    sendMessage(interaction.guild, interaction.channel.id, `Failed to remove war role ${role} from ${interaction.member.user.username}`);
+                                });
+                        }
+                    }
+
+                    await interaction.reply({
+                        content: `You no longer have the ${warRole} role and any war class roles.`,
+                        ephemeral: true,
+                    });
+                } else {
+                    await interaction.member.roles.add(warRole)
+                            .then(() => {
+                                console.log(`Added war role to ${interaction.member.user.username}`);
+                            })
+                            .catch(() => {
+                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add war role to ${interaction.member.user.username}`);
+                            });
+
+                    const tankButton = new ButtonBuilder()
+                        .setCustomId('tank')
+                        .setStyle(ButtonStyle.Secondary)
+                        .setLabel('TANK');
+        
+                    const healerButton = new ButtonBuilder()
+                        .setCustomId('healer')
+                        .setStyle(ButtonStyle.Success)
+                        .setLabel('HEALER');
+        
+                    const damageButton = new ButtonBuilder()
+                        .setCustomId('damage')
+                        .setStyle(ButtonStyle.Danger)
+                        .setLabel('DAMAGE');
+        
+                    const soloButton = new ButtonBuilder()
+                        .setCustomId('solo')
+                        .setStyle(ButtonStyle.Primary)
+                        .setLabel('SOLO');
+
+                    const row = new ActionRowBuilder().addComponents(tankButton, healerButton, damageButton, soloButton);
+
+                    const warMessage = config['warClassMessage'].replace(/\\n/g, '\n');
+
+                    await interaction.reply({
+                        content: warMessage,
+                        ephemeral: true,
+                        components: [row],
+                    });
+                }
+            } else if (interaction.customId === 'tank') {
+                const tankRole = interaction.guild.roles.cache.get(config['tankRole']);
+
+                const memberRoles = interaction.member.roles.cache;
+
+                let replyMessage;
+
+                if (memberRoles.has(tankRole.id)) {
+                    await interaction.member.roles.remove(tankRole)
+                        .then(() => {
+                            console.log(`Removed tank role from ${interaction.member.user.username}`);
+                        })
+                        .catch(() => {
+                            sendMessage(interaction.guild, interaction.channel.id, `Failed to remove tank role from ${interaction.member.user.username}`);
+                        });
+
+                    replyMessage = `You no longer have the ${tankRole} role`;
+                } else {
+                    await interaction.member.roles.add(tankRole)
+                        .then(() => {
+                            console.log(`Added tank role to ${interaction.member.user.username}`);
+                        })
+                        .catch(() => {
+                            sendMessage(interaction.guild, interaction.channel.id, `Failed to add tank role to ${interaction.member.user.username}`);
+                        });
+
+                    replyMessage = `You now have the ${tankRole} role`;
+                }
+
+                await interaction.reply({
+                    content: replyMessage,
+                    ephemeral: true,
+                });
+            } else if (interaction.customId === 'healer') {
+                const healerRole = interaction.guild.roles.cache.get(config['healerRole']);
+
+                const memberRoles = interaction.member.roles.cache;
+
+                let replyMessage;
+
+                if (memberRoles.has(healerRole.id)) {
+                    await interaction.member.roles.remove(healerRole)
+                        .then(() => {
+                            console.log(`Removed healer role from ${interaction.member.user.username}`);
+                        })
+                        .catch(() => {
+                            sendMessage(interaction.guild, interaction.channel.id, `Failed to remove healer role from ${interaction.member.user.username}`);
+                        });
+
+                    replyMessage = `You no longer have the ${healerRole} role`;
+                } else {
+                    await interaction.member.roles.add(healerRole)
+                        .then(() => {
+                            console.log(`Added healer role to ${interaction.member.user.username}`);
+                        })
+                        .catch(() => {
+                            sendMessage(interaction.guild, interaction.channel.id, `Failed to add healer role to ${interaction.member.user.username}`);
+                        });
+
+                    replyMessage = `You now have the ${healerRole} role`;
+                }
+
+                await interaction.reply({
+                    content: replyMessage,
+                    ephemeral: true,
+                });
+            } else if (interaction.customId === 'damage') {
+                const damageRole = interaction.guild.roles.cache.get(config['damageRole']);
+
+                const memberRoles = interaction.member.roles.cache;
+
+                let replyMessage;
+
+                if (memberRoles.has(damageRole.id)) {
+                    await interaction.member.roles.remove(damageRole)
+                        .then(() => {
+                            console.log(`Removed damage role from ${interaction.member.user.username}`);
+                        })
+                        .catch(() => {
+                            sendMessage(interaction.guild, interaction.channel.id, `Failed to remove damage role from ${interaction.member.user.username}`);
+                        });
+
+                    replyMessage = `You no longer have the ${damageRole} role`;
+                } else {
+                    await interaction.member.roles.add(damageRole)
+                        .then(() => {
+                            console.log(`Added damage role to ${interaction.member.user.username}`);
+                        })
+                        .catch(() => {
+                            sendMessage(interaction.guild, interaction.channel.id, `Failed to add damage role to ${interaction.member.user.username}`);
+                        });
+
+                    replyMessage = `You now have the ${damageRole} role`;
+                }
+
+                await interaction.reply({
+                    content: replyMessage,
+                    ephemeral: true,
+                });
+            } else if (interaction.customId === 'solo') {
+                const soloRole = interaction.guild.roles.cache.get(config['soloRole']);
+
+                const memberRoles = interaction.member.roles.cache;
+
+                let replyMessage;
+
+                if (memberRoles.has(soloRole.id)) {
+                    await interaction.member.roles.remove(soloRole)
+                        .then(() => {
+                            console.log(`Removed solo role from ${interaction.member.user.username}`);
+                        })
+                        .catch(() => {
+                            sendMessage(interaction.guild, interaction.channel.id, `Failed to remove solo role from ${interaction.member.user.username}`);
+                        });
+
+                    replyMessage = `You no longer have the ${soloRole} role`;
+                } else {
+                    await interaction.member.roles.add(soloRole)
+                        .then(() => {
+                            console.log(`Added solo role to ${interaction.member.user.username}`);
+                        })
+                        .catch(() => {
+                            sendMessage(interaction.guild, interaction.channel.id, `Failed to add solo role to ${interaction.member.user.username}`);
+                        });
+
+                    replyMessage = `You now have the ${soloRole} role`;
+                }
+
+                await interaction.reply({
+                    content: replyMessage,
+                    ephemeral: true,
+                });
             } else {
+                if (!message) {
+                    interaction.update({
+                        content: 'Data expired.',
+                        components: [],
+                    });
+
+                    return;
+                }
+
                 let result;
 
                 switch (message.messageType) {

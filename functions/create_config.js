@@ -90,6 +90,13 @@ async function createConfig(client, guildId) {
                 levelRoleNineLevel: 50,
                 levelRoleTen: null,
                 levelRoleTenLevel: 40,
+                warRole: null,
+                tankRole: null,
+                healerRole: null,
+                damageRole: null,
+                soloRole: null,
+                warMessage: '',
+                warClassMessage: '',
             };
 
             try {

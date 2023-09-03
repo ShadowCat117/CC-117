@@ -6,12 +6,17 @@ async function sendMessage(guild, channelId, message) {
 
         if (channel) {
             try {
-                await channel.send(message);
+                const formattedMessage = message.replace(/\\n/g, '\n');
+
+                const sentMessage = await channel.send(formattedMessage);
+                return sentMessage;
             } catch (error) {
                 console.log(`Failed to send ${message} to channel ${channelId} in guild ${guild.id}`);
+                return null;
             }
         } else {
             console.log(`${channelId} not found for guild ${guild.id}`);
+            return null;
         }
     }
 }
