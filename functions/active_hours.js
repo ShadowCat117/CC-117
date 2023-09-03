@@ -58,31 +58,14 @@ async function activeHours(interaction, force = false, timezoneOffset = 0) {
                         const currentHour = i.toString().padStart(2, '0');
                         const averageKey = 'average' + currentHour;
                         const captainsKey = 'captains' + currentHour;
-                        let hourAverage = 0;
-                        let hourCaptains = 0;
-                        let divideBy = 0;
 
-                        for (let j = 0; j < 6; j++) {
-                            const minuteAverageKey = averageKey + `${j}0`;
-                            const minuteCaptainsKey = captainsKey + `${j}0`;
+                        const query = 'SELECT ' + averageKey + ', ' + captainsKey + ' FROM guilds WHERE name = ?';
+                        const params = [guildName];
 
-                            const query = 'SELECT ' + minuteAverageKey + ', ' + minuteCaptainsKey + ' FROM guilds WHERE name = ?';
-                            const params = [guildName];
+                        const result = await getAsync(query, params);
 
-                            const result = await getAsync(query, params);
-
-                            if (result[minuteAverageKey] !== null && result[minuteAverageKey] !== -1) {
-                                hourAverage += result[minuteAverageKey];
-                                hourCaptains += result[minuteCaptainsKey];
-                                divideBy++;
-                            }
-                        }
-
-                        if (hourAverage) {
-                            hourAverage /= divideBy;
-                            hourCaptains /= divideBy;
-
-                            guildActiveHours.push(new GuildActiveHours(currentHour, hourAverage, hourCaptains, timezoneOffset));
+                        if (result[averageKey] !== null && result[averageKey] !== -1) {
+                            guildActiveHours.push(new GuildActiveHours(currentHour, result[averageKey], result[captainsKey], timezoneOffset));
                         }
                     }
 
