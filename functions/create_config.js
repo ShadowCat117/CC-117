@@ -51,8 +51,8 @@ async function createConfig(client, guildId) {
                 levelRequirement: 100,
                 inactiveMultiplier: 1,
                 guildName: null,
-                allies: [null],
-                trackedGuilds: [null],
+                allies: [],
+                trackedGuilds: [],
                 chiefPromotionRequirement: ['NONE'],
                 strategistPromotionRequirement: ['NONE'],
                 captainPromotionRequirement: ['NONE'],
@@ -97,6 +97,8 @@ async function createConfig(client, guildId) {
                 soloRole: null,
                 warMessage: '',
                 warClassMessage: '',
+                promotionExceptions: [],
+                demotionExceptions: [],
             };
 
             try {
