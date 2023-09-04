@@ -65,7 +65,7 @@ class GuildMemberDemotion {
             if (this.contributedGuildXP < rankRequirements[0]) {
                 demote = true;
                 reason = `Contributed less than ${rankRequirements[0]} XP`;
-            } else if (this.demotionStatus !== '') {
+            } else {
                 return '';
             }
         }
