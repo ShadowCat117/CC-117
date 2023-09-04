@@ -26,10 +26,6 @@ class GuildMemberDemotion {
                 }
             }
 
-            if (this.demotionStatus !== '') {
-                continue;
-            }
-
             switch (i) {
                 case 0:
                     if (this.guildRank === 'CHIEF') {
@@ -37,18 +33,42 @@ class GuildMemberDemotion {
                     }
                     break;
                 case 1:
-                    if (this.guildRank === 'STRATEGIST') {
+                    if (this.guildRank === 'STRATEGIST' && this.demotionStatus === '') {
                         this.demotionStatus = this.shouldBeDemoted('CAPTAIN', demotionRequirements[i], strategistRequirements);
+                    } else if (this.demotionStatus !== '') {
+                        const demoteAgain = this.shouldBeDemoted('CAPTAIN', demotionRequirements[i], strategistRequirements);
+
+                        if (demoteAgain === '') {
+                            this.guildRank = 'STRATEGIST';
+                        } else {
+                            this.demotionStatus = demoteAgain;
+                        }
                     }
                     break;
                 case 2:
-                    if (this.guildRank === 'CAPTAIN') {
+                    if (this.guildRank === 'CAPTAIN' && this.demotionStatus === '') {
                         this.demotionStatus = this.shouldBeDemoted('RECRUITER', demotionRequirements[i], captainRequirements);
+                    } else if (this.demotionStatus !== '') {
+                        const demoteAgain = this.shouldBeDemoted('RECRUITER', demotionRequirements[i], captainRequirements);
+
+                        if (demoteAgain === '') {
+                            this.guildRank = 'CAPTAIN';
+                        } else {
+                            this.demotionStatus = demoteAgain;
+                        }
                     }
                     break;
                 case 3:
-                    if (this.guildRank === 'RECRUITER') {
+                    if (this.guildRank === 'RECRUITER' && this.demotionStatus === '') {
                         this.demotionStatus = this.shouldBeDemoted('RECRUIT', demotionRequirements[i], recruiterRequirements);
+                    } else if (this.demotionStatus !== '') {
+                        const demoteAgain = this.shouldBeDemoted('RECRUIT', demotionRequirements[i], recruiterRequirements);
+
+                        if (demoteAgain === '') {
+                            this.guildRank = 'RECRUITER';
+                        } else {
+                            this.demotionStatus = demoteAgain;
+                        }
                     }
                     break;
                 default:
