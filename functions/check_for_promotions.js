@@ -57,9 +57,11 @@ async function checkForPromotions(guildId) {
         const captainRequirements = [captainXPRequirement, captainLevelRequirement, captainContributorRequirement];
         const recruiterRequirements = [recruiterXPRequirement, recruiterLevelRequirement, recruiterContributorRequirement];
 
+        const promotionExceptions = config['promotionExceptions'] !== undefined ? config['promotionExceptions'] : [];
+
         const originalRows = await allAsync('SELECT username, guildRank, contributedGuildXP, highestClassLevel FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
 
-        let filteredRows = originalRows.filter(player => player.guildRank !== 'OWNER' && player.guildRank !== 'CHIEF');
+        let filteredRows = originalRows.filter(player => player.guildRank !== 'OWNER' && player.guildRank !== 'CHIEF' && !promotionExceptions.includes(player.username));
         let checkForChiefPromotion = true;
         let checkForStrategistPromotion = true;
         let checkForCaptainPromotion = true;
