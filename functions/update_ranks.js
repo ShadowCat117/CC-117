@@ -139,14 +139,16 @@ async function updateRanks(guild) {
 
                 const updated = await applyRoles(guild, null, serverMember);
 
+                const formattedName = serverMember.user.username.replace(/_/g, '\\_');
+
                 if (updated > 0) {
                     if (updatedMembers > 0) {
-                        messageEnd += `, ${serverMember.user.username}`;
+                        messageEnd += `, ${formattedName}`;
 
                         updatedMembers++;
                         messageStart = `Updated roles for ${updatedMembers} members.`;
                     } else {
-                        messageEnd += `\n(${serverMember.user.username}`;
+                        messageEnd += `\n(${formattedName}`;
 
                         updatedMembers++;
                         messageStart = `Updated roles for ${updatedMembers} member.`;
