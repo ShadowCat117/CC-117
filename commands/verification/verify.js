@@ -141,10 +141,18 @@ module.exports = {
                                                 return;
                                             }
 
-                                            allyResolve(rows);
+                                            if (rows.length === 0) {
+                                                allyResolve(null);
+                                            } else {
+                                                allyResolve(rows);
+                                            }
                                         },
                                     );
                                 });
+
+                                if (!allyRows) {
+                                    continue;
+                                }
 
                                 if (allyRows.length === 0) {
                                     notFound = true;
