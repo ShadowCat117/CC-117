@@ -472,10 +472,12 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                                 await member.setNickname(row.username);
                             }
                         } else {
-                            const guildPrefix = await findPrefix(row.guildName);
+                            if (row.guildName) {
+                                const guildPrefix = await findPrefix(row.guildName);
 
-                            if (guildPrefix && config.changeNicknames && member.nickname !== `${row.username} [${guildPrefix}]` && member.id !== member.guild.ownerId) {
-                                await member.setNickname(`${row.username} [${guildPrefix}]`);
+                                if (guildPrefix && config.changeNicknames && member.nickname !== `${row.username} [${guildPrefix}]` && member.id !== member.guild.ownerId) {
+                                    await member.setNickname(`${row.username} [${guildPrefix}]`);
+                                }
                             }
                         }
                     }
