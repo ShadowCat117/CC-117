@@ -11,8 +11,13 @@ async function findPrefix(name) {
                 return;
             }
 
-            resolve(row.prefix);
-            db.close();
+            if (row) {
+                resolve(row.prefix);
+                db.close();
+            } else {
+                resolve(null);
+                db.close();
+            }
         });
     });
 }
