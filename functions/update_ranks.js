@@ -155,11 +155,9 @@ async function updateRanks(guild) {
                     player = await getAsync('SELECT UUID FROM players WHERE username = ?', [serverMember.user.globalName]);
                 }
 
-                let nickname = undefined;
-
                 if (!player) {
                     if (serverMember.nickname) {
-                        nickname = serverMember.nickname.split(' [')[0];
+                        const nickname = serverMember.nickname.split(' [')[0];
 
                         player = await getAsync('SELECT UUID FROM players WHERE username = ?', [nickname]);
                     }

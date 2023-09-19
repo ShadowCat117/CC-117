@@ -163,10 +163,7 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
 
                     let errorMessage = '';
 
-                    let verified = false;
-
                     if (guildRank && !nonGuildMember) {
-                        verified = true;
                         if (row.guildName === config.guildName) {
                             const guildRankRole = guild.roles.cache.get(config[guildRank.toLowerCase() + 'Role']);
 
@@ -298,7 +295,6 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
 
                     if (rank) {
                         let rankRole;
-                        verified = true;
 
                         if (rank === 'VIP+') {
                             rankRole = guild.roles.cache.get(config['vipPlusRole']);
@@ -381,7 +377,6 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                             if (levelRoleLevels[i] && row.highestClassLevel >= levelRoleLevels[i]) {
                                 if (levelRoles[i] && !memberRoles.has(levelRoles[i].id)) {
                                     levelRoleToApply = levelRoles[i];
-                                    verified = true;
 
                                     await member.roles.add(levelRoles[i])
                                         .then(() => {
@@ -416,32 +411,17 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                         }
                     }
 
-                    if (config.verifyMembers && unverifiedRole && memberRoles.has(unverifiedRole.id) && verified) {
+                    if (config.verifyMembers && unverifiedRole && memberRoles.has(unverifiedRole.id)) {
                         await member.roles.remove(unverifiedRole)
                             .then(() => console.log(`Removed unverified role from ${member.user.username}`))
                             .catch(() => {
                                 errorMessage += `Failed to remove unverified role from ${member.user.username}.\n`;
                             });
-                    } else if (config.verifyMembers && unverifiedRole && !memberRoles.has(unverifiedRole.id) && !verified) {
-                        await member.roles.add(unverifiedRole)
-                            .then(() => {
-                                console.log(`Added unverified role to ${member.user.username}`);
-                                hasUpdated = true;
-                            })
-                            .catch(() => {
-                                errorMessage += `Failed to add unverified role to ${member.user.username}.\n`;
-                            });
                     } else if (config.verifyMembers && !unverifiedRole) {
                         errorMessage += 'Unverified role is not defined in the config or is invalid.\n';
                     }
 
-                    if (config.verifyMembers && verifiedRole && memberRoles.has(verifiedRole.id) && !verified) {
-                        await member.roles.remove(verifiedRole)
-                            .then(() => console.log(`Removed verified role from ${member.user.username}`))
-                            .catch(() => {
-                                errorMessage += `Failed to remove verified role from ${member.user.username}.\n`;
-                            });
-                    } else if (config.verifyMembers && verifiedRole && !memberRoles.has(verifiedRole.id) && verified) {
+                    if (config.verifyMembers && verifiedRole && !memberRoles.has(verifiedRole.id)) {
                         await member.roles.add(verifiedRole)
                             .then(() => {
                                 console.log(`Added verified role to ${member.user.username}`);
