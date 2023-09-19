@@ -22,6 +22,13 @@ const fs = require('fs');
 const path = require('path');
 const sendMessage = require('../functions/send_message');
 
+const warriorArchetypes = ['fallen', 'battleMonk', 'paladin'];
+const mageArchetypes = ['riftwalker', 'lightBender', 'arcanist'];
+const archerArchetypes = ['sharpshooter', 'trapper', 'boltslinger'];
+const shamanArchetypes = ['ritualist', 'summoner', 'acolyte'];
+const assassinArchetypes = ['acrobat', 'shadestepper', 'trickster'];
+const archetypes = warriorArchetypes.concat(mageArchetypes, archerArchetypes, shamanArchetypes, assassinArchetypes);
+
 module.exports = {
     name: Events.InteractionCreate,
     once: false,
@@ -333,6 +340,196 @@ module.exports = {
                         ephemeral: true,
                     });
                 }
+            } else if (interaction.customId === 'warrior') {
+                const fallenButton = new ButtonBuilder()
+                    .setCustomId('fallen')
+                    .setStyle(ButtonStyle.Danger)
+                    .setLabel('FALLEN');
+    
+                const battleMonkButton = new ButtonBuilder()
+                    .setCustomId('battleMonk')
+                    .setStyle(ButtonStyle.Success)
+                    .setLabel('BATTLE MONK');
+    
+                const paladinButton = new ButtonBuilder()
+                    .setCustomId('paladin')
+                    .setStyle(ButtonStyle.Primary)
+                    .setLabel('PALADIN');
+
+                const row = new ActionRowBuilder().addComponents(fallenButton, battleMonkButton, paladinButton);
+
+                const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
+
+                await interaction.reply({
+                    content: archetypeMessage,
+                    ephemeral: true,
+                    components: [row],
+                });
+            } else if (interaction.customId === 'mage') {
+                const riftwalkerButton = new ButtonBuilder()
+                    .setCustomId('riftwalker')
+                    .setStyle(ButtonStyle.Primary)
+                    .setLabel('RIFTWALKER');
+    
+                const lightBenderButton = new ButtonBuilder()
+                    .setCustomId('lightBender')
+                    .setStyle(ButtonStyle.Success)
+                    .setLabel('LIGHT BENDER');
+    
+                const arcanistButton = new ButtonBuilder()
+                    .setCustomId('arcanist')
+                    .setStyle(ButtonStyle.Danger)
+                    .setLabel('ARCANIST');
+
+                const row = new ActionRowBuilder().addComponents(riftwalkerButton, lightBenderButton, arcanistButton);
+
+                const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
+
+                await interaction.reply({
+                    content: archetypeMessage,
+                    ephemeral: true,
+                    components: [row],
+                });
+            } else if (interaction.customId === 'archer') {
+                const sharpshooterButton = new ButtonBuilder()
+                    .setCustomId('sharpshooter')
+                    .setStyle(ButtonStyle.Primary)
+                    .setLabel('SHARPSHOOTER');
+    
+                const trapperButton = new ButtonBuilder()
+                    .setCustomId('trapper')
+                    .setStyle(ButtonStyle.Danger)
+                    .setLabel('TRAPPER');
+    
+                const boltslingerButton = new ButtonBuilder()
+                    .setCustomId('boltslinger')
+                    .setStyle(ButtonStyle.Success)
+                    .setLabel('BOLTSLINGER');
+
+                const row = new ActionRowBuilder().addComponents(sharpshooterButton, trapperButton, boltslingerButton);
+
+                const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
+
+                await interaction.reply({
+                    content: archetypeMessage,
+                    ephemeral: true,
+                    components: [row],
+                });
+            } else if (interaction.customId === 'shaman') {
+                const ritualistButton = new ButtonBuilder()
+                    .setCustomId('ritualist')
+                    .setStyle(ButtonStyle.Primary)
+                    .setLabel('RITUALIST');
+    
+                const summonerButton = new ButtonBuilder()
+                    .setCustomId('summoner')
+                    .setStyle(ButtonStyle.Success)
+                    .setLabel('SUMMONER');
+    
+                const acolyteButton = new ButtonBuilder()
+                    .setCustomId('acolyte')
+                    .setStyle(ButtonStyle.Danger)
+                    .setLabel('ACOLYTE');
+
+                const row = new ActionRowBuilder().addComponents(ritualistButton, summonerButton, acolyteButton);
+
+                const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
+
+                await interaction.reply({
+                    content: archetypeMessage,
+                    ephemeral: true,
+                    components: [row],
+                });
+            } else if (interaction.customId === 'assassin') {
+                const acrobatButton = new ButtonBuilder()
+                    .setCustomId('acrobat')
+                    .setStyle(ButtonStyle.Danger)
+                    .setLabel('ACROBAT');
+    
+                const shadestepperButton = new ButtonBuilder()
+                    .setCustomId('shadestepper')
+                    .setStyle(ButtonStyle.Primary)
+                    .setLabel('SHADERSTEPPER');
+    
+                const tricksterButton = new ButtonBuilder()
+                    .setCustomId('trickster')
+                    .setStyle(ButtonStyle.Success)
+                    .setLabel('TRICKSTER');
+
+                const row = new ActionRowBuilder().addComponents(acrobatButton, shadestepperButton, tricksterButton);
+
+                const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
+
+                await interaction.reply({
+                    content: archetypeMessage,
+                    ephemeral: true,
+                    components: [row],
+                });
+            } else if (archetypes.includes(interaction.customId)) {
+                const memberRoles = await interaction.member.roles.cache;
+
+                const warriorRole = interaction.guild.roles.cache.get(config['warriorRole']);
+                const mageRole = interaction.guild.roles.cache.get(config['mageRole']);
+                const archerRole = interaction.guild.roles.cache.get(config['archerRole']);
+                const shamanRole = interaction.guild.roles.cache.get(config['shamanRole']);
+                const assassinRole = interaction.guild.roles.cache.get(config['assassinRole']);
+
+                const classRoles = [warriorRole, mageRole, archerRole, shamanRole, assassinRole];
+
+                for (const archetype of archetypes) {
+                    classRoles.push(interaction.guild.roles.cache.get(config[`${archetype}Role`]));
+                }
+
+                let classRole;
+
+                if (warriorArchetypes.includes(interaction.customId)) {
+                    classRole = warriorRole;
+                } else if (mageArchetypes.includes(interaction.customId)) {
+                    classRole = mageRole;
+                } else if (archerArchetypes.includes(interaction.customId)) {
+                    classRole = archerRole;
+                } else if (shamanArchetypes.includes(interaction.customId)) {
+                    classRole = shamanRole;
+                } else if (assassinArchetypes.includes(interaction.customId)) {
+                    classRole = assassinRole;
+                }
+
+                const archetypeRole = interaction.guild.roles.cache.get(config[`${interaction.customId}Role`]);
+
+                for (const role of memberRoles.values()) {
+                    if (classRoles.includes(role) && role !== classRole && role !== archetypeRole) {
+                        await interaction.member.roles.remove(role)
+                            .then(() => {
+                                console.log(`Removed class role ${role.name} from ${interaction.member.user.username}`);
+                            })
+                            .catch(() => {
+                                sendMessage(interaction.guild, interaction.channel.id, `Failed to remove class role ${role} from ${interaction.member.user.username}`);
+                            });
+                    }
+                }
+
+                await interaction.member.roles.add(classRole)
+                        .then(() => {
+                            console.log(`Added class role to ${interaction.member.user.username}`);
+                        })
+                        .catch(() => {
+                            sendMessage(interaction.guild, interaction.channel.id, `Failed to add class role to ${interaction.member.user.username}`);
+                        });
+
+                await interaction.member.roles.add(archetypeRole)
+                        .then(() => {
+                            console.log(`Added archetype role to ${interaction.member.user.username}`);
+                        })
+                        .catch(() => {
+                            sendMessage(interaction.guild, interaction.channel.id, `Failed to add archetype role to ${interaction.member.user.username}`);
+                        });
+
+                const replyMessage = `You now have the ${classRole} class role with archetype ${archetypeRole}!`;
+
+                await interaction.reply({
+                    content: replyMessage,
+                    ephemeral: true,
+                });
             } else {
                 if (!message) {
                     interaction.update({

@@ -46,6 +46,12 @@ module.exports = {
                 }, {
                     name: 'War Class Message',
                     value: 'warClassMessage',
+                }, {
+                    name: 'Class Message',
+                    value: 'classMessage',
+                }, {
+                    name: 'Class Archetype Message',
+                    value: 'classArchetypeMessage',
                 }))
         .addStringOption((option) =>
             option.setName('value')
@@ -253,6 +259,26 @@ module.exports = {
                 }
 
                 break;
+            case 'classMessage':
+                if (valueStr == null) {
+                    await interaction.reply({
+                        content: 'Class Message requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                }
+
+                break;
+            case 'classArchetypeMessage':
+                if (valueStr == null) {
+                    await interaction.reply({
+                        content: 'Class Archetype Message requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                }
+
+                break;
             default:
                 await interaction.reply({
                     content: 'Invalid configuration option.',
@@ -276,6 +302,8 @@ module.exports = {
                 case 'leaveMessage':
                 case 'warMessage':
                 case 'warClassMessage':
+                case 'classMessage':
+                case 'classArchetypeMessage':
                     config[option] = valueStr;
                     break;
                 case 'chiefThreshold':
