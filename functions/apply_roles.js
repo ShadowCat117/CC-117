@@ -94,7 +94,7 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                                     .catch(() => {
                                         errorMessage += `Failed to remove rank role ${role.name} from ${member.user.username}.\n`;
                                     });
-                            } else if (veteranRole && memberRoles.has(veteranRole.id)) {
+                            } else if (role === veteranRole && memberRoles.has(veteranRole.id)) {
                                 await member.roles.remove(veteranRole)
                                     .then(() => {
                                         console.log(`Removed veteran role from ${member.user.username}`);
@@ -103,7 +103,7 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                                     .catch(() => {
                                         errorMessage += `Failed to remove veteran role from ${member.user.username}.\n`;
                                     });
-                            } else if (memberOfRole && memberRoles.has(memberOfRole.id)) {
+                            } else if (role === memberOfRole && memberRoles.has(memberOfRole.id)) {
                                 await member.roles.remove(memberOfRole)
                                     .then(() => {
                                         console.log(`Removed member of role from ${member.user.username}`);
