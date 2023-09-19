@@ -467,7 +467,7 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                     }
 
                     if (config.changeNicknames) {
-                        if (config.guildName === row.guildName) {
+                        if (config.guildName === row.guildName || !row.guildName) {
                             if (config.changeNicknames && member.user.username !== row.username && member.nickname !== row.username && member.id !== member.guild.ownerId) {
                                 await member.setNickname(row.username);
                             }
