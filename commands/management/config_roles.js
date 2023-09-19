@@ -56,6 +56,9 @@ module.exports = {
                     name: 'Veteran Role',
                     value: 'vetRole',
                 }, {
+                    name: 'Verified Role',
+                    value: 'verifiedRole',
+                }, {
                     name: 'Unverified Role',
                     value: 'unverifiedRole',
                 }, {
@@ -250,6 +253,16 @@ module.exports = {
                 }
 
                 break;
+            case 'verifiedRole':
+                if (role == null) {
+                    await interaction.reply({
+                        content: 'Verified Role requires a <role> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                }
+
+                break;
             case 'unverifiedRole':
                 if (role == null) {
                     await interaction.reply({
@@ -319,6 +332,7 @@ module.exports = {
                 case 'vipPlusRole':
                 case 'vipRole':
                 case 'vetRole':
+                case 'verifiedRole':
                 case 'unverifiedRole':
                 case 'memberOfRole':
                     config[option] = role.id;
