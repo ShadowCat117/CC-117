@@ -15,6 +15,18 @@ const db = new sqlite3.Database('database/database.db');
 const fs = require('fs');
 const path = require('path');
 
+async function getAsync(query, params) {
+    return new Promise((resolve, reject) => {
+        db.get(query, params, function(err, rows) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+}
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('verify')
@@ -150,11 +162,11 @@ module.exports = {
                                     );
                                 });
 
-                                if (!allyRows) {
+                                if (!allyRows && config.allies.indexOf(ally) != (config.allies.length - 1)) {
                                     continue;
                                 }
 
-                                if (allyRows.length === 0) {
+                                if (!allyRows || allyRows.length === 0) {
                                     notFound = true;
                                 } else if (allyRows.length > 1) {
                                     let message = `Multiple ${username}'s found.\n`;
@@ -208,8 +220,23 @@ module.exports = {
                                 }
 
                                 if (notFound) {
-                                    await interaction.editReply(`Unable to verify you as ${username}.\n\nYou may not be updated as a guild member in the database, run /updateguild <guild_name> to update the members of your guild, it may still take a few minutes to update.`);
-                                    await applyRoles(interaction.guild, undefined, interaction.member);
+                                    const uuid = await getAsync('SELECT UUID FROM players WHERE username = ?', [username]);
+
+                                    if (uuid) {
+                                        await interaction.editReply(`Verified as ${username}, you are not a member of ${guildName} or its allies, if you believe this is incorrect please run /updateguild ${guildName}`);
+
+                                        await applyRoles(interaction.guild, uuid['UUID'], interaction.member, true);
+
+                                        if (config.logMessages && config.logChannel) {
+                                            sendMessage(interaction.guild, config.logChannel, `${interaction.user} has verified as ${username}, they are not a member of ${guildName} or its allies.`);
+                                        }
+                                    } else {
+                                        await interaction.editReply(`Unable to verify you as ${username}.\n\nPlease run /updateplayer with your username or UUID to be added to the database. Please be aware this may take a few minutes.`);
+
+                                        await applyRoles(interaction.guild, null, interaction.member);
+                                    }
+
+                                    
                                     resolve();
                                     return;
                                 }

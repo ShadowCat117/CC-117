@@ -16,6 +16,18 @@ function allAsync(query, params) {
     });
 }
 
+async function getAsync(query, params) {
+    return new Promise((resolve, reject) => {
+        db.get(query, params, function(err, rows) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+}
+
 async function updateRanks(guild) {
     const directoryPath = path.join(__dirname, '..', 'configs');
     const filePath = path.join(directoryPath, `${guild.id}.json`);
@@ -137,7 +149,29 @@ async function updateRanks(guild) {
                     continue;
                 }
 
-                const updated = await applyRoles(guild, null, serverMember);
+                let player = await getAsync('SELECT UUID FROM players WHERE username = ?', [serverMember.user.username]);
+
+                if (!player) {
+                    player = await getAsync('SELECT UUID FROM players WHERE username = ?', [serverMember.user.globalName]);
+                }
+
+                let nickname = undefined;
+
+                if (!player) {
+                    if (serverMember.nickname) {
+                        nickname = serverMember.nickname.split(' [')[0];
+
+                        player = await getAsync('SELECT UUID FROM players WHERE username = ?', [nickname]);
+                    }
+                }
+
+                let uuid = null;
+                
+                if (player) {
+                    uuid = player['UUID'];
+                }
+
+                const updated = await applyRoles(guild, uuid, serverMember, true);
 
                 const formattedName = serverMember.user.username.replace(/_/g, '\\_');
 

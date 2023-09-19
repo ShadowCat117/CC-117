@@ -6,7 +6,7 @@ const findPrefix = require('./find_prefix');
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('database/database.db');
 
-async function applyRoles(guild, uuid, member) {
+async function applyRoles(guild, uuid, member, nonGuildMember = false) {
     const guildId = guild.id;
     const directoryPath = path.join(__dirname, '..', 'configs');
     const filePath = path.join(directoryPath, `${guildId}.json`);
@@ -153,7 +153,7 @@ async function applyRoles(guild, uuid, member) {
 
                     let verified = false;
 
-                    if (guildRank) {
+                    if (guildRank && !nonGuildMember) {
                         verified = true;
                         if (row.guildName === config.guildName) {
                             const guildRankRole = guild.roles.cache.get(config[guildRank.toLowerCase() + 'Role']);
@@ -286,6 +286,7 @@ async function applyRoles(guild, uuid, member) {
 
                     if (rank) {
                         let rankRole;
+                        verified = true;
 
                         if (rank === 'VIP+') {
                             rankRole = guild.roles.cache.get(config['vipPlusRole']);
@@ -368,6 +369,7 @@ async function applyRoles(guild, uuid, member) {
                             if (levelRoleLevels[i] && row.highestClassLevel >= levelRoleLevels[i]) {
                                 if (levelRoles[i] && !memberRoles.has(levelRoles[i].id)) {
                                     levelRoleToApply = levelRoles[i];
+                                    verified = true;
 
                                     await member.roles.add(levelRoles[i])
                                         .then(() => {
