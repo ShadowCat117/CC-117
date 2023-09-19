@@ -82,54 +82,64 @@ module.exports = {
                     content: previousPage,
                 });
             } else if (interaction.customId === 'war') {
+                const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
+                const allyOwnerRole = interaction.guild.roles.cache.get(config['allyOwnerRole']);
+                const allyRole = interaction.guild.roles.cache.get(config['allyRole']);
                 const warRole = interaction.guild.roles.cache.get(config['warRole']);
 
                 const memberRoles = await interaction.member.roles.cache;
 
-                if (!memberRoles.has(warRole.id)) {
-                    await interaction.member.roles.add(warRole)
-                        .then(() => {
-                            console.log(`Added war role to ${interaction.member.user.username}`);
-                        })
-                        .catch(() => {
-                            sendMessage(interaction.guild, interaction.channel.id, `Failed to add war role to ${interaction.member.user.username}`);
-                        });
+                if (memberRoles.has(memberOfRole.id) || memberRoles.has(allyOwnerRole.id) || memberRoles.has(allyRole.id)) {
+                    if (!memberRoles.has(warRole.id)) {
+                        await interaction.member.roles.add(warRole)
+                            .then(() => {
+                                console.log(`Added war role to ${interaction.member.user.username}`);
+                            })
+                            .catch(() => {
+                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add war role to ${interaction.member.user.username}`);
+                            });
+                    }
+    
+                    const tankButton = new ButtonBuilder()
+                        .setCustomId('tank')
+                        .setStyle(ButtonStyle.Secondary)
+                        .setLabel('TANK');
+        
+                    const healerButton = new ButtonBuilder()
+                        .setCustomId('healer')
+                        .setStyle(ButtonStyle.Success)
+                        .setLabel('HEALER');
+        
+                    const damageButton = new ButtonBuilder()
+                        .setCustomId('damage')
+                        .setStyle(ButtonStyle.Danger)
+                        .setLabel('DAMAGE');
+        
+                    const soloButton = new ButtonBuilder()
+                        .setCustomId('solo')
+                        .setStyle(ButtonStyle.Primary)
+                        .setLabel('SOLO');
+    
+                    const removeButton = new ButtonBuilder()
+                        .setCustomId('removewar')
+                        .setStyle(ButtonStyle.Danger)
+                        .setLabel('REMOVE');
+    
+                    const row = new ActionRowBuilder().addComponents(tankButton, healerButton, damageButton, soloButton, removeButton);
+    
+                    const warMessage = config['warClassMessage'].replace(/\\n/g, '\n');
+    
+                    await interaction.reply({
+                        content: warMessage,
+                        ephemeral: true,
+                        components: [row],
+                    });
+                } else {
+                    await interaction.reply({
+                        content: `Sorry, you need to be a member of ${config['guildName']} or its allies to use this.`,
+                        ephemeral: true,
+                    });
                 }
-
-                const tankButton = new ButtonBuilder()
-                    .setCustomId('tank')
-                    .setStyle(ButtonStyle.Secondary)
-                    .setLabel('TANK');
-    
-                const healerButton = new ButtonBuilder()
-                    .setCustomId('healer')
-                    .setStyle(ButtonStyle.Success)
-                    .setLabel('HEALER');
-    
-                const damageButton = new ButtonBuilder()
-                    .setCustomId('damage')
-                    .setStyle(ButtonStyle.Danger)
-                    .setLabel('DAMAGE');
-    
-                const soloButton = new ButtonBuilder()
-                    .setCustomId('solo')
-                    .setStyle(ButtonStyle.Primary)
-                    .setLabel('SOLO');
-
-                const removeButton = new ButtonBuilder()
-                    .setCustomId('removewar')
-                    .setStyle(ButtonStyle.Danger)
-                    .setLabel('REMOVE');
-
-                const row = new ActionRowBuilder().addComponents(tankButton, healerButton, damageButton, soloButton, removeButton);
-
-                const warMessage = config['warClassMessage'].replace(/\\n/g, '\n');
-
-                await interaction.reply({
-                    content: warMessage,
-                    ephemeral: true,
-                    components: [row],
-                });
             } else if (interaction.customId === 'tank') {
                 const tankRole = interaction.guild.roles.cache.get(config['tankRole']);
 
