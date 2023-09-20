@@ -1,10 +1,11 @@
 class GuildMemberPromotion {
-    constructor(username, guildRank, contributedGuildXP, highestClassLevel, contributionPos, promotionRequirements, chiefRequirements, strategistRequirements, captainRequirements, recruiterRequirements) {
+    constructor(username, guildRank, contributedGuildXP, highestClassLevel, contributionPos, promotionRequirements, chiefRequirements, strategistRequirements, captainRequirements, recruiterRequirements, ignoreXPContributions) {
         this.username = username;
         this.guildRank = guildRank;
         this.contributedGuildXP = contributedGuildXP;
         this.highestClassLevel = highestClassLevel;
         this.contributionPos = contributionPos;
+        this.ignoreXPContributions = ignoreXPContributions;
         this.promotionStatus = '';
 
         this.checkForPromotion(promotionRequirements, chiefRequirements, strategistRequirements, captainRequirements, recruiterRequirements);
@@ -51,7 +52,7 @@ class GuildMemberPromotion {
         let promote = false;
         let reason = '';
 
-        if (promotionRequirements.includes('XP')) {
+        if (promotionRequirements.includes('XP') && !this.ignoreXPContributions) {
             if (this.contributedGuildXP >= rankRequirements[0]) {
                 promote = true;
                 reason = `Contributed more than ${rankRequirements[0]} XP`;
@@ -69,7 +70,7 @@ class GuildMemberPromotion {
             }
         }
 
-        if (promotionRequirements.includes('TOP')) {
+        if (promotionRequirements.includes('TOP') && !this.ignoreXPContributions) {
             if (this.contributionPos <= rankRequirements[2]) {
                 promote = true;
                 if (reason === '') {

@@ -121,6 +121,7 @@ async function createConfig(client, guildId) {
                 tricksterRole: null,
                 classMessage: '',
                 classArchetypeMessage: '',
+                promotionTimeRequirement: 0,
             };
 
             try {

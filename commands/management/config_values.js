@@ -52,6 +52,9 @@ module.exports = {
                 }, {
                     name: 'Class Archetype Message',
                     value: 'classArchetypeMessage',
+                }, {
+                    name: 'Promotion Time Requirement',
+                    value: 'promotionTimeRequirement',
                 }))
         .addStringOption((option) =>
             option.setName('value')
@@ -279,6 +282,24 @@ module.exports = {
                 }
 
                 break;
+            case 'promotionTimeRequirement':
+                if (!valueStr) {
+                    await interaction.reply({
+                        content: 'Promotion Time Requirement requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else if (isNaN(valueStr)) {
+                    await interaction.reply({
+                        content: 'Promotion Time Requirement requires <value> to be a number input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseFloat(valueStr);
+                }
+
+                break;
             default:
                 await interaction.reply({
                     content: 'Invalid configuration option.',
@@ -313,6 +334,7 @@ module.exports = {
                 case 'recruitThreshold':
                 case 'levelRequirement':
                 case 'inactiveMultiplier':
+                case 'promotionTimeRequirement':
                     config[option] = number;
                     break;
             }

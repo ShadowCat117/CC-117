@@ -46,6 +46,7 @@ async function checkForPromotions(guildId) {
         const recruiterXPRequirement = config.recruiterXPRequirement;
         const recruiterLevelRequirement = config.recruiterLevelRequirement;
         const recruiterContributorRequirement = config.recruiterContributorRequirement;
+        const promotionTimeRequirement = config.promotionTimeRequirement !== null ? config.promotionTimeRequirement : 0;
 
         if (!guildName) {
             return new ButtonedMessage('', [], '', ['You have not set a guild.']);
@@ -59,7 +60,7 @@ async function checkForPromotions(guildId) {
 
         const promotionExceptions = config['promotionExceptions'] !== undefined ? config['promotionExceptions'] : [];
 
-        const originalRows = await allAsync('SELECT username, guildRank, contributedGuildXP, highestClassLevel FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
+        const originalRows = await allAsync('SELECT username, guildRank, contributedGuildXP, highestClassLevel, guildJoinDate FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
 
         let filteredRows = originalRows.filter(player => player.guildRank !== 'OWNER' && player.guildRank !== 'CHIEF' && !promotionExceptions.includes(player.username));
         let checkForChiefPromotion = true;
@@ -91,6 +92,8 @@ async function checkForPromotions(guildId) {
 
         let contributionPosition = 0;
 
+        const today = new Date();
+
         let promoteGuildMembers = originalRows.map(row => {
             contributionPosition++;
 
@@ -102,7 +105,17 @@ async function checkForPromotions(guildId) {
                     highestClassLevel,
                 } = row;
 
-                return new GuildMemberPromotion(username, guildRank, contributedGuildXP, highestClassLevel, contributionPosition, promotionRequirements, chiefRequirements, strategistRequirements, captainRequirements, recruiterRequirements);
+                const [year, month, day] = row.guildJoinDate.split('-');
+            
+                const joinDate = new Date(year, month - 1, day);
+        
+                const differenceInMilliseconds = today - joinDate;
+                
+                const daysInGuild = Math.round(differenceInMilliseconds / (1000 * 60 * 60 * 24));
+
+                const ignoreXPContributions = daysInGuild <= promotionTimeRequirement;
+
+                return new GuildMemberPromotion(username, guildRank, contributedGuildXP, highestClassLevel, contributionPosition, promotionRequirements, chiefRequirements, strategistRequirements, captainRequirements, recruiterRequirements, ignoreXPContributions);
             }
         });
 
