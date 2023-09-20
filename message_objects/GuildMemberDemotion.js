@@ -1,10 +1,11 @@
 class GuildMemberDemotion {
-    constructor(username, guildRank, contributedGuildXP, highestClassLevel, contributionPos, demotionRequirements, chiefRequirements, strategistRequirements, captainRequirements, recruiterRequirements) {
+    constructor(username, guildRank, contributedGuildXP, highestClassLevel, contributionPos, daysInGuild, demotionRequirements, chiefRequirements, strategistRequirements, captainRequirements, recruiterRequirements) {
         this.username = username;
         this.guildRank = guildRank;
         this.contributedGuildXP = contributedGuildXP;
         this.highestClassLevel = highestClassLevel;
         this.contributionPos = contributionPos;
+        this.daysInGuild = daysInGuild;
         this.demotionStatus = '';
 
         this.checkForDemotion(demotionRequirements, chiefRequirements, strategistRequirements, captainRequirements, recruiterRequirements);
@@ -110,6 +111,19 @@ class GuildMemberDemotion {
                     reason = `Contribution position lower than ${rankRequirements[2]}`;
                 } else {
                     reason += `, contribution position lower than ${rankRequirements[2]}`;
+                }
+            } else if (demote) {
+                return '';
+            }
+        }
+
+        if (demotionRequirements.includes('TIME')) {
+            if (this.daysInGuild < rankRequirements[3]) {
+                demote = true;
+                if (reason === '') {
+                    reason = `Has been in the guild for less than ${rankRequirements[3]} days`;
+                } else {
+                    reason += `, has been in the guild for less than ${rankRequirements[3]} days`;
                 }
             } else if (demote) {
                 return '';

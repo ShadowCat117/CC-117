@@ -37,29 +37,33 @@ async function checkForDemotions(guildId) {
         const chiefXPRequirement = config.chiefXPRequirement;
         const chiefLevelRequirement = config.chiefLevelRequirement;
         const chiefContributorRequirement = config.chiefContributorRequirement;
+        const chiefTimeRequirement = config.chiefTimeRequirement;
         const strategistXPRequirement = config.strategistXPRequirement;
         const strategistLevelRequirement = config.strategistLevelRequirement;
         const strategistContributorRequirement = config.strategistContributorRequirement;
+        const strategistTimeRequirement = config.strategistTimeRequirement;
         const captainXPRequirement = config.captainXPRequirement;
         const captainLevelRequirement = config.captainLevelRequirement;
         const captainContributorRequirement = config.captainContributorRequirement;
+        const captainTimeRequirement = config.captainTimeRequirement;
         const recruiterXPRequirement = config.recruiterXPRequirement;
         const recruiterLevelRequirement = config.recruiterLevelRequirement;
         const recruiterContributorRequirement = config.recruiterContributorRequirement;
+        const recruiterTimeRequirement = config.recruiterTimeRequirement;
 
         if (!guildName) {
             return new ButtonedMessage('', [], '', ['You have not set a guild.']);
         }
 
         const demotionRequirements = [chiefDemotionRequirement, strategistDemotionRequirement, captainDemotionRequirement, recruiterDemotionRequirement];
-        const chiefRequirements = [chiefXPRequirement, chiefLevelRequirement, chiefContributorRequirement];
-        const strategistRequirements = [strategistXPRequirement, strategistLevelRequirement, strategistContributorRequirement];
-        const captainRequirements = [captainXPRequirement, captainLevelRequirement, captainContributorRequirement];
-        const recruiterRequirements = [recruiterXPRequirement, recruiterLevelRequirement, recruiterContributorRequirement];
+        const chiefRequirements = [chiefXPRequirement, chiefLevelRequirement, chiefContributorRequirement, chiefTimeRequirement];
+        const strategistRequirements = [strategistXPRequirement, strategistLevelRequirement, strategistContributorRequirement, strategistTimeRequirement];
+        const captainRequirements = [captainXPRequirement, captainLevelRequirement, captainContributorRequirement, captainTimeRequirement];
+        const recruiterRequirements = [recruiterXPRequirement, recruiterLevelRequirement, recruiterContributorRequirement, recruiterTimeRequirement];
 
         const demotionExceptions = config['demotionExceptions'] !== undefined ? config['demotionExceptions'] : [];
 
-        const originalRows = await allAsync('SELECT username, guildRank, contributedGuildXP, highestClassLevel FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
+        const originalRows = await allAsync('SELECT username, guildRank, contributedGuildXP, highestClassLevel, guildJoinDate FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
 
         let filteredRows = originalRows.filter(player => player.guildRank !== 'OWNER' && player.guildRank !== 'RECRUIT' && !demotionExceptions.includes(player.username));
 
@@ -85,6 +89,8 @@ async function checkForDemotions(guildId) {
 
         let contributionPosition = 0;
 
+        const today = new Date();
+
         let demoteGuildMembers = originalRows.map(row => {
             contributionPosition++;
 
@@ -96,7 +102,15 @@ async function checkForDemotions(guildId) {
                     highestClassLevel,
                 } = row;
 
-                return new GuildMemberDemotion(username, guildRank, contributedGuildXP, highestClassLevel, contributionPosition, demotionRequirements, chiefRequirements, strategistRequirements, captainRequirements, recruiterRequirements);
+                const [year, month, day] = row.guildJoinDate.split('-');
+            
+                const joinDate = new Date(year, month - 1, day);
+        
+                const differenceInMilliseconds = today - joinDate;
+                
+                const daysInGuild = Math.round(differenceInMilliseconds / (1000 * 60 * 60 * 24));
+
+                return new GuildMemberDemotion(username, guildRank, contributedGuildXP, highestClassLevel, contributionPosition, daysInGuild, demotionRequirements, chiefRequirements, strategistRequirements, captainRequirements, recruiterRequirements);
             }
         });
 

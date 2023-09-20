@@ -37,26 +37,29 @@ async function checkForPromotions(guildId) {
         const chiefXPRequirement = config.chiefXPRequirement;
         const chiefLevelRequirement = config.chiefLevelRequirement;
         const chiefContributorRequirement = config.chiefContributorRequirement;
+        const chiefTimeRequirement = config.chiefTimeRequirement;
         const strategistXPRequirement = config.strategistXPRequirement;
         const strategistLevelRequirement = config.strategistLevelRequirement;
         const strategistContributorRequirement = config.strategistContributorRequirement;
+        const strategistTimeRequirement = config.strategistTimeRequirement;
         const captainXPRequirement = config.captainXPRequirement;
         const captainLevelRequirement = config.captainLevelRequirement;
         const captainContributorRequirement = config.captainContributorRequirement;
+        const captainTimeRequirement = config.captainTimeRequirement;
         const recruiterXPRequirement = config.recruiterXPRequirement;
         const recruiterLevelRequirement = config.recruiterLevelRequirement;
         const recruiterContributorRequirement = config.recruiterContributorRequirement;
-        const promotionTimeRequirement = config.promotionTimeRequirement !== null ? config.promotionTimeRequirement : 0;
+        const recruiterTimeRequirement = config.recruiterTimeRequirement;
 
         if (!guildName) {
             return new ButtonedMessage('', [], '', ['You have not set a guild.']);
         }
 
         const promotionRequirements = [chiefPromotionRequirement, strategistPromotionRequirement, captainPromotionRequirement, recruiterPromotionRequirement];
-        const chiefRequirements = [chiefXPRequirement, chiefLevelRequirement, chiefContributorRequirement];
-        const strategistRequirements = [strategistXPRequirement, strategistLevelRequirement, strategistContributorRequirement];
-        const captainRequirements = [captainXPRequirement, captainLevelRequirement, captainContributorRequirement];
-        const recruiterRequirements = [recruiterXPRequirement, recruiterLevelRequirement, recruiterContributorRequirement];
+        const chiefRequirements = [chiefXPRequirement, chiefLevelRequirement, chiefContributorRequirement, chiefTimeRequirement];
+        const strategistRequirements = [strategistXPRequirement, strategistLevelRequirement, strategistContributorRequirement, strategistTimeRequirement];
+        const captainRequirements = [captainXPRequirement, captainLevelRequirement, captainContributorRequirement, captainTimeRequirement];
+        const recruiterRequirements = [recruiterXPRequirement, recruiterLevelRequirement, recruiterContributorRequirement, recruiterTimeRequirement];
 
         const promotionExceptions = config['promotionExceptions'] !== undefined ? config['promotionExceptions'] : [];
 
@@ -113,9 +116,7 @@ async function checkForPromotions(guildId) {
                 
                 const daysInGuild = Math.round(differenceInMilliseconds / (1000 * 60 * 60 * 24));
 
-                const ignoreXPContributions = daysInGuild <= promotionTimeRequirement;
-
-                return new GuildMemberPromotion(username, guildRank, contributedGuildXP, highestClassLevel, contributionPosition, promotionRequirements, chiefRequirements, strategistRequirements, captainRequirements, recruiterRequirements, ignoreXPContributions);
+                return new GuildMemberPromotion(username, guildRank, contributedGuildXP, highestClassLevel, contributionPosition, daysInGuild, promotionRequirements, chiefRequirements, strategistRequirements, captainRequirements, recruiterRequirements);
             }
         });
 

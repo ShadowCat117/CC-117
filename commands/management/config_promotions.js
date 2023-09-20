@@ -27,6 +27,9 @@ module.exports = {
                     name: 'Chief Contributor Requirement',
                     value: 'chiefContributorRequirement',
                 }, {
+                    name: 'Chief Time Requirement',
+                    value: 'chiefTimeRequirement',
+                }, {
                     name: 'Add Strategist Promotion Requirement',
                     value: 'strategistPromotionRequirement',
                 }, {
@@ -38,6 +41,9 @@ module.exports = {
                 }, {
                     name: 'Strategist Contributor Requirement',
                     value: 'strategistContributorRequirement',
+                }, {
+                    name: 'Strategist Time Requirement',
+                    value: 'strategistTimeRequirement',
                 }, {
                     name: 'Add Captain Promotion Requirement',
                     value: 'captainPromotionRequirement',
@@ -51,6 +57,9 @@ module.exports = {
                     name: 'Captain Contributor Requirement',
                     value: 'captainContributorRequirement',
                 }, {
+                    name: 'Captain Time Requirement',
+                    value: 'captainTimeRequirement',
+                }, {
                     name: 'Add Recruiter Promotion Requirement',
                     value: 'recruiterPromotionRequirement',
                 }, {
@@ -62,6 +71,9 @@ module.exports = {
                 }, {
                     name: 'Recruiter Contributor Requirement',
                     value: 'recruiterContributorRequirement',
+                }, {
+                    name: 'Recruiter Time Requirement',
+                    value: 'recruiterTimeRequirement',
                 }))
         .addStringOption((option) =>
             option.setName('requirement')
@@ -78,6 +90,9 @@ module.exports = {
                 }, {
                     name: 'Top Contributor Requirement',
                     value: 'TOP',
+                }, {
+                    name: 'Days in Guild Requirement',
+                    value: 'TIME',
                 }),
         )
         .addIntegerOption((option) =>
@@ -229,6 +244,18 @@ module.exports = {
                 }
 
                 break;
+            case 'chiefTimeRequirement':
+                if (!requirementNum) {
+                    await interaction.reply({
+                        content: 'Chief Time Requirement requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseInt(requirementNum);
+                }
+
+                break;
             case 'strategistXPRequirement':
                 if (!requirementNum) {
                     await interaction.reply({
@@ -257,6 +284,18 @@ module.exports = {
                 if (!requirementNum) {
                     await interaction.reply({
                         content: 'Strategist Contributor Requirement requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseInt(requirementNum);
+                }
+
+                break;
+            case 'strategistTimeRequirement':
+                if (!requirementNum) {
+                    await interaction.reply({
+                        content: 'Strategist Time Requirement requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
@@ -301,6 +340,18 @@ module.exports = {
                 }
 
                 break;
+            case 'captainTimeRequirement':
+                if (!requirementNum) {
+                    await interaction.reply({
+                        content: 'Captain Time Requirement requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseInt(requirementNum);
+                }
+
+                break;
             case 'recruiterXPRequirement':
                 if (!requirementNum) {
                     await interaction.reply({
@@ -337,6 +388,18 @@ module.exports = {
                 }
 
                 break;
+            case 'recruiterTimeRequirement':
+                if (!requirementNum) {
+                    await interaction.reply({
+                        content: 'Recruiter Time Requirement requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseInt(requirementNum);
+                }
+
+                break;
             default:
                 await interaction.reply({
                     content: 'Invalid configuration option.',
@@ -360,15 +423,19 @@ module.exports = {
                 case 'chiefXPRequirement':
                 case 'chiefLevelRequirement':
                 case 'chiefContributorRequirement':
+                case 'chiefTimeRequirement':
                 case 'strategistXPRequirement':
                 case 'strategistLevelRequirement':
                 case 'strategistContributorRequirement':
+                case 'strategistTimeRequirement':
                 case 'captainXPRequirement':
                 case 'captainLevelRequirement':
                 case 'captainContributorRequirement':
+                case 'captainTimeRequirement':
                 case 'recruiterXPRequirement':
                 case 'recruiterLevelRequirement':
                 case 'recruiterContributorRequirement':
+                case 'recruiterTimeRequirement':
                     config[option] = number;
                     break;
                 case 'chiefPromotionRequirement':

@@ -1,11 +1,11 @@
 class GuildMemberPromotion {
-    constructor(username, guildRank, contributedGuildXP, highestClassLevel, contributionPos, promotionRequirements, chiefRequirements, strategistRequirements, captainRequirements, recruiterRequirements, ignoreXPContributions) {
+    constructor(username, guildRank, contributedGuildXP, highestClassLevel, contributionPos, daysInGuild, promotionRequirements, chiefRequirements, strategistRequirements, captainRequirements, recruiterRequirements) {
         this.username = username;
         this.guildRank = guildRank;
         this.contributedGuildXP = contributedGuildXP;
         this.highestClassLevel = highestClassLevel;
         this.contributionPos = contributionPos;
-        this.ignoreXPContributions = ignoreXPContributions;
+        this.daysInGuild = daysInGuild;
         this.promotionStatus = '';
 
         this.checkForPromotion(promotionRequirements, chiefRequirements, strategistRequirements, captainRequirements, recruiterRequirements);
@@ -52,7 +52,7 @@ class GuildMemberPromotion {
         let promote = false;
         let reason = '';
 
-        if (promotionRequirements.includes('XP') && !this.ignoreXPContributions) {
+        if (promotionRequirements.includes('XP')) {
             if (this.contributedGuildXP >= rankRequirements[0]) {
                 promote = true;
                 reason = `Contributed more than ${rankRequirements[0]} XP`;
@@ -70,7 +70,7 @@ class GuildMemberPromotion {
             }
         }
 
-        if (promotionRequirements.includes('TOP') && !this.ignoreXPContributions) {
+        if (promotionRequirements.includes('TOP')) {
             if (this.contributionPos <= rankRequirements[2]) {
                 promote = true;
                 if (reason === '') {
@@ -78,6 +78,12 @@ class GuildMemberPromotion {
                 } else {
                     reason += `, contribution position higher than ${rankRequirements[2]}`;
                 }
+            }
+        }
+
+        if (promotionRequirements.includes('TIME')) {
+            if (this.daysInGuild < rankRequirements[3]) {
+                promote = false;
             }
         }
 
