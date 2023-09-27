@@ -35,14 +35,14 @@ function getMessages() {
 }
 
 async function removeOldMessages() {
-    try {
-        for (const message of messages) {
+    for (const message of messages) {
+        try {
             await message.message.edit({
                 components: [],
             });
+        } catch (error) {
+            console.error('Error removing components from message:', error);
         }
-    } catch (error) {
-        console.error('Error removing components from messages:', error);
     }
 
     messages = [];
