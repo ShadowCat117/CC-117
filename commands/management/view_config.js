@@ -86,7 +86,7 @@ module.exports = {
             }  
 
             if (config.joinMessage.includes('$user$')) {
-                configContent += `Leave Message: ${config.leaveMessage.replace('$user$', interaction.member.user).replace(/\\n/g, '\n')}\n`;
+                configContent += `Leave Message: ${config.leaveMessage.replace('$user$', interaction.member.user.username).replace(/\\n/g, '\n')}\n`;
             } else {
                 configContent += `Leave Message: ${config.leaveMessage.replace(/\\n/g, '\n')}\n`;
             }
