@@ -56,6 +56,9 @@ module.exports = {
                     name: 'Extra Time Multiplier',
                     value: 'extraTimeMultiplier',
                 }, {
+                    name: 'Average Online Requirement',
+                    value: 'averageRequirement',
+                }, {
                     name: 'New Player Minimum Time',
                     value: 'newPlayerMinimumTime',
                 }, {
@@ -520,6 +523,8 @@ module.exports = {
                 case 'levelRequirement':
                 case 'extraTimeMultiplier':
                 case 'averageRequirement':
+                case 'newPlayerMinimumTime':
+                case 'newPlayerThreshold':
                     config[option] = number;
                     break;
             }
