@@ -13,6 +13,10 @@ module.exports = {
         const guildId = guild.id;
         const filePath = path.join(__dirname, '..', 'configs', `${guildId}.json`);
 
+        if (member.client.user.id === member.id) {
+            return;
+        }
+
         if (fs.existsSync(filePath)) {
             try {
                 fs.readFile(filePath, 'utf-8', (error, fileData) => {
