@@ -7,6 +7,30 @@ const ButtonedMessage = require('../message_type/ButtonedMessage');
 const MessageType = require('../message_type/MessageType');
 const db = new sqlite3.Database('database/database.db');
 
+async function getAsync(query, params) {
+    return new Promise((resolve, reject) => {
+        db.get(query, params, function(err, rows) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+}
+
+async function allAsync(query, params) {
+    return new Promise((resolve, reject) => {
+        db.all(query, params, function(err, rows) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+}
+
 async function lastLogins(interaction, force = false) {
     let nameToSearch;
 
@@ -46,172 +70,189 @@ async function lastLogins(interaction, force = false) {
             }
 
             if (config.guildName === guildName) {
-                const chiefThreshold = config.chiefThreshold;
-                const strategistThreshold = config.strategistThreshold;
-                const captainThreshold = config.captainThreshold;
-                const recruiterThreshold = config.recruiterThreshold;
-                const recruitThreshold = config.recruitThreshold;
-                // Added after the bot has released so won't be in old config files
+                const chiefUpperThreshold = config.chiefUpperThreshold || 730;
+                const chiefLowerThreshold = config.chiefLowerThreshold || 365;
+                const strategistUpperThreshold = config.strategistUpperThreshold || 50;
+                const strategistLowerThreshold = config.strategistLowerThreshold || 30;
+                const captainUpperThreshold = config.captainUpperThreshold || 32;
+                const captainLowerThreshold = config.captainLowerThreshold || 16;
+                const recruiterUpperThreshold = config.recruiterUpperThreshold || 20;
+                const recruiterLowerThreshold = config.recruiterLowerThreshold || 10;
+                const recruitUpperThreshold = config.recruitUpperThreshold || 20;
+                const recruitLowerThreshold = config.recruitLowerThreshold || 10;
                 const levelRequirement = config.levelRequirement || 100;
-                const inactiveMultiplier = config.inactiveMultiplier || 1;
+                const extraTimeMultiplier = config.extraTimeMultiplier || 1;
+                const averageRequirement = config.averageRequirement || 5;
+                const newPlayerMinimumTime = config.newPlayerMinimumTime || 14;
+                const newPlayerThreshold = config.newPlayerThreshold || 5;
 
-                return new Promise((resolve, reject) => {
-                    db.all(
-                        'SELECT username, guildRank, lastJoin, isOnline, highestClassLevel FROM players WHERE guildName = ?', [guildName],
-                        async (err, rows) => {
-                            if (err) {
-                                console.error('Error retrieving player data:', err);
-                                reject(err);
+                const rows = await allAsync('SELECT username, guildRank, lastJoin, isOnline, highestClassLevel, guildJoinDate FROM players WHERE guildName = ?', [guildName]);
+
+                let averageOnline = 0;
+                let divideBy = 0;
+
+                for (let i = 0; i < 24; i++) {
+                    const currentHour = i.toString().padStart(2, '0');
+                    const averageKey = 'average' + currentHour;
+
+                    const result = await getAsync('SELECT ' + averageKey + ' FROM guilds WHERE name = ?', [guildName]);
+
+                    if (result[averageKey] !== null && result[averageKey] !== -1) {
+                        averageOnline += result[averageKey];
+                        divideBy++;
+                    }
+                }
+
+                if (divideBy !== 0) {
+                    averageOnline /= divideBy;
+                }
+
+                let useUpperRequirement = true;
+
+                if (averageOnline < averageRequirement) {
+                    useUpperRequirement = false;
+                }
+
+                const playerLastLogins = rows.map(row => {
+                    const {
+                        username,
+                        guildRank,
+                        lastJoin,
+                        isOnline,
+                        highestClassLevel,
+                        guildJoinDate,
+                    } = row;
+
+                    let inactiveThreshold;
+
+                    switch (guildRank) {
+                        case 'CHIEF':
+                            inactiveThreshold = useUpperRequirement ? chiefUpperThreshold : chiefLowerThreshold;
+
+                            if (highestClassLevel >= levelRequirement) {
+                                inactiveThreshold *= extraTimeMultiplier;
+                            }
+                            
+                            break;
+                        case 'STRATEGIST':
+                            inactiveThreshold = useUpperRequirement ? strategistUpperThreshold : strategistLowerThreshold;
+
+                            if (highestClassLevel >= levelRequirement) {
+                                inactiveThreshold *= extraTimeMultiplier;
                             }
 
-                            const playerLastLogins = rows.map(row => {
-                                const {
-                                    username,
-                                    guildRank,
-                                    lastJoin,
-                                    isOnline,
-                                    highestClassLevel,
-                                } = row;
-                                let inactiveThreshold;
+                            break;
+                        case 'CAPTAIN':
+                            inactiveThreshold = useUpperRequirement ? captainUpperThreshold : captainLowerThreshold;
 
-                                switch (guildRank) {
-                                    case 'CHIEF':
-                                        if (highestClassLevel >= levelRequirement) {
-                                            inactiveThreshold = chiefThreshold;
-                                        } else {
-                                            inactiveThreshold = chiefThreshold * inactiveMultiplier;
-                                        }
-                                        
-                                        break;
-                                    case 'STRATEGIST':
-                                        if (highestClassLevel >= levelRequirement) {
-                                            inactiveThreshold = strategistThreshold;
-                                        } else {
-                                            inactiveThreshold = strategistThreshold * inactiveMultiplier;
-                                        }
-
-                                        break;
-                                    case 'CAPTAIN':
-                                        if (highestClassLevel >= levelRequirement) {
-                                            inactiveThreshold = captainThreshold;
-                                        } else {
-                                            inactiveThreshold = captainThreshold * inactiveMultiplier;
-                                        }
-
-                                        break;
-                                    case 'RECRUITER':
-                                        if (highestClassLevel >= levelRequirement) {
-                                            inactiveThreshold = recruiterThreshold;
-                                        } else {
-                                            inactiveThreshold = recruiterThreshold * inactiveMultiplier;
-                                        }
-
-                                        break;
-                                    case 'RECRUIT':
-                                        if (highestClassLevel >= levelRequirement) {
-                                            inactiveThreshold = recruitThreshold;
-                                        } else {
-                                            inactiveThreshold = recruitThreshold * inactiveMultiplier;
-                                        }
-
-                                        break;
-                                    default:
-                                        inactiveThreshold = Number.MAX_SAFE_INTEGER;
-                                        break;
-                                }
-
-                                const currentDate = new Date();
-                                const lastJoinDate = new Date(lastJoin);
-                                const timeDiff = currentDate.getTime() - lastJoinDate.getTime();
-                                const daysSinceLastLogin = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-
-                                return new PlayerLastLogin(username, guildRank, highestClassLevel, daysSinceLastLogin, isOnline, true, inactiveThreshold);
-                            });
-
-                            playerLastLogins.sort((a, b) => a.compareTo(b));
-
-                            const pages = [];
-                            let lastLoginsPage = '```diff\n';
-                            let counter = 0;
-
-                            playerLastLogins.forEach((player) => {
-                                if (counter === 30) {
-                                    lastLoginsPage += '```';
-                                    pages.push(lastLoginsPage);
-                                    lastLoginsPage = '```diff\n' + player.toString();
-                                    counter = 1;
-                                } else {
-                                    lastLoginsPage += player.toString();
-                                    counter++;
-                                }
-                            });
-
-                            if (counter <= 30) {
-                                lastLoginsPage += '```';
-                                pages.push(lastLoginsPage);
+                            if (highestClassLevel >= levelRequirement) {
+                                inactiveThreshold *= extraTimeMultiplier;
                             }
 
-                            const lastLoginsMessage = new ButtonedMessage('', [], '', pages);
+                            break;
+                        case 'RECRUITER':
+                            inactiveThreshold = useUpperRequirement ? recruiterUpperThreshold : recruiterLowerThreshold;
 
-                            resolve(lastLoginsMessage);
-                        },
-                    );
+                            if (highestClassLevel >= levelRequirement) {
+                                inactiveThreshold *= extraTimeMultiplier;
+                            }
+
+                            break;
+                        case 'RECRUIT':
+                            inactiveThreshold = useUpperRequirement ? recruitUpperThreshold : recruitLowerThreshold;
+
+                            if (highestClassLevel >= levelRequirement) {
+                                inactiveThreshold *= extraTimeMultiplier;
+                            }
+
+                            break;
+                        default:
+                            inactiveThreshold = Number.MAX_SAFE_INTEGER;
+                            break;
+                    }
+
+                    const currentDate = new Date();
+                    const lastJoinDate = new Date(lastJoin);
+                    const lastJoinTimeDiff = currentDate.getTime() - lastJoinDate.getTime();
+                    const daysSinceLastLogin = Math.floor(lastJoinTimeDiff / (1000 * 60 * 60 * 24));
+                    const guildJoin = new Date(guildJoinDate);
+                    const guildJoinTimeDiff = currentDate.getTime() - guildJoin.getTime();
+                    const daysSinceGuildJoin = Math.floor(guildJoinTimeDiff / (1000 * 60 * 60 * 24));
+
+                    if (daysSinceGuildJoin < newPlayerMinimumTime) {
+                        inactiveThreshold = newPlayerThreshold;
+                    }
+
+                    return new PlayerLastLogin(username, guildRank, highestClassLevel, daysSinceLastLogin, isOnline, true, inactiveThreshold);
                 });
+
+                playerLastLogins.sort((a, b) => a.compareTo(b));
+
+                const pages = [];
+                let lastLoginsPage = '```diff\n';
+                let counter = 0;
+
+                playerLastLogins.forEach((player) => {
+                    if (counter === 30) {
+                        lastLoginsPage += '```';
+                        pages.push(lastLoginsPage);
+                        lastLoginsPage = '```diff\n' + player.toString();
+                        counter = 1;
+                    } else {
+                        lastLoginsPage += player.toString();
+                        counter++;
+                    }
+                });
+
+                if (counter <= 30) {
+                    lastLoginsPage += '```';
+                    pages.push(lastLoginsPage);
+                }
+
+                return new ButtonedMessage('', [], '', pages);
             } else {
-                return new Promise((resolve, reject) => {
-                    db.all(
-                        'SELECT username, guildRank, lastJoin, isOnline FROM players WHERE guildName = ?', [guildName],
-                        async (err, rows) => {
-                            if (err) {
-                                console.error('Error retrieving player data:', err);
-                                reject(err);
-                            }
+                const rows = await allAsync('SELECT username, guildRank, lastJoin, isOnline FROM players WHERE guildName = ?', [guildName]);
+                
+                const playerLastLogins = rows.map(row => {
+                    const {
+                        username,
+                        guildRank,
+                        lastJoin,
+                        isOnline,
+                    } = row;
 
-                            const playerLastLogins = rows.map(row => {
-                                const {
-                                    username,
-                                    guildRank,
-                                    lastJoin,
-                                    isOnline,
-                                } = row;
+                    const currentDate = new Date();
+                    const lastJoinDate = new Date(lastJoin);
+                    const timeDiff = currentDate.getTime() - lastJoinDate.getTime();
+                    const daysSinceLastLogin = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
 
-                                const currentDate = new Date();
-                                const lastJoinDate = new Date(lastJoin);
-                                const timeDiff = currentDate.getTime() - lastJoinDate.getTime();
-                                const daysSinceLastLogin = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-
-                                return new PlayerLastLogin(username, guildRank, 0, daysSinceLastLogin, isOnline, false, 0);
-                            });
-
-                            playerLastLogins.sort((a, b) => a.compareTo(b));
-
-                            const pages = [];
-                            let lastLoginsPage = '```\n';
-                            let counter = 0;
-
-                            playerLastLogins.forEach((player) => {
-                                if (counter === 30) {
-                                    lastLoginsPage += '```';
-                                    pages.push(lastLoginsPage);
-                                    lastLoginsPage = '```\n' + player.toString();
-                                    counter = 1;
-                                } else {
-                                    lastLoginsPage += player.toString();
-                                    counter++;
-                                }
-                            });
-
-                            if (counter <= 30) {
-                                lastLoginsPage += '```';
-                                pages.push(lastLoginsPage);
-                            }
-
-                            const lastLoginsMessage = new ButtonedMessage('', [], '', pages);
-
-                            resolve(lastLoginsMessage);
-                        },
-                    );
+                    return new PlayerLastLogin(username, guildRank, 0, daysSinceLastLogin, isOnline, false, 0);
                 });
+
+                playerLastLogins.sort((a, b) => a.compareTo(b));
+
+                const pages = [];
+                let lastLoginsPage = '```\n';
+                let counter = 0;
+
+                playerLastLogins.forEach((player) => {
+                    if (counter === 30) {
+                        lastLoginsPage += '```';
+                        pages.push(lastLoginsPage);
+                        lastLoginsPage = '```\n' + player.toString();
+                        counter = 1;
+                    } else {
+                        lastLoginsPage += player.toString();
+                        counter++;
+                    }
+                });
+
+                if (counter <= 30) {
+                    lastLoginsPage += '```';
+                    pages.push(lastLoginsPage);
+                }
+
+                return new ButtonedMessage('', [], '', pages);
             }
         } catch (error) {
             return new ButtonedMessage('', [], '', [`Error checking last login stats for ${guildName}.`]);

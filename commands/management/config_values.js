@@ -20,26 +20,47 @@ module.exports = {
                     name: 'Leave Message',
                     value: 'leaveMessage',
                 }, {
-                    name: 'Chief Inactive Threshold',
-                    value: 'chiefThreshold',
+                    name: 'Chief Inactive Upper Threshold',
+                    value: 'chiefUpperThreshold',
                 }, {
-                    name: 'Strategist Inactive Threshold',
-                    value: 'strategistThreshold',
+                    name: 'Chief Inactive Lower Threshold',
+                    value: 'chiefLowerThreshold',
                 }, {
-                    name: 'Captain Inactive Threshold',
-                    value: 'captainThreshold',
+                    name: 'Strategist Inactive Upper Threshold',
+                    value: 'strategistUpperThreshold',
                 }, {
-                    name: 'Recruiter Inactive Threshold',
-                    value: 'recruiterThreshold',
+                    name: 'Strategist Inactive Lower Threshold',
+                    value: 'strategistLowerThreshold',
                 }, {
-                    name: 'Recruit Inactive Threshold',
-                    value: 'recruitThreshold',
+                    name: 'Captain Inactive Upper Threshold',
+                    value: 'captainUpperThreshold',
+                }, {
+                    name: 'Captain Inactive Lower Threshold',
+                    value: 'captainLowerThreshold',
+                }, {
+                    name: 'Recruiter Inactive Upper Threshold',
+                    value: 'recruiterUpperThreshold',
+                }, {
+                    name: 'Recruiter Inactive Lower Threshold',
+                    value: 'recruiterLowerThreshold',
+                }, {
+                    name: 'Recruit Inactive Upper Threshold',
+                    value: 'recruitUpperThreshold',
+                }, {
+                    name: 'Recruit Inactive Lower Threshold',
+                    value: 'recruitLowerThreshold',
                 }, {
                     name: 'Inactivity Full Level Requirement',
                     value: 'levelRequirement',
                 }, {
-                    name: 'Inactivity Multiplier',
-                    value: 'inactiveMultiplier',
+                    name: 'Extra Time Multiplier',
+                    value: 'extraTimeMultiplier',
+                }, {
+                    name: 'New Player Minimum Time',
+                    value: 'newPlayerMinimumTime',
+                }, {
+                    name: 'New Player Threshold',
+                    value: 'newPlayerThreshold',
                 }, {
                     name: 'War Message',
                     value: 'warMessage',
@@ -125,16 +146,16 @@ module.exports = {
                 }
 
                 break;
-            case 'chiefThreshold':
+            case 'chiefUpperThreshold':
                 if (!valueStr) {
                     await interaction.reply({
-                        content: 'Chief Inactive Threshold requires a <value> input.',
+                        content: 'Chief Inactive Upper Threshold requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
                 } else if (isNaN(valueStr)) {
                     await interaction.reply({
-                        content: 'Chief Inactive Threshold requires <value> to be a number input.',
+                        content: 'Chief Inactive Upper Threshold requires <value> to be a number input.',
                         ephemeral: true,
                     });
                     return;
@@ -143,16 +164,16 @@ module.exports = {
                 }
 
                 break;
-            case 'strategistThreshold':
+            case 'chiefLowerThreshold':
                 if (!valueStr) {
                     await interaction.reply({
-                        content: 'Strategist Inactive Threshold requires a <value> input.',
+                        content: 'Chief Inactive Lower Threshold requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
                 } else if (isNaN(valueStr)) {
                     await interaction.reply({
-                        content: 'Strategist Inactive Threshold requires <value> to be a number input.',
+                        content: 'Chief Inactive Lower Threshold requires <value> to be a number input.',
                         ephemeral: true,
                     });
                     return;
@@ -161,16 +182,16 @@ module.exports = {
                 }
 
                 break;
-            case 'captainThreshold':
+            case 'strategistUpperThreshold':
                 if (!valueStr) {
                     await interaction.reply({
-                        content: 'Captain Inactive Threshold requires a <value> input.',
+                        content: 'Strategist Inactive Upper Threshold requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
                 } else if (isNaN(valueStr)) {
                     await interaction.reply({
-                        content: 'Captain Inactive Threshold requires <value> to be a number input.',
+                        content: 'Strategist Inactive Upper Threshold requires <value> to be a number input.',
                         ephemeral: true,
                     });
                     return;
@@ -179,16 +200,16 @@ module.exports = {
                 }
 
                 break;
-            case 'recruiterThreshold':
+            case 'strategistLowerThreshold':
                 if (!valueStr) {
                     await interaction.reply({
-                        content: 'Recruiter Inactive Threshold requires a <value> input.',
+                        content: 'Strategist Inactive Lower Threshold requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
                 } else if (isNaN(valueStr)) {
                     await interaction.reply({
-                        content: 'Recruiter Inactive Threshold requires <value> to be a number input.',
+                        content: 'Strategist Inactive Lower Threshold requires <value> to be a number input.',
                         ephemeral: true,
                     });
                     return;
@@ -197,16 +218,106 @@ module.exports = {
                 }
 
                 break;
-            case 'recruitThreshold':
+            case 'captainUpperThreshold':
                 if (!valueStr) {
                     await interaction.reply({
-                        content: 'Recruit Inactive Threshold requires a <value> input.',
+                        content: 'Captain Inactive Upper Threshold requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
                 } else if (isNaN(valueStr)) {
                     await interaction.reply({
-                        content: 'Recruit Inactive Threshold requires <value> to be a number input.',
+                        content: 'Captain Inactive Upper Threshold requires <value> to be a number input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseInt(valueStr);
+                }
+
+                break;
+            case 'captainLowerThreshold':
+                if (!valueStr) {
+                    await interaction.reply({
+                        content: 'Captain Inactive Lower Threshold requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else if (isNaN(valueStr)) {
+                    await interaction.reply({
+                        content: 'Captain Inactive Lower Threshold requires <value> to be a number input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseInt(valueStr);
+                }
+
+                break;
+            case 'recruiterUpperThreshold':
+                if (!valueStr) {
+                    await interaction.reply({
+                        content: 'Recruiter Inactive Upper Threshold requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else if (isNaN(valueStr)) {
+                    await interaction.reply({
+                        content: 'Recruiter Inactive Upper Threshold requires <value> to be a number input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseInt(valueStr);
+                }
+
+                break;
+            case 'recruiterLowerThreshold':
+                if (!valueStr) {
+                    await interaction.reply({
+                        content: 'Recruiter Inactive Lower Threshold requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else if (isNaN(valueStr)) {
+                    await interaction.reply({
+                        content: 'Recruiter Inactive Lower Threshold requires <value> to be a number input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseInt(valueStr);
+                }
+
+                break;
+            case 'recruitUpperThreshold':
+                if (!valueStr) {
+                    await interaction.reply({
+                        content: 'Recruit Inactive Upper Threshold requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else if (isNaN(valueStr)) {
+                    await interaction.reply({
+                        content: 'Recruit Inactive Upper Threshold requires <value> to be a number input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseFloat(valueStr);
+                }
+
+                break;
+            case 'recruitLowerThreshold':
+                if (!valueStr) {
+                    await interaction.reply({
+                        content: 'Recruit Inactive Lower Threshold requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else if (isNaN(valueStr)) {
+                    await interaction.reply({
+                        content: 'Recruit Inactive Lower Threshold requires <value> to be a number input.',
                         ephemeral: true,
                     });
                     return;
@@ -233,21 +344,75 @@ module.exports = {
                 }
 
                 break;
-            case 'inactiveMultiplier':
+            case 'extraTimeMultiplier':
                 if (!valueStr) {
                     await interaction.reply({
-                        content: 'Inactivity Multiplier requires a <value> input.',
+                        content: 'Extra Time Multiplier requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
                 } else if (isNaN(valueStr)) {
                     await interaction.reply({
-                        content: 'Inactivity Multiplier requires <value> to be a number input.',
+                        content: 'Extra Time Multiplier requires <value> to be a number input.',
                         ephemeral: true,
                     });
                     return;
                 } else {
                     number = parseFloat(valueStr);
+                }
+
+                break;
+            case 'averageRequirement':
+                if (!valueStr) {
+                    await interaction.reply({
+                        content: 'Average Requirement requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else if (isNaN(valueStr)) {
+                    await interaction.reply({
+                        content: 'Average Requirement requires <value> to be a number input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseFloat(valueStr);
+                }
+
+                break;
+            case 'newPlayerMinimumTime':
+                if (!valueStr) {
+                    await interaction.reply({
+                        content: 'New Player Minimum Time requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else if (isNaN(valueStr)) {
+                    await interaction.reply({
+                        content: 'New Player Minimum Time requires <value> to be a number input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseInt(valueStr);
+                }
+
+                break;
+            case 'newPlayerThreshold':
+                if (!valueStr) {
+                    await interaction.reply({
+                        content: 'New Player Threshold requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else if (isNaN(valueStr)) {
+                    await interaction.reply({
+                        content: 'New Player Threshold requires <value> to be a number input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseInt(valueStr);
                 }
 
                 break;
@@ -342,13 +507,19 @@ module.exports = {
                 case 'classArchetypeMessage':
                     config[option] = valueStr;
                     break;
-                case 'chiefThreshold':
-                case 'strategistThreshold':
-                case 'captainThreshold':
-                case 'recruiterThreshold':
-                case 'recruitThreshold':
+                case 'chiefUpperThreshold':
+                case 'chiefLowerThreshold':
+                case 'strategistUpperThreshold':
+                case 'strategistLowerThreshold':
+                case 'captainUpperThreshold':
+                case 'captainLowerThreshold':
+                case 'recruiterUpperThreshold':
+                case 'recruiterLowerThreshold':
+                case 'recruitUpperThreshold':
+                case 'recruitLowerThreshold':
                 case 'levelRequirement':
-                case 'inactiveMultiplier':
+                case 'extraTimeMultiplier':
+                case 'averageRequirement':
                     config[option] = number;
                     break;
             }

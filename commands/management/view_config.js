@@ -47,33 +47,41 @@ module.exports = {
             }
 
             configContent += `Guild: ${config.guildName}\n`;
-            configContent += `Chief Inactivity Threshold: ${config.chiefThreshold}\n`;
+            configContent += `Chief Inactivity Upper Threshold: ${config.chiefUpperThreshold}\n`;
+            configContent += `Chief Inactivity Lower Threshold: ${config.chiefLowerThreshold}\n`;
             configContent += `Chief Promotion Requirements: ${config.chiefPromotionRequirement}\n`;
             configContent += `Chief XP Promotion Requirement: ${config.chiefXPRequirement}\n`;
             configContent += `Chief Level Promotion Requirement: ${config.chiefLevelRequirement}\n`;
             configContent += `Chief Top Contributor Promotion Requirement: ${config.chiefContributorRequirement}\n`;
             configContent += `Chief Time Promotion Requirement: ${config.chiefTimeRequirement}\n`;
-            configContent += `Strategist Inactivity Threshold: ${config.strategistThreshold}\n`;
+            configContent += `Strategist Inactivity Upper Threshold: ${config.strategistUpperThreshold}\n`;
+            configContent += `Strategist Inactivity Lower Threshold: ${config.strategistLowerThreshold}\n`;
             configContent += `Strategist Promotion Requirements: ${config.strategistPromotionRequirement}\n`;
             configContent += `Strategist XP Promotion Requirement: ${config.strategistXPRequirement}\n`;
             configContent += `Strategist Level Promotion Requirement: ${config.strategistLevelRequirement}\n`;
             configContent += `Strategist Top Contributor Promotion Requirement: ${config.strategistContributorRequirement}\n`;
             configContent += `Strategist Time Promotion Requirement: ${config.strategistTimeRequirement}\n`;
-            configContent += `Captain Inactivity Threshold: ${config.captainThreshold}\n`;
+            configContent += `Captain Inactivity Upper Threshold: ${config.captainUpperThreshold}\n`;
+            configContent += `Captain Inactivity Lower Threshold: ${config.captainLowerThreshold}\n`;
             configContent += `Captain Promotion Requirements: ${config.captainPromotionRequirement}\n`;
             configContent += `Captain XP Promotion Requirement: ${config.captainXPRequirement}\n`;
             configContent += `Captain Level Promotion Requirement: ${config.captainLevelRequirement}\n`;
             configContent += `Captain Top Contributor Promotion Requirement: ${config.captainContributorRequirement}\n`;
             configContent += `Captain Time Promotion Requirement: ${config.captainTimeRequirement}\n`;
-            configContent += `Recruiter Inactivity Threshold: ${config.recruiterThreshold}\n`;
+            configContent += `Recruiter Inactivity Upper Threshold: ${config.recruiterUpperThreshold}\n`;
+            configContent += `Recruiter Inactivity Lower Threshold: ${config.recruiterLowerThreshold}\n`;
             configContent += `Recruiter Promotion Requirements: ${config.recruiterPromotionRequirement}\n`;
             configContent += `Recruiter XP Promotion Requirement: ${config.recruiterXPRequirement}\n`;
             configContent += `Recruiter Level Promotion Requirement: ${config.recruiterLevelRequirement}\n`;
             configContent += `Recruiter Top Contributor Promotion Requirement: ${config.recruiterContributorRequirement}\n`;
             configContent += `Recruiter Time Promotion Requirement: ${config.recruiterTimeRequirement}\n`;
-            configContent += `Recruit Inactivity Threshold: ${config.recruitThreshold}\n`;
+            configContent += `Recruit Inactivity Upper Threshold: ${config.recruitUpperThreshold}\n`;
+            configContent += `Recruit Inactivity Lower Threshold: ${config.recruitLowerThreshold}\n`;
             configContent += `Inactivity Level Requirement: ${config.levelRequirement}\n`;
-            configContent += `Inactivity Level Multiplier: ${config.inactiveMultiplier}\n`;
+            configContent += `Extra Time Multiplier: ${config.extraTimeMultiplier}\n`;
+            configContent += `Average Online Requirement: ${config.averageRequirement}\n`;
+            configContent += `New Member Minimum Time: ${config.newPlayerMinimumTime}\n`;
+            configContent += `New Member Threshold: ${config.newPlayerThreshold}\n`;
 
             pages.push(configContent);
 
