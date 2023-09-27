@@ -44,6 +44,7 @@ module.exports = {
         const directoryPath = path.join(__dirname, '..', '..', 'configs');
         const filePath = path.join(directoryPath, `${guildId}.json`);
         const username = interaction.options.getString('username');
+        const formattedUsername = username.replace(/_/g, '\\_');
 
         try {
             let config = {};
@@ -69,7 +70,7 @@ module.exports = {
                 const alreadyVerified = await validUsername(interaction.member, interaction.guild, username);
 
                 if (!alreadyVerified) {
-                    await interaction.editReply(`Someone in this server is already named ${username}.`);
+                    await interaction.editReply(`Someone in this server is already named ${formattedUsername}.`);
                     return;
                 }
             }
@@ -89,13 +90,13 @@ module.exports = {
                         if (foundRows.length === 0) {
                             checkForAlly = true;
                         } else if (foundRows.length > 1) {
-                            let message = `Multiple ${username}'s found.\n`;
+                            let message = `Multiple ${formattedUsername}'s found.\n`;
                             let counter = 1;
 
                             const row = new ActionRowBuilder();
 
                             for (const possibility of foundRows) {
-                                message += `${counter}. ${username}, ${possibility.rank} and ${possibility.guildRank} of ${guildName}. (UUID: ${possibility.UUID})\n`;
+                                message += `${counter}. ${formattedUsername}, ${possibility.rank} and ${possibility.guildRank} of ${guildName}. (UUID: ${possibility.UUID})\n`;
 
                                 const button = new ButtonBuilder()
                                     .setCustomId(possibility.UUID)
@@ -126,13 +127,13 @@ module.exports = {
                             const response = await applyRoles(interaction.guild, foundRows[0].UUID, interaction.member);
 
                             if (response >= 0) {
-                                await interaction.editReply(`Verified as ${username}`);
+                                await interaction.editReply(`Verified as ${formattedUsername}`);
 
                                 if (config.logMessages && config.logChannel) {
-                                    sendMessage(interaction.guild, config.logChannel, `${interaction.user} has verified as ${username}`);
+                                    sendMessage(interaction.guild, config.logChannel, `${interaction.user} has verified as ${formattedUsername}`);
                                 }
                             } else {
-                                await interaction.editReply(`Unable to verify as ${username}`);
+                                await interaction.editReply(`Unable to verify as ${formattedUsername}`);
                             }
 
                             resolve();
@@ -169,13 +170,13 @@ module.exports = {
                                 if (!allyRows || allyRows.length === 0) {
                                     notFound = true;
                                 } else if (allyRows.length > 1) {
-                                    let message = `Multiple ${username}'s found.\n`;
+                                    let message = `Multiple ${formattedUsername}'s found.\n`;
                                     let counter = 1;
 
                                     const row = new ActionRowBuilder();
 
                                     for (const possibility of allyRows) {
-                                        message += `${counter}. ${username}, ${possibility.rank} and ${possibility.guildRank} of ${ally}. (UUID: ${possibility.UUID})\n`;
+                                        message += `${counter}. ${formattedUsername}, ${possibility.rank} and ${possibility.guildRank} of ${ally}. (UUID: ${possibility.UUID})\n`;
 
                                         const button = new ButtonBuilder()
                                             .setCustomId(possibility.UUID)
@@ -206,13 +207,13 @@ module.exports = {
                                     const response = await applyRoles(interaction.guild, allyRows[0].UUID, interaction.member);
 
                                     if (response >= 0) {
-                                        await interaction.editReply(`Verified as ally ${username}`);
+                                        await interaction.editReply(`Verified as ally ${formattedUsername}`);
 
                                         if (config.logMessages && config.logChannel) {
-                                            sendMessage(interaction.guild, config.logChannel, `${interaction.user} has verified as ally ${username}`);
+                                            sendMessage(interaction.guild, config.logChannel, `${interaction.user} has verified as ally ${formattedUsername}`);
                                         }
                                     } else {
-                                        await interaction.editReply(`Unable to verify as ally ${username}`);
+                                        await interaction.editReply(`Unable to verify as ally ${formattedUsername}`);
                                     }
 
                                     resolve();
@@ -223,15 +224,15 @@ module.exports = {
                                     const uuid = await getAsync('SELECT UUID FROM players WHERE username = ?', [username]);
 
                                     if (uuid) {
-                                        await interaction.editReply(`Verified as ${username}, you are not a member of ${guildName} or its allies, if you believe this is incorrect please run /updateguild ${guildName}`);
+                                        await interaction.editReply(`Verified as ${formattedUsername}, you are not a member of ${guildName} or its allies, if you believe this is incorrect please run /updateguild ${guildName}`);
 
                                         await applyRoles(interaction.guild, uuid['UUID'], interaction.member, true);
 
                                         if (config.logMessages && config.logChannel) {
-                                            sendMessage(interaction.guild, config.logChannel, `${interaction.user} has verified as ${username}, they are not a member of ${guildName} or its allies.`);
+                                            sendMessage(interaction.guild, config.logChannel, `${interaction.user} has verified as ${formattedUsername}, they are not a member of ${guildName} or its allies.`);
                                         }
                                     } else {
-                                        await interaction.editReply(`Unable to verify you as ${username}.\n\nPlease run /updateplayer with your username or UUID to be added to the database. Please be aware this may take a few minutes.`);
+                                        await interaction.editReply(`Unable to verify you as ${formattedUsername}.\n\nPlease run /updateplayer with your username or UUID to be added to the database. Please be aware this may take a few minutes.`);
 
                                         await applyRoles(interaction.guild, null, interaction.member);
                                     }
@@ -246,7 +247,7 @@ module.exports = {
                 );
             });
         } catch (error) {
-            await interaction.editReply(`Unable to verify as ${username}`);
+            await interaction.editReply(`Unable to verify as ${formattedUsername}`);
         }
     },
 };
