@@ -196,7 +196,6 @@ async function updatePlayer(playerName) {
         });
 
         if (!playerJson) {
-            hitLimit = true;
             return;
         }
 
@@ -288,7 +287,6 @@ async function updateGuilds() {
         });
 
         if (!response) {
-            hitLimit = true;
             return;
         }
 
@@ -419,7 +417,6 @@ async function updateGuild(guildName) {
         });
 
         if (!guild) {
-            hitLimit = true;
             return;
         }
 

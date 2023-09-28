@@ -41,7 +41,7 @@ async function removeOldMessages() {
                 components: [],
             });
         } catch (error) {
-            console.error('Error removing components from message: ', message.id);
+            console.error('Error removing components from message: ', message);
         }
     }
 
