@@ -75,14 +75,16 @@ async function updateRanks(guild) {
 
                         serverMembersToIgnore.push(serverMember.user.username);
 
+                        const formattedName = serverMember.user.username.replace(/_/g, '\\_');
+
                         if (updated > 0) {
                             if (updatedMembers > 0) {
-                                messageEnd += `, ${serverMember.user.username}`;
+                                messageEnd += `, ${formattedName}`;
 
                                 updatedMembers++;
                                 messageStart = `Updated roles for ${updatedMembers} members.`;
                             } else {
-                                messageEnd += `\n(${serverMember.user.username}`;
+                                messageEnd += `\n(${formattedName}`;
 
                                 updatedMembers++;
                                 messageStart = `Updated roles for ${updatedMembers} member.`;
@@ -119,14 +121,16 @@ async function updateRanks(guild) {
                         if (guildMember.username === nickname || guildMember.username === serverMember.user.globalName || guildMember.username === serverMember.user.username) {
                             const updated = await applyRoles(guild, guildMember.UUID, serverMember);
 
+                            const formattedName = serverMember.user.username.replace(/_/g, '\\_');
+
                             if (updated > 0) {
                                 if (updatedMembers > 0) {
-                                    messageEnd += `, ${serverMember.user.username}`;
+                                    messageEnd += `, ${formattedName}`;
 
                                     updatedMembers++;
                                     messageStart = `Updated roles for ${updatedMembers} members.`;
                                 } else {
-                                    messageEnd += `\n(${serverMember.user.username}`;
+                                    messageEnd += `\n(${formattedName}`;
 
                                     updatedMembers++;
                                     messageStart = `Updated roles for ${updatedMembers} member.`;
