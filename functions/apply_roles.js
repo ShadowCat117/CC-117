@@ -384,32 +384,60 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                         }
                     }
 
-                    if (config.serverRankRoles && serverRank && serverRank !== 'PLAYER') {
-                        let serverRankRoleToApply;
+                    if (config.serverRankRoles) {
+                        if (serverRank && serverRank !== 'PLAYER') {
+                            let serverRankRoleToApply;
 
-                        for (const contentTeamValue of Object.values(ContentTeamValue)) {
-                            if (serverRank === contentTeamValue) {
-                                serverRankRoleToApply = contentTeamRole;
+                            for (const contentTeamValue of Object.values(ContentTeamValue)) {
+                                if (serverRank === contentTeamValue) {
+                                    serverRankRoleToApply = contentTeamRole;
+                                }
                             }
-                        }
 
-                        if (!serverRankRoleToApply) {
-                            if (serverRank === 'MODERATOR') {
-                                serverRankRoleToApply = moderatorRole;
-                            } else if (serverRank === 'ADMINISTRATOR' || serverRank === 'DEVELOPER') {
-                                serverRankRoleToApply = administratorRole;
+                            if (!serverRankRoleToApply) {
+                                if (serverRank === 'MODERATOR') {
+                                    serverRankRoleToApply = moderatorRole;
+                                } else if (serverRank === 'ADMINISTRATOR' || serverRank === 'DEVELOPER') {
+                                    serverRankRoleToApply = administratorRole;
+                                }
                             }
-                        }
 
-                        if (serverRankRoleToApply) {
-                            await member.roles.add(serverRankRoleToApply)
-                                .then(() => {
-                                    console.log(`Added server rank role to ${member.user.username}`);
-                                    hasUpdated = true;
-                                })
-                                .catch(() => {
-                                    errorMessage += `Failed to add server rank role to ${member.user.username}.\n`;
-                                });
+                            if (serverRankRoleToApply) {
+                                await member.roles.add(serverRankRoleToApply)
+                                    .then(() => {
+                                        console.log(`Added server rank role to ${member.user.username}`);
+                                        hasUpdated = true;
+                                    })
+                                    .catch(() => {
+                                        errorMessage += `Failed to add server rank role to ${member.user.username}.\n`;
+                                    });
+
+                                for (const role of serverRankRoles.values()) {
+                                    if (serverRankRoles.includes(role) && role !== serverRankRoleToApply) {
+                                        await member.roles.remove(role)
+                                            .then(() => {
+                                                console.log(`Removed server rank role ${role.name} from ${member.user.username}`);
+                                                hasUpdated = true;
+                                            })
+                                            .catch(() => {
+                                                errorMessage += `Failed to remove server rank role ${role.name} from ${member.user.username}.\n`;
+                                            });
+                                    }
+                                }
+                            }
+                        } else {
+                            for (const role of serverRankRoles.values()) {
+                                if (serverRankRoles.includes(role)) {
+                                    await member.roles.remove(role)
+                                        .then(() => {
+                                            console.log(`Removed server rank role ${role.name} from ${member.user.username}`);
+                                            hasUpdated = true;
+                                        })
+                                        .catch(() => {
+                                            errorMessage += `Failed to remove server rank role ${role.name} from ${member.user.username}.\n`;
+                                        });
+                                }
+                            }
                         }
                     }
 
