@@ -126,7 +126,7 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                                     .catch(() => {
                                         errorMessage += `Failed to remove level role ${role.name} from ${member.user.username}.\n`;
                                     });
-                            } else if (serverRankRoles.includes(role)) {
+                            } else if (serverRankRoles.includes(role) && memberRoles.has(role.id)) {
                                 await member.roles.remove(role)
                                     .then(() => {
                                         console.log(`Removed server rank role ${role.name} from ${member.user.username}`);
@@ -413,7 +413,7 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                                     });
 
                                 for (const role of serverRankRoles.values()) {
-                                    if (serverRankRoles.includes(role) && role !== serverRankRoleToApply) {
+                                    if (serverRankRoles.includes(role) && role !== serverRankRoleToApply && memberRoles.has(role.id)) {
                                         await member.roles.remove(role)
                                             .then(() => {
                                                 console.log(`Removed server rank role ${role.name} from ${member.user.username}`);
@@ -427,7 +427,7 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                             }
                         } else {
                             for (const role of serverRankRoles.values()) {
-                                if (serverRankRoles.includes(role)) {
+                                if (serverRankRoles.includes(role) && memberRoles.has(role.id)) {
                                     await member.roles.remove(role)
                                         .then(() => {
                                             console.log(`Removed server rank role ${role.name} from ${member.user.username}`);
