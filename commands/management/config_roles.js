@@ -64,6 +64,15 @@ module.exports = {
                 }, {
                     name: 'Member of Role',
                     value: 'memberOfRole',
+                }, {
+                    name: 'Administrator Role',
+                    value: 'administratorRole',
+                }, {
+                    name: 'Moderator Role',
+                    value: 'moderatorRole',
+                }, {
+                    name: 'Content Team Role',
+                    value: 'contentTeamRole',
                 }))
         .addRoleOption((option) =>
             option.setName('role')
@@ -283,6 +292,36 @@ module.exports = {
                 }
 
                 break;
+            case 'administratorRole':
+                if (role == null) {
+                    await interaction.reply({
+                        content: 'Administrator Role requires a <role> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                }
+
+                break;
+            case 'moderatorRole':
+                if (role == null) {
+                    await interaction.reply({
+                        content: 'Moderator Role requires a <role> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                }
+
+                break;
+            case 'contentTeamRole':
+                if (role == null) {
+                    await interaction.reply({
+                        content: 'Content Team Role requires a <role> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                }
+
+                break;
             default:
                 await interaction.reply({
                     content: 'Invalid configuration option.',
@@ -335,6 +374,9 @@ module.exports = {
                 case 'verifiedRole':
                 case 'unverifiedRole':
                 case 'memberOfRole':
+                case 'administratorRole':
+                case 'moderatorRole':
+                case 'contentTeamRole':
                     config[option] = role.id;
                     break;
             }

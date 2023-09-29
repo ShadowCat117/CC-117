@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const sendMessage = require('./send_message');
 const findPrefix = require('./find_prefix');
-
+const ContentTeamValue = require('../values/ContentTeamValue');
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('database/database.db');
 
@@ -46,17 +46,21 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
         const levelRoleEight = guild.roles.cache.get(config['levelRoleEight']);
         const levelRoleNine = guild.roles.cache.get(config['levelRoleNine']);
         const levelRoleTen = guild.roles.cache.get(config['levelRoleTen']);
+        const administratorRole = guild.roles.cache.get(config['administratorRole']);
+        const moderatorRole = guild.roles.cache.get(config['moderatorRole']);
+        const contentTeamRole = guild.roles.cache.get(config['contentTeamRole']);
 
         const guildRoles = [ownerRole, chiefRole, strategistRole, captainRole, recruiterRole, recruitRole];
         const rankRoles = [championRole, heroRole, vipPlusRole, vipRole];
         const allyRoles = [allyOwnerRole, allyRole];
         const levelRoles = [levelRoleOne, levelRoleTwo, levelRoleThree, levelRoleFour, levelRoleFive, levelRoleSix, levelRoleSeven, levelRoleEight, levelRoleNine, levelRoleTen];
+        const serverRankRoles = [administratorRole, moderatorRole, contentTeamRole];
 
         const levelRoleLevels = [config['levelRoleOneLevel'], config['levelRoleTwoLevel'], config['levelRoleThreeLevel'], config['levelRoleFourLevel'], config['levelRoleFiveLevel'], config['levelRoleSixLevel'], config['levelRoleSevenLevel'], config['levelRoleEightLevel'], config['levelRoleNineLevel'], config['levelRoleTenLevel']];
 
         return new Promise((resolve, reject) => {
             db.get(
-                'SELECT username, guildName, guildRank, rank, veteran, highestClassLevel FROM players WHERE UUID = ?', [uuid],
+                'SELECT username, guildName, guildRank, rank, veteran, highestClassLevel, serverRank FROM players WHERE UUID = ?', [uuid],
                 async (err, row) => {
                     if (err) {
                         console.error('Error retrieving player data:', err);
@@ -122,6 +126,15 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                                     .catch(() => {
                                         errorMessage += `Failed to remove level role ${role.name} from ${member.user.username}.\n`;
                                     });
+                            } else if (serverRankRoles.includes(role)) {
+                                await member.roles.remove(role)
+                                    .then(() => {
+                                        console.log(`Removed server rank role ${role.name} from ${member.user.username}`);
+                                        hasUpdated = true;
+                                    })
+                                    .catch(() => {
+                                        errorMessage += `Failed to remove server rank role ${role.name} from ${member.user.username}.\n`;
+                                    });
                             }
                         }
 
@@ -160,6 +173,7 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                     const guildRank = row.guildRank;
                     const rank = row.rank;
                     const veteran = row.veteran;
+                    const serverRank = row.serverRank;
 
                     let errorMessage = '';
 
@@ -367,6 +381,35 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                                         errorMessage += `Failed to remove veteran role from ${member.user.username}.\n`;
                                     });
                             }
+                        }
+                    }
+
+                    if (config.serverRankRoles && serverRank && serverRank !== 'PLAYER') {
+                        let serverRankRoleToApply;
+
+                        for (const contentTeamValue of Object.values(ContentTeamValue)) {
+                            if (serverRank === contentTeamValue) {
+                                serverRankRoleToApply = contentTeamRole;
+                            }
+                        }
+
+                        if (!serverRankRoleToApply) {
+                            if (serverRank === 'MODERATOR') {
+                                serverRankRoleToApply = moderatorRole;
+                            } else if (serverRank === 'ADMINISTRATOR' || serverRank === 'DEVELOPER') {
+                                serverRankRoleToApply = administratorRole;
+                            }
+                        }
+
+                        if (serverRankRoleToApply) {
+                            await member.roles.add(serverRankRoleToApply)
+                                .then(() => {
+                                    console.log(`Added server rank role to ${member.user.username}`);
+                                    hasUpdated = true;
+                                })
+                                .catch(() => {
+                                    errorMessage += `Failed to add server rank role to ${member.user.username}.\n`;
+                                });
                         }
                     }
 

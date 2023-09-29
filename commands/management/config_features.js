@@ -40,6 +40,9 @@ module.exports = {
                 }, {
                     name: 'Level Roles',
                     value: 'levelRoles',
+                }, {
+                    name: 'Add Server Rank Roles',
+                    value: 'serverRankRoles',
                 }))
         .addBooleanOption((option) =>
             option.setName('enabled')
@@ -170,6 +173,16 @@ module.exports = {
                 }
 
                 break;
+            case 'serverRankRoles':
+                if (enabled == null) {
+                    await interaction.reply({
+                        content: 'Add Server Rank Roles requires an <enabled> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                }
+
+                break;
             default:
                 await interaction.reply({
                     content: 'Invalid configuration option.',
@@ -198,6 +211,7 @@ module.exports = {
                 case 'veteranRole':
                 case 'memberOf':
                 case 'levelRoles':
+                case 'serverRankRoles':
                     config[option] = enabled;
                     break;
             }

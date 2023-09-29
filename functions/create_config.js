@@ -133,6 +133,10 @@ async function createConfig(client, guildId) {
                 strategistTimeRequirement: 0,
                 captainTimeRequirement: 0,
                 recruiterTimeRequirement: 0,
+                administratorRole: null,
+                moderatorRole: null,
+                contentTeamRole: null,
+                serverRankRoles: false,
             };
 
             try {
