@@ -128,6 +128,7 @@ module.exports = {
             configContent += `Add Unverified role: ${config.verifyMembers}\n`;
             configContent += `Add Member of guild role: ${config.memberOf}\n`;
             configContent += `Add Level roles: ${config.levelRoles}\n`;
+            configContent += `Add Server Rank roles: ${config.serverRankRoles}\n`;
 
             pages.push(configContent);
 
@@ -287,6 +288,30 @@ module.exports = {
                 configContent += `Unverified role: ${unverifiedRole}\n`;
             } else {
                 configContent += `Unverified role: ${config.unverifiedRole}\n`;
+            }
+
+            const administratorRole = interaction.guild.roles.cache.get(config.administratorRole);
+
+            if (administratorRole) {
+                configContent += `Administrator role: ${administratorRole}\n`;
+            } else {
+                configContent += `Administrator role: ${config.administratorRole}\n`;
+            }
+
+            const moderatorRole = interaction.guild.roles.cache.get(config.moderatorRole);
+
+            if (moderatorRole) {
+                configContent += `Moderator role: ${moderatorRole}\n`;
+            } else {
+                configContent += `Moderator role: ${config.moderatorRole}\n`;
+            }
+
+            const contentTeamRole = interaction.guild.roles.cache.get(config.contentTeamRole);
+
+            if (contentTeamRole) {
+                configContent += `Content Team role: ${contentTeamRole}\n`;
+            } else {
+                configContent += `Content Team role: ${config.contentTeamRole}\n`;
             }
 
             pages.push(configContent);
