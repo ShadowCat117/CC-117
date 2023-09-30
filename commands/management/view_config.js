@@ -87,13 +87,17 @@ module.exports = {
 
             configContent = '';
 
-            if (config.joinMessage.includes('$user$')) {
+            if (!config.joinMessage) {
+                configContent += `Join Message: ${config.joinMessage}\n`;
+            } else if (config.joinMessage.includes('$user$')) {
                 configContent += `Join Message: ${config.joinMessage.replace('$user$', interaction.member.user).replace(/\\n/g, '\n')}\n`;
             } else {
                 configContent += `Join Message: ${config.joinMessage.replace(/\\n/g, '\n')}\n`;
             }  
 
-            if (config.joinMessage.includes('$user$')) {
+            if (!config.leaveMessage) {
+                configContent += `Leave Message: ${config.leaveMessage}\n`;
+            } else if (config.joinMessage.includes('$user$')) {
                 configContent += `Leave Message: ${config.leaveMessage.replace('$user$', interaction.member.user.username).replace(/\\n/g, '\n')}\n`;
             } else {
                 configContent += `Leave Message: ${config.leaveMessage.replace(/\\n/g, '\n')}\n`;
@@ -103,17 +107,33 @@ module.exports = {
 
             configContent = '';
 
-            configContent += `War Message: ${config.warMessage.replace(/\\n/g, '\n')}\n`;
+            if (config.warMessage) {
+                configContent += `War Message: ${config.warMessage.replace(/\\n/g, '\n')}\n`;
+            } else {
+                configContent += `War Message: ${config.warMessage}\n`;
+            }
 
-            configContent += `War Class Message: ${config.warClassMessage.replace(/\\n/g, '\n')}\n`;
+            if (config.warClassMessage) {
+                configContent += `War Class Message: ${config.warClassMessage.replace(/\\n/g, '\n')}\n`;
+            } else {
+                configContent += `War Class Message: ${config.warClassMessage}\n`;
+            }
 
             pages.push(configContent);
 
             configContent = '';
 
-            configContent += `Class Message: ${config.classMessage.replace(/\\n/g, '\n')}\n`;
+            if (config.classMessage) {
+                configContent += `Class Message: ${config.classMessage.replace(/\\n/g, '\n')}\n`;
+            } else {
+                configContent += `Class Message: ${config.classMessage}\n`;
+            }
 
-            configContent += `Class Archetype Message: ${config.classArchetypeMessage.replace(/\\n/g, '\n')}\n`;
+            if (config.classArchetypeMessage) {
+                configContent += `Class Archetype Message: ${config.classArchetypeMessage.replace(/\\n/g, '\n')}\n`;
+            } else {
+                configContent += `Class Archetype Message: ${config.classArchetypeMessage}\n`;
+            }
 
             pages.push(configContent);
 
@@ -653,7 +673,7 @@ module.exports = {
             MessageManager.addMessage(viewConfigMessage);
         } catch (error) {
             console.log(error);
-            await interaction.reply({
+            await interaction.editReply({
                 content: 'Error viewing config.',
                 ephemeral: true,
             });
