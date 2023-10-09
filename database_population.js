@@ -423,7 +423,7 @@ async function updateGuild(guildName) {
         }
 
         db.run(
-            `INSERT OR IGNORE INTO guilds (name, prefix,
+            `INSERT OR IGNORE INTO guilds (name, prefix, level,
             average00, captains00, average01, captains01, average02, captains02, 
             average03, captains03, average04, captains04, average05, captains05, 
             average06, captains06, average07, captains07, average08, captains08, 
@@ -433,9 +433,9 @@ async function updateGuild(guildName) {
             average18, captains18, average19, captains19, average20, captains20, 
             average21, captains21, average22, captains22, average23, captains23,
             averageCount) 
-            VALUES (?, ?, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
+            VALUES (?, ?, ?, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0)`, [guild.name, guild.tag],
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0)`, [guild.name, guild.tag, guild.level],
             (err) => {
                 if (err) {
                     console.error('Failed to add new guild:', err);
@@ -443,6 +443,9 @@ async function updateGuild(guildName) {
                 }
             },
         );
+
+        const updateQuery = `UPDATE guilds SET level = ? WHERE name = '${guild.name}'`;
+        await runAsync(updateQuery, [guild.level]);
 
         await removeGuildMembers(guildName, guild.members);
 
@@ -690,6 +693,17 @@ async function runFunction() {
         // Updates the average online players & captain+'s for each guild.
         console.log('Updating guild activity');
         await updateGuildActivity();
+
+        // Temporary whilst server is slow.
+        const updatedNow = new Date();
+        if (updatedNow.getUTCMinutes() >= 10) {
+            console.log(`Updating guild activity was slow. Running 10 minute tasks at ${updatedNow.getUTCMinutes()} `);
+            await updateOnlinePlayers();
+
+            await updatePriorityPlayers();
+
+            await updatePriorityGuilds();
+        }
 
         console.log('Completed hourly tasks');
     }

@@ -9,6 +9,7 @@ const {
 const MessageManager = require('../message_type/MessageManager');
 const MessageType = require('../message_type/MessageType');
 const lastLogins = require('../functions/last_logins');
+const guildStats = require('../functions/guild_stats');
 const addAlly = require('../functions/add_ally');
 const removeAlly = require('../functions/remove_ally');
 const trackGuild = require('../functions/track_guild');
@@ -651,6 +652,45 @@ module.exports = {
                         });
 
                         MessageManager.removeMessage(message);
+
+                        break;
+                    case MessageType.GUILD_STATS:
+                        result = await guildStats(interaction, true);
+
+                        if (result.pageCount > 1) {
+                            const row = new ActionRowBuilder();
+
+                            const previousPage = new ButtonBuilder()
+                                .setCustomId('previousPage')
+                                .setStyle(ButtonStyle.Primary)
+                                .setEmoji('⬅️');
+
+                            const nextPage = new ButtonBuilder()
+                                .setCustomId('nextPage')
+                                .setStyle(ButtonStyle.Primary)
+                                .setEmoji('➡️');
+
+                            row.addComponents(previousPage, nextPage);
+
+                            interaction.update({
+                                content: result.pages[0],
+                                components: [row],
+                            });
+
+                            MessageManager.setMessagePages(message, result.pages);
+                        } else {
+                            if (result.pages[0] === '```\n```') {
+                                interaction.update({
+                                    content: `No players found in the guild ${interaction.customId}`,
+                                    components: [],
+                                });
+                            } else {
+                                interaction.update({
+                                    content: result.pages[0],
+                                    components: [],
+                                });
+                            }
+                        }
 
                         break;
                     case MessageType.LAST_LOGINS:
