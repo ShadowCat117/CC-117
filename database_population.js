@@ -499,7 +499,7 @@ async function updatePlayersGuild(playerUuid, playerName, guildName, guildRank, 
         const outdatedDate = new Date();
         outdatedDate.setDate(outdatedDate.getDate() - 14);
         const outdatedDateString = outdatedDate.toISOString().split('T')[0];
-        const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, lastUpdated, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, lastUpdated, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
         await runAsync(insertQuery, [playerUuid, playerName, guildName, guildRank, null, 0, outdatedDateString, 0, outdatedDateString, null, contributedGuildXP, 1, joinDate, null]);
     }
 }
