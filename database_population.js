@@ -7,6 +7,7 @@ const path = require('path');
 let playersToUpdate = [];
 let currentGuildIndex = 0;
 let hitLimit = false;
+const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 async function runAsync(query, params) {
     return new Promise((resolve, reject) => {
@@ -704,9 +705,12 @@ async function runFunction() {
         console.log('Adding used guilds to priority');
         await addPriorityGuilds();
 
+        const dayOfWeek = daysOfWeek[now.getUTCDay()];
+        const backupFilename = `database_backup_${dayOfWeek}.db`;
+
         // Creates a copy of the database
         console.log('Creating database backup');
-        await createDatabaseBackup();
+        await createDatabaseBackup(backupFilename);
 
         console.log('Completed daily tasks');
     }
@@ -717,13 +721,13 @@ async function runFunction() {
     setTimeout(runFunction, secondsToNextMinute * 1000);
 }
 
-async function createDatabaseBackup() {
+async function createDatabaseBackup(backupFilename) {
     return new Promise((resolve, reject) => {
         db.close((error) => {
             if (error) {
                 reject(error);
             } else {
-                fs.copyFile('database/database.db', 'database/database_backup.db', COPYFILE_FICLONE, (err) => {
+                fs.copyFile('database/database.db', `database/${backupFilename}`, COPYFILE_FICLONE, (err) => {
                     if (err) {
                         console.error('Error creating backup:', err);
                         reject(err);
