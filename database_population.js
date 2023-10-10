@@ -2,6 +2,7 @@ const wynnAPI = require('gavel-gateway-js');
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('database/database.db');
 const fs = require('fs').promises;
+const { COPYFILE_FICLONE } = require('fs').constants;
 const path = require('path');
 let playersToUpdate = [];
 let currentGuildIndex = 0;
@@ -694,17 +695,6 @@ async function runFunction() {
         console.log('Updating guild activity');
         await updateGuildActivity();
 
-        // Temporary whilst server is slow.
-        const updatedNow = new Date();
-        if (updatedNow.getUTCMinutes() >= 10) {
-            console.log(`Updating guild activity was slow. Running 10 minute tasks at ${updatedNow.getUTCMinutes()} `);
-            await updateOnlinePlayers();
-
-            await updatePriorityPlayers();
-
-            await updatePriorityGuilds();
-        }
-
         console.log('Completed hourly tasks');
     }
 
@@ -714,6 +704,10 @@ async function runFunction() {
         console.log('Adding used guilds to priority');
         await addPriorityGuilds();
 
+        // Creates a copy of the database
+        console.log('Creating database backup');
+        await createDatabaseBackup();
+
         console.log('Completed daily tasks');
     }
 
@@ -722,6 +716,27 @@ async function runFunction() {
 
     setTimeout(runFunction, secondsToNextMinute * 1000);
 }
+
+async function createDatabaseBackup() {
+    return new Promise((resolve, reject) => {
+        db.close((error) => {
+            if (error) {
+                reject(error);
+            } else {
+                fs.copyFile('database/database.db', 'database/database_backup.db', COPYFILE_FICLONE, (err) => {
+                    if (err) {
+                        console.error('Error creating backup:', err);
+                        reject(err);
+                    } else {
+                        console.log('Backup created successfully.');
+                        resolve();
+                    }
+                });
+            }
+        });
+    });
+}
+
 
 wynnAPI.setConfig({ throwOnRatelimitError: true });
 wynnAPI.setConfig({ maxQueueLength: 0 });
