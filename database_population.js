@@ -2,7 +2,6 @@ const wynnAPI = require('gavel-gateway-js');
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('database/database.db');
 const fs = require('fs').promises;
-const { COPYFILE_FICLONE } = require('fs').constants;
 const path = require('path');
 let playersToUpdate = [];
 let currentGuildIndex = 0;
@@ -722,23 +721,15 @@ async function runFunction() {
 }
 
 async function createDatabaseBackup(backupFilename) {
-    return new Promise((resolve, reject) => {
-        db.close((error) => {
-            if (error) {
-                reject(error);
-            } else {
-                fs.copyFile('database/database.db', `database/${backupFilename}`, COPYFILE_FICLONE, (err) => {
-                    if (err) {
-                        console.error('Error creating backup:', err);
-                        reject(err);
-                    } else {
-                        console.log('Backup created successfully.');
-                        resolve();
-                    }
-                });
-            }
-        });
-    });
+    const sourceFile = 'database/database.db';
+    const destinationFile = `database/${backupFilename}`;
+
+    try {
+        await fs.copyFile(sourceFile, destinationFile);
+        console.log('Backup created successfully.');
+    } catch (err) {
+        console.error('Error creating backup:', err);
+    }
 }
 
 
