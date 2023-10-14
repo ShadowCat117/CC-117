@@ -6,7 +6,7 @@ const path = require('path');
 let playersToUpdate = [];
 let currentGuildIndex = 0;
 let hitLimit = false;
-const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 async function runAsync(query, params) {
     return new Promise((resolve, reject) => {
