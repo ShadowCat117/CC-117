@@ -96,7 +96,19 @@ module.exports = {
                             const row = new ActionRowBuilder();
 
                             for (const possibility of foundRows) {
-                                message += `${counter}. ${formattedUsername}, ${possibility.rank} and ${possibility.guildRank} of ${guildName}. (UUID: ${possibility.UUID})\n`;
+                                if (possibility.rank) {
+                                    if (guildName) {
+                                        message += `${counter}. ${formattedUsername}, ${possibility.rank} and ${possibility.guildRank} of ${guildName}. (UUID: ${possibility.UUID})\n`;
+                                    } else {
+                                        message += `${counter}. ${formattedUsername}, ${possibility.rank}. (UUID: ${possibility.UUID})\n`;
+                                    }
+                                } else {
+                                    if (guildName) {
+                                        message += `${counter}. ${formattedUsername}, ${possibility.guildRank} of ${guildName}. (UUID: ${possibility.UUID})\n`;
+                                    } else {
+                                        message += `${counter}. ${formattedUsername}. (UUID: ${possibility.UUID})\n`;
+                                    }
+                                }
 
                                 const button = new ButtonBuilder()
                                     .setCustomId(possibility.UUID)
@@ -176,7 +188,19 @@ module.exports = {
                                     const row = new ActionRowBuilder();
 
                                     for (const possibility of allyRows) {
-                                        message += `${counter}. ${formattedUsername}, ${possibility.rank} and ${possibility.guildRank} of ${ally}. (UUID: ${possibility.UUID})\n`;
+                                        if (possibility.rank) {
+                                            if (ally) {
+                                                message += `${counter}. ${formattedUsername}, ${possibility.rank} and ${possibility.guildRank} of ${ally}. (UUID: ${possibility.UUID})\n`;
+                                            } else {
+                                                message += `${counter}. ${formattedUsername}, ${possibility.rank}. (UUID: ${possibility.UUID})\n`;
+                                            }
+                                        } else {
+                                            if (ally) {
+                                                message += `${counter}. ${formattedUsername}, ${possibility.guildRank} of ${ally}. (UUID: ${possibility.UUID})\n`;
+                                            } else {
+                                                message += `${counter}. ${formattedUsername}. (UUID: ${possibility.UUID})\n`;
+                                            }
+                                        }
 
                                         const button = new ButtonBuilder()
                                             .setCustomId(possibility.UUID)

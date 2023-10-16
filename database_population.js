@@ -514,6 +514,7 @@ async function updateGuildMembers() {
 
             if (currentGuildIndex > endIndex) {
                 currentGuildIndex = 0;
+                return;
             }
 
             // Cap at 100 as it takes too long to update and hit api limit

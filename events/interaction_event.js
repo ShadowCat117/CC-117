@@ -15,6 +15,7 @@ const removeAlly = require('../functions/remove_ally');
 const trackGuild = require('../functions/track_guild');
 const untrackGuild = require('../functions/untrack_guild');
 const setGuild = require('../functions/set_guild');
+const sus = require('../functions/sus');
 const activeHours = require('../functions/active_hours');
 const applyRoles = require('../functions/apply_roles');
 const updateGuild = require('../functions/update_guild');
@@ -748,6 +749,17 @@ module.exports = {
 
                         interaction.update({
                             content: result.pages[0],
+                            components: [],
+                        });
+
+                        MessageManager.removeMessage(message);
+
+                        break;
+                    case MessageType.SUS:
+                        result = await sus(interaction.customId);
+
+                        interaction.update({
+                            content: result,
                             components: [],
                         });
 
