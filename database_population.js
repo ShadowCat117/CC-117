@@ -3,7 +3,6 @@ const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('database/database.db');
 const fs = require('fs').promises;
 const path = require('path');
-let playersToUpdate = [];
 let currentGuildIndex = 0;
 let hitLimit = false;
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -65,7 +64,7 @@ async function updateOnlinePlayers() {
 
 async function updatePlayerStatus(worldData) {
     return new Promise((resolve, reject) => {
-        const playersToUpdateNow = [];
+        const playersToUpdate = [];
 
         let processedCount = 0;
 
@@ -87,17 +86,15 @@ async function updatePlayerStatus(worldData) {
                         processedCount++;
 
                         if (processedCount === playersCount) {
-                            resolve(playersToUpdateNow);
+                            resolve(playersToUpdate);
                         }
                     });
                 } else {
-                    if (!playersToUpdate.includes(playerName)) {
-                        playersToUpdateNow.push(playerName);
-                    }
+                    playersToUpdate.push(playerName);
 
                     processedCount++;
                     if (processedCount === playersCount) {
-                        resolve(playersToUpdateNow);
+                        resolve(playersToUpdate);
                     }
                 }
             });
@@ -119,31 +116,6 @@ async function updatePlayerStatus(worldData) {
         }
     });
 }
-
-async function getOutdatedPlayers() {
-    const outdatedDate = new Date();
-    outdatedDate.setDate(outdatedDate.getDate() - 14);
-
-    const selectQuery = 'SELECT username FROM players WHERE lastUpdated <= ?';
-    const params = [outdatedDate.toISOString()];
-
-    const rows = await allAsync(selectQuery, params);
-
-    playersToUpdate = rows.map(row => row.username);
-
-    return;
-}
-
-async function updateOutdatedPlayers() {
-    try {
-        for (const player of playersToUpdate) {
-            await updatePlayer(player);
-        }
-    } catch (error) {
-        console.error(error);
-    }
-}
-
 
 async function updatePriorityPlayers() {
     const filePath = path.join(__dirname, 'updatePlayers.json');
@@ -221,7 +193,7 @@ async function updatePlayer(playerName) {
             const contributedGuildXP = row.contributedGuildXP !== null ? row.contributedGuildXP : null;
             const guildJoinDate = row.guildJoinDate !== null ? row.guildJoinDate : null;
 
-            const insertQuery = 'INSERT OR REPLACE INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, lastUpdated, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            const insertQuery = 'INSERT OR REPLACE INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
             const insertParams = [
                 playerJson.uuid,
@@ -232,7 +204,6 @@ async function updatePlayer(playerName) {
                 playerJson.rank.veteran,
                 JSON.stringify(playerJson.lastJoin).split('T')[0].slice(1),
                 isOnline,
-                new Date().toISOString().split('T')[0],
                 worldNumber,
                 contributedGuildXP,
                 highestClassLevel,
@@ -242,14 +213,12 @@ async function updatePlayer(playerName) {
 
             await runAsync(insertQuery, insertParams);
 
-            playersToUpdate.pop(playerName);
-
             return;
         } else {
             const worldNumber = playerJson.world !== null ? parseInt(playerJson.world.slice(2)) : null;
             const isOnline = worldNumber ? 1 : 0;
 
-            const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, lastUpdated, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
             const insertParams = [
                 playerJson.uuid,
@@ -260,7 +229,6 @@ async function updatePlayer(playerName) {
                 playerJson.rank.veteran,
                 JSON.stringify(playerJson.lastJoin).split('T')[0].slice(1),
                 isOnline,
-                new Date().toISOString().split('T')[0],
                 worldNumber,
                 0,
                 highestClassLevel,
@@ -500,8 +468,8 @@ async function updatePlayersGuild(playerUuid, playerName, guildName, guildRank, 
         const outdatedDate = new Date();
         outdatedDate.setDate(outdatedDate.getDate() - 14);
         const outdatedDateString = outdatedDate.toISOString().split('T')[0];
-        const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, lastUpdated, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        await runAsync(insertQuery, [playerUuid, playerName, guildName, guildRank, null, 0, outdatedDateString, 0, outdatedDateString, null, contributedGuildXP, 1, joinDate, null]);
+        const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        await runAsync(insertQuery, [playerUuid, playerName, guildName, guildRank, null, 0, outdatedDateString, 0, null, contributedGuildXP, 1, joinDate, null]);
     }
 }
 
@@ -666,19 +634,6 @@ async function runFunction() {
         await updatePriorityGuilds();
 
         console.log('Completed tasks for every 10 minutes');
-    }
-
-    // Update every 20 mins
-    if (now.getUTCMinutes() % 20 == 0) {
-        // Gets all players who haven't been updated in a fortnight.
-        console.log('Getting outdated players');
-        await getOutdatedPlayers();
-
-        // Updates the rank for players that haven't been updated in a fortnight.
-        console.log('Updating outdated players');
-        await updateOutdatedPlayers();
-
-        console.log('Completed tasks for every 20 minutes');
     }
 
     // Update hourly
