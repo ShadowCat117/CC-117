@@ -178,22 +178,30 @@ async function updatePlayer(playerName) {
         const row = await getAsync(selectQuery, selectParams);
 
         let highestClassLevel = 1;
+        let completedQuests = 0;
+        let totalCombatLevel = 0;
 
         for (const playerClass of playerJson.classes) {
             if (playerClass.levels.combat.level > highestClassLevel) {
                 highestClassLevel = playerClass.levels.combat.level;
             }
+
+            completedQuests += playerClass.quests.length;
+            totalCombatLevel += playerClass.levels.combat.level;
         }
+
+        const worldNumber = playerJson.world !== null ? parseInt(playerJson.world.slice(2)) : null;
+        const isOnline = worldNumber ? 1 : 0;
+        const playtime = Math.floor((playerJson.playtime * 4.7) / 60);
 
         if (row) {
             const guildName = row.guildName !== null ? row.guildName : playerJson.guild.name;
             const guildRank = row.guildRank !== null ? row.guildRank : playerJson.guild.rank;
-            const worldNumber = playerJson.world !== null ? parseInt(playerJson.world.slice(2)) : null;
-            const isOnline = worldNumber ? 1 : 0;
             const contributedGuildXP = row.contributedGuildXP !== null ? row.contributedGuildXP : null;
             const guildJoinDate = row.guildJoinDate !== null ? row.guildJoinDate : null;
+            const firstJoinDate = row.firstJoin !== null ? row.firstJoin : JSON.stringify(playerJson.firstJoin).split('T')[0].slice(1);
 
-            const insertQuery = 'INSERT OR REPLACE INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            const insertQuery = 'INSERT OR REPLACE INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank, firstJoin, completedQuests, totalCombatLevel, playtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
             const insertParams = [
                 playerJson.uuid,
@@ -209,16 +217,17 @@ async function updatePlayer(playerName) {
                 highestClassLevel,
                 guildJoinDate,
                 playerJson.rank.serverRank,
+                firstJoinDate,
+                completedQuests,
+                totalCombatLevel,
+                playtime,
             ];
 
             await runAsync(insertQuery, insertParams);
 
             return;
         } else {
-            const worldNumber = playerJson.world !== null ? parseInt(playerJson.world.slice(2)) : null;
-            const isOnline = worldNumber ? 1 : 0;
-
-            const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank, firstJoin, completedQuests, totalCombatLevel, playtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
             const insertParams = [
                 playerJson.uuid,
@@ -234,6 +243,10 @@ async function updatePlayer(playerName) {
                 highestClassLevel,
                 null,
                 playerJson.rank.serverRank,
+                JSON.stringify(playerJson.firstJoin).split('T')[0].slice(1),
+                completedQuests,
+                totalCombatLevel,
+                playtime,
             ];
 
             await runAsync(insertQuery, insertParams);
@@ -290,6 +303,12 @@ async function updateGuilds() {
                 if (hitLimit) break;
 
                 await updateGuild(guildName);
+
+                guildsNotInTable.pop(guildName);
+            }
+
+            for (const guildName of guildsNotInTable) {
+                await addPriorityGuild(guildName);
             }
         } catch (err) {
             console.error('Error updating list of guilds: ', err);
@@ -465,17 +484,17 @@ async function updatePlayersGuild(playerUuid, playerName, guildName, guildRank, 
         const updateQuery = `UPDATE players SET guildName = ?, guildRank = ?, contributedGuildXP = ?, guildJoinDate = ? WHERE UUID = '${playerUuid}'`;
         await runAsync(updateQuery, [guildName, guildRank, contributedGuildXP, joinDate]);
     } else {
-        const outdatedDate = new Date();
-        outdatedDate.setDate(outdatedDate.getDate() - 14);
-        const outdatedDateString = outdatedDate.toISOString().split('T')[0];
-        const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        await runAsync(insertQuery, [playerUuid, playerName, guildName, guildRank, null, 0, outdatedDateString, 0, null, contributedGuildXP, 1, joinDate, null]);
+        const today = new Date();
+        today.setDate(today.getDate() - 14);
+        const todayString = today.toISOString().split('T')[0];
+        const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank, firstJoin, completedQuests, totalCombatLevel, playtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        await runAsync(insertQuery, [playerUuid, playerName, guildName, guildRank, null, 0, todayString, 0, null, contributedGuildXP, 1, joinDate, null, todayString, 0, 0, 0]);
     }
 }
 
 async function updateGuildMembers() {
     try {
-        const query = 'SELECT name FROM guilds';
+        const query = 'SELECT name FROM guilds ORDER BY level';
         const rows = await allAsync(query, []);
 
         const existingGuildNames = rows.map((row) => row.name);
@@ -495,6 +514,11 @@ async function updateGuildMembers() {
 
             if (currentGuildIndex > endIndex) {
                 currentGuildIndex = 0;
+            }
+
+            // Cap at 100 as it takes too long to update and hit api limit
+            if (currentGuildIndex % 100 === 0) {
+                return;
             }
         }
 
@@ -613,6 +637,34 @@ async function addPriorityGuilds() {
         await fs.writeFile(filePath, updatedData, 'utf-8');
     } catch (err) {
         console.error('Error adding priority guilds:', err);
+    }
+}
+
+async function addPriorityGuild(guildName) {
+    try {
+        const filePath = path.join(__dirname, 'updateGuilds.json');
+        let updateGuildsFile = {};
+
+        try {
+            await fs.access(filePath);
+            const fileData = await fs.readFile(filePath, 'utf-8');
+            updateGuildsFile = JSON.parse(fileData);
+        } catch (err) {
+            console.log('Priority guilds file does not exist.');
+            updateGuildsFile.guilds = [];
+        }
+
+        if (!updateGuildsFile.guilds.includes(guildName)) {
+            updateGuildsFile.guilds.push(guildName);
+
+            const updatedData = JSON.stringify(updateGuildsFile, null, 2);
+            await fs.writeFile(filePath, updatedData, 'utf-8');
+            console.log(`Guild "${guildName}" added to priority.`);
+        } else {
+            console.log(`Guild "${guildName}" already prioritised.`);
+        }
+    } catch (err) {
+        console.error('Error adding priority guild:', err);
     }
 }
 
