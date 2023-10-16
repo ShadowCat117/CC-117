@@ -24,16 +24,18 @@ async function sus(uuid) {
                     const daysSinceJoin = Math.floor((Date.now() - new Date(row.firstJoin).getTime()) / (1000 * 60 * 60 * 24));
 
                     let timeSpentPercentage;
+                    let timeSpentSus;
 
                     if (row.playtime && daysSinceJoin > 0) {
                         timeSpentPercentage = ((row.playtime / (daysSinceJoin * 24)) * 100);
+                        timeSpentSus = sigmoid(timeSpentPercentage);
                     } else if (row.playtime && daysSinceJoin === 0) {
                         timeSpentPercentage = 100.00;
+                        timeSpentSus = 100;
                     } else {
                         timeSpentPercentage = 0.00;
+                        timeSpentSus = 0;
                     }
-
-                    const timeSpentSus = sigmoid(timeSpentPercentage);
 
                     const overallSus = ((wynnJoinSus + rankSus + levelSus + playtimeSus + questSus + timeSpentSus) / 6).toFixed(2);
 
