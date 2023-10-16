@@ -45,7 +45,7 @@ async function sus(uuid) {
                     let rankSusMessage;
 
                     if (row.firstJoin) {
-                        joinSusMessage = `**Wynncraft Join Date**: ${row.firstJoin} (${daysSinceJoin * 24} days) __(${wynnJoinSus.toFixed(2)}%)__`;
+                        joinSusMessage = `**Wynncraft Join Date**: ${row.firstJoin} (${daysSinceJoin} days) __(${wynnJoinSus.toFixed(2)}%)__`;
                     } else {
                         joinSusMessage = `Unknown join date: __(${wynnJoinSus.toFixed(2)}%)__`;
                     }
