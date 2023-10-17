@@ -199,7 +199,6 @@ async function updatePlayer(playerName) {
             const guildRank = row.guildRank !== null ? row.guildRank : playerJson.guild.rank;
             const contributedGuildXP = row.contributedGuildXP !== null ? row.contributedGuildXP : null;
             const guildJoinDate = row.guildJoinDate !== null ? row.guildJoinDate : null;
-            const firstJoinDate = row.firstJoin !== null ? row.firstJoin : JSON.stringify(playerJson.firstJoin).split('T')[0].slice(1);
 
             const insertQuery = 'INSERT OR REPLACE INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank, firstJoin, completedQuests, totalCombatLevel, playtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
@@ -217,7 +216,7 @@ async function updatePlayer(playerName) {
                 highestClassLevel,
                 guildJoinDate,
                 playerJson.rank.serverRank,
-                firstJoinDate,
+                JSON.stringify(playerJson.firstJoin).split('T')[0].slice(1),
                 completedQuests,
                 totalCombatLevel,
                 playtime,
@@ -488,7 +487,7 @@ async function updatePlayersGuild(playerUuid, playerName, guildName, guildRank, 
         today.setDate(today.getDate() - 14);
         const todayString = today.toISOString().split('T')[0];
         const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank, firstJoin, completedQuests, totalCombatLevel, playtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        await runAsync(insertQuery, [playerUuid, playerName, guildName, guildRank, null, 0, todayString, 0, null, contributedGuildXP, 1, joinDate, null, joinDate, 0, 0, 0]);
+        await runAsync(insertQuery, [playerUuid, playerName, guildName, guildRank, null, 0, todayString, 0, null, contributedGuildXP, 1, joinDate, null, null, 0, 0, 0]);
     }
 }
 
