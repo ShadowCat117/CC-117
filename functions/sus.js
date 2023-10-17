@@ -15,6 +15,7 @@ async function sus(uuid) {
                     console.error('Error retrieving player data:', err);
                     reject(err);
                 } else {
+                    // Calculations based on Valor bot with some tweaks https://github.com/classAndrew/valor/blob/main/commands/sus.py
                     const wynnJoinSus = row.firstJoin ? Math.max(0, (Date.now() / 1000 - new Date(row.firstJoin).getTime() / 1000 - 63072000) * -1) * 100 / 63072000 : 50.0;
                     const rankSus = row.rank === 'VIP' ? 25.0 : (row.rank === 'VIP+' || row.rank === 'HERO' || row.rank === 'CHAMPION' || row.veteran === 1) ? 0.0 : 50.0;
                     const levelSus = row.totalCombatLevel ? Math.max(0, (row.totalCombatLevel - 210) * -1) * 100 / 210 : 50.0;
