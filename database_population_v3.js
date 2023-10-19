@@ -177,14 +177,13 @@ async function updatePlayer(playerName) {
         }
 
         const isOnline = playerJson.online ? 1 : 0;
-        const completedQuests = playerJson.globalData.completedQuests;
 
         if (row) {
             const supportRank = playerJson.supportRank ? playerJson.supportRank.toUpperCase() : null;
             const contributedGuildXP = row.contributedGuildXP !== null ? row.contributedGuildXP : null;
             const guildJoinDate = row.guildJoinDate !== null ? row.guildJoinDate : null;
 
-            const insertQuery = 'INSERT OR REPLACE INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank, firstJoin, completedQuests, totalCombatLevel, playtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            const insertQuery = 'INSERT OR REPLACE INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank, firstJoin, completedQuests, totalCombatLevel, playtime, wars) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
             const insertParams = [
                 playerJson.uuid,
@@ -201,16 +200,17 @@ async function updatePlayer(playerName) {
                 guildJoinDate,
                 playerJson.rank,
                 JSON.stringify(playerJson.firstJoin).split('T')[0].slice(1),
-                completedQuests,
+                playerJson.globalData.completedQuests,
                 totalCombatLevel,
                 playerJson.playtime,
+                playerJson.globalData.wars,
             ];
 
             await runAsync(insertQuery, insertParams);
 
             return;
         } else {
-            const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank, firstJoin, completedQuests, totalCombatLevel, playtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank, firstJoin, completedQuests, totalCombatLevel, playtime, wars) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
             const insertParams = [
                 playerJson.uuid,
@@ -227,9 +227,10 @@ async function updatePlayer(playerName) {
                 null,
                 playerJson.rank,
                 JSON.stringify(playerJson.firstJoin).split('T')[0].slice(1),
-                completedQuests,
+                playerJson.globalData.completedQuests,
                 totalCombatLevel,
                 playerJson.playtime,
+                playerJson.globalData.wars,
             ];
 
             await runAsync(insertQuery, insertParams);
@@ -496,8 +497,8 @@ async function updatePlayersGuild(playerUuid, playerName, guildName, guildRank, 
         const today = new Date();
         today.setDate(today.getDate() - 14);
         const todayString = today.toISOString().split('T')[0];
-        const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank, firstJoin, completedQuests, totalCombatLevel, playtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        await runAsync(insertQuery, [playerUuid, playerName, guildName, guildRank, null, 0, todayString, isOnline, onlineWorld, contributedGuildXP, 1, joinDate, null, null, 0, 0, 0]);
+        const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank, firstJoin, completedQuests, totalCombatLevel, playtime, wars) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        await runAsync(insertQuery, [playerUuid, playerName, guildName, guildRank, null, 0, todayString, isOnline, onlineWorld, contributedGuildXP, 1, joinDate, null, null, 0, 0, 0, 0]);
     }
 }
 
