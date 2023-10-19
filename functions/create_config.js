@@ -7,7 +7,6 @@ async function createConfig(client, guildId) {
 
     try {
         await fs.access(filePath);
-
     } catch (error) {
         if (error.code === 'ENOENT') {
             const guild = client.guilds.cache.get(guildId);

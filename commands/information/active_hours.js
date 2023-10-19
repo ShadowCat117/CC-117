@@ -8,6 +8,7 @@ const {
 } = require('discord.js');
 const MessageManager = require('../../message_type/MessageManager');
 const activeHours = require('../../functions/active_hours');
+const fs = require('fs');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -20,7 +21,27 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply();
 
-        const response = await activeHours(interaction);
+        let timezoneOffset = 0;
+        const timezoneFile = 'timezones.json';
+
+        try {
+            let timezones = {};
+
+            if (fs.existsSync(timezoneFile)) {
+                const fileData = fs.readFileSync(timezoneFile, 'utf-8');
+                timezones = JSON.parse(fileData);
+
+                timezoneOffset = timezones[interaction.member.id];
+            } else {
+                timezoneOffset = 0;
+            }
+        } catch (error) {
+            console.log(error);
+            await interaction.editReply('Error getting active hours');
+            return;
+        }
+
+        const response = await activeHours(interaction, false, timezoneOffset);
 
         if (response.componentIds.length > 0) {
             const row = new ActionRowBuilder();

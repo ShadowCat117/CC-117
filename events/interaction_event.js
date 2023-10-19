@@ -850,6 +850,39 @@ module.exports = {
                 return;
             }
 
+            const timezoneFile = 'timezones.json';
+
+            try {
+                let timezones = {};
+    
+                if (fs.existsSync(timezoneFile)) {
+                    const fileData = fs.readFileSync(timezoneFile, 'utf-8');
+                    timezones = JSON.parse(fileData);
+                } else {
+                    await new Promise((resolve, reject) => {
+                        fs.writeFile(timezoneFile, JSON.stringify(timezones, null, 2), (err) => {
+                            if (err) {
+                                console.log(err);
+                                console.log('Error creating timezones file');
+                                reject(err);
+                            } else {
+                                console.log('Created timezones file');
+                                resolve();
+                            }
+                        });
+                    });
+                }
+
+                timezones[interaction.member.id] = interaction.values;
+
+                fs.writeFileSync(timezoneFile, JSON.stringify(timezones, null, 2), 'utf-8');
+    
+            } catch (error) {
+                console.log(error);
+                await interaction.update('Error changing timezone');
+                return;
+            }
+
             const result = await activeHours(interaction, true, interaction.values);
 
             const row = new ActionRowBuilder();

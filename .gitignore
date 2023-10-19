@@ -6,3 +6,4 @@ configs
 database/
 updateGuilds.json
 updatePlayers.json
+timezones.json
