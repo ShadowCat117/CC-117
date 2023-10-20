@@ -154,9 +154,13 @@ async function updatePlayer(playerName) {
     try {
         const playerJson = (await axios.get(`https://api.wynncraft.com/v3/player/${playerName}?fullResult=True`)).data;
 
-        // FIXME: Handle API limit properly, !playerJson.username will trigger for invalid name
-        if (!playerJson || !playerJson.username) {
+        // FIXME: May need to handle API limit better
+        if (!playerJson) {
             hitLimit = true;
+            return;
+        }
+
+        if (!playerJson.username) {
             return;
         }
 
@@ -168,12 +172,14 @@ async function updatePlayer(playerName) {
         let highestClassLevel = 1;
         let totalCombatLevel = 0;
 
-        for (const playerClass of playerJson.characters) {
-            if (playerClass.level > highestClassLevel) {
-                highestClassLevel = playerClass.level;
+        for (const character in playerJson.characters) {
+            const characterJson = playerJson.characters[character];
+
+            if (characterJson.level > highestClassLevel) {
+                highestClassLevel = characterJson.level;
             }
 
-            totalCombatLevel += playerClass.level;
+            totalCombatLevel += characterJson.level;
         }
 
         const isOnline = playerJson.online ? 1 : 0;
@@ -249,8 +255,8 @@ async function updateGuilds() {
     try {
         const guildJson = (await axios.get('https://api.wynncraft.com/v3/guild/list/guild')).data;
 
-        // FIXME: Maybe handle API limit better
-        if (!guildJson || (guildJson.length && guildJson.length === 0)) {
+        // FIXME: May need to handle API limit better
+        if (!guildJson) {
             hitLimit = true;
             return;
         }
@@ -326,8 +332,6 @@ async function updatePriorityGuilds() {
                 await updateGuild(priorityGuild);
 
                 if (!hitLimit) {
-                    updateGuildsFile.guilds = updateGuildsFile.guilds.filter(guild => guild !== priorityGuild);
-
                     const memberUuids = await allAsync('SELECT UUID FROM players WHERE guildName = ?', [priorityGuild]);
 
                     const uuids = memberUuids.map(row => row.UUID);
@@ -337,9 +341,6 @@ async function updatePriorityGuilds() {
                     }
                 }
             }
-
-            const updatedData = JSON.stringify(updateGuildsFile);
-            await fs.writeFile(filePath, updatedData, 'utf-8');
 
             console.log('Updated priority guilds.');
         }
@@ -382,9 +383,13 @@ async function updateGuild(guildName) {
     try {
         const guildJson = (await axios.get(`https://api.wynncraft.com/v3/guild/${guildName}`)).data;
 
-        // FIXME: Handle API limit properly, !guildJson.name will trigger for invalid name
-        if (!guildJson || !guildJson.name) {
+        // FIXME: May need to handle API limit better
+        if (!guildJson) {
             hitLimit = true;
+            return;
+        }
+
+        if (!guildJson.name) {
             return;
         }
 
@@ -398,7 +403,7 @@ async function updateGuild(guildName) {
         ];
 
         db.run(
-            `INSERT OR IGNORE INTO guilds (name, prefix, level, xpPercent, wars
+            `INSERT OR IGNORE INTO guilds (name, prefix, level, xpPercent, wars,
             average00, captains00, average01, captains01, average02, captains02, 
             average03, captains03, average04, captains04, average05, captains05, 
             average06, captains06, average07, captains07, average08, captains08, 
@@ -407,18 +412,11 @@ async function updateGuild(guildName) {
             average15, captains15, average16, captains16, average17, captains17, 
             average18, captains18, average19, captains19, average20, captains20, 
             average21, captains21, average22, captains22, average23, captains23,
-            averageCount, season9Rating, season9Terrs, season10Rating, season10Terrs,
-            season11Rating, season11Terrs, season12Rating, season12Terrs,
-            season13Rating, season13Terrs, season14Rating, season14Terrs) 
+            averageCount) 
             VALUES (?, ?, ?, ?, ?, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, ? ? ? ? ? ? ? ? ? ? ? ?)`, [guildJson.name, guildJson.prefix, guildJson.level,
-                guildJson.xpPercent, guildJson.wars, guildJson.seasonRanks['9'].rating, guildJson.seasonRanks['9'].finalTerritories,
-                guildJson.seasonRanks['10'].rating, guildJson.seasonRanks['10'].finalTerritories,
-                guildJson.seasonRanks['11'].rating, guildJson.seasonRanks['11'].finalTerritories,
-                guildJson.seasonRanks['12'].rating, guildJson.seasonRanks['12'].finalTerritories,
-                guildJson.seasonRanks['13'].rating, guildJson.seasonRanks['13'].finalTerritories,
-                guildJson.seasonRanks['14'].rating, guildJson.seasonRanks['14'].finalTerritories],
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0)`, [guildJson.name, guildJson.prefix, guildJson.level,
+                guildJson.xpPercent],
             (err) => {
                 if (err) {
                     console.error('Failed to add new guild:', err);
@@ -427,15 +425,8 @@ async function updateGuild(guildName) {
             },
         );
 
-        const updateQuery = `UPDATE guilds SET level = ?, xpPercent = ?, wars = ?, season9Rating = ?, season9Terrs = ?, season10Rating = ?, season10Terrs = ?,
-            season11Rating = ?, season11Terrs = ?, season12Rating = ?, season12Terrs = ?,
-            season13Rating = ?, season13Terrs = ?, season14Rating = ?, season14Terrs = ? WHERE name = '${guildJson.name}'`;
-        await runAsync(updateQuery, [guildJson.level, guildJson.xpPercent, guildJson.wars, guildJson.seasonRanks['9'].rating, guildJson.seasonRanks['9'].finalTerritories,
-            guildJson.seasonRanks['10'].rating, guildJson.seasonRanks['10'].finalTerritories,
-            guildJson.seasonRanks['11'].rating, guildJson.seasonRanks['11'].finalTerritories,
-            guildJson.seasonRanks['12'].rating, guildJson.seasonRanks['12'].finalTerritories,
-            guildJson.seasonRanks['13'].rating, guildJson.seasonRanks['13'].finalTerritories,
-            guildJson.seasonRanks['14'].rating, guildJson.seasonRanks['14'].finalTerritories]);
+        const updateQuery = `UPDATE guilds SET level = ?, xpPercent = ?, wars = ? WHERE name = '${guildJson.name}'`;
+        await runAsync(updateQuery, [guildJson.level, guildJson.xpPercent, guildJson.wars]);
 
         await removeGuildMembers(guildName, allUuids);
 
@@ -671,8 +662,6 @@ async function addPriorityGuild(guildName) {
             const updatedData = JSON.stringify(updateGuildsFile, null, 2);
             await fs.writeFile(filePath, updatedData, 'utf-8');
             console.log(`Guild "${guildName}" added to priority.`);
-        } else {
-            console.log(`Guild "${guildName}" already prioritised.`);
         }
     } catch (err) {
         console.error('Error adding priority guild:', err);
@@ -684,17 +673,27 @@ async function runFunction() {
 
     let now = new Date();
 
-    // Update every 10 mins
-    if (now.getUTCMinutes() % 10 === 0) {
-        // Updates the players that are online.
-        console.log('Updating all online players.');
-        await updateOnlinePlayers();
+    // Updates the players that are online.
+    console.log('Updating all online players.');
+    await updateOnlinePlayers();
+    console.log('Updated all online players');
+
+    // Update every 5 mins
+    if (now.getUTCMinutes() % 5 === 0) {
+        // Update the list of priority guilds
+        await updatePriorityGuilds();
 
         // Update the list of priority players
         await updatePriorityPlayers();
 
-        // Update the list of priority guilds
-        await updatePriorityGuilds();
+        console.log('Completed tasks for every 5 minutes');
+    }
+
+    // Update every 10 mins
+    if (now.getUTCMinutes() % 10 === 0) {
+        // Adds all set, allied and tracked guilds to priority as they are used more often.
+        console.log('Adding used guilds to priority');
+        await addPriorityGuilds();
 
         console.log('Completed tasks for every 10 minutes');
     }
@@ -718,10 +717,6 @@ async function runFunction() {
 
     // Update daily
     if (now.getUTCHours() == 23 && now.getUTCMinutes() == 0) {
-        // Adds all set, allied and tracked guilds to priority as they are used more often.
-        console.log('Adding used guilds to priority');
-        await addPriorityGuilds();
-
         const dayOfWeek = daysOfWeek[now.getUTCDay()];
         const backupFilename = `database_backup_${dayOfWeek}.db`;
 
