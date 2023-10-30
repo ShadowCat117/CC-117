@@ -15,6 +15,11 @@ async function sus(uuid) {
                     console.error('Error retrieving player data:', err);
                     reject(err);
                 } else {
+                    if (!row.firstJoin || !row.playtime || (!row.totalCombatLevel || row.totalCombatLevel === 0) || (!row.completedQuests || row.completedQuests === 0)) {
+                        const susResponse = `Missing information for ${row.username}, please run \`/updateplayer player:${uuid}\` or \`/updateplayer player:${row.username}\``;
+                        resolve(susResponse);
+                    }
+
                     // Calculations based on Valor bot with some tweaks https://github.com/classAndrew/valor/blob/main/commands/sus.py
                     const wynnJoinSus = row.firstJoin ? Math.max(0, (Date.now() / 1000 - new Date(row.firstJoin).getTime() / 1000 - 63072000) * -1) * 100 / 63072000 : 50.0;
                     const rankSus = row.rank === 'VIP' ? 25.0 : (row.rank === 'VIP+' || row.rank === 'HERO' || row.rank === 'CHAMPION' || row.veteran === 1) ? 0.0 : 50.0;
@@ -48,43 +53,43 @@ async function sus(uuid) {
                     let rankSusMessage;
 
                     if (row.firstJoin) {
-                        joinSusMessage = `**Wynncraft Join Date**: ${row.firstJoin} (${daysSinceJoin} days) __(${wynnJoinSus.toFixed(2)}%)__`;
+                        joinSusMessage = `**Join Date**: ${row.firstJoin} (${daysSinceJoin} days) __(${wynnJoinSus.toFixed(2)}%)__`;
                     } else {
                         joinSusMessage = `Unknown join date: __(${wynnJoinSus.toFixed(2)}%)__`;
                     }
 
                     if (row.playtime) {
-                        playtimeSusMessage = `**Wynncraft Playtime**: ${row.playtime} hours __(${playtimeSus.toFixed(2)}%)__`;
+                        playtimeSusMessage = `**Playtime**: ${row.playtime} hours __(${playtimeSus.toFixed(2)}%)__`;
                     } else {
                         playtimeSusMessage = `Unknown playtime: __(${playtimeSus.toFixed(2)}%)__`;
                     }
 
                     if (timeSpentPercentage > 0) {
-                        timeSpentSusMessage = `**Wynncraft Time Spent Playing**: ${timeSpentPercentage.toFixed(2)}% of playtime __(${timeSpentSus.toFixed(2)}%)__`;
+                        timeSpentSusMessage = `**Time Spent Playing**: ${timeSpentPercentage.toFixed(2)}% of playtime __(${timeSpentSus.toFixed(2)}%)__`;
                     } else {
                         timeSpentSusMessage = `Unknown time spent playing: __(${timeSpentSus.toFixed(2)}%)__`;
                     }
 
                     if (row.totalCombatLevel) {
-                        levelSusMessage = `**Wynncraft Total Combat Level**: ${row.totalCombatLevel} __(${levelSus.toFixed(2)}%)__`;
+                        levelSusMessage = `**Total Combat Level**: ${row.totalCombatLevel} __(${levelSus.toFixed(2)}%)__`;
                     } else {
                         levelSusMessage = `Unknown total combat level: __(${levelSus.toFixed(2)}%)__`;
                     }
 
                     if (row.completedQuests) {
-                        questsSusMessage = `**Wynncraft Total Quests Completed**: ${row.completedQuests} __(${questSus.toFixed(2)}%)__`;
+                        questsSusMessage = `**Total Quests Completed**: ${row.completedQuests} __(${questSus.toFixed(2)}%)__`;
                     } else {
                         questsSusMessage = `Unknown total quests completed: __(${questSus.toFixed(2)}%)__`;
                     }
 
                     if (row.rank) {
                         if (row.veteran === 1) {
-                            rankSusMessage = `**Wynncraft Rank**: ${row.rank} (Vet) __(${rankSus.toFixed(2)}%)__`;
+                            rankSusMessage = `**Rank**: ${row.rank} (Vet) __(${rankSus.toFixed(2)}%)__`;
                         } else {
-                            rankSusMessage = `**Wynncraft Rank**: ${row.rank} __(${rankSus.toFixed(2)}%)__`;
+                            rankSusMessage = `**Rank**: ${row.rank} __(${rankSus.toFixed(2)}%)__`;
                         }
                     } else {
-                        rankSusMessage = `**Wynncraft Rank**: None __(${rankSus.toFixed(2)}%)__`;
+                        rankSusMessage = `**Rank**: None __(${rankSus.toFixed(2)}%)__`;
                     }
 
                     const susResponse = `Suspiciousness of **${row.username}** is: **__${overallSus}%__**\n\n${joinSusMessage}\n\n${playtimeSusMessage}\n\n${timeSpentSusMessage}\n\n${levelSusMessage}\n\n${questsSusMessage}\n\n${rankSusMessage}`;

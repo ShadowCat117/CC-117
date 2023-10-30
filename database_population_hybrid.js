@@ -1,3 +1,4 @@
+const wynnAPI = require('gavel-gateway-js');
 const axios = require('axios');
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('database/database.db');
@@ -45,44 +46,42 @@ async function allAsync(query, params) {
 
 async function updateOnlinePlayers() {
     try {
-        const onlinePlayers = (await axios.get('https://api.wynncraft.com/v3/player')).data;
+        const onlinePlayers = await wynnAPI.fetchOnlinePlayers();
+        const worlds = onlinePlayers.list;
 
-        await setOfflinePlayers(onlinePlayers.players);
+        await setOfflinePlayers(worlds);
 
-        // FIXME: May need to handle API limit better
-        if (onlinePlayers) {
-            const newPlayers = await updatePlayerStatus(onlinePlayers.players, onlinePlayers.total);
-        
-            if (newPlayers) {
-                for (const newPlayer of newPlayers) {
-                    await updatePlayer(newPlayer);
-                }
+        const newPlayers = await updatePlayerStatus(worlds);
+
+        if (newPlayers) {
+            for (const newPlayer of newPlayers) {
+                await updatePlayer(newPlayer);
             }
-        }    
+        }
     } catch (error) {
         console.error(`Error updating online players: ${error}`);
     }
 }
 
-async function setOfflinePlayers(onlinePlayers) {
+async function setOfflinePlayers(worldData) {
     const selectQuery = 'SELECT UUID, username FROM players WHERE isOnline = 1';
 
     const rows = await allAsync(selectQuery, []);
 
-    const onlineUsernames = [];
+    const onlinePlayers = [];
 
-    for (const player in onlinePlayers) {
-        onlineUsernames.push(player);
+    for (const world of worldData) {
+        onlinePlayers.push(...world.players);
     }
 
     for (const player of rows) {
-        if (!onlineUsernames.includes(player.username)) {
+        if (!onlinePlayers.includes(player.username)) {
             await runAsync('UPDATE players SET isOnline = 0, onlineWorld = NULL WHERE UUID = ?', [player.UUID]);
         }
     }
 }
 
-async function updatePlayerStatus(players, playersCount) {
+async function updatePlayerStatus(worldData) {
     return new Promise((resolve, reject) => {
         const playersToUpdate = [];
 
@@ -119,9 +118,17 @@ async function updatePlayerStatus(players, playersCount) {
                 }
             });
         };
-          
-        for (const player in players) {
-            processPlayer(player, players[player]);
+
+        let playersCount = 0;
+
+        for (const worldIndex in worldData) {
+            const world = worldData[worldIndex];
+
+            playersCount += world.players.length;
+
+            for (const playerName of world.players) {
+                processPlayer(playerName, world.name);
+            }
         }
     });
 }
@@ -734,7 +741,7 @@ async function runFreeFunction() {
     await updateOnlinePlayers();
     console.log('Updated all online players');
 
-    // // Update the list of priority guilds
+    // Update the list of priority guilds
     await updatePriorityGuilds();
 
     // Update the list of priority players

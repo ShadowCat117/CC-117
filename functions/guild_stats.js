@@ -55,7 +55,7 @@ async function guildStats(interaction, force = false) {
     }
 
     if (guildName) {
-        const guildRow = await getAsync('SELECT prefix, level FROM guilds WHERE name = ?', [guildName]);
+        const guildRow = await getAsync('SELECT prefix, level, xpPercent, wars FROM guilds WHERE name = ?', [guildName]);
         const memberRows = await allAsync('SELECT username, guildRank, contributedGuildXP, guildJoinDate FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
         const today = new Date();
 
@@ -83,14 +83,14 @@ async function guildStats(interaction, force = false) {
 
         const pages = [];
         const guildLevel = guildRow.level ? guildRow.level : '?';
-        let guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] (Level: ${guildLevel})\n`;
+        let guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%) Wars: ${guildRow.wars}\n`;
         let counter = 0;
 
         guildMembers.forEach((player) => {
             if (counter === 20) {
                 guildStatsPage += '```';
                 pages.push(guildStatsPage);
-                guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] (Level: ${guildLevel})\n` + player.toString();
+                guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%) Wars: ${guildRow.wars}\n` + player.toString();
                 counter = 1;
             } else {
                 guildStatsPage += player.toString();
