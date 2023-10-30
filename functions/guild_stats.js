@@ -56,7 +56,7 @@ async function guildStats(interaction, force = false) {
 
     if (guildName) {
         const guildRow = await getAsync('SELECT prefix, level, xpPercent, wars FROM guilds WHERE name = ?', [guildName]);
-        const memberRows = await allAsync('SELECT username, guildRank, contributedGuildXP, guildJoinDate FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
+        const memberRows = await allAsync('SELECT username, guildRank, contributedGuildXP, guildJoinDate, wars FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
         const today = new Date();
 
         let contributionPosition = 0;
@@ -68,6 +68,7 @@ async function guildStats(interaction, force = false) {
                 username,
                 guildRank,
                 contributedGuildXP,
+                wars,
             } = row;
 
             const [year, month, day] = row.guildJoinDate.split('-');
@@ -78,7 +79,7 @@ async function guildStats(interaction, force = false) {
             
             const daysInGuild = Math.round(differenceInMilliseconds / (1000 * 60 * 60 * 24));
 
-            return new GuildMember(username, guildRank, contributedGuildXP, daysInGuild, contributionPosition);
+            return new GuildMember(username, guildRank, contributedGuildXP, daysInGuild, contributionPosition, wars);
         });
 
         const pages = [];
@@ -87,7 +88,7 @@ async function guildStats(interaction, force = false) {
         let counter = 0;
 
         guildMembers.forEach((player) => {
-            if (counter === 20) {
+            if (counter === 15) {
                 guildStatsPage += '```';
                 pages.push(guildStatsPage);
                 guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%) Wars: ${guildRow.wars}\n` + player.toString();
@@ -98,7 +99,7 @@ async function guildStats(interaction, force = false) {
             }
         });
 
-        if (counter <= 20) {
+        if (counter <= 15) {
             guildStatsPage += '```';
             pages.push(guildStatsPage);
         }
