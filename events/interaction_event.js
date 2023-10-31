@@ -85,13 +85,85 @@ module.exports = {
                 });
             } else if (interaction.customId === 'war') {
                 const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
-                const allyOwnerRole = interaction.guild.roles.cache.get(config['allyOwnerRole']);
-                const allyRole = interaction.guild.roles.cache.get(config['allyRole']);
                 const warRole = interaction.guild.roles.cache.get(config['warRole']);
+                const levelRequirement = config['warLevelRequirement'];
 
                 const memberRoles = await interaction.member.roles.cache;
 
-                if (memberRoles.has(memberOfRole.id) || memberRoles.has(allyOwnerRole.id) || memberRoles.has(allyRole.id)) {
+                let foundLevelRoles = false;
+
+                const validLevelRoles = [];
+
+                if (config['levelRoleOneLevel'] >= levelRequirement) {
+                    validLevelRoles.push(interaction.guild.roles.cache.get(config['levelRoleOne']));
+                } else {
+                    foundLevelRoles = true;
+                }
+
+                if (!foundLevelRoles && config['levelRoleTwoLevel'] >= levelRequirement) {
+                    validLevelRoles.push(interaction.guild.roles.cache.get(config['levelRoleTwo']));
+                } else {
+                    foundLevelRoles = true;
+                }
+
+                if (!foundLevelRoles && config['levelRoleThreeLevel'] >= levelRequirement) {
+                    validLevelRoles.push(interaction.guild.roles.cache.get(config['levelRoleThree']));
+                } else {
+                    foundLevelRoles = true;
+                }
+
+                if (!foundLevelRoles && config['levelRoleFourLevel'] >= levelRequirement) {
+                    validLevelRoles.push(interaction.guild.roles.cache.get(config['levelRoleFour']));
+                } else {
+                    foundLevelRoles = true;
+                }
+
+                if (!foundLevelRoles && config['levelRoleFiveLevel'] >= levelRequirement) {
+                    validLevelRoles.push(interaction.guild.roles.cache.get(config['levelRoleFive']));
+                } else {
+                    foundLevelRoles = true;
+                }
+
+                if (!foundLevelRoles && config['levelRoleSixLevel'] >= levelRequirement) {
+                    validLevelRoles.push(interaction.guild.roles.cache.get(config['levelRoleSix']));
+                } else {
+                    foundLevelRoles = true;
+                }
+
+                if (!foundLevelRoles && config['levelRoleSevenLevel'] >= levelRequirement) {
+                    validLevelRoles.push(interaction.guild.roles.cache.get(config['levelRoleSeven']));
+                } else {
+                    foundLevelRoles = true;
+                }
+
+                if (!foundLevelRoles && config['levelRoleEightLevel'] >= levelRequirement) {
+                    validLevelRoles.push(interaction.guild.roles.cache.get(config['levelRoleEight']));
+                } else {
+                    foundLevelRoles = true;
+                }
+
+                if (!foundLevelRoles && config['levelRoleNineLevel'] >= levelRequirement) {
+                    validLevelRoles.push(interaction.guild.roles.cache.get(config['levelRoleNine']));
+                } else {
+                    foundLevelRoles = true;
+                }
+
+                if (!foundLevelRoles && config['levelRoleTenLevel'] >= levelRequirement) {
+                    validLevelRoles.push(interaction.guild.roles.cache.get(config['levelRoleTen']));
+                } else {
+                    foundLevelRoles = true;
+                }
+
+                let validLevel = false;
+
+                for (const levelRole of validLevelRoles) {
+                    if (memberRoles.has(levelRole.id)) {
+                        validLevel = true;
+                        break;
+                    }
+                }
+
+                if (memberRoles.has(memberOfRole.id) && validLevel) {
                     if (!memberRoles.has(warRole.id)) {
                         await interaction.member.roles.add(warRole)
                             .then(() => {
@@ -138,7 +210,7 @@ module.exports = {
                     });
                 } else {
                     await interaction.reply({
-                        content: `Sorry, you need to be a member of ${config['guildName']} or its allies to use this.`,
+                        content: `Sorry, you need to be a member of ${config['guildName']} to use this and be at least level ${levelRequirement}.`,
                         ephemeral: true,
                     });
                 }

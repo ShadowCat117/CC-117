@@ -394,14 +394,6 @@ async function updatePriorityGuilds() {
                     }
 
                     updated++;
-
-                    const memberUuids = await allAsync('SELECT UUID FROM players WHERE guildName = ?', [priorityGuild]);
-
-                    const uuids = memberUuids.map(row => row.UUID);
-
-                    for (const uuid of uuids) {
-                        await addPlayerToPriority(uuid);
-                    }
                 }
             }
 
@@ -412,36 +404,6 @@ async function updatePriorityGuilds() {
         }
     } catch (error) {
         console.error('Error updating priority guilds', error);
-    }
-}
-
-async function addPlayerToPriority(playerUuid) {
-    const filePath = path.join(__dirname, 'updatePlayers.json');
-
-    try {
-        let updatePlayersFile = {};
-
-        try {
-            await fs.access(filePath);
-            const fileData = await fs.readFile(filePath, 'utf-8');
-            updatePlayersFile = JSON.parse(fileData);
-        } catch (err) {
-            console.log('Priority players file does not exist.');
-            return;
-        }
-
-        updatePlayersFile.players = updatePlayersFile.players.filter(item => item !== null);
-
-        if (!updatePlayersFile.players.includes(playerUuid)) {
-            updatePlayersFile.players.push(playerUuid);
-
-            const updatedData = JSON.stringify(updatePlayersFile, null, 2);
-            await fs.writeFile(filePath, updatedData, 'utf-8');
-
-            return;
-        }
-    } catch (error) {
-        console.error('Error adding player to priority', error);
     }
 }
 
@@ -684,6 +646,16 @@ async function addPriorityGuilds() {
             });
         }
 
+        for (const priorityGuild of uniqueGuildNames) {
+            const memberUuids = await allAsync('SELECT UUID FROM players WHERE guildName = ?', [priorityGuild]);
+
+            const uuids = memberUuids.map(row => row.UUID);
+
+            for (const uuid of uuids) {
+                await addPlayerToPriority(uuid);
+            }
+        }
+
         const filePath = path.join(__dirname, 'updateGuilds.json');
         let updateGuildsFile = {};
 
@@ -733,6 +705,36 @@ async function addPriorityGuild(guildName) {
     }
 }
 
+async function addPlayerToPriority(playerUuid) {
+    const filePath = path.join(__dirname, 'updatePlayers.json');
+
+    try {
+        let updatePlayersFile = {};
+
+        try {
+            await fs.access(filePath);
+            const fileData = await fs.readFile(filePath, 'utf-8');
+            updatePlayersFile = JSON.parse(fileData);
+        } catch (err) {
+            console.log('Priority players file does not exist.');
+            return;
+        }
+
+        updatePlayersFile.players = updatePlayersFile.players.filter(item => item !== null);
+
+        if (!updatePlayersFile.players.includes(playerUuid)) {
+            updatePlayersFile.players.push(playerUuid);
+
+            const updatedData = JSON.stringify(updatePlayersFile, null, 2);
+            await fs.writeFile(filePath, updatedData, 'utf-8');
+
+            return;
+        }
+    } catch (error) {
+        console.error('Error adding player to priority', error);
+    }
+}
+
 async function runFreeFunction() {
     hitLimit = false;
 
@@ -767,10 +769,6 @@ async function runScheduledFunction() {
 
     // Update hourly
     if (now.getUTCMinutes() == 0) {
-        // Adds all set, allied and tracked guilds to priority as they are used more often.
-        console.log('Adding used guilds to priority');
-        await addPriorityGuilds();
-
         // Updates the average online players & captain+'s for each guild.
         console.log('Updating guild activity');
         await updateGuildActivity();
@@ -780,6 +778,10 @@ async function runScheduledFunction() {
 
     // Update daily
     if (now.getUTCHours() == 23 && now.getUTCMinutes() == 0) {
+        // Updates priority guilds with new set, allied and tracked guilds. Also add all members to priority.
+        console.log('Adding used guilds to priority');
+        await addPriorityGuilds();
+
         const dayOfWeek = daysOfWeek[now.getUTCDay()];
         const backupFilename = `database_backup_${dayOfWeek}.db`;
 

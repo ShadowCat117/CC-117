@@ -32,6 +32,10 @@ module.exports = {
         .addRoleOption((option) =>
             option.setName('solorole')
                 .setDescription('The solo role')
+                .setRequired(true))
+        .addStringOption((option) =>
+            option.setName('level')
+                .setDescription('War level requirement for wars')
                 .setRequired(true)),
     async execute(interaction) {
         const guildId = interaction.guild.id;
@@ -64,6 +68,18 @@ module.exports = {
             const healerRole = interaction.options.getRole('healerrole');
             const damageRole = interaction.options.getRole('damagerole');
             const soloRole = interaction.options.getRole('solorole');
+            const levelStr = interaction.options.getString('level');
+            let level;
+
+            if (isNaN(levelStr)) {
+                await interaction.reply({
+                    content: 'War LevelRequirement requires a number input.',
+                    ephemeral: true,
+                });
+                return;
+            } else {
+                level = parseInt(levelStr);
+            }
 
             if (!message) {
                 await interaction.reply({
@@ -100,6 +116,7 @@ module.exports = {
                 config['healerRole'] = healerRole.id;
                 config['damageRole'] = damageRole.id;
                 config['soloRole'] = soloRole.id;
+                config['warLevelRequirement'] = level;
 
                 fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
             } else {

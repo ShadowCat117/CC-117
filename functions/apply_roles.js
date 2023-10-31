@@ -49,12 +49,18 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
         const administratorRole = guild.roles.cache.get(config['administratorRole']);
         const moderatorRole = guild.roles.cache.get(config['moderatorRole']);
         const contentTeamRole = guild.roles.cache.get(config['contentTeamRole']);
+        const warRole = guild.roles.cache.get(config['warRole']);
+        const tankRole = guild.roles.cache.get(config['tankRole']);
+        const healerRole = guild.roles.cache.get(config['healerRole']);
+        const damageRole = guild.roles.cache.get(config['damageRole']);
+        const soloRole = guild.roles.cache.get(config['soloRole']);
 
         const guildRoles = [ownerRole, chiefRole, strategistRole, captainRole, recruiterRole, recruitRole];
         const rankRoles = [championRole, heroRole, vipPlusRole, vipRole];
         const allyRoles = [allyOwnerRole, allyRole];
         const levelRoles = [levelRoleOne, levelRoleTwo, levelRoleThree, levelRoleFour, levelRoleFive, levelRoleSix, levelRoleSeven, levelRoleEight, levelRoleNine, levelRoleTen];
         const serverRankRoles = [administratorRole, moderatorRole, contentTeamRole];
+        const warRoles = [warRole, tankRole, healerRole, damageRole, soloRole];
 
         const levelRoleLevels = [config['levelRoleOneLevel'], config['levelRoleTwoLevel'], config['levelRoleThreeLevel'], config['levelRoleFourLevel'], config['levelRoleFiveLevel'], config['levelRoleSixLevel'], config['levelRoleSevenLevel'], config['levelRoleEightLevel'], config['levelRoleNineLevel'], config['levelRoleTenLevel']];
 
@@ -134,6 +140,15 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                                     })
                                     .catch(() => {
                                         errorMessage += `Failed to remove server rank role ${role.name} from ${member.user.username}.\n`;
+                                    });
+                            } else if (warRoles.includes(role) && memberRoles.has(role.id)) {
+                                await member.roles.remove(role)
+                                    .then(() => {
+                                        console.log(`Removed war role ${role.name} from ${member.user.username}`);
+                                        hasUpdated = true;
+                                    })
+                                    .catch(() => {
+                                        errorMessage += `Failed to remove war role ${role.name} from ${member.user.username}.\n`;
                                     });
                             }
                         }
@@ -271,6 +286,15 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                                         .catch(() => {
                                             errorMessage += `Failed to remove member of role ${role.name} from ${member.user.username}.\n`;
                                         });
+                                } else if (warRoles.includes(role) && memberRoles.has(role.id)) {
+                                    await member.roles.remove(role)
+                                        .then(() => {
+                                            console.log(`Removed war role ${role.name} from ${member.user.username}`);
+                                            hasUpdated = true;
+                                        })
+                                        .catch(() => {
+                                            errorMessage += `Failed to remove war role ${role.name} from ${member.user.username}.\n`;
+                                        });
                                 }
                             }
                         }
@@ -302,6 +326,15 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                                     })
                                     .catch(() => {
                                         errorMessage += `Failed to remove member of role ${role.name} from ${member.user.username}.\n`;
+                                    });
+                            } else if (warRoles.includes(role) && memberRoles.has(role.id)) {
+                                await member.roles.remove(role)
+                                    .then(() => {
+                                        console.log(`Removed war role ${role.name} from ${member.user.username}`);
+                                        hasUpdated = true;
+                                    })
+                                    .catch(() => {
+                                        errorMessage += `Failed to remove war role ${role.name} from ${member.user.username}.\n`;
                                     });
                             }
                         }
