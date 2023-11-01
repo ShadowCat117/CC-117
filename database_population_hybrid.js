@@ -149,7 +149,7 @@ async function updatePriorityPlayers() {
         }
 
         const priorityPlayers = updatePlayersFile.players;
-        const maxToUpdate = 50;
+        const maxToUpdate = 100;
 
         let updated = 0;
 
@@ -374,7 +374,7 @@ async function updatePriorityGuilds() {
         }
 
         const priorityGuilds = updateGuildsFile.guilds;
-        const maxToUpdate = 20;
+        const maxToUpdate = 25;
 
         let updated = 0;
 
