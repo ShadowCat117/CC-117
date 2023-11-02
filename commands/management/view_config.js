@@ -80,8 +80,10 @@ module.exports = {
             configContent += `Inactivity Level Requirement: ${config.levelRequirement}\n`;
             configContent += `Extra Time Multiplier: ${config.extraTimeMultiplier}\n`;
             configContent += `Average Online Requirement: ${config.averageRequirement}\n`;
+            configContent += `Total Members Threshold: ${config.memberThreshold}\n`;
             configContent += `New Member Minimum Time: ${config.newPlayerMinimumTime}\n`;
             configContent += `New Member Threshold: ${config.newPlayerThreshold}\n`;
+            configContent += `War Level Requirement: ${config.warLevelRequirement}\n`;
 
             pages.push(configContent);
 

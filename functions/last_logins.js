@@ -5,6 +5,7 @@ const findGuild = require('./find_guild');
 const PlayerLastLogin = require('../message_objects/PlayerLastLogin');
 const ButtonedMessage = require('../message_type/ButtonedMessage');
 const MessageType = require('../message_type/MessageType');
+const GuildMemberSlots = require('../values/GuildMemberSlots');
 const db = new sqlite3.Database('database/database.db');
 
 async function getAsync(query, params) {
@@ -85,8 +86,10 @@ async function lastLogins(interaction, force = false) {
                 const averageRequirement = config.averageRequirement || 5;
                 const newPlayerMinimumTime = config.newPlayerMinimumTime || 14;
                 const newPlayerThreshold = config.newPlayerThreshold || 5;
+                const memberThreshold = config.memberThreshold || 0.9;
 
                 const rows = await allAsync('SELECT username, guildRank, lastJoin, isOnline, highestClassLevel, guildJoinDate FROM players WHERE guildName = ?', [guildName]);
+                const guild = await getAsync('SELECT level FROM guilds WHERE name = ?', [guildName]);
 
                 let averageOnline = 0;
                 let divideBy = 0;
@@ -107,9 +110,11 @@ async function lastLogins(interaction, force = false) {
                     averageOnline /= divideBy;
                 }
 
+                const memberSlots = calculateMemberSlots(guild.level);
+
                 let useUpperRequirement = true;
 
-                if (averageOnline < averageRequirement) {
+                if (averageOnline < averageRequirement || (rows.length >= memberThreshold * memberSlots)) {
                     useUpperRequirement = false;
                 }
 
@@ -260,6 +265,24 @@ async function lastLogins(interaction, force = false) {
     } else {
         return new ButtonedMessage('', [], '', [`${nameToSearch} not found, try using the full exact guild name.`]);
     }
+}
+
+function calculateMemberSlots(level) {
+    let closestLevel = null;
+    let closestDifference = Infinity;
+
+    for (const key in GuildMemberSlots) {
+        if (Object.hasOwnProperty.call(GuildMemberSlots, key)) {
+            const difference = level - key;
+
+            if (difference >= 0 && difference < closestDifference) {
+                closestDifference = difference;
+                closestLevel = key;
+            }
+        }
+    }
+
+    return closestLevel ? GuildMemberSlots[closestLevel] : null;
 }
 
 module.exports = lastLogins;

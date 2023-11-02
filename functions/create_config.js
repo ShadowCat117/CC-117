@@ -137,6 +137,7 @@ async function createConfig(client, guildId) {
                 contentTeamRole: null,
                 serverRankRoles: false,
                 warLevelRequirement: 100,
+                memberThreshold: 0.9,
             };
 
             try {

@@ -76,6 +76,9 @@ module.exports = {
                 }, {
                     name: 'Class Archetype Message',
                     value: 'classArchetypeMessage',
+                }, {
+                    name: 'Total Member Threshold',
+                    value: 'memberThreshold',
                 }))
         .addStringOption((option) =>
             option.setName('value')
@@ -419,6 +422,24 @@ module.exports = {
                 }
 
                 break;
+            case 'memberThreshold':
+                if (!valueStr) {
+                    await interaction.reply({
+                        content: 'Total Members Threshold requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else if (isNaN(valueStr)) {
+                    await interaction.reply({
+                        content: 'Total Members Threshold requires <value> to be a number input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseFloat(valueStr);
+                }
+
+                break;
             case 'warMessage':
                 if (valueStr == null) {
                     await interaction.reply({
@@ -525,6 +546,7 @@ module.exports = {
                 case 'averageRequirement':
                 case 'newPlayerMinimumTime':
                 case 'newPlayerThreshold':
+                case 'memberThreshold':
                     config[option] = number;
                     break;
             }
