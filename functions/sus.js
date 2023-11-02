@@ -15,7 +15,7 @@ async function sus(uuid) {
                     console.error('Error retrieving player data:', err);
                     reject(err);
                 } else {
-                    if (!row.firstJoin || !row.playtime || (!row.totalCombatLevel || row.totalCombatLevel === 0) || (!row.completedQuests || row.completedQuests === 0)) {
+                    if (row.firstJoin === null || row.playtime === null || (row.totalCombatLevel === null || row.totalCombatLevel === 0) || row.completedQuests === null) {
                         const susResponse = `Missing information for ${row.username}, please run \`/updateplayer player:${uuid}\` or \`/updateplayer player:${row.username}\``;
                         resolve(susResponse);
                     }
@@ -52,13 +52,13 @@ async function sus(uuid) {
                     let questsSusMessage;
                     let rankSusMessage;
 
-                    if (row.firstJoin) {
+                    if (row.firstJoin !== null) {
                         joinSusMessage = `**Join Date**: ${row.firstJoin} (${daysSinceJoin} days) __(${wynnJoinSus.toFixed(2)}%)__`;
                     } else {
                         joinSusMessage = `Unknown join date: __(${wynnJoinSus.toFixed(2)}%)__`;
                     }
 
-                    if (row.playtime) {
+                    if (row.playtime !== null) {
                         playtimeSusMessage = `**Playtime**: ${row.playtime} hours __(${playtimeSus.toFixed(2)}%)__`;
                     } else {
                         playtimeSusMessage = `Unknown playtime: __(${playtimeSus.toFixed(2)}%)__`;
@@ -70,19 +70,19 @@ async function sus(uuid) {
                         timeSpentSusMessage = `Unknown time spent playing: __(${timeSpentSus.toFixed(2)}%)__`;
                     }
 
-                    if (row.totalCombatLevel) {
+                    if (row.totalCombatLevel !== null) {
                         levelSusMessage = `**Total Combat Level**: ${row.totalCombatLevel} __(${levelSus.toFixed(2)}%)__`;
                     } else {
                         levelSusMessage = `Unknown total combat level: __(${levelSus.toFixed(2)}%)__`;
                     }
 
-                    if (row.completedQuests) {
+                    if (row.completedQuests !== null) {
                         questsSusMessage = `**Total Quests Completed**: ${row.completedQuests} __(${questSus.toFixed(2)}%)__`;
                     } else {
                         questsSusMessage = `Unknown total quests completed: __(${questSus.toFixed(2)}%)__`;
                     }
 
-                    if (row.rank) {
+                    if (row.rank !== null) {
                         if (row.veteran === 1) {
                             rankSusMessage = `**Rank**: ${row.rank} (Vet) __(${rankSus.toFixed(2)}%)__`;
                         } else {

@@ -207,7 +207,7 @@ async function updatePlayer(playerName) {
 
         const guildName = playerJson.guild ? playerJson.guild.name : null;
         const guildRank = playerJson.guild ? playerJson.guild.rank : null;
-        let highestClassLevel = 1;
+        let highestClassLevel = 0;
         let totalCombatLevel = 0;
 
         for (const character in playerJson.characters) {
@@ -517,7 +517,7 @@ async function updatePlayersGuild(playerUuid, playerName, guildName, guildRank, 
         today.setDate(today.getDate() - 14);
         const todayString = today.toISOString().split('T')[0];
         const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank, firstJoin, completedQuests, totalCombatLevel, playtime, wars) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        await runAsync(insertQuery, [playerUuid, playerName, guildName, guildRank, null, 0, todayString, isOnline, onlineWorld, contributedGuildXP, 1, joinDate, null, null, 0, 0, 0, 0]);
+        await runAsync(insertQuery, [playerUuid, playerName, guildName, guildRank, null, 0, todayString, isOnline, onlineWorld, contributedGuildXP, 0, joinDate, null, null, 0, 0, 0, 0]);
     }
 }
 
