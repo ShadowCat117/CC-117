@@ -34,7 +34,7 @@ module.exports = {
             if (updatePlayersFile.players.includes(player)) {
                 await interaction.editReply(`${player} is already queued to be updated.`);
             } else {
-                updatePlayersFile.players.push(player);
+                updatePlayersFile.players.unshift(player);
 
                 fs.writeFileSync(filePath, JSON.stringify(updatePlayersFile, null, 2), 'utf-8');
 

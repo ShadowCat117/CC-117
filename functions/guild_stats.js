@@ -55,8 +55,8 @@ async function guildStats(interaction, force = false) {
     }
 
     if (guildName) {
-        const guildRow = await getAsync('SELECT prefix, level, xpPercent, wars FROM guilds WHERE name = ?', [guildName]);
-        const memberRows = await allAsync('SELECT username, guildRank, contributedGuildXP, guildJoinDate, wars FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
+        const guildRow = await getAsync('SELECT prefix, level, xpPercent, wars, rating FROM guilds WHERE name = ?', [guildName]);
+        const memberRows = await allAsync('SELECT username, guildRank, onlineWorld, contributedGuildXP, guildJoinDate, wars FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
         const today = new Date();
 
         let contributionPosition = 0;
@@ -79,19 +79,19 @@ async function guildStats(interaction, force = false) {
             
             const daysInGuild = Math.round(differenceInMilliseconds / (1000 * 60 * 60 * 24));
 
-            return new GuildMember(username, guildRank, contributedGuildXP, daysInGuild, contributionPosition, wars);
+            return new GuildMember(username, guildRank, contributedGuildXP, row.onlineWorld, row.guildJoinDate, daysInGuild, contributionPosition, wars);
         });
 
         const pages = [];
         const guildLevel = guildRow.level ? guildRow.level : '?';
-        let guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%) Wars: ${guildRow.wars}\n`;
+        let guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%) Wars: ${guildRow.wars} Rating: ${guildRow.rating}\n`;
         let counter = 0;
 
         guildMembers.forEach((player) => {
-            if (counter === 15) {
+            if (counter === 8) {
                 guildStatsPage += '```';
                 pages.push(guildStatsPage);
-                guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%) Wars: ${guildRow.wars}\n` + player.toString();
+                guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%) Wars: ${guildRow.wars} Rating: ${guildRow.rating}\n` + player.toString();
                 counter = 1;
             } else {
                 guildStatsPage += player.toString();
@@ -99,7 +99,7 @@ async function guildStats(interaction, force = false) {
             }
         });
 
-        if (counter <= 15) {
+        if (counter <= 8) {
             guildStatsPage += '```';
             pages.push(guildStatsPage);
         }

@@ -4,6 +4,7 @@ const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('database/database.db');
 const fs = require('fs').promises;
 const path = require('path');
+let freeFunctionRuns = 0;
 let currentGuildIndex = 0;
 let hitLimit = false;
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -347,7 +348,8 @@ async function updateGuilds() {
 async function updatePriorityGuilds() {
     const filePath = path.join(__dirname, 'updateGuilds.json');
     const configsPath = path.join(__dirname, 'configs');
-    const mainGuilds = [];
+    const primaryGuilds = [];
+    const secondaryGuilds = [];
 
     try {
         const configFiles = await fs.readdir(configsPath);
@@ -359,9 +361,21 @@ async function updatePriorityGuilds() {
             const data = await fs.readFile(configFilePath, 'utf8');
             const config = JSON.parse(data);
 
-            if (config.guildName && !mainGuilds.includes(config.guildName)) {
-                mainGuilds.push(config.guildName);
+            if (config.guildName && !primaryGuilds.includes(config.guildName)) {
+                primaryGuilds.push(config.guildName);
             }
+
+            config.allies.forEach(name => {
+                if (name && !secondaryGuilds.includes(name) && !primaryGuilds.includes(name)) {
+                    secondaryGuilds.push(name);
+                }
+            });
+
+            config.trackedGuilds.forEach(name => {
+                if (name && !secondaryGuilds.includes(name) && !primaryGuilds.includes(name)) {
+                    secondaryGuilds.push(name);
+                }
+            });
         }
 
         try {
@@ -388,9 +402,11 @@ async function updatePriorityGuilds() {
                 await updateGuild(priorityGuild);
 
                 if (!hitLimit) {
-                    if (!mainGuilds.includes(priorityGuild)) {
+                    if (secondaryGuilds.includes(priorityGuild)) {
                         updateGuildsFile.guilds = updateGuildsFile.guilds.filter(guild => guild !== priorityGuild);
                         updateGuildsFile.guilds.push(priorityGuild);
+                    } else if (!primaryGuilds.includes(priorityGuild)) {
+                        updateGuildsFile.guilds = updateGuildsFile.guilds.filter(guild => guild !== priorityGuild);
                     }
 
                     updated++;
@@ -421,6 +437,12 @@ async function updateGuild(guildName) {
             return;
         }
 
+        const seasonRanks = guildJson.seasonRanks;
+
+        const seasonNumbers = Object.keys(seasonRanks).map(Number);
+        const maxSeasonNumber = Math.max(...seasonNumbers);
+        const rating = seasonRanks[maxSeasonNumber].rating;
+
         const allUuids = [
         ...Object.values(guildJson.members.owner).map(member => member.uuid),
         ...Object.values(guildJson.members.chief).map(member => member.uuid),
@@ -431,7 +453,7 @@ async function updateGuild(guildName) {
         ];
 
         db.run(
-            `INSERT OR IGNORE INTO guilds (name, prefix, level, xpPercent, wars,
+            `INSERT OR IGNORE INTO guilds (name, prefix, level, xpPercent, wars, rating,
             average00, captains00, average01, captains01, average02, captains02, 
             average03, captains03, average04, captains04, average05, captains05, 
             average06, captains06, average07, captains07, average08, captains08, 
@@ -441,10 +463,10 @@ async function updateGuild(guildName) {
             average18, captains18, average19, captains19, average20, captains20, 
             average21, captains21, average22, captains22, average23, captains23,
             averageCount) 
-            VALUES (?, ?, ?, ?, ?, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
+            VALUES (?, ?, ?, ?, ?, ?, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0)`, [guildJson.name, guildJson.prefix, guildJson.level,
-                guildJson.xpPercent],
+                guildJson.xpPercent, rating],
             (err) => {
                 if (err) {
                     console.error('Failed to add new guild:', err);
@@ -453,8 +475,8 @@ async function updateGuild(guildName) {
             },
         );
 
-        const updateQuery = `UPDATE guilds SET level = ?, xpPercent = ?, wars = ? WHERE name = '${guildJson.name}'`;
-        await runAsync(updateQuery, [guildJson.level, guildJson.xpPercent, guildJson.wars]);
+        const updateQuery = `UPDATE guilds SET level = ?, xpPercent = ?, wars = ?, rating = ? WHERE name = '${guildJson.name}'`;
+        await runAsync(updateQuery, [guildJson.level, guildJson.xpPercent, guildJson.wars, rating]);
 
         await removeGuildMembers(guildName, allUuids);
 
@@ -510,6 +532,10 @@ async function updatePlayersGuild(playerUuid, playerName, guildName, guildRank, 
     const row = await getAsync(selectQuery, [playerUuid]);
 
     if (row) {
+        if (row.guildName !== guildName) {
+            await addPlayerToPriority(playerUuid);
+        }
+
         const updateQuery = `UPDATE players SET guildName = ?, guildRank = ?, contributedGuildXP = ?, guildJoinDate = ? WHERE UUID = '${playerUuid}'`;
         await runAsync(updateQuery, [guildName, guildRank, contributedGuildXP, joinDate]);
     } else {
@@ -518,6 +544,8 @@ async function updatePlayersGuild(playerUuid, playerName, guildName, guildRank, 
         const todayString = today.toISOString().split('T')[0];
         const insertQuery = 'INSERT INTO players (UUID, username, guildName, guildRank, rank, veteran, lastJoin, isOnline, onlineWorld, contributedGuildXP, highestClassLevel, guildJoinDate, serverRank, firstJoin, completedQuests, totalCombatLevel, playtime, wars) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
         await runAsync(insertQuery, [playerUuid, playerName, guildName, guildRank, null, 0, todayString, isOnline, onlineWorld, contributedGuildXP, 0, joinDate, null, null, 0, 0, 0, 0]);
+
+        await addPlayerToPriority(playerUuid);
     }
 }
 
@@ -749,17 +777,21 @@ async function runFreeFunction() {
     // Update the list of priority players
     await updatePriorityPlayers();
 
-    const now = new Date();
-
-    if (now.getUTCMinutes() == 0) {
-        // Updates the guilds database with new guilds and removes deleted guilds.
-        console.log('Updating list of all guilds.');
-        await updateGuilds();
-
+    if (freeFunctionRuns % 10 === 0) {
         // Updates the guild and guild rank for each member of each guild.
         console.log('Updating guild members');
         await updateGuildMembers();
     }
+
+    if (freeFunctionRuns == 50) {
+        // Updates the guilds database with new guilds and removes deleted guilds.
+        console.log('Updating list of all guilds.');
+        await updateGuilds();
+
+        freeFunctionRuns = -1;
+    }
+
+    freeFunctionRuns++;
 
     runFreeFunction();
 }

@@ -16,9 +16,7 @@ async function hourlyTasks() {
         // Remove buttons from old message buttons.
         console.log('Removing old buttons');
         MessageManager.removeOldMessages();
-    }
 
-    if (now.getUTCHours() === 0 && now.getUTCMinutes() == 0) {
         for (const guild of client.guilds.cache.values()) {
             try {
                 let config = {};

@@ -1,15 +1,29 @@
 class GuildMember {
-    constructor(username, guildRank, contributedGuildXP, daysInGuild, contributionPosition, wars) {
+    constructor(username, guildRank, contributedGuildXP, onlineWorld, joinDate, daysInGuild, contributionPosition, wars) {
         this.username = username;
         this.guildRank = `(${guildRank})`;
+        this.onlineWorld = onlineWorld;
         this.contributedGuildXP = contributedGuildXP.toLocaleString(); 
+        this.joinDate = joinDate;
         this.daysInGuild = daysInGuild;
         this.contributionPosition = `${contributionPosition}.`;
         this.wars = wars;
     }
 
     toString() {
-        return `${this.contributionPosition.padEnd(3)} ${this.username.padEnd(16)} ${this.guildRank.padStart(12)}: ${this.contributedGuildXP} XP in ${this.daysInGuild} days (${this.getFormattedXPPerDay()})\n                                   ${this.wars} wars\n`;
+        return `${this.contributionPosition.padEnd(3)} ${this.username.padEnd(16)} ${this.guildRank.padStart(12)}: ${this.getOnlineStatus()}
+                                   Joined ${this.joinDate} (${this.daysInGuild} days ago)
+                                   ${this.contributedGuildXP} (${this.getFormattedXPPerDay()})
+                                   ${this.wars} wars\n`;
+        // return `${this.contributionPosition.padEnd(3)} ${this.username.padEnd(16)} ${this.guildRank.padStart(12)}: ${this.contributedGuildXP} XP in ${this.daysInGuild} days (${this.getFormattedXPPerDay()})\n                                   ${this.wars} wars\n`;
+    }
+
+    getOnlineStatus() {
+        if (this.onlineWorld) {
+            return `Online on ${this.onlineWorld}`;
+        } else {
+            return 'Offline';
+        }
     }
 
     getFormattedXPPerDay() {
