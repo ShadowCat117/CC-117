@@ -11,11 +11,7 @@ class GuildMember {
     }
 
     toString() {
-        return `${this.contributionPosition.padEnd(3)} ${this.username.padEnd(16)} ${this.guildRank.padStart(12)}: ${this.getOnlineStatus()}
-                                   Joined ${this.joinDate} (${this.daysInGuild} days ago)
-                                   ${this.contributedGuildXP} (${this.getFormattedXPPerDay()})
-                                   ${this.wars} wars\n`;
-        // return `${this.contributionPosition.padEnd(3)} ${this.username.padEnd(16)} ${this.guildRank.padStart(12)}: ${this.contributedGuildXP} XP in ${this.daysInGuild} days (${this.getFormattedXPPerDay()})\n                                   ${this.wars} wars\n`;
+        return `${this.contributionPosition.padEnd(3)} ${this.username} ${this.guildRank}:\n${this.getOnlineStatus()}\nJoined ${this.joinDate} (${this.daysInGuild} days ago)\n${this.contributedGuildXP} (${this.getFormattedXPPerDay()})\n${this.wars} wars\n\n`;
     }
 
     getOnlineStatus() {

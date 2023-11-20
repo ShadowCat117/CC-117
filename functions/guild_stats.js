@@ -84,14 +84,14 @@ async function guildStats(interaction, force = false) {
 
         const pages = [];
         const guildLevel = guildRow.level ? guildRow.level : '?';
-        let guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%) Wars: ${guildRow.wars} Rating: ${guildRow.rating}\n`;
+        let guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%)\nWars: ${guildRow.wars} Rating: ${guildRow.rating}\n\n`;
         let counter = 0;
 
         guildMembers.forEach((player) => {
-            if (counter === 8) {
+            if (counter === 10) {
                 guildStatsPage += '```';
                 pages.push(guildStatsPage);
-                guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%) Wars: ${guildRow.wars} Rating: ${guildRow.rating}\n` + player.toString();
+                guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%)\nWars: ${guildRow.wars} Rating: ${guildRow.rating}\n\n` + player.toString();
                 counter = 1;
             } else {
                 guildStatsPage += player.toString();
@@ -99,7 +99,7 @@ async function guildStats(interaction, force = false) {
             }
         });
 
-        if (counter <= 8) {
+        if (counter <= 10) {
             guildStatsPage += '```';
             pages.push(guildStatsPage);
         }
