@@ -88,7 +88,7 @@ async function guildStats(interaction, force = false) {
         let counter = 0;
 
         guildMembers.forEach((player) => {
-            if (counter === 10) {
+            if (counter === 5) {
                 guildStatsPage += '```';
                 pages.push(guildStatsPage);
                 guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%)\nWars: ${guildRow.wars} Rating: ${guildRow.rating}\n\n` + player.toString();
@@ -99,7 +99,7 @@ async function guildStats(interaction, force = false) {
             }
         });
 
-        if (counter <= 10) {
+        if (counter <= 5) {
             guildStatsPage += '```';
             pages.push(guildStatsPage);
         }
