@@ -1,3 +1,5 @@
+// How many slots a guild has at each level where new slots are given
+// level: slots
 const GuildMemberSlots = {
     1: 4,
     2: 8,

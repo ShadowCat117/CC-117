@@ -1,3 +1,5 @@
+// Types of messages that can have a choice button
+// Eg. 2 guilds with same tag
 const MessageType = {
   ACTIVE_HOURS: 'ACTIVE_HOURS',
   ADD_ALLY: 'ADD_ALLY',

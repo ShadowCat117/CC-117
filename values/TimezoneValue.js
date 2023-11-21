@@ -1,3 +1,4 @@
+// Timezones available for activehours
 const TimezoneValue = {
   PST: -8,
   PDT: -7,
