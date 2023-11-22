@@ -1,8 +1,8 @@
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 const applyRoles = require('./apply_roles');
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('database/database.db');
+const db = new sqlite3.Database('database/database_updateranks.db');
 
 function allAsync(query, params) {
     return new Promise((resolve, reject) => {
@@ -28,6 +28,18 @@ async function getAsync(query, params) {
     });
 }
 
+async function createDatabaseCopy() {
+    const sourceFile = 'database/database.db';
+    const destinationFile = 'database/database_updateranks.db';
+
+    try {
+        await fs.copyFile(sourceFile, destinationFile);
+        console.log('Copy created successfully.');
+    } catch (err) {
+        console.error('Error creating copy:', err);
+    }
+}
+
 async function updateRanks(guild) {
     const directoryPath = path.join(__dirname, '..', 'configs');
     const filePath = path.join(directoryPath, `${guild.id}.json`);
@@ -38,9 +50,12 @@ async function updateRanks(guild) {
     try {
         let config = {};
 
-        if (fs.existsSync(filePath)) {
-            const fileData = fs.readFileSync(filePath, 'utf-8');
+        try {
+            await fs.access(filePath);
+            const fileData = await fs.readFile(filePath, 'utf-8');
             config = JSON.parse(fileData);
+        } catch (err) {
+            return 'The server you are in does not have a guild set.';
         }
 
         const guildName = config.guildName;
@@ -50,6 +65,8 @@ async function updateRanks(guild) {
         }
 
         try {
+            await createDatabaseCopy();
+
             const rows = await allAsync('SELECT UUID, username FROM players WHERE guildName = ?', [guildName]);
 
             const verifiedServerMembers = [];
@@ -203,6 +220,7 @@ async function updateRanks(guild) {
             return 'Problem updating ranks';
         }
     } catch (err) {
+        console.log(err);
         return 'Problem updating ranks';
     }
 }
