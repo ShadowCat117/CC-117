@@ -431,10 +431,13 @@ async function updateGuild(guildName) {
         }
 
         const seasonRanks = guildJson.seasonRanks;
+        let rating = 0;
 
-        const seasonNumbers = Object.keys(seasonRanks).map(Number);
-        const maxSeasonNumber = Math.max(...seasonNumbers);
-        const rating = seasonRanks[maxSeasonNumber].rating;
+        if (Object.keys(seasonRanks).length > 0) {
+            const seasonNumbers = Object.keys(seasonRanks).map(Number);
+            const maxSeasonNumber = Math.max(...seasonNumbers);
+            rating = seasonRanks[maxSeasonNumber].rating;
+        }
 
         const allUuids = [
         ...Object.values(guildJson.members.owner).map(member => member.uuid),
