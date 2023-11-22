@@ -276,7 +276,7 @@ async function updatePlayer(playerName) {
             return;
         }
     } catch (error) {
-        console.error(`Error fetching ${playerName}:`, error);
+        console.error(`Error fetching ${playerName}:`, error.code);
         return;
     }
 }
@@ -756,6 +756,83 @@ async function addPlayerToPriority(playerUuid) {
     }
 }
 
+async function updatePlayerActivity() {
+    const configsPath = path.join(__dirname, 'configs');
+
+    const primaryGuilds = [];
+
+    try {
+        const files = await fs.readdir(configsPath);
+
+        for (const file of files) {
+            const filePath = path.join(configsPath, file);
+
+            const data = await fs.readFile(filePath, 'utf8');
+            const config = JSON.parse(data);
+
+            if (config.guildName && !primaryGuilds.includes(config.guildName)) {
+                primaryGuilds.push(config.guildName);
+            }
+        }
+    } catch (err) {
+        console.log('Error creating player activity tables');
+    }
+
+    for (const guildName of primaryGuilds) {
+        const tableName = guildName.replaceAll(' ', '_');
+        const tableExists = await doesTableExist(tableName);
+
+        const guildMembers = await allAsync('SELECT UUID, playtime FROM players WHERE guildName = ?', [guildName]);
+
+        if (!tableExists) {
+            await runAsync(`CREATE TABLE ${tableName} (UUID TEXT NOT NULL PRIMARY KEY, playtimeStart INT, averagePlaytime INT, averageCount INT)`);
+
+            for (const member of guildMembers) {
+                await runAsync(`INSERT INTO ${tableName} (UUID, playtimeStart, averagePlaytime, averageCount) VALUES (?, ?, -1, 0)`, [member.UUID, member.playtime]);
+            }
+        } else {
+            const existingMembers = await allAsync(`SELECT * FROM ${tableName}`);
+
+            for (const member of existingMembers) {
+                const currentMember = guildMembers.find(guildMember => member.UUID === guildMember.UUID);
+                const currentPlaytime = currentMember.playtime;
+
+                const weekPlaytime = currentPlaytime - member.playtimeStart;
+                let averageCount = member.averageCount;
+
+                let newAverage;
+
+                if (averageCount >= 4) {
+                    newAverage = member.averagePlaytime + weekPlaytime / 2;
+                } else if (averageCount > 0) {
+                    newAverage = (member.averagePlaytime * averageCount + weekPlaytime) / (averageCount + 1);
+                } else {
+                    newAverage = weekPlaytime;
+                }
+
+                if (averageCount >= 4) {
+                    averageCount = 1;
+                } else {
+                    averageCount += 1;
+                }
+
+                const updateQuery = `UPDATE ${tableName} SET playtimeStart = ?, averagePlaytime = ?, averageCount = ? WHERE UUID = ?`;
+
+                await runAsync(updateQuery, [currentPlaytime, newAverage, averageCount, member.UUID]);
+            }
+
+            for (const member of guildMembers) {
+                await runAsync(`INSERT OR IGNORE INTO ${tableName} (UUID, playtimeStart, averagePlaytime, averageCount) VALUES (?, ?, -1, 0)`, [member.UUID, member.playtime]);
+            }
+        }
+    }
+}
+
+async function doesTableExist(tableName) {
+    const result = await getAsync('SELECT name FROM sqlite_master WHERE type = \'table\' AND name = ?', [tableName]);
+    return !!result;
+}
+
 async function runFreeFunction() {
     hitLimit = false;
 
@@ -815,6 +892,14 @@ async function runScheduledFunction() {
         await createDatabaseBackup(backupFilename);
 
         console.log('Completed daily tasks');
+    }
+
+    // Update weekly
+    if (now.getUTCDay() === 6) {
+        console.log('Checking primary guild members activities');
+        await updatePlayerActivity();
+
+        console.log('Completed weekly tasks');
     }
 
     now = new Date();
