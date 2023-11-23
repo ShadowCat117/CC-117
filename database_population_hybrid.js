@@ -905,7 +905,7 @@ async function runScheduledFunction() {
     }
 
     // Update weekly
-    if (now.getUTCDay() === 6) {
+    if (now.getUTCDay() === 6 && now.getUTCHours() == 0 && now.getUTCMinutes() == 0) {
         console.log('Checking primary guild members activities');
         await updatePlayerActivity();
 
