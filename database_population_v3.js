@@ -798,6 +798,7 @@ async function updatePlayerActivity() {
 
             for (const member of existingMembers) {
                 const currentMember = guildMembers.find(guildMember => member.UUID === guildMember.UUID);
+                if (!currentMember) continue;
                 const currentPlaytime = currentMember.playtime;
 
                 const weekPlaytime = currentPlaytime - member.playtimeStart;
@@ -898,7 +899,7 @@ async function runScheduledFunction() {
     }
 
     // Update weekly
-    if (now.getUTCDay() === 6 && now.getUTCHours() == 0 && now.getUTCMinutes() == 0) {
+    if (now.getUTCDay() === 0 && now.getUTCHours() === 0 && now.getUTCMinutes() === 0) {
         console.log('Checking primary guild members activities');
         await updatePlayerActivity();
 
