@@ -418,7 +418,7 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                     }
 
                     if (config.serverRankRoles) {
-                        if (serverRank && serverRank !== 'PLAYER') {
+                        if (serverRank && serverRank !== 'Player') {
                             let serverRankRoleToApply;
 
                             for (const contentTeamValue of Object.values(ContentTeamValue)) {
@@ -428,14 +428,14 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                             }
 
                             if (!serverRankRoleToApply) {
-                                if (serverRank === 'MODERATOR') {
+                                if (serverRank === 'Moderator') {
                                     serverRankRoleToApply = moderatorRole;
-                                } else if (serverRank === 'ADMINISTRATOR' || serverRank === 'DEVELOPER') {
+                                } else if (serverRank === 'Administrator' || serverRank === 'Developer') {
                                     serverRankRoleToApply = administratorRole;
                                 }
                             }
 
-                            if (serverRankRoleToApply) {
+                            if (serverRankRoleToApply && !memberRoles.has(serverRankRoleToApply.id)) {
                                 await member.roles.add(serverRankRoleToApply)
                                     .then(() => {
                                         console.log(`Added server rank role to ${member.user.username}`);
