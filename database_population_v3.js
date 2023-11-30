@@ -883,7 +883,8 @@ async function runScheduledFunction() {
     }
 
     // Update daily
-    if (now.getUTCHours() == 23 && now.getUTCMinutes() == 0) {
+    // Happens at 30 to allow for updateranks to create its copy of the database
+    if (now.getUTCHours() == 23 && now.getUTCMinutes() == 30) {
         // Updates priority guilds with new set, allied and tracked guilds. Also add all members to priority.
         console.log('Adding used guilds to priority');
         await addPriorityGuilds();
