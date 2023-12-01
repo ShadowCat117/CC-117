@@ -61,6 +61,8 @@ async function guildStats(interaction, force = false) {
 
         let contributionPosition = 0;
 
+        let averageXpPerDay = 0;
+
         const guildMembers = memberRows.map(row => {
             contributionPosition++;
 
@@ -79,19 +81,33 @@ async function guildStats(interaction, force = false) {
             
             const daysInGuild = Math.round(differenceInMilliseconds / (1000 * 60 * 60 * 24));
 
+            averageXpPerDay += contributedGuildXP / daysInGuild;
+
             return new GuildMember(username, guildRank, contributedGuildXP, row.onlineWorld, row.guildJoinDate, daysInGuild, contributionPosition, wars);
         });
 
+        let formattedXPPerDay;
+
+        if (averageXpPerDay >= 1000000000) {
+            formattedXPPerDay = `${(averageXpPerDay / 1000000000).toFixed(1)}B/day`;
+        } else if (averageXpPerDay >= 1000000) {
+            formattedXPPerDay = `${(averageXpPerDay / 1000000).toFixed(1)}M/day`;
+        } else if (averageXpPerDay >= 1000) {
+            formattedXPPerDay = `${(averageXpPerDay / 1000).toFixed(1)}k/day`;
+        } else {
+            formattedXPPerDay = `${averageXpPerDay.toFixed(2)}/day`;
+        }
+
         const pages = [];
         const guildLevel = guildRow.level ? guildRow.level : '?';
-        let guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%)\nWars: ${guildRow.wars} Rating: ${guildRow.rating}\n\n`;
+        let guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%)\nWars: ${guildRow.wars} Rating: ${guildRow.rating}\nXP per day: ${formattedXPPerDay}\n\n`;
         let counter = 0;
 
         guildMembers.forEach((player) => {
             if (counter === 5) {
                 guildStatsPage += '```';
                 pages.push(guildStatsPage);
-                guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%)\nWars: ${guildRow.wars} Rating: ${guildRow.rating}\n\n` + player.toString();
+                guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%)\nWars: ${guildRow.wars} Rating: ${guildRow.rating}\nXP per day: ${formattedXPPerDay}\n\n` + player.toString();
                 counter = 1;
             } else {
                 guildStatsPage += player.toString();
