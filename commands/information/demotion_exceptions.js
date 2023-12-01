@@ -48,7 +48,15 @@ module.exports = {
                 return;
             }
 
-            const exemptPlayers = config['demotionExceptions'].join(', ');
+            const exemptionList = Object.entries(config['demotionExceptions']).map(([username, period]) => {
+                if (period === -1) {
+                    return `${username} is exempt from demotion forever`;
+                } else {
+                    return `${username} is exempt from demotion for ${period} day(s)`;
+                }
+            });
+            
+            const exemptPlayers = exemptionList.join('\n');            
 
             await interaction.editReply({
                 content: `Players who are exempt from demotion: \n${exemptPlayers}`,

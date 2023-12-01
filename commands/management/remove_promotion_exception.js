@@ -54,15 +54,15 @@ module.exports = {
 
             const username = interaction.options.getString('username');
 
-            if (!config['promotionExceptions'] || !config['promotionExceptions'].includes(username)) {
+            if (!config['promotionExceptions'] || !config['promotionExceptions'][username]) {
                 await interaction.editReply({
                     content: `${username} is not exempt from promotions`,
                     ephemeral: true,
                 });
                 return;
             }
-
-            config['promotionExceptions'] = config['promotionExceptions'].filter(item => item !== username);
+            
+            delete config['promotionExceptions'][username];
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 

@@ -48,7 +48,16 @@ module.exports = {
                 return;
             }
 
-            const exemptPlayers = config['promotionExceptions'].join(', ');
+            const exemptionList = Object.entries(config['promotionExceptions']).map(([username, period]) => {
+                if (period === -1) {
+                    return `${username} is exempt from promotion forever`;
+                } else {
+                    return `${username} is exempt from promotion for ${period} day(s)`;
+                }
+            });
+            
+            const exemptPlayers = exemptionList.join('\n');
+            
 
             await interaction.editReply({
                 content: `Players who are exempt from promotion: \n${exemptPlayers}`,

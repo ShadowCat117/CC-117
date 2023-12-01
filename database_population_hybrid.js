@@ -844,6 +844,45 @@ async function doesTableExist(tableName) {
     return !!result;
 }
 
+async function updateExceptions() {
+    const configsPath = path.join(__dirname, 'configs');
+
+    try {
+        const files = await fs.readdir(configsPath);
+
+        for (const file of files) {
+            const filePath = path.join(configsPath, file);
+
+            const data = await fs.readFile(filePath, 'utf8');
+            const config = JSON.parse(data);
+
+            if (config['demotionExceptions']) {
+                for (const [username, period] of Object.entries(config['demotionExceptions'])) {
+                    if (period > 1) {
+                        config['demotionExceptions'][username] = period - 1;
+                    } else if (period === 1) {
+                        delete config['demotionExceptions'][username];
+                    }
+                }
+            }
+
+            if (config['promotionExceptions']) {
+                for (const [username, period] of Object.entries(config['promotionExceptions'])) {
+                    if (period > 1) {
+                        config['promotionExceptions'][username] = period - 1;
+                    } else if (period === 1) {
+                        delete config['promotionExceptions'][username];
+                    }
+                }
+            }
+
+            fs.writeFile(filePath, JSON.stringify(config, null, 2), 'utf-8');
+        }
+    } catch (err) {
+        console.error('Error updating exceptions:', err);
+    }
+}
+
 async function runFreeFunction() {
     hitLimit = false;
 
@@ -903,7 +942,16 @@ async function runScheduledFunction() {
         console.log('Creating database backup');
         await createDatabaseBackup(backupFilename);
 
-        console.log('Completed daily tasks');
+        console.log('Completed daily tasks set 1');
+    }
+
+    // Update daily (different time)
+    if (now.getUTCHours() === 0 && now.getUTCMinutes() === 0) {
+        // Updates the days for how long players are exempt from promotion/demotion
+        console.log('Updating promotion and demotion exceptions.');
+        await updateExceptions();
+
+        console.log('Completed daily tasks set 2');
     }
 
     // Update weekly

@@ -10,11 +10,14 @@ const db = new sqlite3.Database('database/database.db');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('addpromotionexception')
-        .setDescription('Adds a player to be excluded from promotion checks.')
+        .setDescription('Adds a player to be excluded from promotion checks. Default length is forever.')
         .addStringOption(option =>
             option.setName('username')
             .setDescription('The name of the player you want to be exemept from promotion checks.')
-                .setRequired(true)),
+            .setRequired(true))
+        .addIntegerOption((option) =>
+        option.setName('exemption_period')
+            .setDescription('How long should they be exempt from promotion?')),
     async execute(interaction) {
         await interaction.deferReply({
             ephemeral: true,
@@ -55,6 +58,11 @@ module.exports = {
             }
 
             const username = interaction.options.getString('username');
+            let exemptionPeriod = interaction.options.getInteger('exemption_period') ?? -1;
+
+            if (exemptionPeriod < -1) {
+                exemptionPeriod = -1;
+            }
 
             return new Promise((resolve, reject) => {
                 db.all(
@@ -68,25 +76,40 @@ module.exports = {
 
                         if (row.length > 0) {
                             if (!config['promotionExceptions']) {
-                                config['promotionExceptions'] = [];
+                                config['promotionExceptions'] = {};
                             }
 
-                            if (config['promotionExceptions'].includes(username)) {
-                                await interaction.editReply({
-                                    content: `${username} is already exempt from promotions`,
-                                    ephemeral: true,
-                                });
+                            if (config['promotionExceptions'][username] === exemptionPeriod) {
+                                if (exemptionPeriod === -1) {
+                                    await interaction.editReply({
+                                        content: `${username} is already permanently exempt from promotions`,
+                                        ephemeral: true,
+                                    });
+                                } else {
+                                    await interaction.editReply({
+                                        content: `${username} is already exempt from promotions for ${exemptionPeriod} day(s)`,
+                                        ephemeral: true,
+                                    });
+                                }
+                                
                                 return;
                             }
 
-                            config['promotionExceptions'].push(username);
+                            config['promotionExceptions'][username] = exemptionPeriod;
 
                             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
-                            await interaction.editReply({
-                                content: `${username} is now exempt from promotions`,
-                                ephemeral: true,
-                            });
+                            if (exemptionPeriod === -1) {
+                                await interaction.editReply({
+                                    content: `${username} is now permanently exempt from promotions`,
+                                    ephemeral: true,
+                                });
+                            } else {
+                                await interaction.editReply({
+                                    content: `${username} is now exempt from promotions for ${exemptionPeriod} day(s)`,
+                                    ephemeral: true,
+                                });
+                            }
                             return;
                         } else {
                             await interaction.editReply({

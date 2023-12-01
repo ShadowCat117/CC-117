@@ -54,15 +54,15 @@ module.exports = {
 
             const username = interaction.options.getString('username');
 
-            if (!config['demotionExceptions'] || !config['demotionExceptions'].includes(username)) {
+            if (!config['demotionExceptions'] || !config['demotionExceptions'][username]) {
                 await interaction.editReply({
                     content: `${username} is not exempt from demotions`,
                     ephemeral: true,
                 });
                 return;
             }
-
-            config['demotionExceptions'] = config['demotionExceptions'].filter(item => item !== username);
+            
+            delete config['demotionExceptions'][username];
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 

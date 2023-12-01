@@ -61,11 +61,13 @@ async function checkForDemotions(guildId) {
         const captainRequirements = [captainXPRequirement, captainLevelRequirement, captainContributorRequirement, captainTimeRequirement];
         const recruiterRequirements = [recruiterXPRequirement, recruiterLevelRequirement, recruiterContributorRequirement, recruiterTimeRequirement];
 
-        const demotionExceptions = config['demotionExceptions'] !== undefined ? config['demotionExceptions'] : [];
+        const demotionExceptions = config['demotionExceptions'] !== undefined ? config['demotionExceptions'] : {};
+
+        const exemptUsernames = Object.keys(demotionExceptions);
 
         const originalRows = await allAsync('SELECT username, guildRank, contributedGuildXP, highestClassLevel, guildJoinDate FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
 
-        let filteredRows = originalRows.filter(player => player.guildRank !== 'OWNER' && player.guildRank !== 'RECRUIT' && !demotionExceptions.includes(player.username));
+        let filteredRows = originalRows.filter(player => player.guildRank !== 'OWNER' && player.guildRank !== 'RECRUIT' && !exemptUsernames.includes(player.username));
 
         if (demotionRequirements[0].includes('NONE')) {
             filteredRows = filteredRows.filter(player => player.guildRank !== 'CHIEF');
