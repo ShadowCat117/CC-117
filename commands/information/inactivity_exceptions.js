@@ -1,25 +1,23 @@
 const {
     SlashCommandBuilder,
 } = require('discord.js');
-const createConfig = require('../../functions/create_config');
 const fs = require('fs');
 const path = require('path');
+const createConfig = require('../../functions/create_config');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('removedemotionexception')
-        .setDescription('Removes a player to be excluded from demotion checks.')
-        .addStringOption(option =>
-            option.setName('username')
-                .setDescription('The name of the player you want to be exemept from demotion checks.')
-                .setRequired(true)),
+        .setName('inactivityexceptions')
+        .setDescription('Check who in your guild has custom inactivity thresholds.'),
+
     async execute(interaction) {
         await interaction.deferReply({
             ephemeral: true,
         });
 
         const guildId = interaction.guild.id;
-        const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
+        const directoryPath = path.join(__dirname, '..', '..', 'configs');
+        const filePath = path.join(directoryPath, `${guildId}.json`);
 
         try {
             let config = {};
@@ -42,39 +40,33 @@ module.exports = {
                 return;
             }
 
-            const guildName = config.guildName;
-
-            if (!guildName) {
+            if (!config['inactivityExceptions'] || Object.keys(config['inactivityExceptions']).length === 0) {
                 await interaction.editReply({
-                    content: 'The server you are in does not have a guild set.',
+                    content: 'No players with custom inactivity thresholds',
                     ephemeral: true,
                 });
                 return;
             }
 
-            const username = interaction.options.getString('username');
-
-            if (!config['demotionExceptions'] || !config['demotionExceptions'][username]) {
-                await interaction.editReply({
-                    content: `${username} is not exempt from demotions`,
-                    ephemeral: true,
-                });
-                return;
-            }
+            const exemptionList = Object.entries(config['inactivityExceptions']).map(([username, period]) => {
+                if (period === -1) {
+                    return `${username} is exempt from inactivity forever`;
+                } else {
+                    return `${username} is allowed to be inactive ${period} day(s)`;
+                }
+            });
             
-            delete config['demotionExceptions'][username];
-
-            fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
+            const inactivityThresholds = exemptionList.join('\n');            
 
             await interaction.editReply({
-                content: `${username} is no longer exempt from demotions`,
+                content: `Players with custom inactivity thresholds: \n${inactivityThresholds}`,
                 ephemeral: true,
             });
-            return;
         } catch (error) {
-            console.log(error);
-            await interaction.editReply('Error removing demotion exception.');
-            return;
+            await interaction.editReply({
+                content: 'Unable to show inactivity exceptions',
+                ephemeral: true,
+            });
         }
     },
 };

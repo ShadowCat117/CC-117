@@ -7,11 +7,11 @@ const path = require('path');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('removedemotionexception')
-        .setDescription('Removes a player to be excluded from demotion checks.')
+        .setName('removeinactivityexception')
+        .setDescription('Removes a player\'s custom inactivity threshold.')
         .addStringOption(option =>
             option.setName('username')
-                .setDescription('The name of the player you want to be exemept from demotion checks.')
+                .setDescription('The name of the player who\'s threshold you want to remove.')
                 .setRequired(true)),
     async execute(interaction) {
         await interaction.deferReply({
@@ -54,26 +54,26 @@ module.exports = {
 
             const username = interaction.options.getString('username');
 
-            if (!config['demotionExceptions'] || !config['demotionExceptions'][username]) {
+            if (!config['inactivityExceptions'] || config['inactivityExceptions'][username] === undefined) {
                 await interaction.editReply({
-                    content: `${username} is not exempt from demotions`,
+                    content: `${username} does not have a custom inactivity threshold.`,
                     ephemeral: true,
                 });
                 return;
             }
             
-            delete config['demotionExceptions'][username];
+            delete config['inactivityExceptions'][username];
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
             await interaction.editReply({
-                content: `${username} is no longer exempt from demotions`,
+                content: `${username} no longer has a custom inactivity threshold.`,
                 ephemeral: true,
             });
             return;
         } catch (error) {
             console.log(error);
-            await interaction.editReply('Error removing demotion exception.');
+            await interaction.editReply('Error removing inactivity exception.');
             return;
         }
     },

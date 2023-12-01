@@ -87,6 +87,7 @@ async function lastLogins(interaction, force = false) {
                 const newPlayerMinimumTime = config.newPlayerMinimumTime || 14;
                 const newPlayerThreshold = config.newPlayerThreshold || 5;
                 const memberThreshold = config.memberThreshold || 0.9;
+                const inactivityExceptions = config.inactivityExceptions;
 
                 const rows = await allAsync('SELECT username, guildRank, lastJoin, isOnline, highestClassLevel, guildJoinDate FROM players WHERE guildName = ?', [guildName]);
                 const guild = await getAsync('SELECT level FROM guilds WHERE name = ?', [guildName]);
@@ -186,6 +187,10 @@ async function lastLogins(interaction, force = false) {
 
                     if (daysSinceGuildJoin < newPlayerMinimumTime) {
                         inactiveThreshold = newPlayerThreshold;
+                    }
+
+                    if (inactivityExceptions && inactivityExceptions[username] !== undefined) {
+                        inactiveThreshold = inactivityExceptions[username];
                     }
 
                     return new PlayerLastLogin(username, guildRank, highestClassLevel, daysSinceLastLogin, isOnline, true, inactiveThreshold);
