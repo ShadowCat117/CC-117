@@ -66,20 +66,71 @@ async function updateRanks(guild) {
 
         try {
             await createDatabaseCopy();
+        } catch (err) {
+            console.log(`Error creating copy, using old version: ${err}`);
+        }
 
-            const rows = await allAsync('SELECT UUID, username FROM players WHERE guildName = ?', [guildName]);
+        const rows = await allAsync('SELECT UUID, username FROM players WHERE guildName = ?', [guildName]);
 
-            const verifiedServerMembers = [];
+        const verifiedServerMembers = [];
 
-            const serverMembersToIgnore = [];
+        const serverMembersToIgnore = [];
+
+        for (const serverMember of guild.members.cache.values()) {
+            if (serverMember.user.bot) {
+                continue;
+            }
+
+            for (let i = 0; i < rows.length; i++) {
+                const guildMember = rows[i];
+
+                let nickname = undefined;
+
+                if (serverMember.nickname) {
+                    nickname = serverMember.nickname.split(' [')[0];
+                }
+
+                if (guildMember.username === nickname || guildMember.username === serverMember.user.globalName || guildMember.username === serverMember.user.username) {
+                    const updated = await applyRoles(guild, guildMember.UUID, serverMember);
+
+                    serverMembersToIgnore.push(serverMember.user.username);
+
+                    const formattedName = serverMember.user.username.replace(/_/g, '\\_');
+
+                    if (updated > 0) {
+                        if (updatedMembers > 0) {
+                            messageEnd += `, ${formattedName}`;
+
+                            updatedMembers++;
+                            messageStart = `Updated roles for ${updatedMembers} members.`;
+                        } else {
+                            messageEnd += `\n(${formattedName}`;
+
+                            updatedMembers++;
+                            messageStart = `Updated roles for ${updatedMembers} member.`;
+                        }
+                    }
+
+                    if (verifiedServerMembers.indexOf(serverMember.user.username) === -1) {
+                        verifiedServerMembers.push(serverMember.user.username);
+                    }
+
+                    rows.splice(i, 1);
+                    break;
+                }
+            }
+        }
+
+        for (const allyGuild of config.allies) {
+            const allyRows = await allAsync('SELECT UUID, username FROM players WHERE guildName = ?', [allyGuild]);
 
             for (const serverMember of guild.members.cache.values()) {
-                if (serverMember.user.bot) {
+                if (serverMember.user.bot || serverMembersToIgnore.includes(serverMember.user.username)) {
                     continue;
                 }
 
-                for (let i = 0; i < rows.length; i++) {
-                    const guildMember = rows[i];
+                for (let i = 0; i < allyRows.length; i++) {
+                    const guildMember = allyRows[i];
 
                     let nickname = undefined;
 
@@ -89,8 +140,6 @@ async function updateRanks(guild) {
 
                     if (guildMember.username === nickname || guildMember.username === serverMember.user.globalName || guildMember.username === serverMember.user.username) {
                         const updated = await applyRoles(guild, guildMember.UUID, serverMember);
-
-                        serverMembersToIgnore.push(serverMember.user.username);
 
                         const formattedName = serverMember.user.username.replace(/_/g, '\\_');
 
@@ -112,112 +161,62 @@ async function updateRanks(guild) {
                             verifiedServerMembers.push(serverMember.user.username);
                         }
 
-                        rows.splice(i, 1);
+                        allyRows.splice(i, 1);
                         break;
                     }
                 }
             }
+        }
 
-            for (const allyGuild of config.allies) {
-                const allyRows = await allAsync('SELECT UUID, username FROM players WHERE guildName = ?', [allyGuild]);
+        for (const serverMember of guild.members.cache.values()) {
+            if (verifiedServerMembers.includes(serverMember.user.username) || serverMember.user.bot) {
+                continue;
+            }
 
-                for (const serverMember of guild.members.cache.values()) {
-                    if (serverMember.user.bot || serverMembersToIgnore.includes(serverMember.user.username)) {
-                        continue;
-                    }
+            let player = await getAsync('SELECT UUID FROM players WHERE username = ?', [serverMember.user.username]);
 
-                    for (let i = 0; i < allyRows.length; i++) {
-                        const guildMember = allyRows[i];
+            if (!player) {
+                player = await getAsync('SELECT UUID FROM players WHERE username = ?', [serverMember.user.globalName]);
+            }
 
-                        let nickname = undefined;
+            if (!player) {
+                if (serverMember.nickname) {
+                    const nickname = serverMember.nickname.split(' [')[0];
 
-                        if (serverMember.nickname) {
-                            nickname = serverMember.nickname.split(' [')[0];
-                        }
-
-                        if (guildMember.username === nickname || guildMember.username === serverMember.user.globalName || guildMember.username === serverMember.user.username) {
-                            const updated = await applyRoles(guild, guildMember.UUID, serverMember);
-
-                            const formattedName = serverMember.user.username.replace(/_/g, '\\_');
-
-                            if (updated > 0) {
-                                if (updatedMembers > 0) {
-                                    messageEnd += `, ${formattedName}`;
-
-                                    updatedMembers++;
-                                    messageStart = `Updated roles for ${updatedMembers} members.`;
-                                } else {
-                                    messageEnd += `\n(${formattedName}`;
-
-                                    updatedMembers++;
-                                    messageStart = `Updated roles for ${updatedMembers} member.`;
-                                }
-                            }
-
-                            if (verifiedServerMembers.indexOf(serverMember.user.username) === -1) {
-                                verifiedServerMembers.push(serverMember.user.username);
-                            }
-
-                            allyRows.splice(i, 1);
-                            break;
-                        }
-                    }
+                    player = await getAsync('SELECT UUID FROM players WHERE username = ?', [nickname]);
                 }
             }
 
-            for (const serverMember of guild.members.cache.values()) {
-                if (verifiedServerMembers.includes(serverMember.user.username) || serverMember.user.bot) {
-                    continue;
-                }
-
-                let player = await getAsync('SELECT UUID FROM players WHERE username = ?', [serverMember.user.username]);
-
-                if (!player) {
-                    player = await getAsync('SELECT UUID FROM players WHERE username = ?', [serverMember.user.globalName]);
-                }
-
-                if (!player) {
-                    if (serverMember.nickname) {
-                        const nickname = serverMember.nickname.split(' [')[0];
-
-                        player = await getAsync('SELECT UUID FROM players WHERE username = ?', [nickname]);
-                    }
-                }
-
-                let uuid = null;
-                
-                if (player) {
-                    uuid = player['UUID'];
-                }
-
-                const updated = await applyRoles(guild, uuid, serverMember, true);
-
-                const formattedName = serverMember.user.username.replace(/_/g, '\\_');
-
-                if (updated > 0) {
-                    if (updatedMembers > 0) {
-                        messageEnd += `, ${formattedName}`;
-
-                        updatedMembers++;
-                        messageStart = `Updated roles for ${updatedMembers} members.`;
-                    } else {
-                        messageEnd += `\n(${formattedName}`;
-
-                        updatedMembers++;
-                        messageStart = `Updated roles for ${updatedMembers} member.`;
-                    }
-                }
+            let uuid = null;
+            
+            if (player) {
+                uuid = player['UUID'];
             }
 
-            if (updatedMembers > 0) {
-                messageEnd += ')';
-                return (messageStart + messageEnd);
-            } else {
-                return (messageStart);
+            const updated = await applyRoles(guild, uuid, serverMember, true);
+
+            const formattedName = serverMember.user.username.replace(/_/g, '\\_');
+
+            if (updated > 0) {
+                if (updatedMembers > 0) {
+                    messageEnd += `, ${formattedName}`;
+
+                    updatedMembers++;
+                    messageStart = `Updated roles for ${updatedMembers} members.`;
+                } else {
+                    messageEnd += `\n(${formattedName}`;
+
+                    updatedMembers++;
+                    messageStart = `Updated roles for ${updatedMembers} member.`;
+                }
             }
-        } catch (err) {
-            console.log(err);
-            return 'Problem updating ranks';
+        }
+
+        if (updatedMembers > 0) {
+            messageEnd += ')';
+            return (messageStart + messageEnd);
+        } else {
+            return (messageStart);
         }
     } catch (err) {
         console.log(err);
