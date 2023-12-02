@@ -215,6 +215,7 @@ async function updatePlayer(playerName) {
         }
 
         const isOnline = playerJson.online ? 1 : 0;
+        const veteran = playerJson.veteran ? 1 : 0;
 
         if (row) {
             const contributedGuildXP = row.contributedGuildXP !== null ? row.contributedGuildXP : null;
@@ -228,7 +229,7 @@ async function updatePlayer(playerName) {
                 guildName,
                 guildRank,
                 supportRank,
-                row.veteran,
+                veteran,
                 JSON.stringify(playerJson.lastJoin).split('T')[0].slice(1),
                 isOnline,
                 playerJson.server,
@@ -256,7 +257,7 @@ async function updatePlayer(playerName) {
                 guildName,
                 guildRank,
                 supportRank,
-                0,
+                veteran,
                 JSON.stringify(playerJson.lastJoin).split('T')[0].slice(1),
                 isOnline,
                 playerJson.server,
