@@ -48,6 +48,12 @@ async function updateRanks(guild) {
     let messageEnd = '';
 
     try {
+        await createDatabaseCopy();
+    } catch (err) {
+        console.log(`Error creating copy, using old version: ${err}`);
+    }
+
+    try {
         let config = {};
 
         try {
@@ -62,12 +68,6 @@ async function updateRanks(guild) {
 
         if (!guildName) {
             return 'The server you are in does not have a guild set.';
-        }
-
-        try {
-            await createDatabaseCopy();
-        } catch (err) {
-            console.log(`Error creating copy, using old version: ${err}`);
         }
 
         const rows = await allAsync('SELECT UUID, username FROM players WHERE guildName = ?', [guildName]);

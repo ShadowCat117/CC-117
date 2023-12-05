@@ -4,7 +4,7 @@ const sendMessage = require('./send_message');
 const findPrefix = require('./find_prefix');
 const ContentTeamValue = require('../values/ContentTeamValue');
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('database/database.db');
+const db = new sqlite3.Database('database/database_updateranks.db');
 
 async function applyRoles(guild, uuid, member, nonGuildMember = false) {
     const guildId = guild.id;

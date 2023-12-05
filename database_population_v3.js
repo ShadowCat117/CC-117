@@ -46,7 +46,7 @@ async function allAsync(query, params) {
 
 async function updateOnlinePlayers() {
     try {
-        const onlinePlayers = (await axios.get('https://api.wynncraft.com/v3/player')).data;
+        const onlinePlayers = (await axios.get('https://api.wynncraft.com/v3/player?identifier=uuid')).data;
 
         await setOfflinePlayers(onlinePlayers.players);
 
@@ -66,18 +66,18 @@ async function updateOnlinePlayers() {
 }
 
 async function setOfflinePlayers(onlinePlayers) {
-    const selectQuery = 'SELECT UUID, username FROM players WHERE isOnline = 1';
+    const selectQuery = 'SELECT UUID FROM players WHERE isOnline = 1';
 
     const rows = await allAsync(selectQuery, []);
 
-    const onlineUsernames = [];
+    const onlineUUIDs = [];
 
     for (const player in onlinePlayers) {
-        onlineUsernames.push(player);
+        onlineUUIDs.push(player);
     }
 
     for (const player of rows) {
-        if (!onlineUsernames.includes(player.username)) {
+        if (!onlineUUIDs.includes(player.UUID)) {
             await runAsync('UPDATE players SET isOnline = 0, onlineWorld = NULL WHERE UUID = ?', [player.UUID]);
         }
     }
@@ -89,8 +89,8 @@ async function updatePlayerStatus(players, playersCount) {
 
         let processedCount = 0;
 
-        const processPlayer = (playerName, worldNumber) => {
-            db.get('SELECT * FROM players WHERE username = ?', playerName, (err, row) => {
+        const processPlayer = (playerUUID, worldNumber) => {
+            db.get('SELECT * FROM players WHERE UUID = ?', playerUUID, (err, row) => {
                 if (err) {
                     reject(err);
                     return;
@@ -98,7 +98,7 @@ async function updatePlayerStatus(players, playersCount) {
 
                 if (row) {
                     const currentDate = new Date().toISOString().split('T')[0];
-                    db.run('UPDATE players SET isOnline = 1, lastJoin = ?, onlineWorld = ? WHERE username = ?', [currentDate, worldNumber, playerName], (err) => {
+                    db.run('UPDATE players SET isOnline = 1, lastJoin = ?, onlineWorld = ? WHERE UUID = ?', [currentDate, worldNumber, playerUUID], (err) => {
                         if (err) {
                             reject(err);
                             return;
@@ -111,7 +111,7 @@ async function updatePlayerStatus(players, playersCount) {
                         }
                     });
                 } else {
-                    playersToUpdate.push(playerName);
+                    playersToUpdate.push(playerUUID);
 
                     processedCount++;
                     if (processedCount === playersCount) {

@@ -1,5 +1,4 @@
 const sqlite3 = require('sqlite3').verbose();
-const https = require('https');
 
 function findGuild(input, force = false) {
     return new Promise((resolve, reject) => {
@@ -14,41 +13,7 @@ function findGuild(input, force = false) {
                 }
 
                 if (rows.length === 0) {
-                    console.log(`No guild matching ${input}, searching API`);
-
-                    https.get(`https://api.wynncraft.com/public_api.php?action=guildStats&command=${input}`, (resp) => {
-                        let data = '';
-
-                        resp.on('data', (chunk) => {
-                            data += chunk;
-                        });
-
-                        resp.on('end', () => {
-                            const json = JSON.parse(data);
-
-                            if (json.name === undefined) {
-                                resolve(null);
-                                db.close();
-                            } else {
-                                db.run(
-                                    'INSERT INTO guilds (name, prefix) VALUES (?, ?)', [
-                                    json.name,
-                                    json.prefix,
-                                ],
-                                    (err) => {
-                                        if (err) {
-                                            console.error('Failed to insert guild:', err);
-                                        }
-                                    },
-                                );
-                                resolve(input);
-                                db.close();
-                            }
-                        });
-                    }).on('error', () => {
-                        resolve(null);
-                        db.close();
-                    });
+                    resolve('Unknown guild');
                 } else if (rows.length === 1) {
                     resolve(rows[0].name);
                     db.close();
