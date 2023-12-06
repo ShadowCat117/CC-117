@@ -47,11 +47,11 @@ async function allAsync(query, params) {
 async function updateOnlinePlayers() {
     try {
         const onlinePlayers = (await axios.get('https://api.wynncraft.com/v3/player?identifier=uuid')).data;
-
-        await setOfflinePlayers(onlinePlayers.players);
-
+    
         // FIXME: May need to handle API limit better
         if (onlinePlayers) {
+            await setOfflinePlayers(onlinePlayers.players);
+
             const newPlayers = await updatePlayerStatus(onlinePlayers.players, onlinePlayers.total);
         
             if (newPlayers) {
