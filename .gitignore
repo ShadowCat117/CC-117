@@ -7,3 +7,5 @@ database/
 updateGuilds.json
 updatePlayers.json
 timezones.json
+deploy-commands.js
+index.js

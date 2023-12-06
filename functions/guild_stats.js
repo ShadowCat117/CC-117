@@ -59,6 +59,10 @@ async function guildStats(interaction, force = false) {
         const memberRows = await allAsync('SELECT username, guildRank, onlineWorld, contributedGuildXP, guildJoinDate, wars FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
         const today = new Date();
 
+        if (guildRow == undefined) {
+            return new ButtonedMessage('', [], '', [`${nameToSearch} not found, try using the full exact guild name.`]);
+        }
+
         let contributionPosition = 0;
 
         let averageXpPerDay = 0;
@@ -69,19 +73,32 @@ async function guildStats(interaction, force = false) {
             const {
                 username,
                 guildRank,
-                contributedGuildXP,
                 wars,
             } = row;
 
-            const [year, month, day] = row.guildJoinDate.split('-');
-            
-            const joinDate = new Date(year, month - 1, day);
-    
-            const differenceInMilliseconds = today - joinDate;
-            
-            const daysInGuild = Math.round(differenceInMilliseconds / (1000 * 60 * 60 * 24));
+            let {
+                contributedGuildXP,
+            } = row;
+
+            let daysInGuild;
+
+            try {
+                const [year, month, day] = row.guildJoinDate.split('-');
+                
+                const joinDate = new Date(year, month - 1, day);
+        
+                const differenceInMilliseconds = today - joinDate;
+                
+                daysInGuild = Math.round(differenceInMilliseconds / (1000 * 60 * 60 * 24));
+            } catch (err) {
+                daysInGuild = 1;
+            }
 
             averageXpPerDay += contributedGuildXP / daysInGuild;
+
+            if (contributedGuildXP == null) {
+                contributedGuildXP = 0;
+            }
 
             return new GuildMember(username, guildRank, contributedGuildXP, row.onlineWorld, row.guildJoinDate, daysInGuild, contributionPosition, wars);
         });
