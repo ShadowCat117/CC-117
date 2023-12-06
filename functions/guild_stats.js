@@ -29,6 +29,11 @@ async function allAsync(query, params) {
     });
 }
 
+async function doesTableExist(tableName) {
+    const result = await getAsync('SELECT name FROM sqlite_master WHERE type = \'table\' AND name = ?', [tableName]);
+    return !!result;
+}
+
 async function guildStats(interaction, force = false) {
     let nameToSearch;
 
@@ -56,11 +61,20 @@ async function guildStats(interaction, force = false) {
 
     if (guildName) {
         const guildRow = await getAsync('SELECT prefix, level, xpPercent, wars, rating FROM guilds WHERE name = ?', [guildName]);
-        const memberRows = await allAsync('SELECT username, guildRank, onlineWorld, contributedGuildXP, guildJoinDate, wars FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
+        const memberRows = await allAsync('SELECT UUID, username, guildRank, lastJoin, onlineWorld, contributedGuildXP, guildJoinDate, wars FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
         const today = new Date();
 
         if (guildRow == undefined) {
             return new ButtonedMessage('', [], '', [`${nameToSearch} not found, try using the full exact guild name.`]);
+        }
+
+        const tableName = guildName.replaceAll(' ', '_');
+        const tableExists = await doesTableExist(tableName);
+
+        let activityRows;
+
+        if (tableExists) {
+            activityRows = await allAsync(`SELECT UUID, averagePlaytime FROM ${tableName}`);
         }
 
         let contributionPosition = 0;
@@ -100,7 +114,23 @@ async function guildStats(interaction, force = false) {
                 contributedGuildXP = 0;
             }
 
-            return new GuildMember(username, guildRank, contributedGuildXP, row.onlineWorld, row.guildJoinDate, daysInGuild, contributionPosition, wars);
+            const [lastJoinYear, lastJoinMonth, lastJoinDay] = row.lastJoin.split('-');
+                
+            const lastJoinDate = new Date(lastJoinYear, lastJoinMonth - 1, lastJoinDay);
+    
+            const lastJoinDifferenceInMilliseconds = today - lastJoinDate;
+            
+            const daysSinceLastJoin = Math.round(lastJoinDifferenceInMilliseconds / (1000 * 60 * 60 * 24));
+
+            if (tableExists) {
+                for (const player of activityRows) {
+                    if (player.UUID === row.UUID && player.averagePlaytime >= 0) {
+                        return new GuildMember(username, guildRank, daysSinceLastJoin, contributedGuildXP, row.onlineWorld, row.guildJoinDate, daysInGuild, contributionPosition, wars, player.averagePlaytime);
+                    }
+                }
+            }
+
+            return new GuildMember(username, guildRank, daysSinceLastJoin, contributedGuildXP, row.onlineWorld, row.guildJoinDate, daysInGuild, contributionPosition, wars, -1);
         });
 
         let formattedXPPerDay;
