@@ -16,7 +16,7 @@ async function hourlyTasks() {
         // Remove buttons from old message buttons.
         console.log('Removing old buttons');
         MessageManager.removeOldMessages();
-
+    } else if (now.getUTCMinutes() == 30) {
         for (const guild of client.guilds.cache.values()) {
             try {
                 let config = {};
@@ -46,9 +46,10 @@ async function hourlyTasks() {
     }
 
     now = new Date();
-    const timeUntilNextHour = (60 - now.getMinutes()) * 60 * 1000 - (now.getSeconds() * 1000 + now.getMilliseconds());
+    const minutesUntilNextHalfHour = 30 - now.getMinutes() % 30;
+    const timeUntilNextHalfHour = (minutesUntilNextHalfHour * 60 * 1000) - (now.getSeconds() * 1000 + now.getMilliseconds());
 
-    setTimeout(hourlyTasks, timeUntilNextHour);
+    setTimeout(hourlyTasks, timeUntilNextHalfHour);
 }
 
 module.exports = {
@@ -71,10 +72,11 @@ module.exports = {
         }
 
         const now = new Date();
-        const timeUntilNextHour = (60 - now.getMinutes()) * 60 * 1000 - (now.getSeconds() * 1000 + now.getMilliseconds());
+        const minutesUntilNextHalfHour = 30 - now.getMinutes() % 30;
+        const timeUntilNextHalfHour = (minutesUntilNextHalfHour * 60 * 1000) - (now.getSeconds() * 1000 + now.getMilliseconds());
 
         setTimeout(() => {
             hourlyTasks();
-        }, timeUntilNextHour);
+        }, timeUntilNextHalfHour);
     },
 };
