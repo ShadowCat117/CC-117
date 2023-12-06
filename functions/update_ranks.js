@@ -2,7 +2,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const applyRoles = require('./apply_roles');
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('database/database_updateranks.db');
+const db = new sqlite3.Database('database/database.db');
 
 function allAsync(query, params) {
     return new Promise((resolve, reject) => {
@@ -28,30 +28,12 @@ async function getAsync(query, params) {
     });
 }
 
-async function createDatabaseCopy() {
-    const sourceFile = 'database/database.db';
-    const destinationFile = 'database/database_updateranks.db';
-
-    try {
-        await fs.copyFile(sourceFile, destinationFile);
-        console.log('Copy created successfully.');
-    } catch (err) {
-        console.error('Error creating copy:', err);
-    }
-}
-
 async function updateRanks(guild) {
     const directoryPath = path.join(__dirname, '..', 'configs');
     const filePath = path.join(directoryPath, `${guild.id}.json`);
     let updatedMembers = 0;
     let messageStart = 'Updated roles for 0 members.';
     let messageEnd = '';
-
-    try {
-        await createDatabaseCopy();
-    } catch (err) {
-        console.log(`Error creating copy, using old version: ${err}`);
-    }
 
     try {
         let config = {};

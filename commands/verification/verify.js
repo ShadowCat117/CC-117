@@ -27,18 +27,6 @@ async function getAsync(query, params) {
     });
 }
 
-async function createDatabaseCopy() {
-    const sourceFile = 'database/database.db';
-    const destinationFile = 'database/database_updateranks.db';
-
-    try {
-        await fs.copyFile(sourceFile, destinationFile);
-        console.log('Copy created successfully.');
-    } catch (err) {
-        console.error('Error creating copy:', err);
-    }
-}
-
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('verify')
@@ -57,12 +45,6 @@ module.exports = {
         const filePath = path.join(directoryPath, `${guildId}.json`);
         const username = interaction.options.getString('username');
         const formattedUsername = username.replace(/_/g, '\\_');
-
-        try {
-            await createDatabaseCopy();
-        } catch (err) {
-            console.log(`Error creating copy, using old version: ${err}`);
-        }
 
         try {
             let config = {};
