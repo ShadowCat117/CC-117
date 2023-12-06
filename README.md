@@ -61,9 +61,3 @@ The players table contains the UUID, username, guild name, guild rank, personal 
 The bot reads the data from the Wynncraft Public API, the docs for which are located here: https://docs.wynncraft.com/
 
 It reads data relating to guilds, and their members, including their guild rank, personal rank and last login date.
-
-## gavel-gateway-js
-
-The database populator uses the API Wrapper gavel-gateway-js to make requests to the Wynncraft API.
-
-The repository for the wrapper is available here: https://github.com/Mahakadema/gavel-gateway-js
