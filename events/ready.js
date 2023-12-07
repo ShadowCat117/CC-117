@@ -36,6 +36,7 @@ async function hourlyTasks() {
                     if (response !== 'Updated roles for 0 members.') {
                         sendMessage(guild, config.logChannel, response);
                     }
+                    console.log(`Updated ranks for ${guild}`);
                 } else {
                     continue;
                 }
