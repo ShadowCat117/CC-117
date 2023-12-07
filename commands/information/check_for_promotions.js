@@ -15,9 +15,7 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply();
 
-        const guildId = interaction.guild.id;
-
-        const response = await checkForPromotions(guildId);
+        const response = await checkForPromotions(interaction);
 
         if (response.pages.length > 1) {
             const previousPage = new ButtonBuilder()

@@ -17,7 +17,20 @@ async function allAsync(query, params) {
     });
 }
 
-async function checkForPromotions(guildId) {
+async function getAsync(query, params) {
+    return new Promise((resolve, reject) => {
+        db.get(query, params, function(err, rows) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+}
+
+async function checkForPromotions(interaction) {
+    const guildId = interaction.guild.id;
     const directoryPath = path.join(__dirname, '..', 'configs');
     const filePath = path.join(directoryPath, `${guildId}.json`);
 
@@ -34,38 +47,69 @@ async function checkForPromotions(guildId) {
         const strategistPromotionRequirement = config.strategistPromotionRequirement;
         const captainPromotionRequirement = config.captainPromotionRequirement;
         const recruiterPromotionRequirement = config.recruiterPromotionRequirement;
+        const chiefTimeRequirement = config.chiefTimeRequirement;
+        const strategistTimeRequirement = config.strategistTimeRequirement;
+        const captainTimeRequirement = config.captainTimeRequirement;
+        const recruiterTimeRequirement = config.recruiterTimeRequirement;
+        const chiefRequirementsCount = config.chiefRequirementsCount;
+        const strategistRequirementsCount = config.strategistRequirementsCount;
+        const captainRequirementsCount = config.captainRequirementsCount;
+        const recruiterRequirementsCount = config.recruiterRequirementsCount;
         const chiefXPRequirement = config.chiefXPRequirement;
         const chiefLevelRequirement = config.chiefLevelRequirement;
         const chiefContributorRequirement = config.chiefContributorRequirement;
-        const chiefTimeRequirement = config.chiefTimeRequirement;
+        const chiefOptionalTimeRequirement = config.chiefOptionalTimeRequirement;
+        const chiefWarsRequirement = config.chiefWarsRequirement;
+        const chiefBuildRequirement = config.chiefBuildRequirement;
+        const chiefWeeklyPlaytimeRequirement = config.chiefWeeklyPlaytimeRequirement;
+        const chiefEcoRequirement = config.chiefEcoRequirement;
         const strategistXPRequirement = config.strategistXPRequirement;
         const strategistLevelRequirement = config.strategistLevelRequirement;
         const strategistContributorRequirement = config.strategistContributorRequirement;
-        const strategistTimeRequirement = config.strategistTimeRequirement;
+        const strategistOptionalTimeRequirement = config.strategistOptionalTimeRequirement;
+        const strategistWarsRequirement = config.strategistWarsRequirement;
+        const strategistBuildRequirement = config.strategistBuildRequirement;
+        const strategistWeeklyPlaytimeRequirement = config.strategistWeeklyPlaytimeRequirement;
+        const strategistEcoRequirement = config.strategistEcoRequirement;
         const captainXPRequirement = config.captainXPRequirement;
         const captainLevelRequirement = config.captainLevelRequirement;
         const captainContributorRequirement = config.captainContributorRequirement;
-        const captainTimeRequirement = config.captainTimeRequirement;
+        const captainOptionalTimeRequirement = config.captainOptionalTimeRequirement;
+        const captainWarsRequirement = config.captainWarsRequirement;
+        const captainBuildRequirement = config.captainBuildRequirement;
+        const captainWeeklyPlaytimeRequirement = config.captainWeeklyPlaytimeRequirement;
+        const captainEcoRequirement = config.captainEcoRequirement;
         const recruiterXPRequirement = config.recruiterXPRequirement;
         const recruiterLevelRequirement = config.recruiterLevelRequirement;
         const recruiterContributorRequirement = config.recruiterContributorRequirement;
-        const recruiterTimeRequirement = config.recruiterTimeRequirement;
+        const recruiterOptionalTimeRequirement = config.recruiterOptionalTimeRequirement;
+        const recruiterWarsRequirement = config.recruiterWarsRequirement;
+        const recruiterBuildRequirement = config.recruiterBuildRequirement;
+        const recruiterWeeklyPlaytimeRequirement = config.recruiterWeeklyPlaytimeRequirement;
+        const recruiterEcoRequirement = config.recruiterEcoRequirement;
+        const tankRole = interaction.guild.roles.cache.get(config['tankRole']);
+        const healerRole = interaction.guild.roles.cache.get(config['healerRole']);
+        const damageRole = interaction.guild.roles.cache.get(config['damageRole']);
+        const soloRole = interaction.guild.roles.cache.get(config['soloRole']);
+        const ecoRole = interaction.guild.roles.cache.get(config['ecoRole']);
 
         if (!guildName) {
             return new ButtonedMessage('', [], '', ['You have not set a guild.']);
         }
 
         const promotionRequirements = [chiefPromotionRequirement, strategistPromotionRequirement, captainPromotionRequirement, recruiterPromotionRequirement];
-        const chiefRequirements = [chiefXPRequirement, chiefLevelRequirement, chiefContributorRequirement, chiefTimeRequirement];
-        const strategistRequirements = [strategistXPRequirement, strategistLevelRequirement, strategistContributorRequirement, strategistTimeRequirement];
-        const captainRequirements = [captainXPRequirement, captainLevelRequirement, captainContributorRequirement, captainTimeRequirement];
-        const recruiterRequirements = [recruiterXPRequirement, recruiterLevelRequirement, recruiterContributorRequirement, recruiterTimeRequirement];
+        const requirementsCount = [chiefRequirementsCount, strategistRequirementsCount, captainRequirementsCount, recruiterRequirementsCount];
+        const chiefRequirements = [chiefTimeRequirement, chiefXPRequirement, chiefLevelRequirement, chiefContributorRequirement, chiefOptionalTimeRequirement, chiefWarsRequirement, chiefBuildRequirement, chiefWeeklyPlaytimeRequirement, chiefEcoRequirement];
+        const strategistRequirements = [strategistTimeRequirement, strategistXPRequirement, strategistLevelRequirement, strategistContributorRequirement, strategistOptionalTimeRequirement, strategistWarsRequirement, strategistBuildRequirement, strategistWeeklyPlaytimeRequirement, strategistEcoRequirement];
+        const captainRequirements = [captainTimeRequirement, captainXPRequirement, captainLevelRequirement, captainContributorRequirement, captainOptionalTimeRequirement, captainWarsRequirement, captainBuildRequirement, captainWeeklyPlaytimeRequirement, captainEcoRequirement];
+        const recruiterRequirements = [recruiterTimeRequirement, recruiterXPRequirement, recruiterLevelRequirement, recruiterContributorRequirement, recruiterOptionalTimeRequirement, recruiterWarsRequirement, recruiterBuildRequirement, recruiterWeeklyPlaytimeRequirement, recruiterEcoRequirement];
+        const warBuildRoles = [tankRole, healerRole, damageRole, soloRole];
 
         const promotionExceptions = config['promotionExceptions'] !== undefined ? config['promotionExceptions'] : {};
 
         const exemptUsernames = Object.keys(promotionExceptions);
 
-        const originalRows = await allAsync('SELECT username, guildRank, contributedGuildXP, highestClassLevel, guildJoinDate FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
+        const originalRows = await allAsync('SELECT UUID, username, guildRank, contributedGuildXP, highestClassLevel, guildJoinDate, wars FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
 
         let filteredRows = originalRows.filter(player => player.guildRank !== 'OWNER' && player.guildRank !== 'CHIEF' && !exemptUsernames.includes(player.username));
         let checkForChiefPromotion = true;
@@ -95,32 +139,58 @@ async function checkForPromotions(guildId) {
             return new ButtonedMessage('', [], '', [`No members of ${guildName} need promoting`]);
         }
 
-        let contributionPosition = 0;
+        let position = 0;
 
         const today = new Date();
 
-        let promoteGuildMembers = originalRows.map(row => {
-            contributionPosition++;
+        const tableName = guildName.replaceAll(' ', '_');
 
+        let promoteGuildMembers = await Promise.all(originalRows.map(async (row) => {
+            position++;
+    
             if (filteredRows.includes(row)) {
-                const {
-                    username,
-                    guildRank,
-                    contributedGuildXP,
-                    highestClassLevel,
-                } = row;
-
+                const { username, guildRank, contributedGuildXP, highestClassLevel, wars } = row;
+                const contributionPos = position;
+    
                 const [year, month, day] = row.guildJoinDate.split('-');
-            
                 const joinDate = new Date(year, month - 1, day);
-        
                 const differenceInMilliseconds = today - joinDate;
-                
                 const daysInGuild = Math.round(differenceInMilliseconds / (1000 * 60 * 60 * 24));
+    
+                const serverMember = await findDiscordUser(interaction.guild.members.cache.values(), username);
 
-                return new GuildMemberPromotion(username, guildRank, contributedGuildXP, highestClassLevel, contributionPosition, daysInGuild, promotionRequirements, chiefRequirements, strategistRequirements, captainRequirements, recruiterRequirements);
+                const playtimeRow = await getAsync(`SELECT averagePlaytime FROM ${tableName} WHERE UUID = ?`, [row.UUID]);
+
+                let hasBuildRole = false;
+                let hasEcoRole = false;
+
+                if (serverMember) {
+                    const memberRoles = serverMember.roles.cache;
+
+                    for (const role of memberRoles.values()) {
+                        if (role === ecoRole) {
+                            hasEcoRole = true;
+                        } else if (warBuildRoles.includes(role)) {
+                            hasBuildRole = true;
+                        }
+
+                        if (hasBuildRole && hasEcoRole) {
+                            break;
+                        }
+                    }
+                }
+
+                let playtime;
+
+                if (!playtimeRow || playtimeRow.averagePlaytime === -1) {
+                    playtime = 0;
+                } else {
+                    playtime = playtimeRow.averagePlaytime;
+                }
+    
+                return new GuildMemberPromotion(username, guildRank, contributedGuildXP, highestClassLevel, contributionPos, daysInGuild, wars, hasBuildRole, playtime, hasEcoRole, promotionRequirements, requirementsCount, chiefRequirements, strategistRequirements, captainRequirements, recruiterRequirements);
             }
-        });
+        }));
 
         promoteGuildMembers = promoteGuildMembers.filter(player => player !== undefined).filter(player => player.toString() !== '');
 
@@ -150,6 +220,20 @@ async function checkForPromotions(guildId) {
         console.log(error);
         return new ButtonedMessage('', [], '', ['Error checking for guild promotions.']);
     }
+}
+
+async function findDiscordUser(serverMembers, username) {
+    for (const serverMember of serverMembers) {
+        if (serverMember.user.bot) {
+            continue;
+        }
+
+        if (username === serverMember.user.username || username === serverMember.user.globalName || username === serverMember.nickname) {
+            return serverMember;
+        }
+    }
+
+    return null;
 }
 
 module.exports = checkForPromotions;
