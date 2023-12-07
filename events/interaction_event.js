@@ -194,20 +194,26 @@ module.exports = {
                             .setCustomId('solo')
                             .setStyle(ButtonStyle.Primary)
                             .setLabel('SOLO');
+
+                        const ecoButton = new ButtonBuilder()
+                            .setCustomId('eco')
+                            .setStyle(ButtonStyle.Success)
+                            .setLabel('ECO');
         
                         const removeButton = new ButtonBuilder()
                             .setCustomId('removewar')
                             .setStyle(ButtonStyle.Danger)
                             .setLabel('REMOVE');
         
-                        const row = new ActionRowBuilder().addComponents(tankButton, healerButton, damageButton, soloButton, removeButton);
+                        const rolesRow = new ActionRowBuilder().addComponents(tankButton, healerButton, damageButton, soloButton, ecoButton);
+                        const removeRow = new ActionRowBuilder().addComponents(removeButton);
         
                         const warMessage = config['warClassMessage'].replace(/\\n/g, '\n');
         
                         await interaction.reply({
                             content: warMessage,
                             ephemeral: true,
-                            components: [row],
+                            components: [rolesRow, removeRow],
                         });
                     } else {
                         await interaction.reply({
@@ -395,6 +401,51 @@ module.exports = {
                         content: replyMessage,
                         ephemeral: true,
                     });
+                } else if (interaction.customId === 'eco') {
+                    const ecoRole = interaction.guild.roles.cache.get(config['ecoRole']);
+
+                    const memberRoles = interaction.member.roles.cache;
+
+                    const warRole = interaction.guild.roles.cache.get(config['warRole']);
+
+                    if (!memberRoles.has(warRole.id)) {
+                        await interaction.member.roles.add(warRole)
+                            .then(() => {
+                                console.log(`Added war role to ${interaction.member.user.username}`);
+                            })
+                            .catch(() => {
+                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add war role to ${interaction.member.user.username}`);
+                            });
+                    }
+
+                    let replyMessage;
+
+                    if (memberRoles.has(ecoRole.id)) {
+                        await interaction.member.roles.remove(ecoRole)
+                            .then(() => {
+                                console.log(`Removed eco role from ${interaction.member.user.username}`);
+                            })
+                            .catch(() => {
+                                sendMessage(interaction.guild, interaction.channel.id, `Failed to remove eco role from ${interaction.member.user.username}`);
+                            });
+
+                        replyMessage = `You no longer have the ${ecoRole} role`;
+                    } else {
+                        await interaction.member.roles.add(ecoRole)
+                            .then(() => {
+                                console.log(`Added eco role to ${interaction.member.user.username}`);
+                            })
+                            .catch(() => {
+                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add eco role to ${interaction.member.user.username}`);
+                            });
+
+                        replyMessage = `You now have the ${ecoRole} role`;
+                    }
+
+                    await interaction.reply({
+                        content: replyMessage,
+                        ephemeral: true,
+                    });
                 } else if (interaction.customId === 'removewar') {
                     const memberRoles = await interaction.member.roles.cache;
 
@@ -405,8 +456,9 @@ module.exports = {
                         const healerRole = interaction.guild.roles.cache.get(config['healerRole']);
                         const damageRole = interaction.guild.roles.cache.get(config['damageRole']);
                         const soloRole = interaction.guild.roles.cache.get(config['soloRole']);
+                        const ecoRole = interaction.guild.roles.cache.get(config['ecoRole']);
 
-                        const warRoles = [warRole, tankRole, healerRole, damageRole, soloRole];
+                        const warRoles = [warRole, tankRole, healerRole, damageRole, soloRole, ecoRole];
 
                         for (const role of memberRoles.values()) {
                             if (warRoles.includes(role)) {
