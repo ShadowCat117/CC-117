@@ -18,62 +18,38 @@ module.exports = {
                     name: 'Add Chief Promotion Requirement',
                     value: 'chiefPromotionRequirement',
                 }, {
-                    name: 'Chief XP Requirement',
-                    value: 'chiefXPRequirement',
-                }, {
-                    name: 'Chief Level Requirement',
-                    value: 'chiefLevelRequirement',
-                }, {
-                    name: 'Chief Contributor Requirement',
-                    value: 'chiefContributorRequirement',
-                }, {
                     name: 'Chief Time Requirement',
                     value: 'chiefTimeRequirement',
+                }, {
+                    name: 'Chief Requirements Count',
+                    value: 'chiefRequirementsCount',
                 }, {
                     name: 'Add Strategist Promotion Requirement',
                     value: 'strategistPromotionRequirement',
                 }, {
-                    name: 'Strategist XP Requirement',
-                    value: 'strategistXPRequirement',
-                }, {
-                    name: 'Strategist Level Requirement',
-                    value: 'strategistLevelRequirement',
-                }, {
-                    name: 'Strategist Contributor Requirement',
-                    value: 'strategistContributorRequirement',
-                }, {
                     name: 'Strategist Time Requirement',
                     value: 'strategistTimeRequirement',
+                }, {
+                    name: 'Strategist Requirements Count',
+                    value: 'strategistRequirementsCount',
                 }, {
                     name: 'Add Captain Promotion Requirement',
                     value: 'captainPromotionRequirement',
                 }, {
-                    name: 'Captain XP Requirement',
-                    value: 'captainXPRequirement',
-                }, {
-                    name: 'Captain Level Requirement',
-                    value: 'captainLevelRequirement',
-                }, {
-                    name: 'Captain Contributor Requirement',
-                    value: 'captainContributorRequirement',
-                }, {
                     name: 'Captain Time Requirement',
                     value: 'captainTimeRequirement',
+                }, {
+                    name: 'Captain Requirements Count',
+                    value: 'captainRequirementsCount',
                 }, {
                     name: 'Add Recruiter Promotion Requirement',
                     value: 'recruiterPromotionRequirement',
                 }, {
-                    name: 'Recruiter XP Requirement',
-                    value: 'recruiterXPRequirement',
-                }, {
-                    name: 'Recruiter Level Requirement',
-                    value: 'recruiterLevelRequirement',
-                }, {
-                    name: 'Recruiter Contributor Requirement',
-                    value: 'recruiterContributorRequirement',
-                }, {
                     name: 'Recruiter Time Requirement',
                     value: 'recruiterTimeRequirement',
+                }, {
+                    name: 'Recruiter Requirements Count',
+                    value: 'recruiterRequirementsCount',
                 }))
         .addStringOption((option) =>
             option.setName('requirement')
@@ -93,11 +69,23 @@ module.exports = {
                 }, {
                     name: 'Days in Guild Requirement',
                     value: 'TIME',
+                }, {
+                    name: 'Guild Wars Requirement',
+                    value: 'WARS',
+                }, {
+                    name: 'War Build Requirement',
+                    value: 'BUILD',
+                }, {
+                    name: 'Weekly Playtime Requirement',
+                    value: 'PLAYTIME',
+                }, {
+                    name: 'Eco Requirement',
+                    value: 'ECO',
                 }),
         )
         .addIntegerOption((option) =>
             option.setName('requirement_number')
-                .setDescription('How much of the promotion requirement you need to achieve this promotion..'),
+                .setDescription('How much of the promotion requirement you need to achieve this promotion.'),
         ),
     async execute(interaction) {
         try {
@@ -154,6 +142,30 @@ module.exports = {
                 }
 
                 break;
+            case 'chiefTimeRequirement':
+                if (!requirementNum) {
+                    await interaction.reply({
+                        content: 'Chief Time Requirement requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseInt(requirementNum);
+                }
+
+                break;
+            case 'chiefRequirementsCount':
+                if (!requirementNum) {
+                    await interaction.reply({
+                        content: 'Chief Requirements Count requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseInt(requirementNum);
+                }
+
+                break;
             case 'strategistPromotionRequirement':
                 if (requirementStr == null) {
                     await interaction.reply({
@@ -169,6 +181,30 @@ module.exports = {
                     });
 
                     return;
+                }
+
+                break;
+            case 'strategistTimeRequirement':
+                if (!requirementNum) {
+                    await interaction.reply({
+                        content: 'Strategist Time Requirement requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseInt(requirementNum);
+                }
+
+                break;
+            case 'strategistRequirementsCount':
+                if (!requirementNum) {
+                    await interaction.reply({
+                        content: 'Strategist Requirements Count requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseInt(requirementNum);
                 }
 
                 break;
@@ -190,6 +226,30 @@ module.exports = {
                 }
 
                 break;
+            case 'captainTimeRequirement':
+                if (!requirementNum) {
+                    await interaction.reply({
+                        content: 'Captain Time Requirement requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseInt(requirementNum);
+                }
+
+                break;
+            case 'captainRequirementsCount':
+                if (!requirementNum) {
+                    await interaction.reply({
+                        content: 'Captain Requirements Count requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseInt(requirementNum);
+                }
+
+                break;
             case 'recruiterPromotionRequirement':
                 if (requirementStr == null) {
                     await interaction.reply({
@@ -208,190 +268,22 @@ module.exports = {
                 }
 
                 break;
-            case 'chiefXPRequirement':
-                if (!requirementNum) {
-                    await interaction.reply({
-                        content: 'Chief XP Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
-                    return;
-                } else {
-                    number = parseInt(requirementNum);
-                }
-
-                break;
-            case 'chiefLevelRequirement':
-                if (!requirementNum) {
-                    await interaction.reply({
-                        content: 'Chief Level Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
-                    return;
-                } else {
-                    number = parseInt(requirementNum);
-                }
-
-                break;
-            case 'chiefContributorRequirement':
-                if (!requirementNum) {
-                    await interaction.reply({
-                        content: 'Chief Contributor Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
-                    return;
-                } else {
-                    number = parseInt(requirementNum);
-                }
-
-                break;
-            case 'chiefTimeRequirement':
-                if (!requirementNum) {
-                    await interaction.reply({
-                        content: 'Chief Time Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
-                    return;
-                } else {
-                    number = parseInt(requirementNum);
-                }
-
-                break;
-            case 'strategistXPRequirement':
-                if (!requirementNum) {
-                    await interaction.reply({
-                        content: 'Strategist XP Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
-                    return;
-                } else {
-                    number = parseInt(requirementNum);
-                }
-
-                break;
-            case 'strategistLevelRequirement':
-                if (!requirementNum) {
-                    await interaction.reply({
-                        content: 'Strategist Level Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
-                    return;
-                } else {
-                    number = parseInt(requirementNum);
-                }
-
-                break;
-            case 'strategistContributorRequirement':
-                if (!requirementNum) {
-                    await interaction.reply({
-                        content: 'Strategist Contributor Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
-                    return;
-                } else {
-                    number = parseInt(requirementNum);
-                }
-
-                break;
-            case 'strategistTimeRequirement':
-                if (!requirementNum) {
-                    await interaction.reply({
-                        content: 'Strategist Time Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
-                    return;
-                } else {
-                    number = parseInt(requirementNum);
-                }
-
-                break;
-            case 'captainXPRequirement':
-                if (!requirementNum) {
-                    await interaction.reply({
-                        content: 'Captain XP Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
-                    return;
-                } else {
-                    number = parseInt(requirementNum);
-                }
-
-                break;
-            case 'captainLevelRequirement':
-                if (!requirementNum) {
-                    await interaction.reply({
-                        content: 'Captain Level Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
-                    return;
-                } else {
-                    number = parseInt(requirementNum);
-                }
-
-                break;
-            case 'captainContributorRequirement':
-                if (!requirementNum) {
-                    await interaction.reply({
-                        content: 'Captain Contributor Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
-                    return;
-                } else {
-                    number = parseInt(requirementNum);
-                }
-
-                break;
-            case 'captainTimeRequirement':
-                if (!requirementNum) {
-                    await interaction.reply({
-                        content: 'Captain Time Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
-                    return;
-                } else {
-                    number = parseInt(requirementNum);
-                }
-
-                break;
-            case 'recruiterXPRequirement':
-                if (!requirementNum) {
-                    await interaction.reply({
-                        content: 'Recruiter XP Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
-                    return;
-                } else {
-                    number = parseInt(requirementNum);
-                }
-
-                break;
-            case 'recruiterLevelRequirement':
-                if (!requirementNum) {
-                    await interaction.reply({
-                        content: 'Recruiter Level Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
-                    return;
-                } else {
-                    number = parseInt(requirementNum);
-                }
-
-                break;
-            case 'recruiterContributorRequirement':
-                if (!requirementNum) {
-                    await interaction.reply({
-                        content: 'Recruiter Contributor Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
-                    return;
-                } else {
-                    number = parseInt(requirementNum);
-                }
-
-                break;
             case 'recruiterTimeRequirement':
                 if (!requirementNum) {
                     await interaction.reply({
                         content: 'Recruiter Time Requirement requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseInt(requirementNum);
+                }
+
+                break;
+            case 'recruiterRequirementsCount':
+                if (!requirementNum) {
+                    await interaction.reply({
+                        content: 'Recruiter Requirements Count requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
@@ -420,22 +312,14 @@ module.exports = {
             }
 
             switch (option) {
-                case 'chiefXPRequirement':
-                case 'chiefLevelRequirement':
-                case 'chiefContributorRequirement':
                 case 'chiefTimeRequirement':
-                case 'strategistXPRequirement':
-                case 'strategistLevelRequirement':
-                case 'strategistContributorRequirement':
+                case 'chiefRequirementsCount':
                 case 'strategistTimeRequirement':
-                case 'captainXPRequirement':
-                case 'captainLevelRequirement':
-                case 'captainContributorRequirement':
+                case 'strategistRequirementsCount':
                 case 'captainTimeRequirement':
-                case 'recruiterXPRequirement':
-                case 'recruiterLevelRequirement':
-                case 'recruiterContributorRequirement':
+                case 'captainRequirementsCount':
                 case 'recruiterTimeRequirement':
+                case 'recruiterRequirementsCount':
                     config[option] = number;
                     break;
                 case 'chiefPromotionRequirement':
