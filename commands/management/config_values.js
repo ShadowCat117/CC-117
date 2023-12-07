@@ -79,6 +79,9 @@ module.exports = {
                 }, {
                     name: 'Total Member Threshold',
                     value: 'memberThreshold',
+                }, {
+                    name: 'War Level Requirement',
+                    value: 'warLevelRequirement',
                 }))
         .addStringOption((option) =>
             option.setName('value')
@@ -504,6 +507,24 @@ module.exports = {
                 }
 
                 break;
+            case 'warLevelRequirement':
+                if (!valueStr) {
+                    await interaction.reply({
+                        content: 'War Level Requirement requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else if (isNaN(valueStr)) {
+                    await interaction.reply({
+                        content: 'War Level Requirement requires <value> to be a number input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else {
+                    number = parseInt(valueStr);
+                }
+
+                break;
             default:
                 await interaction.reply({
                     content: 'Invalid configuration option.',
@@ -547,6 +568,7 @@ module.exports = {
                 case 'newPlayerMinimumTime':
                 case 'newPlayerThreshold':
                 case 'memberThreshold':
+                case 'warLevelRequirement':
                     config[option] = number;
                     break;
             }

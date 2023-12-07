@@ -9,34 +9,12 @@ const path = require('path');
 const createConfig = require('../../functions/create_config');
 const sendMessage = require('../../functions/send_message');
 
+const warRoles = ['war', 'tank', 'healer', 'damage', 'solo', 'eco'];
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('createwarmessage')
-        .setDescription('Sends a war message with buttons to get war-related roles.')
-        .addRoleOption((option) =>
-            option.setName('warrole')
-                .setDescription('The war role')
-                .setRequired(true))
-        .addRoleOption((option) =>
-            option.setName('tankrole')
-                .setDescription('The tank role')
-                .setRequired(true))
-        .addRoleOption((option) =>
-            option.setName('healerrole')
-                .setDescription('The healer role')
-                .setRequired(true))
-        .addRoleOption((option) =>
-            option.setName('damagerole')
-                .setDescription('The damage role')
-                .setRequired(true))
-        .addRoleOption((option) =>
-            option.setName('solorole')
-                .setDescription('The solo role')
-                .setRequired(true))
-        .addStringOption((option) =>
-            option.setName('level')
-                .setDescription('War level requirement for wars')
-                .setRequired(true)),
+        .setDescription('Sends a war message with buttons to get war-related roles.'),
     async execute(interaction) {
         const guildId = interaction.guild.id;
         const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
@@ -63,23 +41,6 @@ module.exports = {
             }
 
             const message = config['warMessage'];
-            const warRole = interaction.options.getRole('warrole');
-            const tankRole = interaction.options.getRole('tankrole');
-            const healerRole = interaction.options.getRole('healerrole');
-            const damageRole = interaction.options.getRole('damagerole');
-            const soloRole = interaction.options.getRole('solorole');
-            const levelStr = interaction.options.getString('level');
-            let level;
-
-            if (isNaN(levelStr)) {
-                await interaction.reply({
-                    content: 'War LevelRequirement requires a number input.',
-                    ephemeral: true,
-                });
-                return;
-            } else {
-                level = parseInt(levelStr);
-            }
 
             if (!message) {
                 await interaction.reply({
@@ -97,6 +58,17 @@ module.exports = {
                 return;
             }
 
+            for (const warRole of warRoles) {
+                if (!config[`${warRole}Role`]) {
+                    await interaction.reply({
+                        content: `You have not set a role for ${warRole}.`,
+                        ephemeral: true,
+                    });
+    
+                    return;
+                }
+            }
+
             const warMessage = await sendMessage(interaction.guild, interaction.channel.id, message);
 
             const warButton = new ButtonBuilder()
@@ -109,22 +81,6 @@ module.exports = {
             warMessage.edit({
                 components: [row],
             });
-
-            if (warMessage) {
-                config['warRole'] = warRole.id;
-                config['tankRole'] = tankRole.id;
-                config['healerRole'] = healerRole.id;
-                config['damageRole'] = damageRole.id;
-                config['soloRole'] = soloRole.id;
-                config['warLevelRequirement'] = level;
-
-                fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
-            } else {
-                await interaction.reply({
-                    content: 'Error creating war message.',
-                    ephemeral: true,
-                });
-            }
 
             await interaction.reply({
                 content: 'Created war message',
