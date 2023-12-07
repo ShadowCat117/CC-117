@@ -130,9 +130,9 @@ module.exports = {
                         ephemeral: true,
                     });
                     return;
-                } else if (valueStr.length > 500) {
+                } else if (valueStr.length > 750) {
                     await interaction.reply({
-                        content: 'Join Message must be less than 500 characters.',
+                        content: 'Join Message must be less than 750 characters.',
                         ephemeral: true,
                     });
                     return;
@@ -146,9 +146,9 @@ module.exports = {
                         ephemeral: true,
                     });
                     return;
-                } else if (valueStr.length > 500) {
+                } else if (valueStr.length > 750) {
                     await interaction.reply({
-                        content: 'Leave Message must be less than 500 characters.',
+                        content: 'Leave Message must be less than 750 characters.',
                         ephemeral: true,
                     });
                     return;
@@ -450,9 +450,9 @@ module.exports = {
                         ephemeral: true,
                     });
                     return;
-                } else if (valueStr.length > 500) {
+                } else if (valueStr.length > 750) {
                     await interaction.reply({
-                        content: 'War Message must be less than 500 characters.',
+                        content: 'War Message must be less than 750 characters.',
                         ephemeral: true,
                     });
                     return;
@@ -466,9 +466,9 @@ module.exports = {
                         ephemeral: true,
                     });
                     return;
-                } else if (valueStr.length > 500) {
+                } else if (valueStr.length > 750) {
                     await interaction.reply({
-                        content: 'War Class Message must be less than 500 characters.',
+                        content: 'War Class Message must be less than 750 characters.',
                         ephemeral: true,
                     });
                     return;
@@ -482,9 +482,9 @@ module.exports = {
                         ephemeral: true,
                     });
                     return;
-                } else if (valueStr.length > 500) {
+                } else if (valueStr.length > 750) {
                     await interaction.reply({
-                        content: 'Class Message must be less than 500 characters.',
+                        content: 'Class Message must be less than 750 characters.',
                         ephemeral: true,
                     });
                     return;
@@ -498,9 +498,9 @@ module.exports = {
                         ephemeral: true,
                     });
                     return;
-                } else if (valueStr.length > 500) {
+                } else if (valueStr.length > 750) {
                     await interaction.reply({
-                        content: 'Class Archetype Message must be less than 500 characters.',
+                        content: 'Class Archetype Message must be less than 750 characters.',
                         ephemeral: true,
                     });
                     return;
