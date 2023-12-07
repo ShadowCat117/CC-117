@@ -56,6 +56,13 @@ module.exports = {
                 });
 
                 return;
+            } else if (!config['warLevelRequirement']) {
+                await interaction.reply({
+                    content: 'You have not set a war level requirement with /config_values warLevelRequirement.',
+                    ephemeral: true,
+                });
+
+                return;
             }
 
             for (const warRole of warRoles) {
