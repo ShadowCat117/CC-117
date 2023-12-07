@@ -16,13 +16,7 @@ class VerifiedMember {
                 continue;
             }
 
-            let nickname = undefined;
-
-            if (serverMember.nickname) {
-                nickname = serverMember.nickname.split(' [')[0];
-            }
-
-            if (this.playerName === serverMember.user.username || this.playerName === serverMember.user.globalName || this.playerName === nickname) {
+            if (this.playerName === serverMember.user.username || this.playerName === serverMember.user.globalName || this.playerName === serverMember.nickname) {
                 this.verifiedMember = serverMember.user.username;
                 break;
             }
