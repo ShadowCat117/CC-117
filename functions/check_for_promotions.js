@@ -3,6 +3,7 @@ const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const ButtonedMessage = require('../message_type/ButtonedMessage');
 const db = new sqlite3.Database('database/database.db');
+const sendMessage = require('./send_message');
 const GuildMemberPromotion = require('../message_objects/GuildMemberPromotion');
 
 async function allAsync(query, params) {
@@ -192,7 +193,9 @@ async function checkForPromotions(interaction) {
             }
         }));
 
-        promoteGuildMembers = promoteGuildMembers.filter(player => player !== undefined).filter(player => player.toString() !== '');
+        const eligibleChiefs = promoteGuildMembers.filter(player => player !== undefined).filter(player => player.toString().startsWith('CHIEFPROMOTION '));
+
+        promoteGuildMembers = promoteGuildMembers.filter(player => player !== undefined).filter(player => player.toString() !== '').filter(player => !player.toString().startsWith('CHIEFPROMOTION '));
 
         const pages = [];
         let promoteMembersPage = '```\n';
@@ -213,6 +216,31 @@ async function checkForPromotions(interaction) {
         if (counter <= 20) {
             promoteMembersPage += '```';
             pages.push(promoteMembersPage);
+        }
+
+        if (eligibleChiefs.length > 0) {
+            const chiefPages = [];
+            let promoteChiefsPage = '```\n';
+            let chiefCounter = 0;
+
+            eligibleChiefs.forEach((player) => {
+                if (chiefCounter === 20) {
+                    promoteChiefsPage += '```';
+                    chiefPages.push(promoteChiefsPage);
+                    promoteChiefsPage = '```\n' + player.toString().substring(15);
+                    chiefCounter = 1;
+                } else {
+                    promoteChiefsPage += player.toString().substring(15);
+                    chiefCounter++;
+                }
+            });
+
+            if (chiefCounter <= 20) {
+                promoteChiefsPage += '```';
+                chiefPages.push(promoteChiefsPage);
+            }
+
+            sendMessage(interaction.guild, config.highRankChannel, chiefPages[0]);
         }
 
         return new ButtonedMessage('', [], '', pages);

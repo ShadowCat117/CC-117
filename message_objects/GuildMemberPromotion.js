@@ -141,10 +141,6 @@ class GuildMemberPromotion {
                 } else {
                     reason += `, contribution position higher than ${rankRequirements[3]}`;
                 }
-            } else {
-                if (this.username === 'AutumnLeaf_') {
-                    console.log(`Not top ${rankRequirements[3]}, instead ${this.contributionPos}`);
-                }
             }
         }
 
@@ -224,7 +220,11 @@ class GuildMemberPromotion {
 
         // Return promotion message
         if (promote) {
-            return `${this.username} should be promoted to ${rankToPromote} for: ${reason}\n`;
+            if (rankToPromote === 'CHIEF') {
+                return `CHIEFPROMOTION ${this.username} should be promoted to ${rankToPromote} for: ${reason}\n`;
+            } else {
+                return `${this.username} should be promoted to ${rankToPromote} for: ${reason}\n`;
+            }
         } else {
             return '';
         }
