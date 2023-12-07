@@ -54,13 +54,14 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
         const healerRole = guild.roles.cache.get(config['healerRole']);
         const damageRole = guild.roles.cache.get(config['damageRole']);
         const soloRole = guild.roles.cache.get(config['soloRole']);
+        const ecoRole = guild.roles.cache.get(config['ecoRole']);
 
         const guildRoles = [ownerRole, chiefRole, strategistRole, captainRole, recruiterRole, recruitRole];
         const rankRoles = [championRole, heroRole, vipPlusRole, vipRole];
         const allyRoles = [allyOwnerRole, allyRole];
         const levelRoles = [levelRoleOne, levelRoleTwo, levelRoleThree, levelRoleFour, levelRoleFive, levelRoleSix, levelRoleSeven, levelRoleEight, levelRoleNine, levelRoleTen];
         const serverRankRoles = [administratorRole, moderatorRole, contentTeamRole];
-        const warRoles = [warRole, tankRole, healerRole, damageRole, soloRole];
+        const warRoles = [warRole, tankRole, healerRole, damageRole, soloRole, ecoRole];
 
         const levelRoleLevels = [config['levelRoleOneLevel'], config['levelRoleTwoLevel'], config['levelRoleThreeLevel'], config['levelRoleFourLevel'], config['levelRoleFiveLevel'], config['levelRoleSixLevel'], config['levelRoleSevenLevel'], config['levelRoleEightLevel'], config['levelRoleNineLevel'], config['levelRoleTenLevel']];
 
