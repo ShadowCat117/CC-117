@@ -20,6 +20,9 @@ module.exports = {
                 }, {
                     name: 'Join/Leave Channel',
                     value: 'joinLeaveChannel',
+                }, {
+                    name: 'High Rank Channel',
+                    value: 'highRankChannel',
                 }))
         .addChannelOption((option) =>
             option.setName('channel')
@@ -77,6 +80,13 @@ module.exports = {
                 }
 
                 break;
+            case 'highRankChannel':
+                if (channel == null) {
+                    await interaction.reply('High Rank Channel requires a <channel> input.');
+                    return;
+                }
+
+                break;
             default:
                 await interaction.reply({
                     content: 'Invalid configuration option.',
@@ -98,6 +108,7 @@ module.exports = {
             switch (option) {
                 case 'logChannel':
                 case 'joinLeaveChannel':
+                case 'highRankChannel':
                     config[option] = channel.id;
                     break;
             }

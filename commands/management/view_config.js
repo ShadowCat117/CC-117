@@ -172,6 +172,14 @@ module.exports = {
                 configContent += `Log channel: ${config.logChannel}\n`;
             }
 
+            const highRankChannel = interaction.guild.channels.cache.get(config.highRankChannel);
+
+            if (highRankChannel) {
+                configContent += `High Rank channel: ${highRankChannel}\n`;
+            } else {
+                configContent += `High Rank channel: ${config.highRankChannel}\n`;
+            }
+
             pages.push(configContent);
 
             configContent = '';
@@ -482,6 +490,14 @@ module.exports = {
                 configContent += `Solo role: ${soloRole}\n`;
             } else {
                 configContent += `Solo role: ${config.soloRole}\n`;
+            }
+
+            const ecoRole = interaction.guild.roles.cache.get(config.ecoRole);
+
+            if (ecoRole) {
+                configContent += `Eco role: ${ecoRole}\n`;
+            } else {
+                configContent += `Eco role: ${config.ecoRole}\n`;
             }
 
             pages.push(configContent);
