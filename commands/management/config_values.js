@@ -82,6 +82,9 @@ module.exports = {
                 }, {
                     name: 'War Level Requirement',
                     value: 'warLevelRequirement',
+                }, {
+                    name: 'Giveaway Message',
+                    value: 'giveawayMessage',
                 }))
         .addStringOption((option) =>
             option.setName('value')
@@ -525,6 +528,22 @@ module.exports = {
                 }
 
                 break;
+            case 'giveawayMessage':
+                if (valueStr == null) {
+                    await interaction.reply({
+                        content: 'Giveaway Message requires a <value> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                } else if (valueStr.length > 750) {
+                    await interaction.reply({
+                        content: 'Giveaway Message must be less than 750 characters.',
+                        ephemeral: true,
+                    });
+                    return;
+                }
+
+                break;
             default:
                 await interaction.reply({
                     content: 'Invalid configuration option.',
@@ -550,6 +569,7 @@ module.exports = {
                 case 'warClassMessage':
                 case 'classMessage':
                 case 'classArchetypeMessage':
+                case 'giveawayMessage':
                     config[option] = valueStr;
                     break;
                 case 'chiefUpperThreshold':

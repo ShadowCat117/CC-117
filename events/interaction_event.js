@@ -667,6 +667,39 @@ module.exports = {
                         content: replyMessage,
                         ephemeral: true,
                     });
+                } else if (interaction.customId === 'giveaway') {
+                    const giveawayRole = interaction.guild.roles.cache.get(config['giveawayRole']);
+
+                    const memberRoles = interaction.member.roles.cache;
+
+                    let replyMessage;
+
+                    if (memberRoles.has(giveawayRole.id)) {
+                        await interaction.member.roles.remove(giveawayRole)
+                            .then(() => {
+                                console.log(`Removed giveaway role from ${interaction.member.user.username}`);
+                            })
+                            .catch(() => {
+                                sendMessage(interaction.guild, interaction.channel.id, `Failed to remove giveaway role from ${interaction.member.user.username}`);
+                            });
+
+                        replyMessage = `You no longer have the ${giveawayRole} role`;
+                    } else {
+                        await interaction.member.roles.add(giveawayRole)
+                            .then(() => {
+                                console.log(`Added giveaway role to ${interaction.member.user.username}`);
+                            })
+                            .catch(() => {
+                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add giveaway role to ${interaction.member.user.username}`);
+                            });
+
+                        replyMessage = `You now have the ${giveawayRole} role`;
+                    }
+
+                    await interaction.reply({
+                        content: replyMessage,
+                        ephemeral: true,
+                    });
                 } else {
                     if (!message) {
                         interaction.update({

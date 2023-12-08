@@ -165,6 +165,8 @@ async function createConfig(client, guildId) {
                 recruiterWeeklyPlaytimeRequirement: 0,
                 recruiterWarBuildRequirement: false,
                 recruiterEcoRequirement: false,
+                giveawayMessage: '',
+                giveawayRole: null,
             };
 
             try {

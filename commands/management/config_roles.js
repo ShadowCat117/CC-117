@@ -73,6 +73,9 @@ module.exports = {
                 }, {
                     name: 'Content Team Role',
                     value: 'contentTeamRole',
+                }, {
+                    name: 'Giveaway Role',
+                    value: 'giveawayRole',
                 }))
         .addRoleOption((option) =>
             option.setName('role')
@@ -322,6 +325,16 @@ module.exports = {
                 }
 
                 break;
+            case 'giveawayRole':
+                if (role == null) {
+                    await interaction.reply({
+                        content: 'Giveaway Role requires a <role> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                }
+
+                break;
             default:
                 await interaction.reply({
                     content: 'Invalid configuration option.',
@@ -377,6 +390,7 @@ module.exports = {
                 case 'administratorRole':
                 case 'moderatorRole':
                 case 'contentTeamRole':
+                case 'giveawayRole':
                     config[option] = role.id;
                     break;
             }
