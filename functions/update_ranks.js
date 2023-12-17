@@ -3,7 +3,7 @@ const path = require('path');
 const applyRoles = require('./apply_roles');
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('database/database.db');
-const minecraftNamePattern = /^[a-zA-Z0-9]{3,16}$/;
+const minecraftNamePattern = /^[a-zA-Z0-9_]{3,16}$/;
 
 function allAsync(query, params) {
     return new Promise((resolve, reject) => {
