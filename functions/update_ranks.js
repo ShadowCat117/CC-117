@@ -3,6 +3,7 @@ const path = require('path');
 const applyRoles = require('./apply_roles');
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('database/database.db');
+const minecraftNamePattern = /^[a-zA-Z0-9]{3,16}$/;
 
 function allAsync(query, params) {
     return new Promise((resolve, reject) => {
@@ -157,7 +158,7 @@ async function updateRanks(guild) {
 
             let player = await getAsync('SELECT UUID FROM players WHERE username = ?', [serverMember.user.username]);
 
-            if (!player) {
+            if (!player && minecraftNamePattern.test(serverMember.user.globalName)) {
                 player = await getAsync('SELECT UUID FROM players WHERE username = ?', [serverMember.user.globalName]);
             }
 
@@ -165,7 +166,9 @@ async function updateRanks(guild) {
                 if (serverMember.nickname) {
                     const nickname = serverMember.nickname.split(' [')[0];
 
-                    player = await getAsync('SELECT UUID FROM players WHERE username = ?', [nickname]);
+                    if (minecraftNamePattern.test(nickname)) {
+                        player = await getAsync('SELECT UUID FROM players WHERE username = ?', [nickname]);
+                    }
                 }
             }
 
