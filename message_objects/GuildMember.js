@@ -21,7 +21,7 @@ class GuildMember {
         this.daysInGuild = daysInGuild;
         this.contributionPosition = `${contributionPosition}.`;
         this.wars = wars;
-        this.averagePlaytime = averagePlaytime;
+        this.averagePlaytime = parseFloat(averagePlaytime.toFixed(2));
     }
 
     // Returns a formatted string of the guild member with all the stats listed
