@@ -87,7 +87,7 @@ async function activeHours(interaction, force = false, timezoneOffset = 0) {
                         timezone = '???';
                     }
 
-                    let message = `\`\`\`Active hours for ${guildName} (${timezone}):\n\nTime    Avg. Online    Avg. Captains`;
+                    let message = `\`\`\`Active hours for ${guildName} (${timezone}):\n\nTime    Avg. Online    Avg. Captain+`;
 
                     guildActiveHours.sort((a, b) => a.compareTo(b));
 

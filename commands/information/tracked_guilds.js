@@ -102,7 +102,7 @@ module.exports = {
 
                         trackedGuilds.sort((a, b) => a.compareTo(b));
 
-                        const header = '```Guild Name          Avg. Online     Avg. Captains     Current Online     Current Captains\n-----------------------------------------------------------------------------------------\n';
+                        const header = '```Guild Name          Avg. Online     Avg. Captain+     Current Online     Current Captain+\n-----------------------------------------------------------------------------------------\n';
 
                         const pages = [];
                         let page = header;
