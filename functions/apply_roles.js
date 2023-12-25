@@ -437,7 +437,7 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                 if (!serverRankRoleToApply) {
                     if (serverRank === 'Moderator') {
                         serverRankRoleToApply = moderatorRole;
-                    } else if (serverRank === 'Administrator' || serverRank === 'Developer') {
+                    } else if (serverRank === 'Administrator' || serverRank === 'Developer' || serverRank === 'WebDev') {
                         serverRankRoleToApply = administratorRole;
                     }
                 }
