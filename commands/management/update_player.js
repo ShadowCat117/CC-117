@@ -1,7 +1,7 @@
 const {
     SlashCommandBuilder,
 } = require('discord.js');
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 
 module.exports = {
@@ -24,9 +24,13 @@ module.exports = {
         try {
             let updatePlayersFile = {};
 
-            if (fs.existsSync(filePath)) {
-                const fileData = fs.readFileSync(filePath, 'utf-8');
+            try {
+                await fs.access(filePath);
+                const fileData = await fs.readFile(filePath, 'utf-8');
                 updatePlayersFile = JSON.parse(fileData);
+            } catch (err) {
+                console.log('Error reading priority players file.');
+                return;
             }
 
             updatePlayersFile.players = updatePlayersFile.players.filter(item => item !== null);
@@ -36,7 +40,8 @@ module.exports = {
             } else {
                 updatePlayersFile.players.unshift(player);
 
-                fs.writeFileSync(filePath, JSON.stringify(updatePlayersFile, null, 2), 'utf-8');
+                const updatedData = JSON.stringify(updatePlayersFile);
+                await fs.writeFile(filePath, updatedData, 'utf-8');
 
                 await interaction.editReply(`${player} will be updated soon.`);
             }
