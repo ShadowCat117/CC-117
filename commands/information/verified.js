@@ -4,6 +4,9 @@ const {
     ButtonStyle,
     SlashCommandBuilder,
 } = require('discord.js');
+const fs = require('fs');
+const path = require('path');
+const createConfig = require('../../functions/create_config');
 const MessageManager = require('../../message_type/MessageManager');
 const verified = require('../../functions/verified');
 
@@ -14,6 +17,51 @@ module.exports = {
 
     async execute(interaction) {
         await interaction.deferReply();
+
+        const guildId = interaction.guild.id;
+        const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
+
+        try {
+            let config = {};
+
+            if (fs.existsSync(filePath)) {
+                const fileData = fs.readFileSync(filePath, 'utf-8');
+                config = JSON.parse(fileData);
+            } else {
+                await createConfig(interaction.client, guildId);
+
+                const fileData = fs.readFileSync(filePath, 'utf-8');
+                config = JSON.parse(fileData);
+            }
+
+            const adminRoleId = config.adminRole;
+            const addMemberOfRole = config.memberOf;
+            const memberOfRole = config.memberOfRole;
+            const memberRoles = interaction.member.roles.cache;
+
+            const guildName = config.guildName;
+
+            if (!guildName) {
+                await interaction.editReply('The server you are in does not have a guild set.');
+                return;
+            }
+
+            if (addMemberOfRole) {
+                if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
+                    await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
+                    return;
+                }
+            }
+
+            if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
+                await interaction.editReply('You do not have the required permissions to run this command.');
+                return;
+            }
+        } catch (err) {
+            console.log(err);
+            await interaction.editReply('Error checking for demotions.');
+            return;
+        }
 
         const response = await verified(interaction);
 

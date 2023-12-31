@@ -36,6 +36,24 @@ module.exports = {
                 config = JSON.parse(fileData);
             }
 
+            const addMemberOfRole = config.memberOf;
+            const memberOfRole = config.memberOfRole;
+            const memberRoles = interaction.member.roles.cache;
+
+            const guildName = config.guildName;
+
+            if (!guildName) {
+                await interaction.editReply('The server you are in does not have a guild set.');
+                return;
+            }
+
+            if (addMemberOfRole) {
+                if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
+                    await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
+                    return;
+                }
+            }
+
             if (config.allies.includes(null)) {
                 await interaction.editReply('You have not set any allies.');
                 return;

@@ -41,6 +41,15 @@ module.exports = {
 
             const adminRoleId = config.adminRole;
             const memberRoles = interaction.member.roles.cache;
+            const addMemberOfRole = config.memberOf;
+            const memberOfRole = config.memberOfRole;
+
+            if (addMemberOfRole) {
+                if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
+                    await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
+                    return;
+                }
+            }
 
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 await interaction.editReply('You do not have the required permissions to run this command.');
