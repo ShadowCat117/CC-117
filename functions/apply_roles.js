@@ -189,6 +189,8 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                 response = true;
             }
 
+            await member.setNickname(null);
+
             return response;
         }
 
