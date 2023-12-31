@@ -9,3 +9,5 @@ updatePlayers.json
 timezones.json
 deploy-commands.js
 index.js
+events/message_create.js
+events/message_delete.js
