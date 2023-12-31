@@ -138,7 +138,7 @@ async function updatePriorityPlayers() {
             const fileData = await fs.readFile(filePath, 'utf-8');
             updatePlayersFile = JSON.parse(fileData);
         } catch (err) {
-            console.log('Priority players file does not exist.');
+            console.log('Error reading priority players file.');
             return;
         }
 
@@ -741,7 +741,7 @@ async function addPlayerToPriority(playerUuid) {
             const fileData = await fs.readFile(filePath, 'utf-8');
             updatePlayersFile = JSON.parse(fileData);
         } catch (err) {
-            console.log('Priority players file does not exist.');
+            console.log('Error reading priority players file.');
             return;
         }
 
