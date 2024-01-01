@@ -68,6 +68,7 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
         const soloRole = guild.roles.cache.get(config['soloRole']);
         const ecoRole = guild.roles.cache.get(config['ecoRole']);
         const warrerRole = guild.roles.cache.get(config['warrerRole']);
+        const giveawayRole = guild.roles.cache.get(config['giveawayRole']);
 
         const guildRoles = [ownerRole, chiefRole, strategistRole, captainRole, recruiterRole, recruitRole];
         const rankRoles = [championRole, heroRole, vipPlusRole, vipRole];
@@ -158,6 +159,15 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                         })
                         .catch(() => {
                             errorMessage += `Failed to remove war role ${role.name} from ${member.user.username}.\n`;
+                        });
+                } else if (role === giveawayRole && memberRoles.has(giveawayRole.id)) {
+                    await member.roles.remove(giveawayRole)
+                        .then(() => {
+                            console.log(`Removed giveaway role from ${member.user.username}`);
+                            hasUpdated = true;
+                        })
+                        .catch(() => {
+                            errorMessage += `Failed to remove giveaway role from ${member.user.username}.\n`;
                         });
                 }
             }
@@ -305,6 +315,15 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                             .catch(() => {
                                 errorMessage += `Failed to remove war role ${role.name} from ${member.user.username}.\n`;
                             });
+                    } else if (role === giveawayRole && memberRoles.has(giveawayRole.id)) {
+                        await member.roles.remove(giveawayRole)
+                            .then(() => {
+                                console.log(`Removed giveaway role from ${member.user.username}`);
+                                hasUpdated = true;
+                            })
+                            .catch(() => {
+                                errorMessage += `Failed to remove giveaway role from ${member.user.username}.\n`;
+                            });
                     }
                 }
             }
@@ -345,6 +364,15 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                         })
                         .catch(() => {
                             errorMessage += `Failed to remove war role ${role.name} from ${member.user.username}.\n`;
+                        });
+                } else if (role === giveawayRole && memberRoles.has(giveawayRole.id)) {
+                    await member.roles.remove(giveawayRole)
+                        .then(() => {
+                            console.log(`Removed giveaway role from ${member.user.username}`);
+                            hasUpdated = true;
+                        })
+                        .catch(() => {
+                            errorMessage += `Failed to remove giveaway role from ${member.user.username}.\n`;
                         });
                 }
             }
