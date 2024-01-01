@@ -165,6 +165,18 @@ module.exports = {
                     }
 
                     if (memberRoles.has(memberOfRole.id) && validLevel) {
+                        const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
+
+                        if (!memberRoles.has(warrerRole.id)) {
+                            await interaction.member.roles.add(warrerRole)
+                                .then(() => {
+                                    console.log(`Added warrer role to ${interaction.member.user.username}`);
+                                })
+                                .catch(() => {
+                                    sendMessage(interaction.guild, interaction.channel.id, `Failed to add warrer role to ${interaction.member.user.username}`);
+                                });
+                        }
+
                         const tankButton = new ButtonBuilder()
                             .setCustomId('tank')
                             .setStyle(ButtonStyle.Secondary)
@@ -221,15 +233,15 @@ module.exports = {
 
                     const memberRoles = interaction.member.roles.cache;
 
-                    const warRole = interaction.guild.roles.cache.get(config['warRole']);
+                    const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
 
-                    if (!memberRoles.has(warRole.id)) {
-                        await interaction.member.roles.add(warRole)
+                    if (!memberRoles.has(warrerRole.id)) {
+                        await interaction.member.roles.add(warrerRole)
                             .then(() => {
                                 console.log(`Added war role to ${interaction.member.user.username}`);
                             })
                             .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add war role to ${interaction.member.user.username}`);
+                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add warrer role to ${interaction.member.user.username}`);
                             });
                     }
 
@@ -266,15 +278,15 @@ module.exports = {
 
                     const memberRoles = interaction.member.roles.cache;
 
-                    const warRole = interaction.guild.roles.cache.get(config['warRole']);
+                    const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
 
-                    if (!memberRoles.has(warRole.id)) {
-                        await interaction.member.roles.add(warRole)
+                    if (!memberRoles.has(warrerRole.id)) {
+                        await interaction.member.roles.add(warrerRole)
                             .then(() => {
                                 console.log(`Added war role to ${interaction.member.user.username}`);
                             })
                             .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add war role to ${interaction.member.user.username}`);
+                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add warrer role to ${interaction.member.user.username}`);
                             });
                     }
 
@@ -311,15 +323,15 @@ module.exports = {
 
                     const memberRoles = interaction.member.roles.cache;
 
-                    const warRole = interaction.guild.roles.cache.get(config['warRole']);
+                    const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
 
-                    if (!memberRoles.has(warRole.id)) {
-                        await interaction.member.roles.add(warRole)
+                    if (!memberRoles.has(warrerRole.id)) {
+                        await interaction.member.roles.add(warrerRole)
                             .then(() => {
                                 console.log(`Added war role to ${interaction.member.user.username}`);
                             })
                             .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add war role to ${interaction.member.user.username}`);
+                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add warrer role to ${interaction.member.user.username}`);
                             });
                     }
 
@@ -356,15 +368,15 @@ module.exports = {
 
                     const memberRoles = interaction.member.roles.cache;
 
-                    const warRole = interaction.guild.roles.cache.get(config['warRole']);
+                    const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
 
-                    if (!memberRoles.has(warRole.id)) {
-                        await interaction.member.roles.add(warRole)
+                    if (!memberRoles.has(warrerRole.id)) {
+                        await interaction.member.roles.add(warrerRole)
                             .then(() => {
                                 console.log(`Added war role to ${interaction.member.user.username}`);
                             })
                             .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add war role to ${interaction.member.user.username}`);
+                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add warrer role to ${interaction.member.user.username}`);
                             });
                     }
 
@@ -401,18 +413,6 @@ module.exports = {
 
                     const memberRoles = interaction.member.roles.cache;
 
-                    const warRole = interaction.guild.roles.cache.get(config['warRole']);
-
-                    if (!memberRoles.has(warRole.id)) {
-                        await interaction.member.roles.add(warRole)
-                            .then(() => {
-                                console.log(`Added war role to ${interaction.member.user.username}`);
-                            })
-                            .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add war role to ${interaction.member.user.username}`);
-                            });
-                    }
-
                     let replyMessage;
 
                     if (memberRoles.has(ecoRole.id)) {
@@ -444,6 +444,17 @@ module.exports = {
                 } else if (interaction.customId === 'warping') {
                     const memberRoles = await interaction.member.roles.cache;
                     const warRole = interaction.guild.roles.cache.get(config['warRole']);
+                    const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
+
+                    if (!memberRoles.has(warrerRole.id)) {
+                        await interaction.member.roles.add(warrerRole)
+                            .then(() => {
+                                console.log(`Added war role to ${interaction.member.user.username}`);
+                            })
+                            .catch(() => {
+                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add warrer role to ${interaction.member.user.username}`);
+                            });
+                    }
 
                     if (!memberRoles.has(warRole.id)) {
                         await interaction.member.roles.add(warRole)
@@ -475,16 +486,17 @@ module.exports = {
                 } else if (interaction.customId === 'removewar') {
                     const memberRoles = await interaction.member.roles.cache;
 
-                    const warRole = interaction.guild.roles.cache.get(config['warRole']);
+                    const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
 
-                    if (memberRoles.has(warRole.id)) {
+                    if (memberRoles.has(warrerRole.id)) {
+                        const warRole = interaction.guild.roles.cache.get(config['warRole']);
                         const tankRole = interaction.guild.roles.cache.get(config['tankRole']);
                         const healerRole = interaction.guild.roles.cache.get(config['healerRole']);
                         const damageRole = interaction.guild.roles.cache.get(config['damageRole']);
                         const soloRole = interaction.guild.roles.cache.get(config['soloRole']);
                         const ecoRole = interaction.guild.roles.cache.get(config['ecoRole']);
 
-                        const warRoles = [warRole, tankRole, healerRole, damageRole, soloRole, ecoRole];
+                        const warRoles = [warRole, tankRole, healerRole, damageRole, soloRole, ecoRole, warrerRole];
 
                         for (const role of memberRoles.values()) {
                             if (warRoles.includes(role)) {
@@ -499,7 +511,12 @@ module.exports = {
                         }
 
                         await interaction.reply({
-                            content: `You no longer have the ${warRole} role and any war class roles.`,
+                            content: `You no longer have the ${warrerRole} role and any war class roles.`,
+                            ephemeral: true,
+                        });
+                    } else {
+                        await interaction.reply({
+                            content: 'You do not have any war roles',
                             ephemeral: true,
                         });
                     }

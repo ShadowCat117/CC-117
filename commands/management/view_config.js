@@ -516,6 +516,14 @@ module.exports = {
                 configContent += `Eco role: ${config.ecoRole}\n`;
             }
 
+            const warrerRole = interaction.guild.roles.cache.get(config.warrerRole);
+
+            if (ecoRole) {
+                configContent += `Warrer role: ${warrerRole}\n`;
+            } else {
+                configContent += `Warrer role: ${config.warrerRole}\n`;
+            }
+
             pages.push(configContent);
 
             configContent = '';

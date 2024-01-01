@@ -31,6 +31,9 @@ module.exports = {
                 }, {
                     name: 'Eco Role',
                     value: 'ecoRole',
+                }, {
+                    name: 'Warrer Role',
+                    value: 'warrerRole',
                 }))
         .addRoleOption((option) =>
             option.setName('role')
@@ -150,6 +153,16 @@ module.exports = {
                 }
 
                 break;
+            case 'warrerRole':
+                if (role == null) {
+                    await interaction.reply({
+                        content: 'Warrer Role requires a <role> input.',
+                        ephemeral: true,
+                    });
+                    return;
+                }
+
+                break;
             default:
                 await interaction.reply({
                     content: 'Invalid configuration option.',
@@ -191,6 +204,7 @@ module.exports = {
                 case 'damageRole':
                 case 'soloRole':
                 case 'ecoRole':
+                case 'warrerRole':
                     config[option] = role.id;
                     break;
             }
