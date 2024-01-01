@@ -87,7 +87,6 @@ module.exports = {
                     });
                 } else if (interaction.customId === 'war') {
                     const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
-                    const warRole = interaction.guild.roles.cache.get(config['warRole']);
                     const levelRequirement = config['warLevelRequirement'];
 
                     const memberRoles = await interaction.member.roles.cache;
@@ -166,16 +165,6 @@ module.exports = {
                     }
 
                     if (memberRoles.has(memberOfRole.id) && validLevel) {
-                        if (!memberRoles.has(warRole.id)) {
-                            await interaction.member.roles.add(warRole)
-                                .then(() => {
-                                    console.log(`Added war role to ${interaction.member.user.username}`);
-                                })
-                                .catch(() => {
-                                    sendMessage(interaction.guild, interaction.channel.id, `Failed to add war role to ${interaction.member.user.username}`);
-                                });
-                        }
-        
                         const tankButton = new ButtonBuilder()
                             .setCustomId('tank')
                             .setStyle(ButtonStyle.Secondary)
@@ -200,6 +189,11 @@ module.exports = {
                             .setCustomId('eco')
                             .setStyle(ButtonStyle.Success)
                             .setLabel('ECO');
+
+                        const warPingButton = new ButtonBuilder()
+                            .setCustomId('warping')
+                            .setStyle(ButtonStyle.Danger)
+                            .setLabel('WAR PING');
         
                         const removeButton = new ButtonBuilder()
                             .setCustomId('removewar')
@@ -207,7 +201,7 @@ module.exports = {
                             .setLabel('REMOVE');
         
                         const rolesRow = new ActionRowBuilder().addComponents(tankButton, healerButton, damageButton, soloButton, ecoButton);
-                        const removeRow = new ActionRowBuilder().addComponents(removeButton);
+                        const removeRow = new ActionRowBuilder().addComponents(warPingButton, removeButton);
         
                         const warMessage = config['warClassMessage'].replace(/\\n/g, '\n');
         
@@ -447,6 +441,37 @@ module.exports = {
                         content: replyMessage,
                         ephemeral: true,
                     });
+                } else if (interaction.customId === 'warping') {
+                    const memberRoles = await interaction.member.roles.cache;
+                    const warRole = interaction.guild.roles.cache.get(config['warRole']);
+
+                    if (!memberRoles.has(warRole.id)) {
+                        await interaction.member.roles.add(warRole)
+                            .then(() => {
+                                console.log(`Added war role to ${interaction.member.user.username}`);
+                            })
+                            .catch(() => {
+                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add war role to ${interaction.member.user.username}`);
+                            });
+
+                            await interaction.reply({
+                                content: `You now have the ${warRole} role.`,
+                                ephemeral: true,
+                            });
+                    } else {
+                        await interaction.member.roles.remove(warRole)
+                            .then(() => {
+                                console.log(`Removed war role from ${interaction.member.user.username}`);
+                            })
+                            .catch(() => {
+                                sendMessage(interaction.guild, interaction.channel.id, `Failed to remove war role from ${interaction.member.user.username}`);
+                            });
+
+                        await interaction.reply({
+                            content: `You no longer have the ${warRole} role.`,
+                            ephemeral: true,
+                        });
+                    }
                 } else if (interaction.customId === 'removewar') {
                     const memberRoles = await interaction.member.roles.cache;
 
