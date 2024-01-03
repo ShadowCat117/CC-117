@@ -1180,6 +1180,8 @@ module.exports = {
             }
 
             sendMessage(interaction.guild, config.logChannel, 'Bad interaction, <@237296939245240330> fix me :)');
+
+            console.error(err);
         }
     },
 };
