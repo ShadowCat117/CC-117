@@ -14,10 +14,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('verified')
         .setDescription('Check who in your server is verified.'),
-
+    ephemeral: false,
     async execute(interaction) {
-        await interaction.deferReply();
-
         const guildId = interaction.guild.id;
         const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
 

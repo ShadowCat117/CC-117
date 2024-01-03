@@ -46,6 +46,7 @@ module.exports = {
             option.setName('needed')
                 .setDescription('Is this requirement needed to achieve this promotion.'),
         ),
+    ephemeral: true,
     async execute(interaction) {
         try {
             let config = {};
@@ -83,13 +84,13 @@ module.exports = {
             }
 
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
-                await interaction.reply('You do not have the required permissions to run this command.');
+                await interaction.editReply('You do not have the required permissions to run this command.');
                 return;
             }
 
         } catch (error) {
             console.log(error);
-            await interaction.reply('Error changing config.');
+            await interaction.editReply('Error changing config.');
             return;
         }
 
@@ -101,13 +102,13 @@ module.exports = {
         switch (option) {
             case 'recruiterXPRequirement':
                 if (!requirementNum) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Recruiter XP Requirement requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
                 } else if (isNaN(requirementNum)) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Recruiter XP Requirement requires <value> to be a number input.',
                         ephemeral: true,
                     });
@@ -119,13 +120,13 @@ module.exports = {
                 break;
             case 'recruiterLevelRequirement':
                 if (!requirementNum) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Recruiter Level Requirement requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
                 } else if (isNaN(requirementNum)) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Recruiter Level Requirement requires <value> to be a number input.',
                         ephemeral: true,
                     });
@@ -137,13 +138,13 @@ module.exports = {
                 break;
             case 'recruiterContributorRequirement':
                 if (!requirementNum) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Recruiter Contributor Requirement requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
                 } else if (isNaN(requirementNum)) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Recruiter Contributor Requirement requires <value> to be a number input.',
                         ephemeral: true,
                     });
@@ -155,13 +156,13 @@ module.exports = {
                 break;
             case 'recruiterOptionalTimeRequirement':
                 if (!requirementNum) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Recruiter Optional Time Requirement requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
                 } else if (isNaN(requirementNum)) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Recruiter Optional Time Requirement requires <value> to be a number input.',
                         ephemeral: true,
                     });
@@ -173,13 +174,13 @@ module.exports = {
                 break;
             case 'recruiterWarsRequirement':
                 if (!requirementNum) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Recruiter Wars Requirement requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
                 } else if (isNaN(requirementNum)) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Recruiter Wars Requirement requires <value> to be a number input.',
                         ephemeral: true,
                     });
@@ -191,7 +192,7 @@ module.exports = {
                 break;
             case 'recruiterWarBuildRequirement':
                 if (!requirementNeeded) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Recruiter War Build Requirement requires a <value> input.',
                         ephemeral: true,
                     });
@@ -201,13 +202,13 @@ module.exports = {
                 break;
             case 'recruiterWeeklyPlaytimeRequirement':
                 if (!requirementNum) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Recruiter Weekly Playtime Requirement requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
                 } else if (isNaN(requirementNum)) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Recruiter Weekly Playtime Requirement requires <value> to be a number input.',
                         ephemeral: true,
                     });
@@ -219,7 +220,7 @@ module.exports = {
                 break;
             case 'recruiterEcoRequirement':
                 if (!requirementNeeded) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Recruiter Eco Requirement requires a <value> input.',
                         ephemeral: true,
                     });
@@ -228,7 +229,7 @@ module.exports = {
 
                 break;
             default:
-                await interaction.reply({
+                await interaction.editReply({
                     content: 'Invalid configuration option.',
                     ephemeral: true,
                 });
@@ -264,19 +265,19 @@ module.exports = {
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
             if (number) {
-                await interaction.reply({
+                await interaction.editReply({
                     content: `Configuration option \`${option}\` updated successfully to ${number}.`,
                     ephemeral: true,
                 });
             } else {
-                await interaction.reply({
+                await interaction.editReply({
                     content: `Configuration option \`${option}\` updated successfully to ${requirementNeeded}.`,
                     ephemeral: true,
                 });
             }
         } catch (error) {
             console.log(`Error updating configuration option: ${error}`);
-            await interaction.reply({
+            await interaction.editReply({
                 content: 'An error occurred while updating the configuration option.',
                 ephemeral: true,
             });

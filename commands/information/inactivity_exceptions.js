@@ -9,12 +9,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('inactivityexceptions')
         .setDescription('Check who in your guild has custom inactivity thresholds.'),
-
+    ephemeral: true,
     async execute(interaction) {
-        await interaction.deferReply({
-            ephemeral: true,
-        });
-
         const guildId = interaction.guild.id;
         const directoryPath = path.join(__dirname, '..', '..', 'configs');
         const filePath = path.join(directoryPath, `${guildId}.json`);

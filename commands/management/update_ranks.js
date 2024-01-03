@@ -10,9 +10,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('updateranks')
         .setDescription('Updates the rank of every member of the server.'),
+    ephemeral: false,
     async execute(interaction) {
-        await interaction.deferReply();
-
         const guildId = interaction.guild.id;
         const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
 

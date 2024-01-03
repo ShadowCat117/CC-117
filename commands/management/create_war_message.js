@@ -15,6 +15,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('createwarmessage')
         .setDescription('Sends a war message with buttons to get war-related roles.'),
+    ephemeral: true,
     async execute(interaction) {
         const guildId = interaction.guild.id;
         const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
@@ -52,28 +53,28 @@ module.exports = {
             }
 
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
-                await interaction.reply('You do not have the required permissions to run this command.');
+                await interaction.editReply('You do not have the required permissions to run this command.');
                 return;
             }
 
             const message = config['warMessage'];
 
             if (!message) {
-                await interaction.reply({
+                await interaction.editReply({
                     content: 'You have not set a war message with /config_values warMessage.',
                     ephemeral: true,
                 });
 
                 return;
             } else if (!config['warClassMessage']) {
-                await interaction.reply({
+                await interaction.editReply({
                     content: 'You have not set a war class message with /config_values warClassMessage.',
                     ephemeral: true,
                 });
 
                 return;
             } else if (!config['warLevelRequirement']) {
-                await interaction.reply({
+                await interaction.editReply({
                     content: 'You have not set a war level requirement with /config_values warLevelRequirement.',
                     ephemeral: true,
                 });
@@ -83,7 +84,7 @@ module.exports = {
 
             for (const warRole of warRoles) {
                 if (!config[`${warRole}Role`]) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: `You have not set a role for ${warRole}.`,
                         ephemeral: true,
                     });
@@ -105,13 +106,13 @@ module.exports = {
                 components: [row],
             });
 
-            await interaction.reply({
+            await interaction.editReply({
                 content: 'Created war message',
                 ephemeral: true,
             });
         } catch (error) {
             console.log(error);
-            await interaction.reply({
+            await interaction.editReply({
                 content: 'Error creating war message.',
                 ephemeral: true,
             });

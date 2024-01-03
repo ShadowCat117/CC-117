@@ -14,10 +14,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('checkfordemotions')
         .setDescription('Check your guild members to see who should be a lower rank.'),
-
+    ephemeral: false,
     async execute(interaction) {
-        await interaction.deferReply();
-
         const guildId = interaction.guild.id;
         const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
 

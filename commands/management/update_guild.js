@@ -15,11 +15,8 @@ module.exports = {
             option.setName('guild_name')
                 .setDescription('The name of the guild you want to be updated.')
                 .setRequired(true)),
+    ephemeral: true,
     async execute(interaction) {
-        await interaction.deferReply({
-            ephemeral: true,
-        });
-
         const response = await updateGuild(interaction);
 
         if (response.componentIds.length > 0) {

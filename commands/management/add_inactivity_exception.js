@@ -18,11 +18,8 @@ module.exports = {
         .addIntegerOption((option) =>
         option.setName('inactivity_threshold')
             .setDescription('What should their custom inactivity threshold be?')),
+    ephemeral: true,
     async execute(interaction) {
-        await interaction.deferReply({
-            ephemeral: true,
-        });
-
         const guildId = interaction.guild.id;
         const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
 

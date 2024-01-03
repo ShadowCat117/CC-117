@@ -18,11 +18,8 @@ module.exports = {
         .addIntegerOption((option) =>
         option.setName('exemption_period')
             .setDescription('How long should they be exempt from demotion?')),
+    ephemeral: true,
     async execute(interaction) {
-        await interaction.deferReply({
-            ephemeral: true,
-        });
-
         const guildId = interaction.guild.id;
         const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
 

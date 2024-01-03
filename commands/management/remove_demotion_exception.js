@@ -13,11 +13,8 @@ module.exports = {
             option.setName('username')
                 .setDescription('The name of the player you want to be exemept from demotion checks.')
                 .setRequired(true)),
+    ephemeral: true,
     async execute(interaction) {
-        await interaction.deferReply({
-            ephemeral: true,
-        });
-
         const guildId = interaction.guild.id;
         const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
 

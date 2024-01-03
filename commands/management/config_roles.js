@@ -81,6 +81,7 @@ module.exports = {
             option.setName('role')
                 .setDescription('The role value to set for the configuration option'),
         ),
+    ephemeral: true,
     async execute(interaction) {
         try {
             let config = {};
@@ -118,7 +119,7 @@ module.exports = {
             }
 
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
-                await interaction.reply({
+                await interaction.editReply({
                     content: 'You do not have the required permissions to run this command.',
                     ephemeral: true,
                 });
@@ -127,7 +128,7 @@ module.exports = {
 
         } catch (error) {
             console.log(error);
-            await interaction.reply('Error changing config.');
+            await interaction.editReply('Error changing config.');
             return;
         }
 
@@ -137,13 +138,13 @@ module.exports = {
         switch (option) {
             case 'adminRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Admin Role requires a <role> input.',
                         ephemeral: true,
                     });
                     return;
                 } else if (interaction.member.id !== interaction.member.guild.ownerId && interaction.member.roles.highest.comparePositionTo(role) < 0) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'You don\'t have permission to change the Admin Role to that role.',
                         ephemeral: true,
                     });
@@ -153,7 +154,7 @@ module.exports = {
                 break;
             case 'ownerRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Owner Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -163,7 +164,7 @@ module.exports = {
                 break;
             case 'chiefRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Chief Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -173,7 +174,7 @@ module.exports = {
                 break;
             case 'strategistRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Strategist Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -183,7 +184,7 @@ module.exports = {
                 break;
             case 'captainRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Captain Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -193,7 +194,7 @@ module.exports = {
                 break;
             case 'recruiterRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Recruiter Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -203,7 +204,7 @@ module.exports = {
                 break;
             case 'recruitRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Recruit Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -213,7 +214,7 @@ module.exports = {
                 break;
             case 'allyOwnerRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Ally Owner Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -223,7 +224,7 @@ module.exports = {
                 break;
             case 'allyRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Ally Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -233,7 +234,7 @@ module.exports = {
                 break;
             case 'championRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Champion Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -243,7 +244,7 @@ module.exports = {
                 break;
             case 'heroRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Hero Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -253,7 +254,7 @@ module.exports = {
                 break;
             case 'vipPlusRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'VIP+ Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -263,7 +264,7 @@ module.exports = {
                 break;
             case 'vipRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'VIP Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -273,7 +274,7 @@ module.exports = {
                 break;
             case 'vetRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Veteran Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -283,7 +284,7 @@ module.exports = {
                 break;
             case 'verifiedRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Verified Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -293,7 +294,7 @@ module.exports = {
                 break;
             case 'unverifiedRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Unverified Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -303,7 +304,7 @@ module.exports = {
                 break;
             case 'memberOfRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Member of Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -313,7 +314,7 @@ module.exports = {
                 break;
             case 'administratorRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Administrator Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -323,7 +324,7 @@ module.exports = {
                 break;
             case 'moderatorRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Moderator Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -333,7 +334,7 @@ module.exports = {
                 break;
             case 'contentTeamRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Content Team Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -343,7 +344,7 @@ module.exports = {
                 break;
             case 'giveawayRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Giveaway Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -352,7 +353,7 @@ module.exports = {
 
                 break;
             default:
-                await interaction.reply({
+                await interaction.editReply({
                     content: 'Invalid configuration option.',
                     ephemeral: true,
                 });
@@ -413,13 +414,13 @@ module.exports = {
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
-            await interaction.reply({
+            await interaction.editReply({
                 content: message,
                 ephemeral: true,
             });
         } catch (error) {
             console.log(`Error updating configuration option: ${error}`);
-            await interaction.reply({
+            await interaction.editReply({
                 content: 'An error occurred while updating the configuration option.',
                 ephemeral: true,
             });

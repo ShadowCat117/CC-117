@@ -7,11 +7,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('unverify')
         .setDescription('Removes all roles associated with your verified username.'),
+    ephemeral: true,
     async execute(interaction) {
-        await interaction.deferReply({
-            ephemeral: true,
-        });
-
         const response = await applyRoles(interaction.guild, null, interaction.member);
 
         if (response >= 0) {

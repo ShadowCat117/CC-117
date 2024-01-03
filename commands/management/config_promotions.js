@@ -87,6 +87,7 @@ module.exports = {
             option.setName('requirement_number')
                 .setDescription('How much of the promotion requirement you need to achieve this promotion.'),
         ),
+    ephemeral: true,
     async execute(interaction) {
         try {
             let config = {};
@@ -124,13 +125,13 @@ module.exports = {
             }
 
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
-                await interaction.reply('You do not have the required permissions to run this command.');
+                await interaction.editReply('You do not have the required permissions to run this command.');
                 return;
             }
 
         } catch (error) {
             console.log(error);
-            await interaction.reply('Error changing config.');
+            await interaction.editReply('Error changing config.');
             return;
         }
 
@@ -142,14 +143,14 @@ module.exports = {
         switch (option) {
             case 'chiefPromotionRequirement':
                 if (requirementStr == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Chief Promotion Requirement requires a <value> input.',
                         ephemeral: true,
                     });
 
                     return;
                 } else if (!containsPromotionValue(requirementStr)) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Chief Promotion Requirement requires the <value> input to be one of the presented options.',
                         ephemeral: true,
                     });
@@ -160,7 +161,7 @@ module.exports = {
                 break;
             case 'chiefTimeRequirement':
                 if (!requirementNum) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Chief Time Requirement requires a <value> input.',
                         ephemeral: true,
                     });
@@ -172,7 +173,7 @@ module.exports = {
                 break;
             case 'chiefRequirementsCount':
                 if (!requirementNum) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Chief Requirements Count requires a <value> input.',
                         ephemeral: true,
                     });
@@ -184,14 +185,14 @@ module.exports = {
                 break;
             case 'strategistPromotionRequirement':
                 if (requirementStr == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Strategist Promotion Requirement requires a <value> input.',
                         ephemeral: true,
                     });
 
                     return;
                 } else if (!containsPromotionValue(requirementStr)) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Strategist Promotion Requirement requires the <value> input to be one of the presented options.',
                         ephemeral: true,
                     });
@@ -202,7 +203,7 @@ module.exports = {
                 break;
             case 'strategistTimeRequirement':
                 if (!requirementNum) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Strategist Time Requirement requires a <value> input.',
                         ephemeral: true,
                     });
@@ -214,7 +215,7 @@ module.exports = {
                 break;
             case 'strategistRequirementsCount':
                 if (!requirementNum) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Strategist Requirements Count requires a <value> input.',
                         ephemeral: true,
                     });
@@ -226,14 +227,14 @@ module.exports = {
                 break;
             case 'captainPromotionRequirement':
                 if (requirementStr == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Captain Promotion Requirement requires a <value> input.',
                         ephemeral: true,
                     });
 
                     return;
                 } else if (!containsPromotionValue(requirementStr)) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Captain Promotion Requirement requires the <value> input to be one of the presented options.',
                         ephemeral: true,
                     });
@@ -244,7 +245,7 @@ module.exports = {
                 break;
             case 'captainTimeRequirement':
                 if (!requirementNum) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Captain Time Requirement requires a <value> input.',
                         ephemeral: true,
                     });
@@ -256,7 +257,7 @@ module.exports = {
                 break;
             case 'captainRequirementsCount':
                 if (!requirementNum) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Captain Requirements Count requires a <value> input.',
                         ephemeral: true,
                     });
@@ -268,14 +269,14 @@ module.exports = {
                 break;
             case 'recruiterPromotionRequirement':
                 if (requirementStr == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Recruiter Promotion Requirement requires a <value> input.',
                         ephemeral: true,
                     });
 
                     return;
                 } else if (!containsPromotionValue(requirementStr)) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Recruiter Promotion Requirement requires the <value> input to be one of the presented options.',
                         ephemeral: true,
                     });
@@ -286,7 +287,7 @@ module.exports = {
                 break;
             case 'recruiterTimeRequirement':
                 if (!requirementNum) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Recruiter Time Requirement requires a <value> input.',
                         ephemeral: true,
                     });
@@ -298,7 +299,7 @@ module.exports = {
                 break;
             case 'recruiterRequirementsCount':
                 if (!requirementNum) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Recruiter Requirements Count requires a <value> input.',
                         ephemeral: true,
                     });
@@ -309,7 +310,7 @@ module.exports = {
 
                 break;
             default:
-                await interaction.reply({
+                await interaction.editReply({
                     content: 'Invalid configuration option.',
                     ephemeral: true,
                 });
@@ -344,7 +345,7 @@ module.exports = {
                 case 'recruiterPromotionRequirement':
                     if (requirementStr === 'NONE') {
                         if (config[option].includes('NONE')) {
-                            await interaction.reply({
+                            await interaction.editReply({
                                 content: `Configuration option \`${option}\` is already NONE.`,
                                 ephemeral: true,
                             });
@@ -355,7 +356,7 @@ module.exports = {
                         }
                     } else {
                         if (config[option].includes(requirementStr)) {
-                            await interaction.reply({
+                            await interaction.editReply({
                                 content: `Configuration option \`${option}\` already includes ${requirementStr}.`,
                                 ephemeral: true,
                             });
@@ -374,25 +375,25 @@ module.exports = {
 
             if (requirementStr) {
                 if (requirementStr === 'NONE') {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: `Configuration option \`${option}\` updated successfully to NONE.`,
                         ephemeral: true,
                     });
                 } else {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: `Configuration option \`${option}\` updated successfully to include ${requirementStr}.`,
                         ephemeral: true,
                     });
                 }
             } else {
-                await interaction.reply({
+                await interaction.editReply({
                     content: `Configuration option \`${option}\` updated successfully to ${number}.`,
                     ephemeral: true,
                 });
             }
         } catch (error) {
             console.log(`Error updating configuration option: ${error}`);
-            await interaction.reply({
+            await interaction.editReply({
                 content: 'An error occurred while updating the configuration option.',
                 ephemeral: true,
             });

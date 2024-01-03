@@ -48,6 +48,7 @@ module.exports = {
             option.setName('value')
                 .setDescription('The value to set for the configuration option'),
         ),
+    ephemeral: true,
     async execute(interaction) {
         try {
             let config = {};
@@ -85,13 +86,13 @@ module.exports = {
             }
 
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
-                await interaction.reply('You do not have the required permissions to run this command.');
+                await interaction.editReply('You do not have the required permissions to run this command.');
                 return;
             }
 
         } catch (error) {
             console.log(error);
-            await interaction.reply('Error changing config.');
+            await interaction.editReply('Error changing config.');
             return;
         }
 
@@ -102,13 +103,13 @@ module.exports = {
         switch (option) {
             case 'levelRoleOneLevel':
                 if (!valueStr) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Level One Level requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Level One Level requires <value> to be a number input.',
                         ephemeral: true,
                     });
@@ -120,13 +121,13 @@ module.exports = {
                 break;
             case 'levelRoleTwoLevel':
                 if (!valueStr) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Level Two Level requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Level Two Level requires <value> to be a number input.',
                         ephemeral: true,
                     });
@@ -138,13 +139,13 @@ module.exports = {
                 break;
             case 'levelRoleThreeLevel':
                 if (!valueStr) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Level Three Level requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Level Three Level requires <value> to be a number input.',
                         ephemeral: true,
                     });
@@ -156,13 +157,13 @@ module.exports = {
                 break;
             case 'levelRoleFourLevel':
                 if (!valueStr) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Level Four Level requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Level Four Level requires <value> to be a number input.',
                         ephemeral: true,
                     });
@@ -174,13 +175,13 @@ module.exports = {
                 break;
             case 'levelRoleFiveLevel':
                 if (!valueStr) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Level Five Level requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Level Five Level requires <value> to be a number input.',
                         ephemeral: true,
                     });
@@ -192,13 +193,13 @@ module.exports = {
                 break;
             case 'levelRoleSixLevel':
                 if (!valueStr) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Level Six Level requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Level Six Level requires <value> to be a number input.',
                         ephemeral: true,
                     });
@@ -210,13 +211,13 @@ module.exports = {
                 break;
             case 'levelRoleSevenLevel':
                 if (!valueStr) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Level Seven Level requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Level Seven Level requires <value> to be a number input.',
                         ephemeral: true,
                     });
@@ -228,13 +229,13 @@ module.exports = {
                 break;
             case 'levelRoleEightLevel':
                 if (!valueStr) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Level Eight Level requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Level Eight Level requires <value> to be a number input.',
                         ephemeral: true,
                     });
@@ -246,13 +247,13 @@ module.exports = {
                 break;
             case 'levelRoleNineLevel':
                 if (!valueStr) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Level Nine Level requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Level Nine Level requires <value> to be a number input.',
                         ephemeral: true,
                     });
@@ -264,13 +265,13 @@ module.exports = {
                 break;
             case 'levelRoleTenLevel':
                 if (!valueStr) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Level Ten Level requires a <value> input.',
                         ephemeral: true,
                     });
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Level Ten Level requires <value> to be a number input.',
                         ephemeral: true,
                     });
@@ -281,7 +282,7 @@ module.exports = {
 
                 break;
             default:
-                await interaction.reply({
+                await interaction.editReply({
                     content: 'Invalid configuration option.',
                     ephemeral: true,
                 });
@@ -316,19 +317,19 @@ module.exports = {
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
             if (valueStr) {
-                await interaction.reply({
+                await interaction.editReply({
                     content: `Configuration option \`${option}\` updated successfully to ${valueStr}.`,
                     ephemeral: true,
                 });
             } else {
-                await interaction.reply({
+                await interaction.editReply({
                     content: `Configuration option \`${option}\` updated successfully to ${number}.`,
                     ephemeral: true,
                 });
             }
         } catch (error) {
             console.log(`Error updating configuration option: ${error}`);
-            await interaction.reply({
+            await interaction.editReply({
                 content: 'An error occurred while updating the configuration option.',
                 ephemeral: true,
             });

@@ -39,9 +39,8 @@ module.exports = {
             option.setName('username')
                 .setDescription('The name of the player you want to check.')
                 .setRequired(true)),
+    ephemeral: false,
     async execute(interaction) {
-        await interaction.deferReply();
-
         const guildId = interaction.guild.id;
         const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
 

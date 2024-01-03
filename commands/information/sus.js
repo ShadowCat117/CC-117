@@ -22,9 +22,8 @@ module.exports = {
             option.setName('username')
                 .setDescription('The name of who you want to check the sus level of.')
                 .setRequired(true)),
+    ephemeral: false,
     async execute(interaction) {
-        await interaction.deferReply();
-
         const guildId = interaction.guild.id;
         const directoryPath = path.join(__dirname, '..', '..', 'configs');
         const filePath = path.join(directoryPath, `${guildId}.json`);

@@ -13,6 +13,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('creategiveawaymessage')
         .setDescription('Sends a giveaway message with a button to get the giveaways role.'),
+    ephemeral: true,
     async execute(interaction) {
         const guildId = interaction.guild.id;
         const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
@@ -50,14 +51,14 @@ module.exports = {
             }
 
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
-                await interaction.reply('You do not have the required permissions to run this command.');
+                await interaction.editReply('You do not have the required permissions to run this command.');
                 return;
             }
 
             const message = config['giveawayMessage'];
 
             if (!message) {
-                await interaction.reply({
+                await interaction.editReply({
                     content: 'You have not set a giveaway message with /config_values giveawayMessage.',
                     ephemeral: true,
                 });
@@ -66,7 +67,7 @@ module.exports = {
             }
 
             if (!config['giveawayRole']) {
-                await interaction.reply({
+                await interaction.editReply({
                     content: 'You have not set a giveaway role.',
                     ephemeral: true,
                 });
@@ -87,13 +88,13 @@ module.exports = {
                 components: [row],
             });
 
-            await interaction.reply({
+            await interaction.editReply({
                 content: 'Created giveaway message',
                 ephemeral: true,
             });
         } catch (error) {
             console.log(error);
-            await interaction.reply({
+            await interaction.editReply({
                 content: 'Error creating giveaway message.',
                 ephemeral: true,
             });

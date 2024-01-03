@@ -28,6 +28,7 @@ module.exports = {
             option.setName('channel')
                 .setDescription('The channel value to set for the configuration option'),
         ),
+    ephemeral: true,
     async execute(interaction) {
         try {
             let config = {};
@@ -65,13 +66,13 @@ module.exports = {
             }
 
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
-                await interaction.reply('You do not have the required permissions to run this command.');
+                await interaction.editReply('You do not have the required permissions to run this command.');
                 return;
             }
 
         } catch (error) {
             console.log(error);
-            await interaction.reply('Error changing config.');
+            await interaction.editReply('Error changing config.');
             return;
         }
 
@@ -81,7 +82,7 @@ module.exports = {
         switch (option) {
             case 'logChannel':
                 if (channel == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Log Channel requires a <channel> input.',
                         ephemeral: true,
                     });
@@ -91,20 +92,20 @@ module.exports = {
                 break;
             case 'joinLeaveChannel':
                 if (channel == null) {
-                    await interaction.reply('Join/Leave Channel requires a <channel> input.');
+                    await interaction.editReply('Join/Leave Channel requires a <channel> input.');
                     return;
                 }
 
                 break;
             case 'highRankChannel':
                 if (channel == null) {
-                    await interaction.reply('High Rank Channel requires a <channel> input.');
+                    await interaction.editReply('High Rank Channel requires a <channel> input.');
                     return;
                 }
 
                 break;
             default:
-                await interaction.reply({
+                await interaction.editReply({
                     content: 'Invalid configuration option.',
                     ephemeral: true,
                 });
@@ -134,19 +135,19 @@ module.exports = {
             const botPermissions = channel.permissionsFor(interaction.client.user);
 
             if (!botPermissions.has(PermissionsBitField.Flags.SendMessages) || !botPermissions.has(PermissionsBitField.Flags.ViewChannel)) {
-                await interaction.reply({
+                await interaction.editReply({
                     content: `Configuration option \`${option}\` updated successfully to ${channel}.\n\nI currently do not have permission to send messages to that channel so please allow me to. I need View Channel & Send Messages.`,
                     ephemeral: true,
                 });
             } else {
-                await interaction.reply({
+                await interaction.editReply({
                     content: `Configuration option \`${option}\` updated successfully to ${channel}.`,
                     ephemeral: true,
                 });
             }
         } catch (error) {
             console.log(`Error updating configuration option: ${error}`);
-            await interaction.reply({
+            await interaction.editReply({
                 content: 'An error occurred while updating the configuration option.',
                 ephemeral: true,
             });

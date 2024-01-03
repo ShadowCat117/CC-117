@@ -18,9 +18,8 @@ module.exports = {
             option.setName('guild_name')
                 .setDescription('The name of the guild you want to see the hourly activity for.')
                 .setRequired(true)),
+    ephemeral: false,
     async execute(interaction) {
-        await interaction.deferReply();
-
         let timezoneOffset = 0;
         const timezoneFile = 'timezones.json';
 

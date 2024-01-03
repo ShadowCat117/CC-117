@@ -15,9 +15,8 @@ module.exports = {
             option.setName('guild_name')
                 .setDescription('The name of the guild you want to see the active world for.')
                 .setRequired(true)),
+    ephemeral: false,
     async execute(interaction) {
-        await interaction.deferReply();
-
         const response = await worldActivity(interaction);
 
         if (response.componentIds.length > 0) {

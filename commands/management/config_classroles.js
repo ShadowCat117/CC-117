@@ -78,6 +78,7 @@ module.exports = {
             option.setName('role')
                 .setDescription('The role value to set for the configuration option'),
         ),
+    ephemeral: true,
     async execute(interaction) {
         try {
             let config = {};
@@ -115,7 +116,7 @@ module.exports = {
             }
 
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
-                await interaction.reply({
+                await interaction.editReply({
                     content: 'You do not have the required permissions to run this command.',
                     ephemeral: true,
                 });
@@ -124,7 +125,7 @@ module.exports = {
 
         } catch (error) {
             console.log(error);
-            await interaction.reply('Error changing config.');
+            await interaction.editReply('Error changing config.');
             return;
         }
 
@@ -134,7 +135,7 @@ module.exports = {
         switch (option) {
             case 'warriorRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Warrior Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -144,7 +145,7 @@ module.exports = {
                 break;
             case 'fallenRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Fallen Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -154,7 +155,7 @@ module.exports = {
                 break;
             case 'battleMonkRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Battle Monk Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -164,7 +165,7 @@ module.exports = {
                 break;
             case 'paladinRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Paladin Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -174,7 +175,7 @@ module.exports = {
                 break;
             case 'mageRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Mage Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -184,7 +185,7 @@ module.exports = {
                 break;
             case 'riftwalkerRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Riftwalker Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -194,7 +195,7 @@ module.exports = {
                 break;
             case 'lightBenderRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Light Bender Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -204,7 +205,7 @@ module.exports = {
                 break;
             case 'arcanistRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Arcanist Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -214,7 +215,7 @@ module.exports = {
                 break;
             case 'archerRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Archer Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -224,7 +225,7 @@ module.exports = {
                 break;
             case 'sharpshooterRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Sharpshooter Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -234,7 +235,7 @@ module.exports = {
                 break;
             case 'trapperRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Trapper Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -244,7 +245,7 @@ module.exports = {
                 break;
             case 'boltslingerRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Boltslinger Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -254,7 +255,7 @@ module.exports = {
                 break;
             case 'shamanRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Shaman Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -264,7 +265,7 @@ module.exports = {
                 break;
             case 'ritualistRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Ritualist Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -274,7 +275,7 @@ module.exports = {
                 break;
             case 'summonerRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Summoner Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -284,7 +285,7 @@ module.exports = {
                 break;
             case 'acolyteRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Acolyte Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -294,7 +295,7 @@ module.exports = {
                 break;
             case 'assassinRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Assassin Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -304,7 +305,7 @@ module.exports = {
                 break;
             case 'acrobatRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Acrobat Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -314,7 +315,7 @@ module.exports = {
                 break;
             case 'shadestepperRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Shadestepper Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -324,7 +325,7 @@ module.exports = {
                 break;
             case 'tricksterRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Trickster Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -333,7 +334,7 @@ module.exports = {
 
                 break;
             default:
-                await interaction.reply({
+                await interaction.editReply({
                     content: 'Invalid configuration option.',
                     ephemeral: true,
                 });
@@ -393,13 +394,13 @@ module.exports = {
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
-            await interaction.reply({
+            await interaction.editReply({
                 content: message,
                 ephemeral: true,
             });
         } catch (error) {
             console.log(`Error updating configuration option: ${error}`);
-            await interaction.reply({
+            await interaction.editReply({
                 content: 'An error occurred while updating the configuration option.',
                 ephemeral: true,
             });

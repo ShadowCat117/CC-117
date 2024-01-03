@@ -12,11 +12,8 @@ module.exports = {
             option.setName('player')
                 .setDescription('The name/UUID of the player you want to be updated. UUID is preferred.')
                 .setRequired(true)),
+    ephemeral: true,
     async execute(interaction) {
-        await interaction.deferReply({
-            ephemeral: true,
-        });
-
         const player = interaction.options.getString('player');
 
         const filePath = path.join(__dirname, '..', '..', 'updatePlayers.json');

@@ -217,13 +217,13 @@ module.exports = {
         
                         const warMessage = config['warClassMessage'].replace(/\\n/g, '\n');
         
-                        await interaction.reply({
+                        await interaction.editReply({
                             content: warMessage,
                             ephemeral: true,
                             components: [rolesRow, removeRow],
                         });
                     } else {
-                        await interaction.reply({
+                        await interaction.editReply({
                             content: `Sorry, you need to be a member of ${config['guildName']} to use this and be at least level ${levelRequirement}.`,
                             ephemeral: true,
                         });
@@ -269,7 +269,7 @@ module.exports = {
                         replyMessage = `You now have the ${tankRole} role`;
                     }
 
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: replyMessage,
                         ephemeral: true,
                     });
@@ -314,7 +314,7 @@ module.exports = {
                         replyMessage = `You now have the ${healerRole} role`;
                     }
 
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: replyMessage,
                         ephemeral: true,
                     });
@@ -359,7 +359,7 @@ module.exports = {
                         replyMessage = `You now have the ${damageRole} role`;
                     }
 
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: replyMessage,
                         ephemeral: true,
                     });
@@ -404,7 +404,7 @@ module.exports = {
                         replyMessage = `You now have the ${soloRole} role`;
                     }
 
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: replyMessage,
                         ephemeral: true,
                     });
@@ -437,7 +437,7 @@ module.exports = {
                         replyMessage = `You now have the ${ecoRole} role`;
                     }
 
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: replyMessage,
                         ephemeral: true,
                     });
@@ -465,7 +465,7 @@ module.exports = {
                                 sendMessage(interaction.guild, interaction.channel.id, `Failed to add war role to ${interaction.member.user.username}`);
                             });
 
-                            await interaction.reply({
+                            await interaction.editReply({
                                 content: `You now have the ${warRole} role.`,
                                 ephemeral: true,
                             });
@@ -478,7 +478,7 @@ module.exports = {
                                 sendMessage(interaction.guild, interaction.channel.id, `Failed to remove war role from ${interaction.member.user.username}`);
                             });
 
-                        await interaction.reply({
+                        await interaction.editReply({
                             content: `You no longer have the ${warRole} role.`,
                             ephemeral: true,
                         });
@@ -510,12 +510,12 @@ module.exports = {
                             }
                         }
 
-                        await interaction.reply({
+                        await interaction.editReply({
                             content: `You no longer have the ${warrerRole} role and any war class roles.`,
                             ephemeral: true,
                         });
                     } else {
-                        await interaction.reply({
+                        await interaction.editReply({
                             content: 'You do not have any war roles',
                             ephemeral: true,
                         });
@@ -540,7 +540,7 @@ module.exports = {
 
                     const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
 
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: archetypeMessage,
                         ephemeral: true,
                         components: [row],
@@ -565,7 +565,7 @@ module.exports = {
 
                     const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
 
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: archetypeMessage,
                         ephemeral: true,
                         components: [row],
@@ -590,7 +590,7 @@ module.exports = {
 
                     const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
 
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: archetypeMessage,
                         ephemeral: true,
                         components: [row],
@@ -615,7 +615,7 @@ module.exports = {
 
                     const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
 
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: archetypeMessage,
                         ephemeral: true,
                         components: [row],
@@ -640,7 +640,7 @@ module.exports = {
 
                     const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
 
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: archetypeMessage,
                         ephemeral: true,
                         components: [row],
@@ -706,7 +706,7 @@ module.exports = {
 
                     const replyMessage = `You now have the ${classRole} class role with archetype ${archetypeRole}!`;
 
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: replyMessage,
                         ephemeral: true,
                     });
@@ -741,12 +741,12 @@ module.exports = {
                             replyMessage = `You now have the ${giveawayRole} role`;
                         }
 
-                        await interaction.reply({
+                        await interaction.editReply({
                             content: replyMessage,
                             ephemeral: true,
                         });
                     } else {
-                        await interaction.reply({
+                        await interaction.editReply({
                             content: `Sorry, you need to be a member of ${config['guildName']} to use this.`,
                             ephemeral: true,
                         });

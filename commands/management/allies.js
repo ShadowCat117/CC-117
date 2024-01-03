@@ -14,11 +14,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('allies')
         .setDescription('View the guilds you have set as allies.'),
+    ephemeral: true,
     async execute(interaction) {
-        await interaction.deferReply({
-            ephemeral: true,
-        });
-
         const guildId = interaction.guild.id;
         const directoryPath = path.join(__dirname, '..', '..', 'configs');
         const filePath = path.join(directoryPath, `${guildId}.json`);

@@ -9,12 +9,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('demotionexceptions')
         .setDescription('Check who in your guild is exempt from demotion.'),
-
+    ephemeral: true,
     async execute(interaction) {
-        await interaction.deferReply({
-            ephemeral: true,
-        });
-
         const guildId = interaction.guild.id;
         const directoryPath = path.join(__dirname, '..', '..', 'configs');
         const filePath = path.join(directoryPath, `${guildId}.json`);

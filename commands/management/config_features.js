@@ -48,6 +48,7 @@ module.exports = {
             option.setName('enabled')
                 .setDescription('Enable or disable this feature.'),
         ),
+    ephemeral: true,
     async execute(interaction) {
         try {
             let config = {};
@@ -85,13 +86,13 @@ module.exports = {
             }
 
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
-                await interaction.reply('You do not have the required permissions to run this command.');
+                await interaction.editReply('You do not have the required permissions to run this command.');
                 return;
             }
 
         } catch (error) {
             console.log(error);
-            await interaction.reply('Error changing config.');
+            await interaction.editReply('Error changing config.');
             return;
         }
 
@@ -101,7 +102,7 @@ module.exports = {
         switch (option) {
             case 'updateRanks':
                 if (enabled == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Update Ranks requires an <enabled> input.',
                         ephemeral: true,
                     });
@@ -111,7 +112,7 @@ module.exports = {
                 break;
             case 'changeNicknames':
                 if (enabled == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Change Nicknames requires an <enabled> input.',
                         ephemeral: true,
                     });
@@ -121,7 +122,7 @@ module.exports = {
                 break;
             case 'checkDuplicateNicknames':
                 if (enabled == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Check Duplicate Nicknames requires an <enabled> input.',
                         ephemeral: true,
                     });
@@ -131,7 +132,7 @@ module.exports = {
                 break;
             case 'logMessages':
                 if (enabled == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Send Log Messages requires an <enabled> input.',
                         ephemeral: true,
                     });
@@ -141,7 +142,7 @@ module.exports = {
                 break;
             case 'sendJoinLeaveMessages':
                 if (enabled == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Send Join/Leave Messages requires an <enabled> input.',
                         ephemeral: true,
                     });
@@ -151,7 +152,7 @@ module.exports = {
                 break;
             case 'verifyMembers':
                 if (enabled == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Verified Roles requires an <enabled> input.',
                         ephemeral: true,
                     });
@@ -161,7 +162,7 @@ module.exports = {
                 break;
             case 'veteranRole':
                 if (enabled == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Veteran Role requires an <enabled> input.',
                         ephemeral: true,
                     });
@@ -171,7 +172,7 @@ module.exports = {
                 break;
             case 'memberOf':
                 if (enabled == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Member of Role requires an <enabled> input.',
                         ephemeral: true,
                     });
@@ -181,7 +182,7 @@ module.exports = {
                 break;
             case 'levelRoles':
                 if (enabled == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Level Roles requires an <enabled> input.',
                         ephemeral: true,
                     });
@@ -191,7 +192,7 @@ module.exports = {
                 break;
             case 'serverRankRoles':
                 if (enabled == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Add Server Rank Roles requires an <enabled> input.',
                         ephemeral: true,
                     });
@@ -200,7 +201,7 @@ module.exports = {
 
                 break;
             default:
-                await interaction.reply({
+                await interaction.editReply({
                     content: 'Invalid configuration option.',
                     ephemeral: true,
                 });
@@ -234,13 +235,13 @@ module.exports = {
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
-            await interaction.reply({
+            await interaction.editReply({
                 content: `Configuration option \`${option}\` updated successfully to ${enabled}.`,
                 ephemeral: true,
             });
         } catch (error) {
             console.log(`Error updating configuration option: ${error}`);
-            await interaction.reply({
+            await interaction.editReply({
                 content: 'An error occurred while updating the configuration option.',
                 ephemeral: true,
             });

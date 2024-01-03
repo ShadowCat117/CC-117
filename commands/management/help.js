@@ -68,6 +68,7 @@ module.exports = {
                     name: '/viewconfig',
                     value: 'viewConfig',
                 })),
+    ephemeral: true,
     async execute(interaction) {
         const option = interaction.options.getString('option');
 
@@ -136,7 +137,7 @@ module.exports = {
                 return;
         }
 
-        await interaction.reply({
+        await interaction.editReply({
             content: message,
             ephemeral: true,
         });

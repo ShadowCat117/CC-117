@@ -35,11 +35,8 @@ module.exports = {
             option.setName('username')
                 .setDescription('The name of the player you want to verify as.')
                 .setRequired(true)),
+    ephemeral: true,
     async execute(interaction) {
-        await interaction.deferReply({
-            ephemeral: true,
-        });
-
         const guildId = interaction.guild.id;
         const directoryPath = path.join(__dirname, '..', '..', 'configs');
         const filePath = path.join(directoryPath, `${guildId}.json`);

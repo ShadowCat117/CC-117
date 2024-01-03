@@ -15,10 +15,8 @@ module.exports = {
             option.setName('guild_name')
                 .setDescription('The name of the guild you want to see last logins for.')
                 .setRequired(true)),
-
+    ephemeral: false,
     async execute(interaction) {
-        await interaction.deferReply();
-
         const response = await lastLogins(interaction);
 
         if (response.componentIds.length > 0) {

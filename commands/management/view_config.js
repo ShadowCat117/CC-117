@@ -14,11 +14,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('viewconfig')
         .setDescription('View the config in a user friendly format.'),
+    ephemeral: true,
     async execute(interaction) {
-        await interaction.deferReply({
-            ephemeral: true,
-        });
-
         let configContent = `__${interaction.guild}'s Config__\n\n`;
         const pages = [];
 

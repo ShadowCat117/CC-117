@@ -18,11 +18,8 @@ module.exports = {
             option.setName('guild_name')
                 .setDescription('The name of the guild you want to represent.')
                 .setRequired(true)),
+    ephemeral: true,
     async execute(interaction) {
-        await interaction.deferReply({
-            ephemeral: true,
-        });
-
         const guildId = interaction.guild.id;
         const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
 

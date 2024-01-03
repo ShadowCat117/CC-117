@@ -15,6 +15,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('createclassmessage')
         .setDescription('Sends a class message with buttons to get class-related roles.'),
+    ephemeral: true,
     async execute(interaction) {
         const guildId = interaction.guild.id;
         const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
@@ -52,21 +53,21 @@ module.exports = {
             }
 
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
-                await interaction.reply('You do not have the required permissions to run this command.');
+                await interaction.editReply('You do not have the required permissions to run this command.');
                 return;
             }
 
             const message = config['classMessage'];
 
             if (!message) {
-                await interaction.reply({
+                await interaction.editReply({
                     content: 'You have not set a class message with /config_values classMessage.',
                     ephemeral: true,
                 });
 
                 return;
             } else if (!config['classArchetypeMessage']) {
-                await interaction.reply({
+                await interaction.editReply({
                     content: 'You have not set a class archetype message with /config_values classArchetypeMessage.',
                     ephemeral: true,
                 });
@@ -76,7 +77,7 @@ module.exports = {
 
             for (const classRole of classRoles) {
                 if (!config[`${classRole}Role`]) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: `You have not set a role for ${classRole}.`,
                         ephemeral: true,
                     });
@@ -119,19 +120,19 @@ module.exports = {
             });
 
             if (!classMessage) {
-                await interaction.reply({
+                await interaction.editReply({
                     content: 'Error creating class message.',
                     ephemeral: true,
                 });
             } else {
-                await interaction.reply({
+                await interaction.editReply({
                     content: 'Created class message',
                     ephemeral: true,
                 });
             }
         } catch (error) {
             console.log(error);
-            await interaction.reply({
+            await interaction.editReply({
                 content: 'Error creating class message.',
                 ephemeral: true,
             });

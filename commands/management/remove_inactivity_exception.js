@@ -13,11 +13,8 @@ module.exports = {
             option.setName('username')
                 .setDescription('The name of the player who\'s threshold you want to remove.')
                 .setRequired(true)),
+    ephemeral: true,
     async execute(interaction) {
-        await interaction.deferReply({
-            ephemeral: true,
-        });
-
         const guildId = interaction.guild.id;
         const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
 

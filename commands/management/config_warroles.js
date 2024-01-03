@@ -39,6 +39,7 @@ module.exports = {
             option.setName('role')
                 .setDescription('The role value to set for the configuration option'),
         ),
+    ephemeral: true,
     async execute(interaction) {
         try {
             let config = {};
@@ -76,7 +77,7 @@ module.exports = {
             }
 
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
-                await interaction.reply({
+                await interaction.editReply({
                     content: 'You do not have the required permissions to run this command.',
                     ephemeral: true,
                 });
@@ -85,7 +86,7 @@ module.exports = {
 
         } catch (error) {
             console.log(error);
-            await interaction.reply('Error changing config.');
+            await interaction.editReply('Error changing config.');
             return;
         }
 
@@ -95,7 +96,7 @@ module.exports = {
         switch (option) {
             case 'warRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'War Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -105,7 +106,7 @@ module.exports = {
                 break;
             case 'tankRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Tank Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -115,7 +116,7 @@ module.exports = {
                 break;
             case 'healerRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Healer Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -125,7 +126,7 @@ module.exports = {
                 break;
             case 'damageRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Damage Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -135,7 +136,7 @@ module.exports = {
                 break;
             case 'soloRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Solo Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -145,7 +146,7 @@ module.exports = {
                 break;
             case 'ecoRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Eco Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -155,7 +156,7 @@ module.exports = {
                 break;
             case 'warrerRole':
                 if (role == null) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: 'Warrer Role requires a <role> input.',
                         ephemeral: true,
                     });
@@ -164,7 +165,7 @@ module.exports = {
 
                 break;
             default:
-                await interaction.reply({
+                await interaction.editReply({
                     content: 'Invalid configuration option.',
                     ephemeral: true,
                 });
@@ -211,13 +212,13 @@ module.exports = {
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
-            await interaction.reply({
+            await interaction.editReply({
                 content: message,
                 ephemeral: true,
             });
         } catch (error) {
             console.log(`Error updating configuration option: ${error}`);
-            await interaction.reply({
+            await interaction.editReply({
                 content: 'An error occurred while updating the configuration option.',
                 ephemeral: true,
             });

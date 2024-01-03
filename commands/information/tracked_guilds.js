@@ -29,9 +29,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('trackedguilds')
         .setDescription('View the average number of online players for each tracked guild.'),
+    ephemeral: false,
     async execute(interaction) {
-        await interaction.deferReply();
-
         const guildId = interaction.guild.id;
         const directoryPath = path.join(__dirname, '..', '..', 'configs');
         const filePath = path.join(directoryPath, `${guildId}.json`);
