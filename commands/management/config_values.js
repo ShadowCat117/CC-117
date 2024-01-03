@@ -145,48 +145,30 @@ module.exports = {
         switch (option) {
             case 'joinMessage':
                 if (valueStr == null) {
-                    await interaction.editReply({
-                        content: 'Join Message requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Join Message requires a <value> input.');
                     return;
                 } else if (valueStr.length > 750) {
-                    await interaction.editReply({
-                        content: 'Join Message must be less than 750 characters.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Join Message must be less than 750 characters.');
                     return;
                 }
 
                 break;
             case 'leaveMessage':
                 if (valueStr == null) {
-                    await interaction.editReply({
-                        content: 'Leave Message requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Leave Message requires a <value> input.');
                     return;
                 } else if (valueStr.length > 750) {
-                    await interaction.editReply({
-                        content: 'Leave Message must be less than 750 characters.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Leave Message must be less than 750 characters.');
                     return;
                 }
 
                 break;
             case 'chiefUpperThreshold':
                 if (!valueStr) {
-                    await interaction.editReply({
-                        content: 'Chief Inactive Upper Threshold requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Chief Inactive Upper Threshold requires a <value> input.');
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.editReply({
-                        content: 'Chief Inactive Upper Threshold requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Chief Inactive Upper Threshold requires <value> to be a number input.');
                     return;
                 } else {
                     number = parseInt(valueStr);
@@ -195,16 +177,10 @@ module.exports = {
                 break;
             case 'chiefLowerThreshold':
                 if (!valueStr) {
-                    await interaction.editReply({
-                        content: 'Chief Inactive Lower Threshold requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Chief Inactive Lower Threshold requires a <value> input.');
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.editReply({
-                        content: 'Chief Inactive Lower Threshold requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Chief Inactive Lower Threshold requires <value> to be a number input.');
                     return;
                 } else {
                     number = parseInt(valueStr);
@@ -213,16 +189,10 @@ module.exports = {
                 break;
             case 'strategistUpperThreshold':
                 if (!valueStr) {
-                    await interaction.editReply({
-                        content: 'Strategist Inactive Upper Threshold requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Strategist Inactive Upper Threshold requires a <value> input.');
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.editReply({
-                        content: 'Strategist Inactive Upper Threshold requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Strategist Inactive Upper Threshold requires <value> to be a number input.');
                     return;
                 } else {
                     number = parseInt(valueStr);
@@ -231,16 +201,10 @@ module.exports = {
                 break;
             case 'strategistLowerThreshold':
                 if (!valueStr) {
-                    await interaction.editReply({
-                        content: 'Strategist Inactive Lower Threshold requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Strategist Inactive Lower Threshold requires a <value> input.');
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.editReply({
-                        content: 'Strategist Inactive Lower Threshold requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Strategist Inactive Lower Threshold requires <value> to be a number input.');
                     return;
                 } else {
                     number = parseInt(valueStr);
@@ -249,16 +213,10 @@ module.exports = {
                 break;
             case 'captainUpperThreshold':
                 if (!valueStr) {
-                    await interaction.editReply({
-                        content: 'Captain Inactive Upper Threshold requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Captain Inactive Upper Threshold requires a <value> input.');
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.editReply({
-                        content: 'Captain Inactive Upper Threshold requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Captain Inactive Upper Threshold requires <value> to be a number input.');
                     return;
                 } else {
                     number = parseInt(valueStr);
@@ -267,16 +225,10 @@ module.exports = {
                 break;
             case 'captainLowerThreshold':
                 if (!valueStr) {
-                    await interaction.editReply({
-                        content: 'Captain Inactive Lower Threshold requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Captain Inactive Lower Threshold requires a <value> input.');
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.editReply({
-                        content: 'Captain Inactive Lower Threshold requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Captain Inactive Lower Threshold requires <value> to be a number input.');
                     return;
                 } else {
                     number = parseInt(valueStr);
@@ -285,16 +237,10 @@ module.exports = {
                 break;
             case 'recruiterUpperThreshold':
                 if (!valueStr) {
-                    await interaction.editReply({
-                        content: 'Recruiter Inactive Upper Threshold requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Recruiter Inactive Upper Threshold requires a <value> input.');
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.editReply({
-                        content: 'Recruiter Inactive Upper Threshold requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Recruiter Inactive Upper Threshold requires <value> to be a number input.');
                     return;
                 } else {
                     number = parseInt(valueStr);
@@ -303,16 +249,10 @@ module.exports = {
                 break;
             case 'recruiterLowerThreshold':
                 if (!valueStr) {
-                    await interaction.editReply({
-                        content: 'Recruiter Inactive Lower Threshold requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Recruiter Inactive Lower Threshold requires a <value> input.');
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.editReply({
-                        content: 'Recruiter Inactive Lower Threshold requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Recruiter Inactive Lower Threshold requires <value> to be a number input.');
                     return;
                 } else {
                     number = parseInt(valueStr);
@@ -321,16 +261,10 @@ module.exports = {
                 break;
             case 'recruitUpperThreshold':
                 if (!valueStr) {
-                    await interaction.editReply({
-                        content: 'Recruit Inactive Upper Threshold requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Recruit Inactive Upper Threshold requires a <value> input.');
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.editReply({
-                        content: 'Recruit Inactive Upper Threshold requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Recruit Inactive Upper Threshold requires <value> to be a number input.');
                     return;
                 } else {
                     number = parseFloat(valueStr);
@@ -339,16 +273,10 @@ module.exports = {
                 break;
             case 'recruitLowerThreshold':
                 if (!valueStr) {
-                    await interaction.editReply({
-                        content: 'Recruit Inactive Lower Threshold requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Recruit Inactive Lower Threshold requires a <value> input.');
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.editReply({
-                        content: 'Recruit Inactive Lower Threshold requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Recruit Inactive Lower Threshold requires <value> to be a number input.');
                     return;
                 } else {
                     number = parseFloat(valueStr);
@@ -357,16 +285,10 @@ module.exports = {
                 break;
             case 'levelRequirement':
                 if (!valueStr) {
-                    await interaction.editReply({
-                        content: 'Inactivity Full Level Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Inactivity Full Level Requirement requires a <value> input.');
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.editReply({
-                        content: 'Inactivity Full Level Requirement requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Inactivity Full Level Requirement requires <value> to be a number input.');
                     return;
                 } else {
                     number = parseInt(valueStr);
@@ -375,16 +297,10 @@ module.exports = {
                 break;
             case 'extraTimeMultiplier':
                 if (!valueStr) {
-                    await interaction.editReply({
-                        content: 'Extra Time Multiplier requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Extra Time Multiplier requires a <value> input.');
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.editReply({
-                        content: 'Extra Time Multiplier requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Extra Time Multiplier requires <value> to be a number input.');
                     return;
                 } else {
                     number = parseFloat(valueStr);
@@ -393,16 +309,10 @@ module.exports = {
                 break;
             case 'averageRequirement':
                 if (!valueStr) {
-                    await interaction.editReply({
-                        content: 'Average Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Average Requirement requires a <value> input.');
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.editReply({
-                        content: 'Average Requirement requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Average Requirement requires <value> to be a number input.');
                     return;
                 } else {
                     number = parseFloat(valueStr);
@@ -411,16 +321,10 @@ module.exports = {
                 break;
             case 'newPlayerMinimumTime':
                 if (!valueStr) {
-                    await interaction.editReply({
-                        content: 'New Player Minimum Time requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('New Player Minimum Time requires a <value> input.');
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.editReply({
-                        content: 'New Player Minimum Time requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('New Player Minimum Time requires <value> to be a number input.');
                     return;
                 } else {
                     number = parseInt(valueStr);
@@ -429,16 +333,10 @@ module.exports = {
                 break;
             case 'newPlayerThreshold':
                 if (!valueStr) {
-                    await interaction.editReply({
-                        content: 'New Player Threshold requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('New Player Threshold requires a <value> input.');
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.editReply({
-                        content: 'New Player Threshold requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('New Player Threshold requires <value> to be a number input.');
                     return;
                 } else {
                     number = parseInt(valueStr);
@@ -447,16 +345,10 @@ module.exports = {
                 break;
             case 'memberThreshold':
                 if (!valueStr) {
-                    await interaction.editReply({
-                        content: 'Total Members Threshold requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Total Members Threshold requires a <value> input.');
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.editReply({
-                        content: 'Total Members Threshold requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Total Members Threshold requires <value> to be a number input.');
                     return;
                 } else {
                     number = parseFloat(valueStr);
@@ -465,80 +357,50 @@ module.exports = {
                 break;
             case 'warMessage':
                 if (valueStr == null) {
-                    await interaction.editReply({
-                        content: 'War Message requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('War Message requires a <value> input.');
                     return;
                 } else if (valueStr.length > 750) {
-                    await interaction.editReply({
-                        content: 'War Message must be less than 750 characters.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('War Message must be less than 750 characters.');
                     return;
                 }
 
                 break;
             case 'warClassMessage':
                 if (valueStr == null) {
-                    await interaction.editReply({
-                        content: 'War Class Message requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('War Class Message requires a <value> input.');
                     return;
                 } else if (valueStr.length > 750) {
-                    await interaction.editReply({
-                        content: 'War Class Message must be less than 750 characters.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('War Class Message must be less than 750 characters.');
                     return;
                 }
 
                 break;
             case 'classMessage':
                 if (valueStr == null) {
-                    await interaction.editReply({
-                        content: 'Class Message requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Class Message requires a <value> input.');
                     return;
                 } else if (valueStr.length > 750) {
-                    await interaction.editReply({
-                        content: 'Class Message must be less than 750 characters.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Class Message must be less than 750 characters.');
                     return;
                 }
 
                 break;
             case 'classArchetypeMessage':
                 if (valueStr == null) {
-                    await interaction.editReply({
-                        content: 'Class Archetype Message requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Class Archetype Message requires a <value> input.');
                     return;
                 } else if (valueStr.length > 750) {
-                    await interaction.editReply({
-                        content: 'Class Archetype Message must be less than 750 characters.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Class Archetype Message must be less than 750 characters.');
                     return;
                 }
 
                 break;
             case 'warLevelRequirement':
                 if (!valueStr) {
-                    await interaction.editReply({
-                        content: 'War Level Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('War Level Requirement requires a <value> input.');
                     return;
                 } else if (isNaN(valueStr)) {
-                    await interaction.editReply({
-                        content: 'War Level Requirement requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('War Level Requirement requires <value> to be a number input.');
                     return;
                 } else {
                     number = parseInt(valueStr);
@@ -547,25 +409,16 @@ module.exports = {
                 break;
             case 'giveawayMessage':
                 if (valueStr == null) {
-                    await interaction.editReply({
-                        content: 'Giveaway Message requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Giveaway Message requires a <value> input.');
                     return;
                 } else if (valueStr.length > 750) {
-                    await interaction.editReply({
-                        content: 'Giveaway Message must be less than 750 characters.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Giveaway Message must be less than 750 characters.');
                     return;
                 }
 
                 break;
             default:
-                await interaction.editReply({
-                    content: 'Invalid configuration option.',
-                    ephemeral: true,
-                });
+                await interaction.editReply('Invalid configuration option.');
                 return;
         }
 
@@ -613,22 +466,13 @@ module.exports = {
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
             if (valueStr) {
-                await interaction.editReply({
-                    content: `Configuration option \`${option}\` updated successfully to ${valueStr}.`,
-                    ephemeral: true,
-                });
+                await interaction.editReply(`Configuration option \`${option}\` updated successfully to ${valueStr}.`);
             } else {
-                await interaction.editReply({
-                    content: `Configuration option \`${option}\` updated successfully to ${number}.`,
-                    ephemeral: true,
-                });
+                await interaction.editReply(`Configuration option \`${option}\` updated successfully to ${number}.`);
             }
         } catch (error) {
             console.log(`Error updating configuration option: ${error}`);
-            await interaction.editReply({
-                content: 'An error occurred while updating the configuration option.',
-                ephemeral: true,
-            });
+            await interaction.editReply('An error occurred while updating the configuration option.');
         }
     },
 };

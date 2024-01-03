@@ -56,10 +56,7 @@ module.exports = {
             const guildName = config.guildName;
 
             if (!guildName) {
-                await interaction.editReply({
-                    content: 'The server you are in does not have a guild set.',
-                    ephemeral: true,
-                });
+                await interaction.editReply('The server you are in does not have a guild set.');
                 return;
             }
 
@@ -87,15 +84,9 @@ module.exports = {
 
                             if (config['inactivityExceptions'][username] === inactivityThreshold) {
                                 if (inactivityThreshold === -1) {
-                                    await interaction.editReply({
-                                        content: `${username} is already exempt from inactivity`,
-                                        ephemeral: true,
-                                    });
+                                    await interaction.editReply(`${username} is already exempt from inactivity`);
                                 } else {
-                                    await interaction.editReply({
-                                        content: `${username}'s inactivity threshold is already ${inactivityThreshold}`,
-                                        ephemeral: true,
-                                    });
+                                    await interaction.editReply(`${username}'s inactivity threshold is already ${inactivityThreshold}`);
                                 }
                                 
                                 return;
@@ -106,22 +97,13 @@ module.exports = {
                             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
                             if (inactivityThreshold === -1) {
-                                await interaction.editReply({
-                                    content: `${username} is now exempt from inactivity`,
-                                    ephemeral: true,
-                                });
+                                await interaction.editReply(`${username} is now exempt from inactivity`);
                             } else {
-                                await interaction.editReply({
-                                    content: `${username}'s inactivity threshold is now ${inactivityThreshold}`,
-                                    ephemeral: true,
-                                });
+                                await interaction.editReply(`${username}'s inactivity threshold is now ${inactivityThreshold}`);
                             }
                             return;
                         } else {
-                            await interaction.editReply({
-                                content: `${username} is not a member of ${guildName}`,
-                                ephemeral: true,
-                            });
+                            await interaction.editReply(`${username} is not a member of ${guildName}`);
                             return;
                         }
                     },

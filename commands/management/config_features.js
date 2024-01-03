@@ -102,109 +102,76 @@ module.exports = {
         switch (option) {
             case 'updateRanks':
                 if (enabled == null) {
-                    await interaction.editReply({
-                        content: 'Update Ranks requires an <enabled> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Update Ranks requires an <enabled> input.');
                     return;
                 }
 
                 break;
             case 'changeNicknames':
                 if (enabled == null) {
-                    await interaction.editReply({
-                        content: 'Change Nicknames requires an <enabled> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Change Nicknames requires an <enabled> input.');
                     return;
                 }
 
                 break;
             case 'checkDuplicateNicknames':
                 if (enabled == null) {
-                    await interaction.editReply({
-                        content: 'Check Duplicate Nicknames requires an <enabled> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Check Duplicate Nicknames requires an <enabled> input.');
                     return;
                 }
 
                 break;
             case 'logMessages':
                 if (enabled == null) {
-                    await interaction.editReply({
-                        content: 'Send Log Messages requires an <enabled> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Send Log Messages requires an <enabled> input.');
                     return;
                 }
 
                 break;
             case 'sendJoinLeaveMessages':
                 if (enabled == null) {
-                    await interaction.editReply({
-                        content: 'Send Join/Leave Messages requires an <enabled> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Send Join/Leave Messages requires an <enabled> input.');
                     return;
                 }
 
                 break;
             case 'verifyMembers':
                 if (enabled == null) {
-                    await interaction.editReply({
-                        content: 'Verified Roles requires an <enabled> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Verified Roles requires an <enabled> input.');
                     return;
                 }
 
                 break;
             case 'veteranRole':
                 if (enabled == null) {
-                    await interaction.editReply({
-                        content: 'Veteran Role requires an <enabled> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Veteran Role requires an <enabled> input.');
                     return;
                 }
 
                 break;
             case 'memberOf':
                 if (enabled == null) {
-                    await interaction.editReply({
-                        content: 'Member of Role requires an <enabled> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Member of Role requires an <enabled> input.');
                     return;
                 }
 
                 break;
             case 'levelRoles':
                 if (enabled == null) {
-                    await interaction.editReply({
-                        content: 'Level Roles requires an <enabled> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Level Roles requires an <enabled> input.');
                     return;
                 }
 
                 break;
             case 'serverRankRoles':
                 if (enabled == null) {
-                    await interaction.editReply({
-                        content: 'Add Server Rank Roles requires an <enabled> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Add Server Rank Roles requires an <enabled> input.');
                     return;
                 }
 
                 break;
             default:
-                await interaction.editReply({
-                    content: 'Invalid configuration option.',
-                    ephemeral: true,
-                });
+                await interaction.editReply('Invalid configuration option.');
                 return;
         }
 
@@ -235,16 +202,10 @@ module.exports = {
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
-            await interaction.editReply({
-                content: `Configuration option \`${option}\` updated successfully to ${enabled}.`,
-                ephemeral: true,
-            });
+            await interaction.editReply(`Configuration option \`${option}\` updated successfully to ${enabled}.`);
         } catch (error) {
             console.log(`Error updating configuration option: ${error}`);
-            await interaction.editReply({
-                content: 'An error occurred while updating the configuration option.',
-                ephemeral: true,
-            });
+            await interaction.editReply('An error occurred while updating the configuration option.');
         }
     },
 };

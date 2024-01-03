@@ -137,9 +137,6 @@ module.exports = {
                 return;
         }
 
-        await interaction.editReply({
-            content: message,
-            ephemeral: true,
-        });
+        await interaction.editReply(message);
     },
 };

@@ -56,10 +56,7 @@ module.exports = {
             const guildName = config.guildName;
 
             if (!guildName) {
-                await interaction.editReply({
-                    content: 'The server you are in does not have a guild set.',
-                    ephemeral: true,
-                });
+                await interaction.editReply('The server you are in does not have a guild set.');
                 return;
             }
 
@@ -87,15 +84,9 @@ module.exports = {
 
                             if (config['demotionExceptions'][username] === exemptionPeriod) {
                                 if (exemptionPeriod === -1) {
-                                    await interaction.editReply({
-                                        content: `${username} is already permanently exempt from demotions`,
-                                        ephemeral: true,
-                                    });
+                                    await interaction.editReply(`${username} is already permanently exempt from demotions`);
                                 } else {
-                                    await interaction.editReply({
-                                        content: `${username} is already exempt from demotions for ${exemptionPeriod} day(s)`,
-                                        ephemeral: true,
-                                    });
+                                    await interaction.editReply(`${username} is already exempt from demotions for ${exemptionPeriod} day(s)`);
                                 }
                                 
                                 return;
@@ -106,22 +97,13 @@ module.exports = {
                             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
                             if (exemptionPeriod === -1) {
-                                await interaction.editReply({
-                                    content: `${username} is now permanently exempt from demotions`,
-                                    ephemeral: true,
-                                });
+                                await interaction.editReply(`${username} is now permanently exempt from demotions`);
                             } else {
-                                await interaction.editReply({
-                                    content: `${username} is now exempt from demotions for ${exemptionPeriod} day(s)`,
-                                    ephemeral: true,
-                                });
+                                await interaction.editReply(`${username} is now exempt from demotions for ${exemptionPeriod} day(s)`);
                             }
                             return;
                         } else {
-                            await interaction.editReply({
-                                content: `${username} is not a member of ${guildName}`,
-                                ephemeral: true,
-                            });
+                            await interaction.editReply(`${username} is not a member of ${guildName}`);
                             return;
                         }
                     },
@@ -132,7 +114,5 @@ module.exports = {
             await interaction.editReply('Error adding demotion exception.');
             return;
         }
-
-        
     },
 };

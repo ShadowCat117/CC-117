@@ -86,10 +86,7 @@ module.exports = {
             }
 
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
-                await interaction.editReply({
-                    content: 'You do not have the required permissions to run this command.',
-                    ephemeral: true,
-                });
+                await interaction.editReply('You do not have the required permissions to run this command.');
                 return;
             }
 
@@ -105,109 +102,76 @@ module.exports = {
         switch (option) {
             case 'levelRoleOne':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Level Role One requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Level Role One requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'levelRoleTwo':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Level Role Two requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Level Role Two requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'levelRoleThree':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Level Role Three requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Level Role Three requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'levelRoleFour':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Level Role Four requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Level Role Four requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'levelRoleFive':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Level Role Five requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Level Role Five requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'levelRoleSix':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Level Role Six requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Level Role Six requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'levelRoleSeven':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Level Role Seven requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Level Role Seven requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'levelRoleEight':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Level Role Eight requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Level Role Eight requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'levelRoleNine':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Level Role Nine requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Level Role Nine requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'levelRoleTen':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Level Role Ten requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Level Role Ten requires a <role> input.');
                     return;
                 }
 
                 break;
             default:
-                await interaction.editReply({
-                    content: 'Invalid configuration option.',
-                    ephemeral: true,
-                });
+                await interaction.editReply('Invalid configuration option.');
                 return;
         }
 
@@ -254,16 +218,10 @@ module.exports = {
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
-            await interaction.editReply({
-                content: message,
-                ephemeral: true,
-            });
+            await interaction.editReply(message);
         } catch (error) {
             console.log(`Error updating configuration option: ${error}`);
-            await interaction.editReply({
-                content: 'An error occurred while updating the configuration option.',
-                ephemeral: true,
-            });
+            await interaction.editReply('An error occurred while updating the configuration option.');
         }
     },
 };

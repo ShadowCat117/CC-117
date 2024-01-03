@@ -82,10 +82,7 @@ module.exports = {
         switch (option) {
             case 'logChannel':
                 if (channel == null) {
-                    await interaction.editReply({
-                        content: 'Log Channel requires a <channel> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Log Channel requires a <channel> input.');
                     return;
                 }
 
@@ -105,10 +102,7 @@ module.exports = {
 
                 break;
             default:
-                await interaction.editReply({
-                    content: 'Invalid configuration option.',
-                    ephemeral: true,
-                });
+                await interaction.editReply('Invalid configuration option.');
                 return;
         }
 
@@ -135,22 +129,13 @@ module.exports = {
             const botPermissions = channel.permissionsFor(interaction.client.user);
 
             if (!botPermissions.has(PermissionsBitField.Flags.SendMessages) || !botPermissions.has(PermissionsBitField.Flags.ViewChannel)) {
-                await interaction.editReply({
-                    content: `Configuration option \`${option}\` updated successfully to ${channel}.\n\nI currently do not have permission to send messages to that channel so please allow me to. I need View Channel & Send Messages.`,
-                    ephemeral: true,
-                });
+                await interaction.editReply(`Configuration option \`${option}\` updated successfully to ${channel}.\n\nI currently do not have permission to send messages to that channel so please allow me to. I need View Channel & Send Messages.`);
             } else {
-                await interaction.editReply({
-                    content: `Configuration option \`${option}\` updated successfully to ${channel}.`,
-                    ephemeral: true,
-                });
+                await interaction.editReply(`Configuration option \`${option}\` updated successfully to ${channel}.`);
             }
         } catch (error) {
             console.log(`Error updating configuration option: ${error}`);
-            await interaction.editReply({
-                content: 'An error occurred while updating the configuration option.',
-                ephemeral: true,
-            });
+            await interaction.editReply('An error occurred while updating the configuration option.');
         }
     },
 };

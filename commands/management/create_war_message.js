@@ -60,34 +60,22 @@ module.exports = {
             const message = config['warMessage'];
 
             if (!message) {
-                await interaction.editReply({
-                    content: 'You have not set a war message with /config_values warMessage.',
-                    ephemeral: true,
-                });
+                await interaction.editReply('You have not set a war message with /config_values warMessage.');
 
                 return;
             } else if (!config['warClassMessage']) {
-                await interaction.editReply({
-                    content: 'You have not set a war class message with /config_values warClassMessage.',
-                    ephemeral: true,
-                });
+                await interaction.editReply('You have not set a war class message with /config_values warClassMessage.');
 
                 return;
             } else if (!config['warLevelRequirement']) {
-                await interaction.editReply({
-                    content: 'You have not set a war level requirement with /config_values warLevelRequirement.',
-                    ephemeral: true,
-                });
+                await interaction.editReply('You have not set a war level requirement with /config_values warLevelRequirement.');
 
                 return;
             }
 
             for (const warRole of warRoles) {
                 if (!config[`${warRole}Role`]) {
-                    await interaction.editReply({
-                        content: `You have not set a role for ${warRole}.`,
-                        ephemeral: true,
-                    });
+                    await interaction.editReply(`You have not set a role for ${warRole}.`);
     
                     return;
                 }
@@ -106,16 +94,10 @@ module.exports = {
                 components: [row],
             });
 
-            await interaction.editReply({
-                content: 'Created war message',
-                ephemeral: true,
-            });
+            await interaction.editReply('Created war message');
         } catch (error) {
             console.log(error);
-            await interaction.editReply({
-                content: 'Error creating war message.',
-                ephemeral: true,
-            });
+            await interaction.editReply('Error creating war message.');
         }
     },
 };

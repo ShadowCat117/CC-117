@@ -49,10 +49,7 @@ module.exports = {
                 return;
             }
         } catch (error) {
-            await interaction.editReply({
-                content: 'Unable to show sus value',
-                ephemeral: true,
-            });
+            await interaction.editReply('Unable to show sus value');
         }
 
         const username = interaction.options.getString('username');

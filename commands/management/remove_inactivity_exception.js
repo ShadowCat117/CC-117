@@ -51,20 +51,14 @@ module.exports = {
             const guildName = config.guildName;
 
             if (!guildName) {
-                await interaction.editReply({
-                    content: 'The server you are in does not have a guild set.',
-                    ephemeral: true,
-                });
+                await interaction.editReply('The server you are in does not have a guild set.');
                 return;
             }
 
             const username = interaction.options.getString('username');
 
             if (!config['inactivityExceptions'] || config['inactivityExceptions'][username] === undefined) {
-                await interaction.editReply({
-                    content: `${username} does not have a custom inactivity threshold.`,
-                    ephemeral: true,
-                });
+                await interaction.editReply(`${username} does not have a custom inactivity threshold.`);
                 return;
             }
             
@@ -72,10 +66,7 @@ module.exports = {
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
-            await interaction.editReply({
-                content: `${username} no longer has a custom inactivity threshold.`,
-                ephemeral: true,
-            });
+            await interaction.editReply(`${username} no longer has a custom inactivity threshold.`);
             return;
         } catch (error) {
             console.log(error);

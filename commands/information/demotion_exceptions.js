@@ -53,10 +53,7 @@ module.exports = {
             }
 
             if (!config['demotionExceptions'] || config['demotionExceptions'].length === 0) {
-                await interaction.editReply({
-                    content: 'No players are exempt from demotion',
-                    ephemeral: true,
-                });
+                await interaction.editReply('No players are exempt from demotion');
                 return;
             }
 
@@ -70,15 +67,9 @@ module.exports = {
             
             const exemptPlayers = exemptionList.join('\n');            
 
-            await interaction.editReply({
-                content: `Players who are exempt from demotion: \n${exemptPlayers}`,
-                ephemeral: true,
-            });
+            await interaction.editReply(`Players who are exempt from demotion: \n${exemptPlayers}`);
         } catch (error) {
-            await interaction.editReply({
-                content: 'Unable to show demotion exemptions',
-                ephemeral: true,
-            });
+            await interaction.editReply('Unable to show demotion exemptions');
         }
     },
 };

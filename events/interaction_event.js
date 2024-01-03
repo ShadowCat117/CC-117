@@ -219,14 +219,10 @@ module.exports = {
         
                         await interaction.editReply({
                             content: warMessage,
-                            ephemeral: true,
                             components: [rolesRow, removeRow],
                         });
                     } else {
-                        await interaction.editReply({
-                            content: `Sorry, you need to be a member of ${config['guildName']} to use this and be at least level ${levelRequirement}.`,
-                            ephemeral: true,
-                        });
+                        await interaction.editReply(`Sorry, you need to be a member of ${config['guildName']} to use this and be at least level ${levelRequirement}.`);
                     }
                 } else if (interaction.customId === 'tank') {
                     const tankRole = interaction.guild.roles.cache.get(config['tankRole']);
@@ -269,10 +265,7 @@ module.exports = {
                         replyMessage = `You now have the ${tankRole} role`;
                     }
 
-                    await interaction.editReply({
-                        content: replyMessage,
-                        ephemeral: true,
-                    });
+                    await interaction.editReply(replyMessage);
                 } else if (interaction.customId === 'healer') {
                     const healerRole = interaction.guild.roles.cache.get(config['healerRole']);
 
@@ -314,10 +307,7 @@ module.exports = {
                         replyMessage = `You now have the ${healerRole} role`;
                     }
 
-                    await interaction.editReply({
-                        content: replyMessage,
-                        ephemeral: true,
-                    });
+                    await interaction.editReply(replyMessage);
                 } else if (interaction.customId === 'damage') {
                     const damageRole = interaction.guild.roles.cache.get(config['damageRole']);
 
@@ -359,10 +349,7 @@ module.exports = {
                         replyMessage = `You now have the ${damageRole} role`;
                     }
 
-                    await interaction.editReply({
-                        content: replyMessage,
-                        ephemeral: true,
-                    });
+                    await interaction.editReply(replyMessage);
                 } else if (interaction.customId === 'solo') {
                     const soloRole = interaction.guild.roles.cache.get(config['soloRole']);
 
@@ -404,10 +391,7 @@ module.exports = {
                         replyMessage = `You now have the ${soloRole} role`;
                     }
 
-                    await interaction.editReply({
-                        content: replyMessage,
-                        ephemeral: true,
-                    });
+                    await interaction.editReply(replyMessage);
                 } else if (interaction.customId === 'eco') {
                     const ecoRole = interaction.guild.roles.cache.get(config['ecoRole']);
 
@@ -437,10 +421,7 @@ module.exports = {
                         replyMessage = `You now have the ${ecoRole} role`;
                     }
 
-                    await interaction.editReply({
-                        content: replyMessage,
-                        ephemeral: true,
-                    });
+                    await interaction.editReply(replyMessage);
                 } else if (interaction.customId === 'warping') {
                     const memberRoles = await interaction.member.roles.cache;
                     const warRole = interaction.guild.roles.cache.get(config['warRole']);
@@ -465,10 +446,7 @@ module.exports = {
                                 sendMessage(interaction.guild, interaction.channel.id, `Failed to add war role to ${interaction.member.user.username}`);
                             });
 
-                            await interaction.editReply({
-                                content: `You now have the ${warRole} role.`,
-                                ephemeral: true,
-                            });
+                            await interaction.editReply(`You now have the ${warRole} role.`);
                     } else {
                         await interaction.member.roles.remove(warRole)
                             .then(() => {
@@ -478,10 +456,7 @@ module.exports = {
                                 sendMessage(interaction.guild, interaction.channel.id, `Failed to remove war role from ${interaction.member.user.username}`);
                             });
 
-                        await interaction.editReply({
-                            content: `You no longer have the ${warRole} role.`,
-                            ephemeral: true,
-                        });
+                        await interaction.editReply(`You no longer have the ${warRole} role.`);
                     }
                 } else if (interaction.customId === 'removewar') {
                     const memberRoles = await interaction.member.roles.cache;
@@ -510,15 +485,9 @@ module.exports = {
                             }
                         }
 
-                        await interaction.editReply({
-                            content: `You no longer have the ${warrerRole} role and any war class roles.`,
-                            ephemeral: true,
-                        });
+                        await interaction.editReply(`You no longer have the ${warrerRole} role and any war class roles.`);
                     } else {
-                        await interaction.editReply({
-                            content: 'You do not have any war roles',
-                            ephemeral: true,
-                        });
+                        await interaction.editReply('You do not have any war roles');
                     }
                 } else if (interaction.customId === 'warrior') {
                     const fallenButton = new ButtonBuilder()
@@ -542,7 +511,6 @@ module.exports = {
 
                     await interaction.editReply({
                         content: archetypeMessage,
-                        ephemeral: true,
                         components: [row],
                     });
                 } else if (interaction.customId === 'mage') {
@@ -567,7 +535,6 @@ module.exports = {
 
                     await interaction.editReply({
                         content: archetypeMessage,
-                        ephemeral: true,
                         components: [row],
                     });
                 } else if (interaction.customId === 'archer') {
@@ -592,7 +559,6 @@ module.exports = {
 
                     await interaction.editReply({
                         content: archetypeMessage,
-                        ephemeral: true,
                         components: [row],
                     });
                 } else if (interaction.customId === 'shaman') {
@@ -617,7 +583,6 @@ module.exports = {
 
                     await interaction.editReply({
                         content: archetypeMessage,
-                        ephemeral: true,
                         components: [row],
                     });
                 } else if (interaction.customId === 'assassin') {
@@ -642,7 +607,6 @@ module.exports = {
 
                     await interaction.editReply({
                         content: archetypeMessage,
-                        ephemeral: true,
                         components: [row],
                     });
                 } else if (archetypes.includes(interaction.customId)) {
@@ -706,10 +670,7 @@ module.exports = {
 
                     const replyMessage = `You now have the ${classRole} class role with archetype ${archetypeRole}!`;
 
-                    await interaction.editReply({
-                        content: replyMessage,
-                        ephemeral: true,
-                    });
+                    await interaction.editReply(replyMessage);
                 } else if (interaction.customId === 'giveaway') {
                     const giveawayRole = interaction.guild.roles.cache.get(config['giveawayRole']);
                     const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
@@ -741,15 +702,9 @@ module.exports = {
                             replyMessage = `You now have the ${giveawayRole} role`;
                         }
 
-                        await interaction.editReply({
-                            content: replyMessage,
-                            ephemeral: true,
-                        });
+                        await interaction.editReply(replyMessage);
                     } else {
-                        await interaction.editReply({
-                            content: `Sorry, you need to be a member of ${config['guildName']} to use this.`,
-                            ephemeral: true,
-                        });
+                        await interaction.editReply(`Sorry, you need to be a member of ${config['guildName']} to use this.`);
                     }
                 } else {
                     if (!message) {

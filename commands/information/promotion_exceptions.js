@@ -53,10 +53,7 @@ module.exports = {
             }
 
             if (!config['promotionExceptions'] || config['promotionExceptions'].length === 0) {
-                await interaction.editReply({
-                    content: 'No players are exempt from promotion',
-                    ephemeral: true,
-                });
+                await interaction.editReply('No players are exempt from promotion');
                 return;
             }
 
@@ -71,15 +68,9 @@ module.exports = {
             const exemptPlayers = exemptionList.join('\n');
             
 
-            await interaction.editReply({
-                content: `Players who are exempt from promotion: \n${exemptPlayers}`,
-                ephemeral: true,
-            });
+            await interaction.editReply(`Players who are exempt from promotion: \n${exemptPlayers}`);
         } catch (error) {
-            await interaction.editReply({
-                content: 'Unable to show promotion exemptions',
-                ephemeral: true,
-            });
+            await interaction.editReply('Unable to show promotion exemptions');
         }
     },
 };

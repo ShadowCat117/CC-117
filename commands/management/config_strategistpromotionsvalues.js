@@ -102,16 +102,10 @@ module.exports = {
         switch (option) {
             case 'strategistXPRequirement':
                 if (!requirementNum) {
-                    await interaction.editReply({
-                        content: 'Strategist XP Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Strategist XP Requirement requires a <value> input.');
                     return;
                 } else if (isNaN(requirementNum)) {
-                    await interaction.editReply({
-                        content: 'Strategist XP Requirement requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Strategist XP Requirement requires <value> to be a number input.');
                     return;
                 } else {
                     number = parseInt(requirementNum);
@@ -120,16 +114,10 @@ module.exports = {
                 break;
             case 'strategistLevelRequirement':
                 if (!requirementNum) {
-                    await interaction.editReply({
-                        content: 'Strategist Level Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Strategist Level Requirement requires a <value> input.');
                     return;
                 } else if (isNaN(requirementNum)) {
-                    await interaction.editReply({
-                        content: 'Strategist Level Requirement requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Strategist Level Requirement requires <value> to be a number input.');
                     return;
                 } else {
                     number = parseInt(requirementNum);
@@ -138,16 +126,10 @@ module.exports = {
                 break;
             case 'strategistContributorRequirement':
                 if (!requirementNum) {
-                    await interaction.editReply({
-                        content: 'Strategist Contributor Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Strategist Contributor Requirement requires a <value> input.');
                     return;
                 } else if (isNaN(requirementNum)) {
-                    await interaction.editReply({
-                        content: 'Strategist Contributor Requirement requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Strategist Contributor Requirement requires <value> to be a number input.');
                     return;
                 } else {
                     number = parseInt(requirementNum);
@@ -156,16 +138,10 @@ module.exports = {
                 break;
             case 'strategistOptionalTimeRequirement':
                 if (!requirementNum) {
-                    await interaction.editReply({
-                        content: 'Strategist Optional Time Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Strategist Optional Time Requirement requires a <value> input.');
                     return;
                 } else if (isNaN(requirementNum)) {
-                    await interaction.editReply({
-                        content: 'Strategist Optional Time Requirement requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Strategist Optional Time Requirement requires <value> to be a number input.');
                     return;
                 } else {
                     number = parseInt(requirementNum);
@@ -174,16 +150,10 @@ module.exports = {
                 break;
             case 'strategistWarsRequirement':
                 if (!requirementNum) {
-                    await interaction.editReply({
-                        content: 'Strategist Wars Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Strategist Wars Requirement requires a <value> input.');
                     return;
                 } else if (isNaN(requirementNum)) {
-                    await interaction.editReply({
-                        content: 'Strategist Wars Requirement requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Strategist Wars Requirement requires <value> to be a number input.');
                     return;
                 } else {
                     number = parseInt(requirementNum);
@@ -192,26 +162,17 @@ module.exports = {
                 break;
             case 'strategistWarBuildRequirement':
                 if (!requirementNeeded) {
-                    await interaction.editReply({
-                        content: 'Strategist War Build Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Strategist War Build Requirement requires a <value> input.');
                     return;
                 }
 
                 break;
             case 'strategistWeeklyPlaytimeRequirement':
                 if (!requirementNum) {
-                    await interaction.editReply({
-                        content: 'Strategist Weekly Playtime Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Strategist Weekly Playtime Requirement requires a <value> input.');
                     return;
                 } else if (isNaN(requirementNum)) {
-                    await interaction.editReply({
-                        content: 'Strategist Weekly Playtime Requirement requires <value> to be a number input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Strategist Weekly Playtime Requirement requires <value> to be a number input.');
                     return;
                 } else {
                     number = parseInt(requirementNum);
@@ -220,19 +181,13 @@ module.exports = {
                 break;
             case 'strategistEcoRequirement':
                 if (!requirementNeeded) {
-                    await interaction.editReply({
-                        content: 'Strategist Eco Requirement requires a <value> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Strategist Eco Requirement requires a <value> input.');
                     return;
                 }
 
                 break;
             default:
-                await interaction.editReply({
-                    content: 'Invalid configuration option.',
-                    ephemeral: true,
-                });
+                await interaction.editReply('Invalid configuration option.');
                 return;
         }
 
@@ -265,22 +220,13 @@ module.exports = {
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
             if (number) {
-                await interaction.editReply({
-                    content: `Configuration option \`${option}\` updated successfully to ${number}.`,
-                    ephemeral: true,
-                });
+                await interaction.editReply(`Configuration option \`${option}\` updated successfully to ${number}.`);
             } else {
-                await interaction.editReply({
-                    content: `Configuration option \`${option}\` updated successfully to ${requirementNeeded}.`,
-                    ephemeral: true,
-                });
+                await interaction.editReply(`Configuration option \`${option}\` updated successfully to ${requirementNeeded}.`);
             }
         } catch (error) {
             console.log(`Error updating configuration option: ${error}`);
-            await interaction.editReply({
-                content: 'An error occurred while updating the configuration option.',
-                ephemeral: true,
-            });
+            await interaction.editReply('An error occurred while updating the configuration option.');
         }
     },
 };

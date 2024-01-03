@@ -60,27 +60,18 @@ module.exports = {
             const message = config['classMessage'];
 
             if (!message) {
-                await interaction.editReply({
-                    content: 'You have not set a class message with /config_values classMessage.',
-                    ephemeral: true,
-                });
+                await interaction.editReply('You have not set a class message with /config_values classMessage.');
 
                 return;
             } else if (!config['classArchetypeMessage']) {
-                await interaction.editReply({
-                    content: 'You have not set a class archetype message with /config_values classArchetypeMessage.',
-                    ephemeral: true,
-                });
+                await interaction.editReply('You have not set a class archetype message with /config_values classArchetypeMessage.');
 
                 return;
             }
 
             for (const classRole of classRoles) {
                 if (!config[`${classRole}Role`]) {
-                    await interaction.editReply({
-                        content: `You have not set a role for ${classRole}.`,
-                        ephemeral: true,
-                    });
+                    await interaction.editReply(`You have not set a role for ${classRole}.`);
     
                     return;
                 }
@@ -120,22 +111,13 @@ module.exports = {
             });
 
             if (!classMessage) {
-                await interaction.editReply({
-                    content: 'Error creating class message.',
-                    ephemeral: true,
-                });
+                await interaction.editReply('Error creating class message.');
             } else {
-                await interaction.editReply({
-                    content: 'Created class message',
-                    ephemeral: true,
-                });
+                await interaction.editReply('Created class message');
             }
         } catch (error) {
             console.log(error);
-            await interaction.editReply({
-                content: 'Error creating class message.',
-                ephemeral: true,
-            });
+            await interaction.editReply('Error creating class message.');
         }
     },
 };

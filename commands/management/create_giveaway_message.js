@@ -58,19 +58,13 @@ module.exports = {
             const message = config['giveawayMessage'];
 
             if (!message) {
-                await interaction.editReply({
-                    content: 'You have not set a giveaway message with /config_values giveawayMessage.',
-                    ephemeral: true,
-                });
+                await interaction.editReply('You have not set a giveaway message with /config_values giveawayMessage.');
 
                 return;
             }
 
             if (!config['giveawayRole']) {
-                await interaction.editReply({
-                    content: 'You have not set a giveaway role.',
-                    ephemeral: true,
-                });
+                await interaction.editReply('You have not set a giveaway role.');
 
                 return;
             }
@@ -88,16 +82,10 @@ module.exports = {
                 components: [row],
             });
 
-            await interaction.editReply({
-                content: 'Created giveaway message',
-                ephemeral: true,
-            });
+            await interaction.editReply('Created giveaway message');
         } catch (error) {
             console.log(error);
-            await interaction.editReply({
-                content: 'Error creating giveaway message.',
-                ephemeral: true,
-            });
+            await interaction.editReply('Error creating giveaway message.');
         }
     },
 };

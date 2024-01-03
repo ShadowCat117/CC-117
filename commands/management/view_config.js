@@ -704,7 +704,6 @@ module.exports = {
             const editedReply = await interaction.editReply({
                 content: viewConfigMessage.pages[0],
                 components: [row],
-                ephemeral: true,
             });
 
             viewConfigMessage.setMessage(editedReply);
@@ -712,10 +711,7 @@ module.exports = {
             MessageManager.addMessage(viewConfigMessage);
         } catch (error) {
             console.log(error);
-            await interaction.editReply({
-                content: 'Error viewing config.',
-                ephemeral: true,
-            });
+            await interaction.editReply('Error viewing config.');
         }
     },
 };

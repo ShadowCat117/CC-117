@@ -66,17 +66,13 @@ module.exports = {
             const editedReply = await interaction.editReply({
                 content: response.text,
                 components: [row],
-                ephemeral: true,
             });
 
             response.setMessage(editedReply);
 
             MessageManager.addMessage(response);
         } else {
-            await interaction.editReply({
-                content: response.pages[0],
-                ephemeral: true,
-            });
+            await interaction.editReply(response.pages[0]);
         }
     },
 };

@@ -53,10 +53,7 @@ module.exports = {
             }
 
             if (!config['inactivityExceptions'] || Object.keys(config['inactivityExceptions']).length === 0) {
-                await interaction.editReply({
-                    content: 'No players with custom inactivity thresholds',
-                    ephemeral: true,
-                });
+                await interaction.editReply('No players with custom inactivity thresholds');
                 return;
             }
 
@@ -70,15 +67,9 @@ module.exports = {
             
             const inactivityThresholds = exemptionList.join('\n');            
 
-            await interaction.editReply({
-                content: `Players with custom inactivity thresholds: \n${inactivityThresholds}`,
-                ephemeral: true,
-            });
+            await interaction.editReply(`Players with custom inactivity thresholds: \n${inactivityThresholds}`);
         } catch (error) {
-            await interaction.editReply({
-                content: 'Unable to show inactivity exceptions',
-                ephemeral: true,
-            });
+            await interaction.editReply('Unable to show inactivity exceptions');
         }
     },
 };

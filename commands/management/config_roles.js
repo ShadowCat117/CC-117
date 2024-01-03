@@ -119,10 +119,7 @@ module.exports = {
             }
 
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
-                await interaction.editReply({
-                    content: 'You do not have the required permissions to run this command.',
-                    ephemeral: true,
-                });
+                await interaction.editReply('You do not have the required permissions to run this command.');
                 return;
             }
 
@@ -138,225 +135,156 @@ module.exports = {
         switch (option) {
             case 'adminRole':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Admin Role requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Admin Role requires a <role> input.');
                     return;
                 } else if (interaction.member.id !== interaction.member.guild.ownerId && interaction.member.roles.highest.comparePositionTo(role) < 0) {
-                    await interaction.editReply({
-                        content: 'You don\'t have permission to change the Admin Role to that role.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('You don\'t have permission to change the Admin Role to that role.');
                     return;
                 }
 
                 break;
             case 'ownerRole':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Owner Role requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Owner Role requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'chiefRole':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Chief Role requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Chief Role requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'strategistRole':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Strategist Role requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Strategist Role requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'captainRole':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Captain Role requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Captain Role requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'recruiterRole':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Recruiter Role requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Recruiter Role requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'recruitRole':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Recruit Role requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Recruit Role requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'allyOwnerRole':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Ally Owner Role requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Ally Owner Role requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'allyRole':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Ally Role requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Ally Role requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'championRole':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Champion Role requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Champion Role requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'heroRole':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Hero Role requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Hero Role requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'vipPlusRole':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'VIP+ Role requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('VIP+ Role requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'vipRole':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'VIP Role requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('VIP Role requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'vetRole':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Veteran Role requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Veteran Role requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'verifiedRole':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Verified Role requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Verified Role requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'unverifiedRole':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Unverified Role requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Unverified Role requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'memberOfRole':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Member of Role requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Member of Role requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'administratorRole':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Administrator Role requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Administrator Role requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'moderatorRole':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Moderator Role requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Moderator Role requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'contentTeamRole':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Content Team Role requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Content Team Role requires a <role> input.');
                     return;
                 }
 
                 break;
             case 'giveawayRole':
                 if (role == null) {
-                    await interaction.editReply({
-                        content: 'Giveaway Role requires a <role> input.',
-                        ephemeral: true,
-                    });
+                    await interaction.editReply('Giveaway Role requires a <role> input.');
                     return;
                 }
 
                 break;
             default:
-                await interaction.editReply({
-                    content: 'Invalid configuration option.',
-                    ephemeral: true,
-                });
+                await interaction.editReply('Invalid configuration option.');
                 return;
         }
 
@@ -414,16 +342,10 @@ module.exports = {
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
-            await interaction.editReply({
-                content: message,
-                ephemeral: true,
-            });
+            await interaction.editReply(message);
         } catch (error) {
             console.log(`Error updating configuration option: ${error}`);
-            await interaction.editReply({
-                content: 'An error occurred while updating the configuration option.',
-                ephemeral: true,
-            });
+            await interaction.editReply('An error occurred while updating the configuration option.');
         }
     },
 };

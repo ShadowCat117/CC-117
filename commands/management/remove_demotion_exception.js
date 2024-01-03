@@ -51,20 +51,14 @@ module.exports = {
             const guildName = config.guildName;
 
             if (!guildName) {
-                await interaction.editReply({
-                    content: 'The server you are in does not have a guild set.',
-                    ephemeral: true,
-                });
+                await interaction.editReply('The server you are in does not have a guild set.');
                 return;
             }
 
             const username = interaction.options.getString('username');
 
             if (!config['demotionExceptions'] || !config['demotionExceptions'][username]) {
-                await interaction.editReply({
-                    content: `${username} is not exempt from demotions`,
-                    ephemeral: true,
-                });
+                await interaction.editReply(`${username} is not exempt from demotions`);
                 return;
             }
             
@@ -72,10 +66,7 @@ module.exports = {
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
-            await interaction.editReply({
-                content: `${username} is no longer exempt from demotions`,
-                ephemeral: true,
-            });
+            await interaction.editReply(`${username} is no longer exempt from demotions`);
             return;
         } catch (error) {
             console.log(error);
