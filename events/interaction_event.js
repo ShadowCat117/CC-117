@@ -219,6 +219,7 @@ module.exports = {
         
                         await interaction.reply({
                             content: warMessage,
+                            ephemeral: true,
                             components: [rolesRow, removeRow],
                         });
                     } else {
