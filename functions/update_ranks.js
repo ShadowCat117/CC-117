@@ -205,7 +205,13 @@ async function updateRanks(guild) {
         }
     } catch (err) {
         console.log(err);
-        return 'Problem updating ranks';
+        // return 'Problem updating ranks';
+        if (updatedMembers > 0) {
+            messageEnd += ')';
+            return (messageStart + messageEnd + ' (interrupted)');
+        } else {
+            return (messageStart + ' (interrupted)');
+        }
     }
 }
 
