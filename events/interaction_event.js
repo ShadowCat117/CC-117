@@ -41,6 +41,8 @@ module.exports = {
                 return;
             }
 
+            await interaction.deferUpdate();
+
             const guildId = interaction.guild.id;
             const directoryPath = path.join(__dirname, '..', 'configs');
             const filePath = path.join(directoryPath, `${guildId}.json`);
@@ -57,7 +59,7 @@ module.exports = {
 
                 if (interaction.customId === 'nextPage') {
                     if (!message) {
-                        interaction.update({
+                        interaction.editReply({
                             content: 'Data expired.',
                             components: [],
                         });
@@ -67,12 +69,12 @@ module.exports = {
 
                     const nextPage = message.getNextPage();
 
-                    interaction.update({
+                    interaction.editReply({
                         content: nextPage,
                     });
                 } else if (interaction.customId === 'previousPage') {
                     if (!message) {
-                        interaction.update({
+                        interaction.editReply({
                             content: 'Data expired.',
                             components: [],
                         });
@@ -82,7 +84,7 @@ module.exports = {
 
                     const previousPage = message.getPreviousPage();
 
-                    interaction.update({
+                    interaction.editReply({
                         content: previousPage,
                     });
                 } else if (interaction.customId === 'war') {
@@ -217,13 +219,13 @@ module.exports = {
         
                         const warMessage = config['warClassMessage'].replace(/\\n/g, '\n');
         
-                        await interaction.reply({
+                        await interaction.followUp({
                             content: warMessage,
                             ephemeral: true,
                             components: [rolesRow, removeRow],
                         });
                     } else {
-                        await interaction.reply({
+                        await interaction.followUp({
                             content: `Sorry, you need to be a member of ${config['guildName']} to use this and be at least level ${levelRequirement}.`,
                             ephemeral: true,
                         });
@@ -269,7 +271,7 @@ module.exports = {
                         replyMessage = `You now have the ${tankRole} role`;
                     }
 
-                    await interaction.reply({
+                    await interaction.followUp({
                         content: replyMessage,
                         ephemeral: true,
                     });
@@ -314,7 +316,7 @@ module.exports = {
                         replyMessage = `You now have the ${healerRole} role`;
                     }
 
-                    await interaction.reply({
+                    await interaction.followUp({
                         content: replyMessage,
                         ephemeral: true,
                     });
@@ -359,7 +361,7 @@ module.exports = {
                         replyMessage = `You now have the ${damageRole} role`;
                     }
 
-                    await interaction.reply({
+                    await interaction.followUp({
                         content: replyMessage,
                         ephemeral: true,
                     });
@@ -404,7 +406,7 @@ module.exports = {
                         replyMessage = `You now have the ${soloRole} role`;
                     }
 
-                    await interaction.reply({
+                    await interaction.followUp({
                         content: replyMessage,
                         ephemeral: true,
                     });
@@ -437,7 +439,7 @@ module.exports = {
                         replyMessage = `You now have the ${ecoRole} role`;
                     }
 
-                    await interaction.reply({
+                    await interaction.followUp({
                         content: replyMessage,
                         ephemeral: true,
                     });
@@ -449,7 +451,7 @@ module.exports = {
                     if (!memberRoles.has(warrerRole.id)) {
                         await interaction.member.roles.add(warrerRole)
                             .then(() => {
-                                console.log(`Added war role to ${interaction.member.user.username}`);
+                                console.log(`Added warrer role to ${interaction.member.user.username}`);
                             })
                             .catch(() => {
                                 sendMessage(interaction.guild, interaction.channel.id, `Failed to add warrer role to ${interaction.member.user.username}`);
@@ -465,7 +467,7 @@ module.exports = {
                                 sendMessage(interaction.guild, interaction.channel.id, `Failed to add war role to ${interaction.member.user.username}`);
                             });
 
-                            await interaction.reply({
+                            await interaction.followUp({
                                 content: `You now have the ${warRole} role.`,
                                 ephemeral: true,
                             });
@@ -478,7 +480,7 @@ module.exports = {
                                 sendMessage(interaction.guild, interaction.channel.id, `Failed to remove war role from ${interaction.member.user.username}`);
                             });
 
-                        await interaction.reply({
+                        await interaction.followUp({
                             content:`You no longer have the ${warRole} role.`,
                             ephemeral: true,
                         });
@@ -510,12 +512,12 @@ module.exports = {
                             }
                         }
 
-                        await interaction.reply({
+                        await interaction.followUp({
                             content: `You no longer have the ${warrerRole} role and any war class roles.`,
                             ephemeral: true,
                         });
                     } else {
-                        await interaction.reply({
+                        await interaction.followUp({
                             content: 'You do not have any war roles',
                             ephemeral: true,
                         });
@@ -540,7 +542,7 @@ module.exports = {
 
                     const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
 
-                    await interaction.reply({
+                    await interaction.followUp({
                         content: archetypeMessage,
                         ephemeral: true,
                         components: [row],
@@ -565,7 +567,7 @@ module.exports = {
 
                     const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
 
-                    await interaction.reply({
+                    await interaction.followUp({
                         content: archetypeMessage,
                         ephemeral: true,
                         components: [row],
@@ -590,7 +592,7 @@ module.exports = {
 
                     const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
 
-                    await interaction.reply({
+                    await interaction.followUp({
                         content: archetypeMessage,
                         ephemeral: true,
                         components: [row],
@@ -615,7 +617,7 @@ module.exports = {
 
                     const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
 
-                    await interaction.reply({
+                    await interaction.followUp({
                         content: archetypeMessage,
                         ephemeral: true,
                         components: [row],
@@ -640,7 +642,7 @@ module.exports = {
 
                     const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
 
-                    await interaction.reply({
+                    await interaction.followUp({
                         content: archetypeMessage,
                         ephemeral: true,
                         components: [row],
@@ -706,7 +708,7 @@ module.exports = {
 
                     const replyMessage = `You now have the ${classRole} class role with archetype ${archetypeRole}!`;
 
-                    await interaction.reply({
+                    await interaction.followUp({
                         content: replyMessage,
                         ephemeral: true,
                     });
@@ -741,19 +743,19 @@ module.exports = {
                             replyMessage = `You now have the ${giveawayRole} role`;
                         }
 
-                        await interaction.reply({
+                        await interaction.followUp({
                             content: replyMessage,
                             ephemeral: true,
                         });
                     } else {
-                        await interaction.reply({
+                        await interaction.followUp({
                             content: `Sorry, you need to be a member of ${config['guildName']} to use this.`,
                             ephemeral: true,
                         });
                     }
                 } else {
                     if (!message) {
-                        interaction.update({
+                        interaction.editReply({
                             content: 'Data expired.',
                             components: [],
                         });
@@ -768,7 +770,7 @@ module.exports = {
                             result = await activeHours(interaction, true);
 
                             if (result.pages[0] === 'No data') {
-                                interaction.update({
+                                interaction.editReply({
                                     content: `No activity data found for ${interaction.customId}`,
                                     components: [],
                                 });
@@ -846,7 +848,7 @@ module.exports = {
                                     );
 
                                 row.addComponents(timezoneSelection);
-                                await interaction.update({
+                                await interaction.editReply({
                                     content: result.pages[0],
                                     components: [row],
                                 });
@@ -856,7 +858,7 @@ module.exports = {
                         case MessageType.ADD_ALLY:
                             result = await addAlly(interaction, true);
 
-                            interaction.update({
+                            interaction.editReply({
                                 content: result.pages[0],
                                 components: [],
                             });
@@ -882,7 +884,7 @@ module.exports = {
 
                                 row.addComponents(previousPage, nextPage);
 
-                                interaction.update({
+                                interaction.editReply({
                                     content: result.pages[0],
                                     components: [row],
                                 });
@@ -890,12 +892,12 @@ module.exports = {
                                 MessageManager.setMessagePages(message, result.pages);
                             } else {
                                 if (result.pages[0] === '```\n```') {
-                                    interaction.update({
+                                    interaction.editReply({
                                         content: `No players found in the guild ${interaction.customId}`,
                                         components: [],
                                     });
                                 } else {
-                                    interaction.update({
+                                    interaction.editReply({
                                         content: result.pages[0],
                                         components: [],
                                     });
@@ -921,7 +923,7 @@ module.exports = {
 
                                 row.addComponents(previousPage, nextPage);
 
-                                interaction.update({
+                                interaction.editReply({
                                     content: result.pages[0],
                                     components: [row],
                                 });
@@ -929,12 +931,12 @@ module.exports = {
                                 MessageManager.setMessagePages(message, result.pages);
                             } else {
                                 if (result.pages[0] === '```\n```') {
-                                    interaction.update({
+                                    interaction.editReply({
                                         content: `No players found in the guild ${interaction.customId}`,
                                         components: [],
                                     });
                                 } else {
-                                    interaction.update({
+                                    interaction.editReply({
                                         content: result.pages[0],
                                         components: [],
                                     });
@@ -960,7 +962,7 @@ module.exports = {
 
                                 row.addComponents(previousPage, nextPage);
 
-                                interaction.update({
+                                interaction.editReply({
                                     content: result.pages[0],
                                     components: [row],
                                 });
@@ -968,12 +970,12 @@ module.exports = {
                                 MessageManager.setMessagePages(message, result.pages);
                             } else {
                                 if (result.pages[0] === '```\n```') {
-                                    interaction.update({
+                                    interaction.editReply({
                                         content: `No players online in the guild ${interaction.customId}`,
                                         components: [],
                                     });
                                 } else {
-                                    interaction.update({
+                                    interaction.editReply({
                                         content: result.pages[0],
                                         components: [],
                                     });
@@ -984,7 +986,7 @@ module.exports = {
                         case MessageType.REMOVE_ALLY:
                             result = await removeAlly(interaction, true);
 
-                            interaction.update({
+                            interaction.editReply({
                                 content: result.pages[0],
                                 components: [],
                             });
@@ -995,7 +997,7 @@ module.exports = {
                         case MessageType.SET_GUILD:
                             result = await setGuild(interaction, true);
 
-                            interaction.update({
+                            interaction.editReply({
                                 content: result.pages[0],
                                 components: [],
                             });
@@ -1006,7 +1008,7 @@ module.exports = {
                         case MessageType.SUS:
                             result = await sus(interaction.customId);
 
-                            interaction.update({
+                            interaction.editReply({
                                 content: result,
                                 components: [],
                             });
@@ -1017,7 +1019,7 @@ module.exports = {
                         case MessageType.TRACK_GUILD:
                             result = await trackGuild(interaction, true);
 
-                            interaction.update({
+                            interaction.editReply({
                                 content: result.pages[0],
                                 components: [],
                             });
@@ -1028,7 +1030,7 @@ module.exports = {
                         case MessageType.UNTRACK_GUILD:
                             result = await untrackGuild(interaction, true);
 
-                            interaction.update({
+                            interaction.editReply({
                                 content: result.pages[0],
                                 components: [],
                             });
@@ -1039,7 +1041,7 @@ module.exports = {
                         case MessageType.UPDATE_GUILD:
                             result = await updateGuild(interaction, true);
 
-                            interaction.update({
+                            interaction.editReply({
                                 content: result.pages[0],
                                 components: [],
                             });
@@ -1052,19 +1054,19 @@ module.exports = {
 
                             switch (result) {
                                 case 1:
-                                    interaction.update({
+                                    interaction.editReply({
                                         content: 'Successfully verified',
                                         components: [],
                                     });
                                     break;
                                 case 2:
-                                    interaction.update({
+                                    interaction.editReply({
                                         content: 'Successfully verified as ally',
                                         components: [],
                                     });
                                     break;
                                 default:
-                                    interaction.update({
+                                    interaction.editReply({
                                         content: 'Failed to verify',
                                         components: [],
                                     });
@@ -1077,7 +1079,7 @@ module.exports = {
                         case MessageType.WORLD_ACTIVITY:
                             result = await worldActivity(interaction, true);
 
-                            interaction.update({
+                            interaction.editReply({
                                 content: result.pages[0],
                                 components: [],
                             });
@@ -1091,7 +1093,7 @@ module.exports = {
                 const message = MessageManager.getMessage(interaction.message.id);
 
                 if (!message) {
-                    interaction.update({
+                    interaction.editReply({
                         content: 'Data expired.',
                         components: [],
                     });
@@ -1127,7 +1129,7 @@ module.exports = {
         
                 } catch (error) {
                     console.log(error);
-                    await interaction.update('Error changing timezone');
+                    await interaction.editReply('Error changing timezone');
                     return;
                 }
 
@@ -1207,7 +1209,7 @@ module.exports = {
 
                 row.addComponents(timezoneSelection);
 
-                interaction.update({
+                interaction.editReply({
                     content: result.pages[0],
                     components: [row],
                 });
