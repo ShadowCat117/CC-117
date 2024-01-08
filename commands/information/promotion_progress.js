@@ -279,7 +279,9 @@ module.exports = {
             }
 
             if (promotionRequirements.includes('PLAYTIME')) {
-                if (memberPlaytime.averagePlaytime >= weeklyPlaytimeRequirement) {
+                if (!memberPlaytime || memberPlaytime.averagePlaytime === -1) {
+                    reqsMessage += '🔴 Has not been in guild long enough for weekly playtime to be tracked';
+                } else if (memberPlaytime.averagePlaytime >= weeklyPlaytimeRequirement) {
                     reqsMessage += `🟢 Has enough weekly playtime (${parseFloat(memberPlaytime.averagePlaytime.toFixed(2))} hrs/${weeklyPlaytimeRequirement} hrs)\n`;
                     metRequirements++;
                 } else {
