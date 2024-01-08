@@ -73,7 +73,35 @@ async function updateRanks(guild) {
                     nickname = serverMember.nickname.split(' [')[0];
                 }
 
-                if (guildMember.username === nickname || guildMember.username === serverMember.user.globalName || guildMember.username === serverMember.user.username) {
+                // Check for valid nickname first as that is more likely to be correct
+                if (guildMember.username === nickname) {
+                    const updated = await applyRoles(guild, guildMember.UUID, serverMember);
+
+                    serverMembersToIgnore.push(serverMember.user.username);
+
+                    const formattedName = serverMember.user.username.replace(/_/g, '\\_');
+
+                    if (updated > 0) {
+                        if (updatedMembers > 0) {
+                            messageEnd += `, ${formattedName}`;
+
+                            updatedMembers++;
+                            messageStart = `Updated roles for ${updatedMembers} members.`;
+                        } else {
+                            messageEnd += `\n(${formattedName}`;
+
+                            updatedMembers++;
+                            messageStart = `Updated roles for ${updatedMembers} member.`;
+                        }
+                    }
+
+                    if (verifiedServerMembers.indexOf(serverMember.user.username) === -1) {
+                        verifiedServerMembers.push(serverMember.user.username);
+                    }
+
+                    rows.splice(i, 1);
+                    break;
+                } else if (guildMember.username === serverMember.user.globalName || guildMember.username === serverMember.user.username) {
                     const updated = await applyRoles(guild, guildMember.UUID, serverMember);
 
                     serverMembersToIgnore.push(serverMember.user.username);
@@ -121,7 +149,33 @@ async function updateRanks(guild) {
                         nickname = serverMember.nickname.split(' [')[0];
                     }
 
-                    if (guildMember.username === nickname || guildMember.username === serverMember.user.globalName || guildMember.username === serverMember.user.username) {
+                    // Check for valid nickname first as that is more likely to be correct
+                    if (guildMember.username === nickname) {
+                        const updated = await applyRoles(guild, guildMember.UUID, serverMember);
+
+                        const formattedName = serverMember.user.username.replace(/_/g, '\\_');
+
+                        if (updated > 0) {
+                            if (updatedMembers > 0) {
+                                messageEnd += `, ${formattedName}`;
+
+                                updatedMembers++;
+                                messageStart = `Updated roles for ${updatedMembers} members.`;
+                            } else {
+                                messageEnd += `\n(${formattedName}`;
+
+                                updatedMembers++;
+                                messageStart = `Updated roles for ${updatedMembers} member.`;
+                            }
+                        }
+
+                        if (verifiedServerMembers.indexOf(serverMember.user.username) === -1) {
+                            verifiedServerMembers.push(serverMember.user.username);
+                        }
+
+                        allyRows.splice(i, 1);
+                        break;
+                    } else if (guildMember.username === serverMember.user.globalName || guildMember.username === serverMember.user.username) {
                         const updated = await applyRoles(guild, guildMember.UUID, serverMember);
 
                         const formattedName = serverMember.user.username.replace(/_/g, '\\_');
@@ -156,20 +210,23 @@ async function updateRanks(guild) {
                 continue;
             }
 
-            let player = await getAsync('SELECT UUID FROM players WHERE username = ?', [serverMember.user.username]);
+            let player;
+
+            // Check for valid nickname first as that is more likely to be correct
+            if (serverMember.nickname) {
+                const nickname = serverMember.nickname.split(' [')[0];
+
+                if (minecraftNamePattern.test(nickname)) {
+                    player = await getAsync('SELECT UUID FROM players WHERE username = ?', [nickname]);
+                }
+            }
 
             if (!player && minecraftNamePattern.test(serverMember.user.globalName)) {
                 player = await getAsync('SELECT UUID FROM players WHERE username = ?', [serverMember.user.globalName]);
             }
 
             if (!player) {
-                if (serverMember.nickname) {
-                    const nickname = serverMember.nickname.split(' [')[0];
-
-                    if (minecraftNamePattern.test(nickname)) {
-                        player = await getAsync('SELECT UUID FROM players WHERE username = ?', [nickname]);
-                    }
-                }
+                player = await getAsync('SELECT UUID FROM players WHERE username = ?', [serverMember.user.username]);
             }
 
             let uuid = null;
