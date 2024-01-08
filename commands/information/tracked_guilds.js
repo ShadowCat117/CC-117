@@ -65,18 +65,35 @@ module.exports = {
 
                             for (let i = 0; i < 24; i++) {
                                 const currentHour = i.toString().padStart(2, '0');
-                                const averageKey = 'average' + currentHour;
-                                const captainsKey = 'captains' + currentHour;
 
-                                const query = 'SELECT ' + averageKey + ', ' + captainsKey + ' FROM guilds WHERE name = ?';
-                                const params = [tracked];
+                                for (let j = 0; j < 4; j++) {
+                                    let currentMinute;
 
-                                const result = await getAsync(query, params);
+                                    if (j === 0) {
+                                        currentMinute = '00';
+                                    } else if (j === 1) {
+                                        currentMinute = '15';
+                                    } else if (j === 2) {
+                                        currentMinute = '30';
+                                    } else if (j === 3) {
+                                        currentMinute = '45';
+                                    }
 
-                                if (result[averageKey] !== null && result[averageKey] !== -1) {
-                                    averageOnline += result[averageKey];
-                                    averageCaptains += result[captainsKey];
-                                    divideBy++;
+                                    const currentTime = `${currentHour}${currentMinute}`;
+
+                                    const averageKey = 'average' + currentTime;
+                                    const captainsKey = 'captains' + currentTime;
+
+                                    const query = 'SELECT ' + averageKey + ', ' + captainsKey + ' FROM guilds WHERE name = ?';
+                                    const params = [tracked];
+
+                                    const result = await getAsync(query, params);
+
+                                    if (result[averageKey] !== null && result[averageKey] !== -1) {
+                                        averageOnline += result[averageKey];
+                                        averageCaptains += result[captainsKey];
+                                        divideBy++;
+                                    }
                                 }
                             }
 

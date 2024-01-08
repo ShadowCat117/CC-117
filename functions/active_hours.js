@@ -56,16 +56,42 @@ async function activeHours(interaction, force = false, timezoneOffset = 0) {
 
                     for (let i = 0; i < 24; i++) {
                         const currentHour = i.toString().padStart(2, '0');
-                        const averageKey = 'average' + currentHour;
-                        const captainsKey = 'captains' + currentHour;
+                        let hourTotalOnline = 0;
+                        let hourTotalCaptains = 0;
+                        let availableAverages = 0;
 
-                        const query = 'SELECT ' + averageKey + ', ' + captainsKey + ' FROM guilds WHERE name = ?';
-                        const params = [guildName];
+                        for (let j = 0; j < 4; j++) {
+                            let currentMinute;
 
-                        const result = await getAsync(query, params);
+                            if (j === 0) {
+                                currentMinute = '00';
+                            } else if (j === 1) {
+                                currentMinute = '15';
+                            } else if (j === 2) {
+                                currentMinute = '30';
+                            } else if (j === 3) {
+                                currentMinute = '45';
+                            }
 
-                        if (result[averageKey] !== null && result[averageKey] !== -1) {
-                            guildActiveHours.push(new GuildActiveHours(currentHour, result[averageKey], result[captainsKey], timezoneOffset));
+                            const currentTime = `${currentHour}${currentMinute}`;
+
+                            const averageKey = 'average' + currentTime;
+                            const captainsKey = 'captains' + currentTime;
+
+                            const query = 'SELECT ' + averageKey + ', ' + captainsKey + ' FROM guilds WHERE name = ?';
+                            const params = [guildName];
+
+                            const result = await getAsync(query, params);
+
+                            if (result[averageKey] !== null && result[averageKey] !== -1) {
+                                hourTotalOnline += result[averageKey];
+                                hourTotalCaptains += result[captainsKey];
+                                availableAverages++;
+                            }
+                        }
+
+                        if (availableAverages > 0) {
+                            guildActiveHours.push(new GuildActiveHours(currentHour, hourTotalOnline / availableAverages, hourTotalCaptains / availableAverages, timezoneOffset));
                         }
                     }
 

@@ -451,18 +451,57 @@ async function updateGuild(guildName) {
 
         db.run(
             `INSERT OR IGNORE INTO guilds (name, prefix, level, xpPercent, wars, rating,
-            average00, captains00, average01, captains01, average02, captains02, 
-            average03, captains03, average04, captains04, average05, captains05, 
-            average06, captains06, average07, captains07, average08, captains08, 
-            average09, captains09, average10, captains10, average11, captains11, 
-            average12, captains12, average13, captains13, average14, captains14, 
-            average15, captains15, average16, captains16, average17, captains17, 
-            average18, captains18, average19, captains19, average20, captains20, 
-            average21, captains21, average22, captains22, average23, captains23,
+            average0000, captains0000, average0015, captains0015, average0030, captains0030, average0045, captains0045,
+            average0100, captains0100, average0115, captains0115, average0130, captains0130, average0145, captains0145,
+            average0200, captains0200, average0215, captains0215, average0230, captains0230, average0245, captains0245,
+            average0300, captains0300, average0315, captains0315, average0330, captains0330, average0345, captains0345,
+            average0400, captains0400, average0415, captains0415, average0430, captains0430, average0445, captains0445,
+            average0500, captains0500, average0515, captains0515, average0530, captains0530, average0545, captains0545,
+            average0600, captains0600, average0615, captains0615, average0630, captains0630, average0645, captains0645,
+            average0700, captains0700, average0715, captains0715, average0730, captains0730, average0745, captains0745,
+            average0800, captains0800, average0815, captains0815, average0830, captains0830, average0845, captains0845,
+            average0900, captains0900, average0915, captains0915, average0930, captains0930, average0945, captains0945,
+            average1000, captains1000, average1015, captains1015, average1030, captains1030, average1045, captains1045,
+            average1100, captains1100, average1115, captains1115, average1130, captains1130, average1145, captains1145,
+            average1200, captains1200, average1215, captains1215, average1230, captains1230, average1245, captains1245,
+            average1300, captains1300, average1315, captains1315, average1330, captains1330, average1345, captains1345,
+            average1400, captains1400, average1415, captains1415, average1430, captains1430, average1445, captains1445,
+            average1500, captains1500, average1515, captains1515, average1530, captains1530, average1545, captains1545,
+            average1600, captains1600, average1615, captains1615, average1630, captains1630, average1645, captains1645,
+            average1700, captains1700, average1715, captains1715, average1730, captains1730, average1745, captains1745,
+            average1800, captains1800, average1815, captains1815, average1830, captains1830, average1845, captains1845,
+            average1900, captains1900, average1915, captains1915, average1930, captains1930, average1945, captains1945,
+            average2000, captains2000, average2015, captains2015, average2030, captains2030, average2045, captains2045,
+            average2100, captains2100, average2115, captains2115, average2130, captains2130, average2145, captains2145,
+            average2200, captains2200, average2215, captains2215, average2230, captains2230, average2245, captains2245,
+            average2300, captains2300, average2315, captains2315, average2330, captains2330, average2345, captains2345,
             averageCount) 
-            VALUES (?, ?, ?, ?, ?, ?, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0)`, [guildJson.name, guildJson.prefix, guildJson.level,
+            VALUES (?, ?, ?, ?, ?, ?,
+            -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, 
+            -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, 
+            -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, 
+            -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, 
+            -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1,
+            0)`, [guildJson.name, guildJson.prefix, guildJson.level,
                 guildJson.xpPercent, rating],
             (err) => {
                 if (err) {
@@ -583,19 +622,21 @@ async function updateGuildMembers() {
     }
 }
 
-async function updateGuildActivity() {
+// This can almost certainly be done better, using the old system of just having one average for each hour and updating that
+// average every 10 mins but using the current minute (eg xx:10 or xx:20) and the averageCount to have a mini running average
+// for the hour. That would make it the most accurate but would either require another guild activity wipe or figuring out a
+// way to quickly merge all of the hours activity back into 1 column.
+async function updateGuildActivity(currentHour, currentMinute) {
     try {
-        const now = new Date();
-        const currentHour = now.getUTCHours().toString().padStart(2, '0');
-
-        const query = 'SELECT name, averageCount, average' + currentHour + ', captains' + currentHour + ' FROM guilds';
+        const currentTime = `${currentHour}${currentMinute}`;
+        const query = 'SELECT name, averageCount, average' + currentTime + ', captains' + currentTime + ' FROM guilds';
         const guilds = await allAsync(query, []);
 
         for (const guild of guilds) {
             const guildName = guild.name;
             let averageCount = guild.averageCount;
-            const currentAverage = guild['average' + currentHour];
-            const currentCaptains = guild['captains' + currentHour];
+            const currentAverage = guild['average' + currentTime];
+            const currentCaptains = guild['captains' + currentTime];
 
             const playerQuery = 'SELECT COUNT(*) as count FROM players WHERE guildName = ? AND isOnline = 1';
             const playerResult = await getAsync(playerQuery, [guildName]);
@@ -620,7 +661,7 @@ async function updateGuildActivity() {
                 newCaptains = captainsOnline;
             }
 
-            if (currentHour === '23') {
+            if (currentTime === '2345') {
                 if (averageCount >= 7) {
                     averageCount = 1;
                 } else {
@@ -628,7 +669,7 @@ async function updateGuildActivity() {
                 }
             }
 
-            const updateQuery = 'UPDATE guilds SET average' + currentHour + ' = ?, captains' + currentHour + ' = ?, averageCount = ? WHERE name = ?';
+            const updateQuery = 'UPDATE guilds SET average' + currentTime + ' = ?, captains' + currentTime + ' = ?, averageCount = ? WHERE name = ?';
 
             await runAsync(updateQuery, [newAverage, newCaptains, averageCount, guildName]);
         }
@@ -913,18 +954,21 @@ async function runFreeFunction() {
 async function runScheduledFunction() {
     let now = new Date();
 
-    // Update hourly
-    if (now.getUTCMinutes() == 0) {
+    // Update quarter hourly
+    if (now.getUTCMinutes() == 0 || now.getUTCMinutes() == 15 || now.getUTCMinutes() == 30 || now.getUTCMinutes() == 45) {
         // Updates the average online players & captain+'s for each guild.
-        console.log('Updating guild activity');
-        await updateGuildActivity();
+        console.log(`Updating guild activity at ${now.getUTCHours()}:${now.getUTCMinutes()}`);
+        await updateGuildActivity(now.getUTCHours().toString().padStart(2, '0'), now.getUTCMinutes().toString().padStart(2, '0'));
 
-        console.log('Completed hourly tasks');
+        console.log('Completed quarter hourly tasks');
     }
 
     // Update daily
-    // Happens at 30 to allow for updateranks to create its copy of the database
-    if (now.getUTCHours() == 23 && now.getUTCMinutes() == 30) {
+    if (now.getUTCHours() === 0 && now.getUTCMinutes() === 0) {
+        // Updates the days for how long players are exempt from promotion/demotion
+        console.log('Updating promotion and demotion exceptions.');
+        await updateExceptions();
+
         // Updates priority guilds with new set, allied and tracked guilds. Also add all members to priority.
         console.log('Adding used guilds to priority');
         await addPriorityGuilds();
@@ -936,16 +980,7 @@ async function runScheduledFunction() {
         console.log('Creating database backup');
         await createDatabaseBackup(backupFilename);
 
-        console.log('Completed daily tasks set 1');
-    }
-
-    // Update daily (different time)
-    if (now.getUTCHours() === 0 && now.getUTCMinutes() === 0) {
-        // Updates the days for how long players are exempt from promotion/demotion
-        console.log('Updating promotion and demotion exceptions.');
-        await updateExceptions();
-
-        console.log('Completed daily tasks set 2');
+        console.log('Completed daily tasks');
     }
 
     // Update weekly
@@ -974,5 +1009,22 @@ async function createDatabaseBackup(backupFilename) {
     }
 }
 
-runFreeFunction();
-runScheduledFunction();
+async function setup() {
+    const guildTableExists = await doesTableExist('guilds');
+    const playerTableExists = await doesTableExist('players');
+
+    if (!guildTableExists) {
+        await runAsync('CREATE TABLE "guilds" (name TEXT NOT NULL PRIMARY KEY, prefix TEXT, level INT, xpPercent INT, wars INT, rating INT, average0000 DECIMAL, captains0000 DECIMAL, average0015 DECIMAL, captains0015 DECIMAL, average0030 DECIMAL, captains0030 DECIMAL, average0045 DECIMAL, captains0045 DECIMAL, average0100 DECIMAL, captains0100 DECIMAL, average0115 DECIMAL, captains0115 DECIMAL, average0130 DECIMAL, captains0130 DECIMAL, average0145 DECIMAL, captains0145 DECIMAL, average0200 DECIMAL, captains0200 DECIMAL, average0215 DECIMAL, captains0215 DECIMAL, average0230 DECIMAL, captains0230 DECIMAL, average0245 DECIMAL, captains0245 DECIMAL, average0300 DECIMAL, captains0300 DECIMAL, average0315 DECIMAL, captains0315 DECIMAL, average0330 DECIMAL, captains0330 DECIMAL, average0345 DECIMAL, captains0345 DECIMAL, average0400 DECIMAL, captains0400 DECIMAL, average0415 DECIMAL, captains0415 DECIMAL, average0430 DECIMAL, captains0430 DECIMAL, average0445 DECIMAL, captains0445 DECIMAL, average0500 DECIMAL, captains0500 DECIMAL, average0515 DECIMAL, captains0515 DECIMAL, average0530 DECIMAL, captains0530 DECIMAL, average0545 DECIMAL, captains0545 DECIMAL, average0600 DECIMAL, captains0600 DECIMAL, average0615 DECIMAL, captains0615 DECIMAL, average0630 DECIMAL, captains0630 DECIMAL, average0645 DECIMAL, captains0645 DECIMAL, average0700 DECIMAL, captains0700 DECIMAL, average0715 DECIMAL, captains0715 DECIMAL, average0730 DECIMAL, captains0730 DECIMAL, average0745 DECIMAL, captains0745 DECIMAL, average0800 DECIMAL, captains0800 DECIMAL, average0815 DECIMAL, captains0815 DECIMAL, average0830 DECIMAL, captains0830 DECIMAL, average0845 DECIMAL, captains0845 DECIMAL, average0900 DECIMAL, captains0900 DECIMAL, average0915 DECIMAL, captains0915 DECIMAL, average0930 DECIMAL, captains0930 DECIMAL, average0945 DECIMAL, captains0945 DECIMAL, average1000 DECIMAL, captains1000 DECIMAL, average1015 DECIMAL, captains1015 DECIMAL, average1030 DECIMAL, captains1030 DECIMAL, average1045 DECIMAL, captains1045 DECIMAL, average1100 DECIMAL, captains1100 DECIMAL, average1115 DECIMAL, captains1115 DECIMAL, average1130 DECIMAL, captains1130 DECIMAL, average1145 DECIMAL, captains1145 DECIMAL, average1200 DECIMAL, captains1200 DECIMAL, average1215 DECIMAL, captains1215 DECIMAL, average1230 DECIMAL, captains1230 DECIMAL, average1245 DECIMAL, captains1245 DECIMAL, average1300 DECIMAL, captains1300 DECIMAL, average1315 DECIMAL, captains1315 DECIMAL, average1330 DECIMAL, captains1330 DECIMAL, average1345 DECIMAL, captains1345 DECIMAL, average1400 DECIMAL, captains1400 DECIMAL, average1415 DECIMAL, captains1415 DECIMAL, average1430 DECIMAL, captains1430 DECIMAL, average1445 DECIMAL, captains1445 DECIMAL, average1500 DECIMAL, captains1500 DECIMAL, average1515 DECIMAL, captains1515 DECIMAL, average1530 DECIMAL, captains1530 DECIMAL, average1545 DECIMAL, captains1545 DECIMAL, average1600 DECIMAL, captains1600 DECIMAL, average1615 DECIMAL, captains1615 DECIMAL, average1630 DECIMAL, captains1630 DECIMAL, average1645 DECIMAL, captains1645 DECIMAL, average1700 DECIMAL, captains1700 DECIMAL, average1715 DECIMAL, captains1715 DECIMAL, average1730 DECIMAL, captains1730 DECIMAL, average1745 DECIMAL, captains1745 DECIMAL, average1800 DECIMAL, captains1800 DECIMAL, average1815 DECIMAL, captains1815 DECIMAL, average1830 DECIMAL, captains1830 DECIMAL, average1845 DECIMAL, captains1845 DECIMAL, average1900 DECIMAL, captains1900 DECIMAL, average1915 DECIMAL, captains1915 DECIMAL, average1930 DECIMAL, captains1930 DECIMAL, average1945 DECIMAL, captains1945 DECIMAL, average2000 DECIMAL, captains2000 DECIMAL, average2015 DECIMAL, captains2015 DECIMAL, average2030 DECIMAL, captains2030 DECIMAL, average2045 DECIMAL, captains2045 DECIMAL, average2100 DECIMAL, captains2100 DECIMAL, average2115 DECIMAL, captains2115 DECIMAL, average2130 DECIMAL, captains2130 DECIMAL, average2145 DECIMAL, captains2145 DECIMAL, average2200 DECIMAL, captains2200 DECIMAL, average2215 DECIMAL, captains2215 DECIMAL, average2230 DECIMAL, captains2230 DECIMAL, average2245 DECIMAL, captains2245 DECIMAL, average2300 DECIMAL, captains2300 DECIMAL, average2315 DECIMAL, captains2315 DECIMAL, average2330 DECIMAL, captains2330 DECIMAL, average2345 DECIMAL, captains2345 DECIMAL, averageCount INTEGER)');
+        await runAsync('CREATE INDEX idx_guildName ON guilds (name)');
+    }
+
+    if (!playerTableExists) {
+        await runAsync('CREATE TABLE "players" (UUID TEXT NOT NULL PRIMARY KEY, username TEXT, guildName TEXT, guildRank TEXT, rank TEXT, veteran INT, lastJoin TEXT, isOnline INT, onlineWorld TEXT, contributedGuildXP INT, highestClassLevel INT, guildJoinDate TEXT, serverRank TEXT, firstJoin TEXT, completedQuests INT, totalCombatLevel INT, playtime INT, wars INT)');
+        await runAsync('CREATE INDEX "idx_playerGuild" ON "players" (guildName)');
+    }
+
+    runFreeFunction();
+    runScheduledFunction();
+}
+
+setup();
