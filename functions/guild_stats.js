@@ -108,10 +108,12 @@ async function guildStats(interaction, force = false) {
                 daysInGuild = 1;
             }
 
-            averageXpPerDay += contributedGuildXP / daysInGuild;
-
             if (contributedGuildXP == null) {
                 contributedGuildXP = 0;
+            }
+
+            if (daysInGuild !== 0) {
+                averageXpPerDay += contributedGuildXP / daysInGuild;
             }
 
             const [lastJoinYear, lastJoinMonth, lastJoinDay] = row.lastJoin.split('-');
