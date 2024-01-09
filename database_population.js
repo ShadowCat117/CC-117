@@ -840,7 +840,10 @@ async function updatePlayerActivity() {
 
             for (const member of existingMembers) {
                 const currentMember = guildMembers.find(guildMember => member.UUID === guildMember.UUID);
-                if (!currentMember) continue;
+                if (!currentMember) {
+                    await runAsync(`DELETE FROM ${tableName} WHERE UUID = ?`, [member.UUID]);
+                    continue;
+                }
                 const currentPlaytime = currentMember.playtime;
 
                 const weekPlaytime = currentPlaytime - member.playtimeStart;
