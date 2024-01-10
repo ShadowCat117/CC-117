@@ -139,7 +139,26 @@ async function updatePriorityPlayers() {
             updatePlayersFile = JSON.parse(fileData);
         } catch (err) {
             console.log('Error reading priority players file.');
-            return;
+            let fileData = await fs.readFile(filePath, 'utf-8');
+
+            if (err instanceof SyntaxError && fileData.startsWith('{"players":[]} [')) {
+                const fixedData = '{"players":' + fileData.substring(15);
+                updatePlayersFile = JSON.parse(fixedData);
+                await fs.writeFile(filePath, fixedData, 'utf-8');
+
+                try {
+                    await fs.access(filePath);
+                    fileData = await fs.readFile(filePath, 'utf-8');
+                    updatePlayersFile = JSON.parse(fileData);
+                    console.log('Fixed priority players file');
+                } catch (err) {
+                    console.log('Error reading "fixed" priority players file.');
+                    return;
+                }
+            } else {
+                console.log('Unable to fix priority players file.');
+                return;
+            }
         }
 
         const priorityPlayers = updatePlayersFile.players;
