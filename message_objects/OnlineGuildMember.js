@@ -13,6 +13,22 @@ class OnlineGuildMember {
     toString() {
         return `${this.playerName.padEnd(16)} (${this.guildRank}) is currently online on ${this.onlineWorld}!\n`;
     }
+
+    compareTo(other) {
+        if (this.guildRank === 'OWNER') {
+            return -1;
+        } else if (this.guildRank === 'CHIEF' && other.guildRank !== 'OWNER') {
+            return -1;
+        } else if (this.guildRank === 'STRATEGIST' && other.guildRank !== 'OWNER' && other.guildRank !== 'CHIEF') {
+            return -1;
+        } else if (this.guildRank === 'CAPTAIN' && other.guildRank !== 'OWNER' && other.guildRank !== 'CHIEF' && other.guildRank !== 'STRATEGIST') {
+            return -1;
+        } else if (this.guildRank === 'RECRUITER' && other.guildRank !== 'OWNER' && other.guildRank !== 'CHIEF' && other.guildRank !== 'STRATEGIST' && other.guildRank !== 'CAPTAIN') {
+            return -1;
+        } else {
+            return 0;
+        }
+    }
 }
 
 module.exports = OnlineGuildMember;

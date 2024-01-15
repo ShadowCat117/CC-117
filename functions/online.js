@@ -55,6 +55,8 @@ async function online(interaction, force = false) {
                 return new OnlineGuildMember(username, guildRank, onlineWorld);
             });
 
+            onlinePlayers.sort((a, b) => a.compareTo(b));
+
             const pages = [];
             let onlinePage = '```\n';
             let counter = 0;
