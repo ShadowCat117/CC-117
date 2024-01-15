@@ -11,24 +11,37 @@ class OnlineGuildMember {
 
     // Returns a formatted string for the players online state
     toString() {
-        return `${this.playerName.padEnd(16)} (${this.guildRank}) is currently online on ${this.onlineWorld}!\n`;
+        return `${this.playerName.padEnd(16)} ${`(${this.guildRank})`.padEnd(12)} is currently online on ${this.onlineWorld}!\n`;
     }
 
+    // Compare an online player with another for sorting.
+    // First sort by guild rank, Owner, Chief, Strategist, Captain, Recruiter, Recruit
+    // Then sort by world number
+    // Then sort by username
     compareTo(other) {
-        if (this.guildRank === 'OWNER') {
+        const rankOrder = ['OWNER', 'CHIEF', 'STRATEGIST', 'CAPTAIN', 'RECRUITER', 'RECRUIT'];
+        const thisRankIndex = rankOrder.indexOf(this.guildRank);
+        const otherRankIndex = rankOrder.indexOf(other.guildRank);
+    
+        if (thisRankIndex < otherRankIndex) {
             return -1;
-        } else if (this.guildRank === 'CHIEF' && other.guildRank !== 'OWNER') {
-            return -1;
-        } else if (this.guildRank === 'STRATEGIST' && other.guildRank !== 'OWNER' && other.guildRank !== 'CHIEF') {
-            return -1;
-        } else if (this.guildRank === 'CAPTAIN' && other.guildRank !== 'OWNER' && other.guildRank !== 'CHIEF' && other.guildRank !== 'STRATEGIST') {
-            return -1;
-        } else if (this.guildRank === 'RECRUITER' && other.guildRank !== 'OWNER' && other.guildRank !== 'CHIEF' && other.guildRank !== 'STRATEGIST' && other.guildRank !== 'CAPTAIN') {
-            return -1;
+        } else if (thisRankIndex > otherRankIndex) {
+            return 1;
         } else {
-            return 0;
+            const worldNumber = parseInt(this.onlineWorld.split('WC')[1], 10);
+            const otherWorldNumber = parseInt(other.onlineWorld.split('WC')[1], 10);
+    
+            if (worldNumber < otherWorldNumber) {
+                return -1;
+            } else if (worldNumber > otherWorldNumber) {
+                return 1;
+            } else {
+                return this.playerName.localeCompare(other.playerName);
+            }
         }
     }
+    
+    
 }
 
 module.exports = OnlineGuildMember;
