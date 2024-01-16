@@ -1,8 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const {
-    Events,
-} = require('discord.js');
+const { Events } = require('discord.js');
 const sendMessage = require('../functions/send_message');
 
 module.exports = {
@@ -13,6 +11,7 @@ module.exports = {
         const guildId = guild.id;
         const filePath = path.join(__dirname, '..', 'configs', `${guildId}.json`);
 
+        // Don't do anything when the bot leaves the server
         if (member.client.user.id === member.id) {
             return;
         }
@@ -26,18 +25,25 @@ module.exports = {
                     }
 
                     try {
+                        // Get the config file for the server
                         const config = JSON.parse(fileData);
+                        // Get the channel to send leave messages in
                         const joinLeaveChannelId = config.joinLeaveChannel;
+                        // See whether a message should be sent when a member leaves
                         const sendJoinLeaveMessages = config.sendJoinLeaveMessages;
 
+                        // If no message sent, do nothing
                         if (!sendJoinLeaveMessages) {
                             return;
                         }
 
+                        // Get the message to send when a member leaves
                         const leaveMessage = config.leaveMessage;
 
                         if (joinLeaveChannelId) {
                             guild.fetch().then(() => {
+                                // Replace $user$ with the username of the member who left if present.
+                                // Then send the message
                                 if (leaveMessage.includes('$user$')) {
                                     const userLeaveMessage = leaveMessage.replace('$user$', member.user.username.replace(/_/g, '\\_'));
                                     sendMessage(guild, joinLeaveChannelId, userLeaveMessage);

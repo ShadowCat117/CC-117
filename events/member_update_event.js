@@ -24,12 +24,17 @@ module.exports = {
                     }
 
                     try {
+                        // Get config file for server
                         const config = JSON.parse(fileData);
 
+                        // If they don't care about duplicate nicknames, ignore
                         if (!config.checkDuplicateNicknames) return;
 
+                        // Check if new nickname is valid
                         const validChange = await validUsername(newMember, guild);
 
+                        // If not valid, set nickname to old nickname
+                        // or no nickname if they did not have a previous nickname
                         if (!validChange) {
                             const oldNickname = oldMember.nickname;
 
@@ -50,8 +55,14 @@ module.exports = {
     },
 };
 
+// Check if a username is valid, as in does the new nickname match the username, display name and nickname of any existing server member
+// newMember: The member who is trying to change their username
+// guild: The Discord server they are changing their nickname in
 async function validUsername(newMember, guild) {
+    // Loop through all members of the server
     for (const member of guild.members.cache) {
+        // If member is same as member changing nickname, ignore
+        // member[0] is member ID
         if (member[0] === newMember.id) {
             continue;
         }
@@ -60,6 +71,7 @@ async function validUsername(newMember, guild) {
         const nicknameToCheck = member[1].nickname;
         const usernameToCheck = member[1].user.username;
 
+        // If new nickname matches any variation of an existing member, return false
         if (nicknameToChange && (nicknameToChange.toLowerCase() === (nicknameToCheck || '').toLowerCase() || nicknameToChange.toLowerCase() === usernameToCheck.toLowerCase())) {
             return false;
         }

@@ -1,7 +1,4 @@
-const {
-    ActivityType,
-    Events,
-} = require('discord.js');
+const { ActivityType, Events } = require('discord.js');
 const updateRanks = require('../functions/update_ranks');
 const fs = require('fs');
 const path = require('path');
@@ -9,6 +6,7 @@ const sendMessage = require('../functions/send_message');
 const MessageManager = require('../message_type/MessageManager');
 let client;
 
+// Tasks to be ran every hour
 async function hourlyTasks() {
     let now = new Date();
 
@@ -16,9 +14,11 @@ async function hourlyTasks() {
         // Remove buttons from old message buttons.
         console.log('Removing old buttons');
         MessageManager.removeOldMessages();
-    } else if (now.getUTCMinutes() == 30) {
+
+        // For each server the bot is in
         for (const guild of client.guilds.cache.values()) {
             try {
+                // Get the config file for that server
                 let config = {};
 
                 const directoryPath = path.join(__dirname, '..', 'configs');
@@ -29,11 +29,14 @@ async function hourlyTasks() {
                     config = JSON.parse(fileData);
                 }
 
+                // If the server has the hourly rank updates enabled, then update the ranks
                 if (config.updateRanks) {
                     console.log(`Updating ranks for ${guild}`);
                     const response = await updateRanks(guild);
 
-                    if (response !== 'Updated roles for 0 members.') {
+                    // Only send a message to their log channel if any members were updated
+                    // and currently ignore the problem message whilst it's persisting a lot
+                    if (response !== 'Updated roles for 0 members.' && response !== 'Updated roles for 0 members. (interrupted)' && response !== 'Problem updating ranks') {
                         sendMessage(guild, config.logChannel, response);
                     }
                     console.log(`Updated ranks for ${guild}`);
@@ -47,10 +50,9 @@ async function hourlyTasks() {
     }
 
     now = new Date();
-    const minutesUntilNextHalfHour = 30 - now.getMinutes() % 30;
-    const timeUntilNextHalfHour = (minutesUntilNextHalfHour * 60 * 1000) - (now.getSeconds() * 1000 + now.getMilliseconds());
+    const timeUntilNextHour = (60 - now.getMinutes()) * 60 * 1000 - (now.getSeconds() * 1000 + now.getMilliseconds());
 
-    setTimeout(hourlyTasks, timeUntilNextHalfHour);
+    setTimeout(hourlyTasks, timeUntilNextHour);
 }
 
 module.exports = {
@@ -60,6 +62,7 @@ module.exports = {
         client = _client;
         console.log(`Ready! Logged in as ${client.user.tag}`);
 
+        // Set a custom activity for the bot
         client.user.setPresence({
             activities: [{
                 name: 'over Corkus Island',
@@ -68,16 +71,17 @@ module.exports = {
             status: 'online',
         });
 
+        // Update members of each server the bot is in
         for (const guild of client.guilds.cache.values()) {
             await guild.members.fetch();
         }
 
+        // Calculate time to run first hourly task at
         const now = new Date();
-        const minutesUntilNextHalfHour = 30 - now.getMinutes() % 30;
-        const timeUntilNextHalfHour = (minutesUntilNextHalfHour * 60 * 1000) - (now.getSeconds() * 1000 + now.getMilliseconds());
+        const timeUntilNextHour = (60 - now.getMinutes()) * 60 * 1000 - (now.getSeconds() * 1000 + now.getMilliseconds());
 
         setTimeout(() => {
             hourlyTasks();
-        }, timeUntilNextHalfHour);
+        }, timeUntilNextHour);
     },
 };

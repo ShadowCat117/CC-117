@@ -1,8 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const {
-    Events,
-} = require('discord.js');
+const { Events } = require('discord.js');
 const sendMessage = require('../functions/send_message');
 
 module.exports = {
@@ -22,15 +20,21 @@ module.exports = {
                     }
 
                     try {
+                        // Get the config file for the server
                         const config = JSON.parse(fileData);
+                        // Get the channel to send join messages in
                         const joinLeaveChannelId = config.joinLeaveChannel;
+                        // See whether a message should be sent when a member joins
                         const sendJoinLeaveMessages = config.sendJoinLeaveMessages;
 
                         if (sendJoinLeaveMessages) {
+                            // Get the message to send when a member joins
                             const joinMessage = config.joinMessage;
 
                             if (joinLeaveChannelId) {
                                 guild.fetch().then(async () => {
+                                    // Replace $user$ with the username of the member who left if present.
+                                    // Then send the message
                                     if (joinMessage.includes('$user$')) {
                                         const userJoinMessage = joinMessage.replace('$user$', member.user);
                                         sendMessage(guild, joinLeaveChannelId, userJoinMessage);
@@ -43,9 +47,12 @@ module.exports = {
                             }
                         }
 
+                        // Does the server want to verify members
                         const verifyMembers = config.verifyMembers;
 
+                        // If so, apply the unverified role to newly joined member
                         if (verifyMembers) {
+                            // Get the unverified role
                             const unverifiedRole = guild.roles.cache.get(config.unverifiedRole);
 
                             if (unverifiedRole) {
