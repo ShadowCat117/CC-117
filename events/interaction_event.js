@@ -37,6 +37,8 @@ module.exports = {
     once: false,
     async execute(interaction) {
         try {
+            // If the interaction was not a button or string select menu
+            // we don't need to do anything
             if (!interaction.isButton() && !interaction.isStringSelectMenu()) {
                 return;
             }
@@ -49,15 +51,20 @@ module.exports = {
 
             let config = {};
 
+            // Get the config file for the server
             if (fs.existsSync(filePath)) {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
             }
 
+            // Button interactions
             if (interaction.isButton()) {
+                // Get the message we're interacting with so we know how to handle
+                // the button press
                 const message = MessageManager.getMessage(interaction.message.id);
 
                 if (interaction.customId === 'nextPage') {
+                    // No known message, change message to "Data expired."
                     if (!message) {
                         interaction.editReply({
                             content: 'Data expired.',
@@ -67,12 +74,14 @@ module.exports = {
                         return;
                     }
 
+                    // Get the next page for the message and change it to that
                     const nextPage = message.getNextPage();
 
                     interaction.editReply({
                         content: nextPage,
                     });
                 } else if (interaction.customId === 'previousPage') {
+                    // No known message, change message to "Data expired."
                     if (!message) {
                         interaction.editReply({
                             content: 'Data expired.',
@@ -82,12 +91,14 @@ module.exports = {
                         return;
                     }
 
+                    // Get the previous page for the message and change it to that
                     const previousPage = message.getPreviousPage();
 
                     interaction.editReply({
                         content: previousPage,
                     });
                 } else if (interaction.customId === 'war') {
+                    // Get the member of guild role and level requirement for getting war roles
                     const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
                     const levelRequirement = config['warLevelRequirement'];
 
@@ -97,6 +108,8 @@ module.exports = {
 
                     const validLevelRoles = [];
 
+                    // Check each level roles set level to see which roles will be valid for war roles.
+                    // If the minimum role has been found, ignore checking other roles.
                     if (config['levelRoleOneLevel'] >= levelRequirement) {
                         validLevelRoles.push(interaction.guild.roles.cache.get(config['levelRoleOne']));
                     } else {
@@ -159,6 +172,8 @@ module.exports = {
 
                     let validLevel = false;
 
+                    // Check all roles above minimum requirement and if the member has them
+                    // they are the valid level for getting war roles.
                     for (const levelRole of validLevelRoles) {
                         if (memberRoles.has(levelRole.id)) {
                             validLevel = true;
@@ -166,9 +181,13 @@ module.exports = {
                         }
                     }
 
+                    // If the member has both the memer of guild role and is a valid level
+                    // allow them to get war roles.
                     if (memberRoles.has(memberOfRole.id) && validLevel) {
+                        // Get the warrer role
                         const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
 
+                        // Add warrer role if they don't already have it
                         if (!memberRoles.has(warrerRole.id)) {
                             await interaction.member.roles.add(warrerRole)
                                 .then(() => {
@@ -179,6 +198,7 @@ module.exports = {
                                 });
                         }
 
+                        // Create the buttons to be displayed on response button
                         const tankButton = new ButtonBuilder()
                             .setCustomId('tank')
                             .setStyle(ButtonStyle.Secondary)
@@ -214,29 +234,37 @@ module.exports = {
                             .setStyle(ButtonStyle.Danger)
                             .setLabel('REMOVE');
         
+                        // Add the buttons to rows
                         const rolesRow = new ActionRowBuilder().addComponents(tankButton, healerButton, damageButton, soloButton, ecoButton);
                         const removeRow = new ActionRowBuilder().addComponents(warPingButton, removeButton);
         
+                        // Get the war message
                         const warMessage = config['warClassMessage'].replace(/\\n/g, '\n');
         
+                        // Send a followup with the war message and buttons
                         await interaction.followUp({
                             content: warMessage,
                             ephemeral: true,
                             components: [rolesRow, removeRow],
                         });
                     } else {
+                        // Tell the user they need to be a guild member and meet a level requirement to gain war roles
                         await interaction.followUp({
                             content: `Sorry, you need to be a member of ${config['guildName']} to use this and be at least level ${levelRequirement}.`,
                             ephemeral: true,
                         });
                     }
                 } else if (interaction.customId === 'tank') {
+                    // Get tank role
                     const tankRole = interaction.guild.roles.cache.get(config['tankRole']);
 
+                    // Get member roles
                     const memberRoles = interaction.member.roles.cache;
 
+                    // Get warrer role
                     const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
 
+                    // Add warrer role if they don't already have
                     if (!memberRoles.has(warrerRole.id)) {
                         await interaction.member.roles.add(warrerRole)
                             .then(() => {
@@ -249,6 +277,7 @@ module.exports = {
 
                     let replyMessage;
 
+                    // If they have the tank role, remove it, otherwise add it
                     if (memberRoles.has(tankRole.id)) {
                         await interaction.member.roles.remove(tankRole)
                             .then(() => {
@@ -276,12 +305,16 @@ module.exports = {
                         ephemeral: true,
                     });
                 } else if (interaction.customId === 'healer') {
+                    // Get healer role
                     const healerRole = interaction.guild.roles.cache.get(config['healerRole']);
 
+                    // Get member roles
                     const memberRoles = interaction.member.roles.cache;
 
+                    // Get warrer role
                     const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
 
+                    // Add warrer role if they don't already have it
                     if (!memberRoles.has(warrerRole.id)) {
                         await interaction.member.roles.add(warrerRole)
                             .then(() => {
@@ -294,6 +327,7 @@ module.exports = {
 
                     let replyMessage;
 
+                    // Add healer role or remove if they already have it
                     if (memberRoles.has(healerRole.id)) {
                         await interaction.member.roles.remove(healerRole)
                             .then(() => {
@@ -321,12 +355,16 @@ module.exports = {
                         ephemeral: true,
                     });
                 } else if (interaction.customId === 'damage') {
+                    // Get damage role
                     const damageRole = interaction.guild.roles.cache.get(config['damageRole']);
 
+                    // Get member roles
                     const memberRoles = interaction.member.roles.cache;
 
+                    // Get warrer role
                     const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
 
+                    // Add warrer role if they don't already have it
                     if (!memberRoles.has(warrerRole.id)) {
                         await interaction.member.roles.add(warrerRole)
                             .then(() => {
@@ -339,6 +377,7 @@ module.exports = {
 
                     let replyMessage;
 
+                    // Remove damage role if they have it, otherwise add it
                     if (memberRoles.has(damageRole.id)) {
                         await interaction.member.roles.remove(damageRole)
                             .then(() => {
@@ -366,12 +405,16 @@ module.exports = {
                         ephemeral: true,
                     });
                 } else if (interaction.customId === 'solo') {
+                    // Get solo role
                     const soloRole = interaction.guild.roles.cache.get(config['soloRole']);
 
+                    // Get member roles
                     const memberRoles = interaction.member.roles.cache;
 
+                    // Get warrer role
                     const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
 
+                    // Add warrer role if they don't already have it
                     if (!memberRoles.has(warrerRole.id)) {
                         await interaction.member.roles.add(warrerRole)
                             .then(() => {
@@ -384,6 +427,7 @@ module.exports = {
 
                     let replyMessage;
 
+                    // Add solo role if they don't have it, otherwise remove it
                     if (memberRoles.has(soloRole.id)) {
                         await interaction.member.roles.remove(soloRole)
                             .then(() => {
@@ -411,12 +455,15 @@ module.exports = {
                         ephemeral: true,
                     });
                 } else if (interaction.customId === 'eco') {
+                    // Get eco role
                     const ecoRole = interaction.guild.roles.cache.get(config['ecoRole']);
 
+                    // Get member roles
                     const memberRoles = interaction.member.roles.cache;
 
                     let replyMessage;
 
+                    // Remove eco role if they have it, otherwise add it
                     if (memberRoles.has(ecoRole.id)) {
                         await interaction.member.roles.remove(ecoRole)
                             .then(() => {
@@ -444,10 +491,14 @@ module.exports = {
                         ephemeral: true,
                     });
                 } else if (interaction.customId === 'warping') {
+                    // Get member roles
                     const memberRoles = await interaction.member.roles.cache;
+                    // Get war role
                     const warRole = interaction.guild.roles.cache.get(config['warRole']);
+                    // Get warrer role
                     const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
 
+                    // Add warrer role if they didn't have it
                     if (!memberRoles.has(warrerRole.id)) {
                         await interaction.member.roles.add(warrerRole)
                             .then(() => {
@@ -458,6 +509,7 @@ module.exports = {
                             });
                     }
 
+                    // Add war role if they didn't have, otherwise remove the role
                     if (!memberRoles.has(warRole.id)) {
                         await interaction.member.roles.add(warRole)
                             .then(() => {
@@ -486,10 +538,13 @@ module.exports = {
                         });
                     }
                 } else if (interaction.customId === 'removewar') {
+                    // Get member roles
                     const memberRoles = await interaction.member.roles.cache;
 
+                    // Get warrer role
                     const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
 
+                    // If they have the warrer role then remove all war related roles
                     if (memberRoles.has(warrerRole.id)) {
                         const warRole = interaction.guild.roles.cache.get(config['warRole']);
                         const tankRole = interaction.guild.roles.cache.get(config['tankRole']);
@@ -500,6 +555,7 @@ module.exports = {
 
                         const warRoles = [warRole, tankRole, healerRole, damageRole, soloRole, ecoRole, warrerRole];
 
+                        // Remove each role
                         for (const role of memberRoles.values()) {
                             if (warRoles.includes(role)) {
                                 await interaction.member.roles.remove(role)
@@ -517,12 +573,15 @@ module.exports = {
                             ephemeral: true,
                         });
                     } else {
+                        // They should have no war roles if they do not have the warrer role
+                        // unless it was manually added
                         await interaction.followUp({
                             content: 'You do not have any war roles',
                             ephemeral: true,
                         });
                     }
                 } else if (interaction.customId === 'warrior') {
+                    // Create buttons for warrior archetypes
                     const fallenButton = new ButtonBuilder()
                         .setCustomId('fallen')
                         .setStyle(ButtonStyle.Danger)
@@ -538,6 +597,7 @@ module.exports = {
                         .setStyle(ButtonStyle.Primary)
                         .setLabel('PALADIN');
 
+                    // Add buttons to row
                     const row = new ActionRowBuilder().addComponents(fallenButton, battleMonkButton, paladinButton);
 
                     const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
@@ -548,6 +608,7 @@ module.exports = {
                         components: [row],
                     });
                 } else if (interaction.customId === 'mage') {
+                    // Create buttons for mage archetypes
                     const riftwalkerButton = new ButtonBuilder()
                         .setCustomId('riftwalker')
                         .setStyle(ButtonStyle.Primary)
@@ -563,6 +624,7 @@ module.exports = {
                         .setStyle(ButtonStyle.Danger)
                         .setLabel('ARCANIST');
 
+                    // Add buttons to row
                     const row = new ActionRowBuilder().addComponents(riftwalkerButton, lightBenderButton, arcanistButton);
 
                     const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
@@ -573,6 +635,7 @@ module.exports = {
                         components: [row],
                     });
                 } else if (interaction.customId === 'archer') {
+                    // Create buttons for archer archetypes
                     const sharpshooterButton = new ButtonBuilder()
                         .setCustomId('sharpshooter')
                         .setStyle(ButtonStyle.Primary)
@@ -588,6 +651,7 @@ module.exports = {
                         .setStyle(ButtonStyle.Success)
                         .setLabel('BOLTSLINGER');
 
+                    // Add buttons to row
                     const row = new ActionRowBuilder().addComponents(sharpshooterButton, trapperButton, boltslingerButton);
 
                     const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
@@ -598,6 +662,7 @@ module.exports = {
                         components: [row],
                     });
                 } else if (interaction.customId === 'shaman') {
+                    // Create buttons for shaman archetypes
                     const ritualistButton = new ButtonBuilder()
                         .setCustomId('ritualist')
                         .setStyle(ButtonStyle.Primary)
@@ -613,6 +678,7 @@ module.exports = {
                         .setStyle(ButtonStyle.Danger)
                         .setLabel('ACOLYTE');
 
+                    // Add buttons to row
                     const row = new ActionRowBuilder().addComponents(ritualistButton, summonerButton, acolyteButton);
 
                     const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
@@ -623,6 +689,7 @@ module.exports = {
                         components: [row],
                     });
                 } else if (interaction.customId === 'assassin') {
+                    // Create buttons for assassin archetypes
                     const acrobatButton = new ButtonBuilder()
                         .setCustomId('acrobat')
                         .setStyle(ButtonStyle.Danger)
@@ -638,6 +705,7 @@ module.exports = {
                         .setStyle(ButtonStyle.Success)
                         .setLabel('TRICKSTER');
 
+                    // Add buttons to row
                     const row = new ActionRowBuilder().addComponents(acrobatButton, shadestepperButton, tricksterButton);
 
                     const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
@@ -648,8 +716,10 @@ module.exports = {
                         components: [row],
                     });
                 } else if (archetypes.includes(interaction.customId)) {
+                    // Get member roles
                     const memberRoles = await interaction.member.roles.cache;
 
+                    // Get class roles
                     const warriorRole = interaction.guild.roles.cache.get(config['warriorRole']);
                     const mageRole = interaction.guild.roles.cache.get(config['mageRole']);
                     const archerRole = interaction.guild.roles.cache.get(config['archerRole']);
@@ -664,6 +734,7 @@ module.exports = {
 
                     let classRole;
 
+                    // Determine which class was selected
                     if (warriorArchetypes.includes(interaction.customId)) {
                         classRole = warriorRole;
                     } else if (mageArchetypes.includes(interaction.customId)) {
@@ -676,8 +747,10 @@ module.exports = {
                         classRole = assassinRole;
                     }
 
+                    // Get the role for the archetype
                     const archetypeRole = interaction.guild.roles.cache.get(config[`${interaction.customId}Role`]);
 
+                    // Remove any previous class roles that aren't the same as the new selected
                     for (const role of memberRoles.values()) {
                         if (classRoles.includes(role) && role !== classRole && role !== archetypeRole) {
                             await interaction.member.roles.remove(role)
@@ -690,6 +763,7 @@ module.exports = {
                         }
                     }
 
+                    // Add class role
                     await interaction.member.roles.add(classRole)
                             .then(() => {
                                 console.log(`Added class role to ${interaction.member.user.username}`);
@@ -698,6 +772,7 @@ module.exports = {
                                 sendMessage(interaction.guild, interaction.channel.id, `Failed to add class role to ${interaction.member.user.username}`);
                             });
 
+                    // Add archetype role
                     await interaction.member.roles.add(archetypeRole)
                             .then(() => {
                                 console.log(`Added archetype role to ${interaction.member.user.username}`);
@@ -713,14 +788,19 @@ module.exports = {
                         ephemeral: true,
                     });
                 } else if (interaction.customId === 'giveaway') {
+                    // Get giveaway role
                     const giveawayRole = interaction.guild.roles.cache.get(config['giveawayRole']);
+                    // Get member of guild role
                     const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
 
+                    // Get member roles
                     const memberRoles = await interaction.member.roles.cache;
 
                     let replyMessage;
 
+                    // If they have the guild member role
                     if (memberRoles.has(memberOfRole.id)) {
+                        // Remove giveaway role if they have it already, otherwise add it
                         if (memberRoles.has(giveawayRole.id)) {
                             await interaction.member.roles.remove(giveawayRole)
                                 .then(() => {
@@ -748,12 +828,14 @@ module.exports = {
                             ephemeral: true,
                         });
                     } else {
+                        // Tell user they must be a guild member to get the giveaway role
                         await interaction.followUp({
                             content: `Sorry, you need to be a member of ${config['guildName']} to use this.`,
                             ephemeral: true,
                         });
                     }
                 } else {
+                    // Unknown message, display "Data expired."
                     if (!message) {
                         interaction.editReply({
                             content: 'Data expired.',
@@ -765,10 +847,15 @@ module.exports = {
 
                     let result;
 
+                    // Depending on what the original command was, we need to rerun that command but
+                    // using the exact guild name and letting the function know we are looking for this
+                    // exact name.
                     switch (message.messageType) {
                         case MessageType.ACTIVE_HOURS:
+                            // Run active hours
                             result = await activeHours(interaction, true);
 
+                            // Handle response
                             if (result.pages[0] === 'No data') {
                                 interaction.editReply({
                                     content: `No activity data found for ${interaction.customId}`,
@@ -856,6 +943,7 @@ module.exports = {
 
                             break;
                         case MessageType.ADD_ALLY:
+                            // Run addAlly
                             result = await addAlly(interaction, true);
 
                             interaction.editReply({
@@ -867,8 +955,10 @@ module.exports = {
 
                             break;
                         case MessageType.GUILD_STATS:
+                            // Run guildStats
                             result = await guildStats(interaction, true);
 
+                            // Handle response
                             if (result.pageCount > 1) {
                                 const row = new ActionRowBuilder();
 
@@ -906,8 +996,10 @@ module.exports = {
 
                             break;
                         case MessageType.LAST_LOGINS:
+                            // Run lastLogins
                             result = await lastLogins(interaction, true);
 
+                            // Handle response
                             if (result.pageCount > 1) {
                                 const row = new ActionRowBuilder();
 
@@ -945,8 +1037,10 @@ module.exports = {
 
                             break;
                         case MessageType.ONLINE:
+                            // Run online
                             result = await online(interaction, true);
 
+                            // Handle response
                             if (result.pageCount > 1) {
                                 const row = new ActionRowBuilder();
 
@@ -984,6 +1078,7 @@ module.exports = {
 
                             break;
                         case MessageType.REMOVE_ALLY:
+                            // Run removeAlly
                             result = await removeAlly(interaction, true);
 
                             interaction.editReply({
@@ -995,6 +1090,7 @@ module.exports = {
 
                             break;
                         case MessageType.SET_GUILD:
+                            // Run setGuild
                             result = await setGuild(interaction, true);
 
                             interaction.editReply({
@@ -1006,6 +1102,7 @@ module.exports = {
 
                             break;
                         case MessageType.SUS:
+                            // Run sus
                             result = await sus(interaction.customId);
 
                             interaction.editReply({
@@ -1017,6 +1114,7 @@ module.exports = {
 
                             break;
                         case MessageType.TRACK_GUILD:
+                            // Run trackGuild
                             result = await trackGuild(interaction, true);
 
                             interaction.editReply({
@@ -1028,6 +1126,7 @@ module.exports = {
 
                             break;
                         case MessageType.UNTRACK_GUILD:
+                            // Run untrackGuild
                             result = await untrackGuild(interaction, true);
 
                             interaction.editReply({
@@ -1039,6 +1138,7 @@ module.exports = {
 
                             break;
                         case MessageType.UPDATE_GUILD:
+                            // Run updateGuild
                             result = await updateGuild(interaction, true);
 
                             interaction.editReply({
@@ -1050,8 +1150,10 @@ module.exports = {
 
                             break;
                         case MessageType.VERIFY:
+                            // Run applyRoles
                             result = await applyRoles(interaction.guild, interaction.customId, interaction.member);
 
+                            // Handle response
                             switch (result) {
                                 case 1:
                                     interaction.editReply({
@@ -1077,6 +1179,7 @@ module.exports = {
 
                             break;
                         case MessageType.WORLD_ACTIVITY:
+                            // Run worldActivity
                             result = await worldActivity(interaction, true);
 
                             interaction.editReply({
@@ -1090,8 +1193,10 @@ module.exports = {
                     }
                 }
             } else if (interaction.isStringSelectMenu()) {
+                // Get message
                 const message = MessageManager.getMessage(interaction.message.id);
 
+                // Unknown message, set to "Data expired."
                 if (!message) {
                     interaction.editReply({
                         content: 'Data expired.',
@@ -1100,11 +1205,13 @@ module.exports = {
                     return;
                 }
 
+                // Get timezones file
                 const timezoneFile = 'timezones.json';
 
                 try {
                     let timezones = {};
         
+                    // Get or create timezones file
                     if (fs.existsSync(timezoneFile)) {
                         const fileData = fs.readFileSync(timezoneFile, 'utf-8');
                         timezones = JSON.parse(fileData);
@@ -1123,6 +1230,7 @@ module.exports = {
                         });
                     }
 
+                    // Save new timezone value for member
                     timezones[interaction.member.id] = interaction.values;
 
                     fs.writeFileSync(timezoneFile, JSON.stringify(timezones, null, 2), 'utf-8');
@@ -1133,8 +1241,10 @@ module.exports = {
                     return;
                 }
 
+                // Run activeHours, pass in timezone from file for member
                 const result = await activeHours(interaction, true, interaction.values);
 
+                // Create row and string select menu for message
                 const row = new ActionRowBuilder();
 
                 const timezoneSelection = new StringSelectMenuBuilder()
