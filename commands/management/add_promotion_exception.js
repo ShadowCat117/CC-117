@@ -1,11 +1,14 @@
 const {
     SlashCommandBuilder,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
 } = require('discord.js');
 const createConfig = require('../../functions/create_config');
 const fs = require('fs');
 const path = require('path');
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('database/database.db');
+const addPromotionException = require('../../functions/add_promotion_exception');
+const MessageManager = require('../../message_type/MessageManager');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -13,8 +16,8 @@ module.exports = {
         .setDescription('Adds a player to be excluded from promotion checks. Default length is forever.')
         .addStringOption(option =>
             option.setName('username')
-            .setDescription('The name of the player you want to be exemept from promotion checks.')
-            .setRequired(true))
+                .setDescription('The name of the player you want to be exemept from promotion checks.')
+                .setRequired(true))
         .addIntegerOption((option) =>
         option.setName('exemption_period')
             .setDescription('How long should they be exempt from promotion?')),
@@ -60,55 +63,36 @@ module.exports = {
                 return;
             }
 
-            const username = interaction.options.getString('username');
             let exemptionPeriod = interaction.options.getInteger('exemption_period') ?? -1;
 
             if (exemptionPeriod < -1) {
                 exemptionPeriod = -1;
             }
 
-            return new Promise((resolve, reject) => {
-                db.all(
-                    'SELECT username FROM players WHERE username = ? AND guildName = ?', [username, guildName],
-                    async (err, row) => {
-                        if (err) {
-                            console.error('Error retrieving player data:', err);
-                            reject(err);
-                            return;
-                        }
+            const response = await addPromotionException(interaction, false, exemptionPeriod);
 
-                        if (row.length > 0) {
-                            if (!config['promotionExceptions']) {
-                                config['promotionExceptions'] = {};
-                            }
-
-                            if (config['promotionExceptions'][username] === exemptionPeriod) {
-                                if (exemptionPeriod === -1) {
-                                    await interaction.editReply(`${username} is already permanently exempt from promotions`);
-                                } else {
-                                    await interaction.editReply(`${username} is already exempt from promotions for ${exemptionPeriod} day(s)`);
-                                }
-                                
-                                return;
-                            }
-
-                            config['promotionExceptions'][username] = exemptionPeriod;
-
-                            fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
-
-                            if (exemptionPeriod === -1) {
-                                await interaction.editReply(`${username} is now permanently exempt from promotions`);
-                            } else {
-                                await interaction.editReply(`${username} is now exempt from promotions for ${exemptionPeriod} day(s)`);
-                            }
-                            return;
-                        } else {
-                            await interaction.editReply(`${username} is not a member of ${guildName}`);
-                            return;
-                        }
-                    },
-                );
-            });
+            if (response.componentIds.length > 0) {
+                const row = new ActionRowBuilder();
+    
+                for (let i = 0; i < response.componentIds.length; i++) {
+                    const button = new ButtonBuilder()
+                        .setCustomId(response.componentIds[i])
+                        .setStyle(ButtonStyle.Primary)
+                        .setLabel((i + 1).toString());
+                    row.addComponents(button);
+                }
+    
+                const editedReply = await interaction.editReply({
+                    content: response.text,
+                    components: [row],
+                });
+    
+                response.setMessage(editedReply);
+    
+                MessageManager.addMessage(response);
+            } else {
+                await interaction.editReply(response.pages[0]);
+            }
         } catch (error) {
             console.log(error);
             await interaction.editReply('Error adding promotion exception.');

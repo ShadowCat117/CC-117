@@ -1,11 +1,14 @@
 const {
     SlashCommandBuilder,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
 } = require('discord.js');
 const createConfig = require('../../functions/create_config');
 const fs = require('fs');
 const path = require('path');
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('database/database.db');
+const addInactivityException = require('../../functions/add_inactivity_exception');
+const MessageManager = require('../../message_type/MessageManager');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -13,8 +16,8 @@ module.exports = {
         .setDescription('Adds a custom inactivity threshold for a player. Default length is forever.')
         .addStringOption(option =>
             option.setName('username')
-            .setDescription('The name of the player you want to be have a custom inactivity threshold.')
-            .setRequired(true))
+                .setDescription('The name of the player you want to be have a custom inactivity threshold.')
+                .setRequired(true))
         .addIntegerOption((option) =>
         option.setName('inactivity_threshold')
             .setDescription('What should their custom inactivity threshold be?')),
@@ -60,55 +63,36 @@ module.exports = {
                 return;
             }
 
-            const username = interaction.options.getString('username');
             let inactivityThreshold = interaction.options.getInteger('inactivity_threshold') ?? -1;
 
             if (inactivityThreshold < -1) {
                 inactivityThreshold = -1;
             }
 
-            return new Promise((resolve, reject) => {
-                db.all(
-                    'SELECT username FROM players WHERE username = ? AND guildName = ?', [username, guildName],
-                    async (err, row) => {
-                        if (err) {
-                            console.error('Error retrieving player data:', err);
-                            reject(err);
-                            return;
-                        }
+            const response = await addInactivityException(interaction, false, inactivityThreshold);
 
-                        if (row.length > 0) {
-                            if (!config['inactivityExceptions']) {
-                                config['inactivityExceptions'] = {};
-                            }
-
-                            if (config['inactivityExceptions'][username] === inactivityThreshold) {
-                                if (inactivityThreshold === -1) {
-                                    await interaction.editReply(`${username} is already exempt from inactivity`);
-                                } else {
-                                    await interaction.editReply(`${username}'s inactivity threshold is already ${inactivityThreshold}`);
-                                }
-                                
-                                return;
-                            }
-
-                            config['inactivityExceptions'][username] = inactivityThreshold;
-
-                            fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
-
-                            if (inactivityThreshold === -1) {
-                                await interaction.editReply(`${username} is now exempt from inactivity`);
-                            } else {
-                                await interaction.editReply(`${username}'s inactivity threshold is now ${inactivityThreshold}`);
-                            }
-                            return;
-                        } else {
-                            await interaction.editReply(`${username} is not a member of ${guildName}`);
-                            return;
-                        }
-                    },
-                );
-            });
+            if (response.componentIds.length > 0) {
+                const row = new ActionRowBuilder();
+    
+                for (let i = 0; i < response.componentIds.length; i++) {
+                    const button = new ButtonBuilder()
+                        .setCustomId(response.componentIds[i])
+                        .setStyle(ButtonStyle.Primary)
+                        .setLabel((i + 1).toString());
+                    row.addComponents(button);
+                }
+    
+                const editedReply = await interaction.editReply({
+                    content: response.text,
+                    components: [row],
+                });
+    
+                response.setMessage(editedReply);
+    
+                MessageManager.addMessage(response);
+            } else {
+                await interaction.editReply(response.pages[0]);
+            }
         } catch (error) {
             console.log(error);
             await interaction.editReply('Error adding inactivity exception.');

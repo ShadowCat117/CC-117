@@ -197,7 +197,7 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
             let response = 0;
 
             if (hasUpdated) {
-                response = true;
+                response = 1;
             }
 
             await member.setNickname(null);

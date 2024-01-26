@@ -1,9 +1,14 @@
 const {
     SlashCommandBuilder,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
 } = require('discord.js');
 const createConfig = require('../../functions/create_config');
 const fs = require('fs');
 const path = require('path');
+const removePromotionException = require('../../functions/remove_promotion_exception');
+const MessageManager = require('../../message_type/MessageManager');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -55,19 +60,30 @@ module.exports = {
                 return;
             }
 
-            const username = interaction.options.getString('username');
+            const response = await removePromotionException(interaction, false);
 
-            if (!config['promotionExceptions'] || !config['promotionExceptions'][username]) {
-                await interaction.editReply(`${username} is not exempt from promotions`);
-                return;
+            if (response.componentIds.length > 0) {
+                const row = new ActionRowBuilder();
+    
+                for (let i = 0; i < response.componentIds.length; i++) {
+                    const button = new ButtonBuilder()
+                        .setCustomId(response.componentIds[i])
+                        .setStyle(ButtonStyle.Primary)
+                        .setLabel((i + 1).toString());
+                    row.addComponents(button);
+                }
+    
+                const editedReply = await interaction.editReply({
+                    content: response.text,
+                    components: [row],
+                });
+    
+                response.setMessage(editedReply);
+    
+                MessageManager.addMessage(response);
+            } else {
+                await interaction.editReply(response.pages[0]);
             }
-            
-            delete config['promotionExceptions'][username];
-
-            fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
-
-            await interaction.editReply(`${username} is no longer exempt from promotions`);
-            return;
         } catch (error) {
             console.log(error);
             await interaction.editReply('Error removing promotion exception.');

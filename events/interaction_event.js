@@ -18,12 +18,19 @@ const untrackGuild = require('../functions/untrack_guild');
 const setGuild = require('../functions/set_guild');
 const sus = require('../functions/sus');
 const activeHours = require('../functions/active_hours');
-const applyRoles = require('../functions/apply_roles');
 const updateGuild = require('../functions/update_guild');
 const worldActivity = require('../functions/world_activity');
 const fs = require('fs');
 const path = require('path');
 const sendMessage = require('../functions/send_message');
+const promotionProgress = require('../functions/promotion_progress');
+const verify = require('../functions/verify');
+const addDemotionException = require('../functions/add_demotion_exception');
+const addInactivityException = require('../functions/add_inactivity_exception');
+const addPromotionException = require('../functions/add_promotion_exception');
+const removeDemotionException = require('../functions/remove_demotion_exception');
+const removeInactivityException = require('../functions/remove_inactivity_exception');
+const removePromotionException = require('../functions/remove_promotion_exception');
 
 const warriorArchetypes = ['fallen', 'battleMonk', 'paladin'];
 const mageArchetypes = ['riftwalker', 'lightBender', 'arcanist'];
@@ -954,6 +961,42 @@ module.exports = {
                             MessageManager.removeMessage(message);
 
                             break;
+                        case MessageType.ADD_DEMOTION_EXCEPTION:
+                            // Run addDemotionException
+                            result = await addDemotionException(interaction, true);
+
+                            interaction.editReply({
+                                content: result.pages[0],
+                                components: [],
+                            });
+
+                            MessageManager.removeMessage(message);
+
+                            break;
+                        case MessageType.ADD_INACTIVITY_EXCEPTION:
+                            // Run addInactivityException
+                            result = await addInactivityException(interaction, true);
+
+                            interaction.editReply({
+                                content: result.pages[0],
+                                components: [],
+                            });
+
+                            MessageManager.removeMessage(message);
+
+                            break;
+                        case MessageType.ADD_PROMOTION_EXCEPTION:
+                            // Run addPromotionException
+                            result = await addPromotionException(interaction, true);
+
+                            interaction.editReply({
+                                content: result.pages[0],
+                                components: [],
+                            });
+
+                            MessageManager.removeMessage(message);
+
+                            break;
                         case MessageType.GUILD_STATS:
                             // Run guildStats
                             result = await guildStats(interaction, true);
@@ -1077,9 +1120,57 @@ module.exports = {
                             }
 
                             break;
+                        case MessageType.PROMOTION_PROGRESS:
+                            // Run promotionProgress
+                            result = await promotionProgress(interaction, true);
+
+                            interaction.editReply({
+                                content: result.pages[0],
+                                components: [],
+                            });
+
+                            MessageManager.removeMessage(message);
+
+                            break;
                         case MessageType.REMOVE_ALLY:
                             // Run removeAlly
                             result = await removeAlly(interaction, true);
+
+                            interaction.editReply({
+                                content: result.pages[0],
+                                components: [],
+                            });
+
+                            MessageManager.removeMessage(message);
+
+                            break;
+                        case MessageType.REMOVE_DEMOTION_EXCEPTION:
+                            // Run removeDemotionException
+                            result = await removeDemotionException(interaction, true);
+
+                            interaction.editReply({
+                                content: result.pages[0],
+                                components: [],
+                            });
+
+                            MessageManager.removeMessage(message);
+
+                            break;
+                        case MessageType.REMOVE_INACTIVITY_EXCEPTION:
+                            // Run removeInactivityException
+                            result = await removeInactivityException(interaction, true);
+
+                            interaction.editReply({
+                                content: result.pages[0],
+                                components: [],
+                            });
+
+                            MessageManager.removeMessage(message);
+
+                            break;
+                        case MessageType.REMOVE_PROMOTION_EXCEPTION:
+                            // Run removePromotionException
+                            result = await removePromotionException(interaction, true);
 
                             interaction.editReply({
                                 content: result.pages[0],
@@ -1103,10 +1194,10 @@ module.exports = {
                             break;
                         case MessageType.SUS:
                             // Run sus
-                            result = await sus(interaction.customId);
+                            result = await sus(interaction, true);
 
                             interaction.editReply({
-                                content: result,
+                                content: result.pages[0],
                                 components: [],
                             });
 
@@ -1151,29 +1242,12 @@ module.exports = {
                             break;
                         case MessageType.VERIFY:
                             // Run applyRoles
-                            result = await applyRoles(interaction.guild, interaction.customId, interaction.member);
+                            result = await await verify(interaction, true);
 
-                            // Handle response
-                            switch (result) {
-                                case 1:
-                                    interaction.editReply({
-                                        content: 'Successfully verified',
-                                        components: [],
-                                    });
-                                    break;
-                                case 2:
-                                    interaction.editReply({
-                                        content: 'Successfully verified as ally',
-                                        components: [],
-                                    });
-                                    break;
-                                default:
-                                    interaction.editReply({
-                                        content: 'Failed to verify',
-                                        components: [],
-                                    });
-                                    break;
-                            }
+                            interaction.editReply({
+                                content: result.pages[0],
+                                components: [],
+                            });
 
                             MessageManager.removeMessage(message);
 

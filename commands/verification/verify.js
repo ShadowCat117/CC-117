@@ -5,27 +5,10 @@ const {
     SlashCommandBuilder,
 } = require('discord.js');
 const createConfig = require('../../functions/create_config');
-const applyRoles = require('../../functions/apply_roles');
-const sendMessage = require('../../functions/send_message');
-const ButtonedMessage = require('../../message_type/ButtonedMessage');
-const MessageType = require('../../message_type/MessageType');
 const MessageManager = require('../../message_type/MessageManager');
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('database/database.db');
 const fs = require('fs');
 const path = require('path');
-
-async function getAsync(query, params) {
-    return new Promise((resolve, reject) => {
-        db.get(query, params, function(err, rows) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(rows);
-            }
-        });
-    });
-}
+const verify = require('../../functions/verify');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -72,201 +55,30 @@ module.exports = {
                 }
             }
 
-            return new Promise((resolve, reject) => {
-                db.all(
-                    'SELECT UUID, guildRank, rank FROM players WHERE username = ? AND guildName = ?', [username, guildName],
-                    async (err, foundRows) => {
-                        if (err) {
-                            console.error('Error retrieving player data:', err);
-                            reject(err);
-                            return;
-                        }
+            const response = await verify(interaction, false);
 
-                        let checkForAlly = false;
-
-                        if (foundRows.length === 0) {
-                            checkForAlly = true;
-                        } else if (foundRows.length > 1) {
-                            let message = `Multiple ${formattedUsername}'s found.\n`;
-                            let counter = 1;
-
-                            const row = new ActionRowBuilder();
-
-                            for (const possibility of foundRows) {
-                                if (possibility.rank) {
-                                    if (guildName) {
-                                        message += `${counter}. ${formattedUsername}, ${possibility.rank} and ${possibility.guildRank} of ${guildName}. (UUID: ${possibility.UUID})\n`;
-                                    } else {
-                                        message += `${counter}. ${formattedUsername}, ${possibility.rank}. (UUID: ${possibility.UUID})\n`;
-                                    }
-                                } else {
-                                    if (guildName) {
-                                        message += `${counter}. ${formattedUsername}, ${possibility.guildRank} of ${guildName}. (UUID: ${possibility.UUID})\n`;
-                                    } else {
-                                        message += `${counter}. ${formattedUsername}. (UUID: ${possibility.UUID})\n`;
-                                    }
-                                }
-
-                                const button = new ButtonBuilder()
-                                    .setCustomId(possibility.UUID)
-                                    .setStyle(ButtonStyle.Primary)
-                                    .setLabel(counter.toString());
-
-                                row.addComponents(button);
-
-                                counter++;
-                            }
-
-                            message += 'Click button to choose player.';
-
-                            const editedReply = await interaction.editReply({
-                                content: message,
-                                components: [row],
-                            });
-
-                            const response = new ButtonedMessage(message, [], MessageType.VERIFY, []);
-
-                            response.setMessage(editedReply);
-
-                            MessageManager.addMessage(response);
-
-                            resolve();
-                            return;
-                        } else {
-                            const response = await applyRoles(interaction.guild, foundRows[0].UUID, interaction.member);
-
-                            if (response >= 0) {
-                                await interaction.editReply(`Verified as ${formattedUsername}`);
-
-                                if (config.logMessages && config.logChannel) {
-                                    sendMessage(interaction.guild, config.logChannel, `${interaction.user} has verified as ${formattedUsername}`);
-                                }
-                            } else {
-                                await interaction.editReply(`Unable to verify as ${formattedUsername}`);
-                            }
-
-                            resolve();
-                            return;
-                        }
-
-                        if (checkForAlly) {
-                            let notFound = false;
-
-                            for (const ally of config.allies) {
-                                const allyRows = await new Promise((allyResolve, allyReject) => {
-                                    db.all(
-                                        'SELECT uuid, guildRank, rank FROM players WHERE username = ? AND guildName = ?', [username, ally],
-                                        async (allyErr, rows) => {
-                                            if (allyErr) {
-                                                console.error('Error retrieving player data:', allyErr);
-                                                allyReject(allyErr);
-                                                return;
-                                            }
-
-                                            if (rows.length === 0) {
-                                                allyResolve(null);
-                                            } else {
-                                                allyResolve(rows);
-                                            }
-                                        },
-                                    );
-                                });
-
-                                if (!allyRows && config.allies.indexOf(ally) != (config.allies.length - 1)) {
-                                    continue;
-                                }
-
-                                if (!allyRows || allyRows.length === 0) {
-                                    notFound = true;
-                                } else if (allyRows.length > 1) {
-                                    let message = `Multiple ${formattedUsername}'s found.\n`;
-                                    let counter = 1;
-
-                                    const row = new ActionRowBuilder();
-
-                                    for (const possibility of allyRows) {
-                                        if (possibility.rank) {
-                                            if (ally) {
-                                                message += `${counter}. ${formattedUsername}, ${possibility.rank} and ${possibility.guildRank} of ${ally}. (UUID: ${possibility.UUID})\n`;
-                                            } else {
-                                                message += `${counter}. ${formattedUsername}, ${possibility.rank}. (UUID: ${possibility.UUID})\n`;
-                                            }
-                                        } else {
-                                            if (ally) {
-                                                message += `${counter}. ${formattedUsername}, ${possibility.guildRank} of ${ally}. (UUID: ${possibility.UUID})\n`;
-                                            } else {
-                                                message += `${counter}. ${formattedUsername}. (UUID: ${possibility.UUID})\n`;
-                                            }
-                                        }
-
-                                        const button = new ButtonBuilder()
-                                            .setCustomId(possibility.UUID)
-                                            .setStyle(ButtonStyle.Primary)
-                                            .setLabel(counter.toString());
-
-                                        row.addComponents(button);
-
-                                        counter++;
-                                    }
-
-                                    message += 'Click button to choose player.';
-
-                                    const editedReply = await interaction.editReply({
-                                        content: message,
-                                        components: [row],
-                                    });
-
-                                    const response = new ButtonedMessage(message, [], MessageType.VERIFY, []);
-
-                                    response.setMessage(editedReply);
-
-                                    MessageManager.addMessage(response);
-
-                                    resolve();
-                                    return;
-                                } else {
-                                    const response = await applyRoles(interaction.guild, allyRows[0].UUID, interaction.member);
-
-                                    if (response >= 0) {
-                                        await interaction.editReply(`Verified as ally ${formattedUsername}`);
-
-                                        if (config.logMessages && config.logChannel) {
-                                            sendMessage(interaction.guild, config.logChannel, `${interaction.user} has verified as ally ${formattedUsername}`);
-                                        }
-                                    } else {
-                                        await interaction.editReply(`Unable to verify as ally ${formattedUsername}`);
-                                    }
-
-                                    resolve();
-                                    return;
-                                }
-
-                                if (notFound) {
-                                    const uuid = await getAsync('SELECT UUID FROM players WHERE username = ?', [username]);
-
-                                    if (uuid) {
-                                        await interaction.editReply(`Verified as ${formattedUsername}, you are not a member of ${guildName} or its allies, if you believe this is incorrect please run /updateguild ${guildName}`);
-
-                                        await applyRoles(interaction.guild, uuid['UUID'], interaction.member, true);
-
-                                        if (config.logMessages && config.logChannel) {
-                                            sendMessage(interaction.guild, config.logChannel, `${interaction.user} has verified as ${formattedUsername}, they are not a member of ${guildName} or its allies.`);
-                                        }
-                                    } else {
-                                        await interaction.editReply(`Unable to verify you as ${formattedUsername}.\n\nPlease run /updateplayer with your username or UUID to be added to the database. Please be aware this may take a few minutes.`);
-
-                                        await applyRoles(interaction.guild, null, interaction.member);
-                                    }
-
-                                    
-                                    resolve();
-                                    return;
-                                }
-                            }
-                        }
-                    },
-                );
-            });
+            if (response.componentIds.length > 0) {
+                const row = new ActionRowBuilder();
+    
+                for (let i = 0; i < response.componentIds.length; i++) {
+                    const button = new ButtonBuilder()
+                        .setCustomId(response.componentIds[i])
+                        .setStyle(ButtonStyle.Primary)
+                        .setLabel((i + 1).toString());
+                    row.addComponents(button);
+                }
+    
+                const editedReply = await interaction.editReply({
+                    content: response.text,
+                    components: [row],
+                });
+    
+                response.setMessage(editedReply);
+    
+                MessageManager.addMessage(response);
+            } else {
+                await interaction.editReply(response.pages[0]);
+            }
         } catch (error) {
             await interaction.editReply(`Unable to verify as ${formattedUsername}`);
         }
