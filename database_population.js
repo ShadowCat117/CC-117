@@ -354,8 +354,8 @@ async function updateGuilds() {
             return;
         }
 
-        // Map all guilds
-        const allGuilds = guildJson.map(guild => guild.name);
+        // Get all guild names
+        const guildNames = Object.keys(guildJson);
 
         try {
             // Get all guilds from the table
@@ -366,13 +366,13 @@ async function updateGuilds() {
             const existingGuildNames = rows.map((row) => row.name);
 
             // Find guilds that haven't been added to table yet
-            const guildsNotInTable = allGuilds.filter(
+            const guildsNotInTable = guildNames.filter(
                 (name) => !existingGuildNames.includes(name),
             );
 
             // Find guilds that are in the table but no longer exist
             const guildsToDelete = existingGuildNames.filter(
-                (name) => !allGuilds.includes(name),
+                (name) => !guildNames.includes(name),
             );
 
             for (const guildName of guildsToDelete) {
