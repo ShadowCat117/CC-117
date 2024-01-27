@@ -1,8 +1,11 @@
 const {
     SlashCommandBuilder,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
 } = require('discord.js');
-const fs = require('fs').promises;
-const path = require('path');
+const updatePlayer = require('../../functions/update_player');
+const MessageManager = require('../../message_type/MessageManager');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -10,40 +13,33 @@ module.exports = {
         .setDescription('Prioritises a player to be updated in the database.')
         .addStringOption(option =>
             option.setName('player')
-                .setDescription('The name/UUID of the player you want to be updated. UUID is preferred.')
+                .setDescription('The name of the player you want to be updated.')
                 .setRequired(true)),
     ephemeral: true,
     async execute(interaction) {
-        const player = interaction.options.getString('player');
+        const response = await updatePlayer(interaction, false);
 
-        const filePath = path.join(__dirname, '..', '..', 'updatePlayers.json');
+        if (response.componentIds.length > 0) {
+            const row = new ActionRowBuilder();
 
-        try {
-            let updatePlayersFile = {};
-
-            try {
-                await fs.access(filePath);
-                const fileData = await fs.readFile(filePath, 'utf-8');
-                updatePlayersFile = JSON.parse(fileData);
-            } catch (err) {
-                console.log('Error reading priority players file.');
-                return;
+            for (let i = 0; i < response.componentIds.length; i++) {
+                const button = new ButtonBuilder()
+                    .setCustomId(response.componentIds[i])
+                    .setStyle(ButtonStyle.Primary)
+                    .setLabel((i + 1).toString());
+                row.addComponents(button);
             }
 
-            updatePlayersFile.players = updatePlayersFile.players.filter(item => item !== null);
+            const editedReply = await interaction.editReply({
+                content: response.text,
+                components: [row],
+            });
 
-            if (updatePlayersFile.players.includes(player)) {
-                await interaction.editReply(`${player} is already queued to be updated.`);
-            } else {
-                updatePlayersFile.players.unshift(player);
+            response.setMessage(editedReply);
 
-                const updatedData = JSON.stringify(updatePlayersFile);
-                await fs.writeFile(filePath, updatedData, 'utf-8');
-
-                await interaction.editReply(`${player} will be updated soon.`);
-            }
-        } catch (error) {
-            await interaction.editReply('Unable to update player.');
+            MessageManager.addMessage(response);
+        } else {
+            await interaction.editReply(response.pages[0]);
         }
     },
 };

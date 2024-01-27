@@ -31,6 +31,7 @@ const addPromotionException = require('../functions/add_promotion_exception');
 const removeDemotionException = require('../functions/remove_demotion_exception');
 const removeInactivityException = require('../functions/remove_inactivity_exception');
 const removePromotionException = require('../functions/remove_promotion_exception');
+const updatePlayer = require('../functions/update_player');
 
 const warriorArchetypes = ['fallen', 'battleMonk', 'paladin'];
 const mageArchetypes = ['riftwalker', 'lightBender', 'arcanist'];
@@ -1231,6 +1232,18 @@ module.exports = {
                         case MessageType.UPDATE_GUILD:
                             // Run updateGuild
                             result = await updateGuild(interaction, true);
+
+                            interaction.editReply({
+                                content: result.pages[0],
+                                components: [],
+                            });
+
+                            MessageManager.removeMessage(message);
+
+                            break;
+                        case MessageType.UPDATE_PLAYER:
+                            // Run updatePlayer
+                            result = await updatePlayer(interaction, true);
 
                             interaction.editReply({
                                 content: result.pages[0],
