@@ -413,7 +413,7 @@ async function updatePriorityGuilds() {
     const filePath = path.join(__dirname, 'updateGuilds.json');
     const configsPath = path.join(__dirname, 'configs');
     const primaryGuilds = [];
-    const secondaryGuilds = [];
+    let secondaryGuilds = [];
 
     try {
         // Read all config files
@@ -445,6 +445,9 @@ async function updatePriorityGuilds() {
                 }
             });
         }
+
+        // Remove any guild that is primary from the secondary list
+        secondaryGuilds = secondaryGuilds.filter(name => !(name && primaryGuilds.includes(name)));
 
         try {
             // Get priority guilds file
