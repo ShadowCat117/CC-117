@@ -202,10 +202,12 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                 response = 1;
             }
 
-            try {
-                await member.setNickname(null);
-            } catch (ex) {
-                errorMessage += `Failed to change nickname for ${member.user.username}.`;
+            if (member.id !== member.guild.ownerId) {
+                try {
+                    await member.setNickname(null);
+                } catch (ex) {
+                    errorMessage += `Failed to change nickname for ${member.user.username}.`;
+                }
             }
 
             if (errorMessage !== '' && config.logMessages) {
