@@ -86,6 +86,8 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
 
         const memberRoles = member.roles.cache;
 
+        let errorMessage = '';
+
         if (!row) {
             for (const role of memberRoles.values()) {
                 if (guildRoles.includes(role)) {
@@ -200,7 +202,15 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                 response = 1;
             }
 
-            await member.setNickname(null);
+            try {
+                await member.setNickname(null);
+            } catch (ex) {
+                errorMessage += `Failed to change nickname for ${member.user.username}.`;
+            }
+
+            if (errorMessage !== '' && config.logMessages) {
+                sendMessage(guild, config.logChannel, errorMessage);
+            }
 
             return response;
         }
@@ -209,8 +219,6 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
         const rank = row.rank;
         const veteran = row.veteran;
         const serverRank = row.serverRank;
-
-        let errorMessage = '';
 
         if (guildRank && !nonGuildMember) {
             if (row.guildName === config.guildName) {
@@ -598,14 +606,22 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                 }
 
                 if (!validNickname && member.user.username !== row.username) {
+                    try {
                         await member.setNickname(row.username);
+                    } catch (ex) {
+                        sendMessage(guild, config.logChannel, `Failed to change nickname for ${member.user.username}.`);
+                    }
                 }
             } else {
                 if (row.guildName) {
                     const guildPrefix = await findPrefix(row.guildName);
 
                     if (guildPrefix && config.changeNicknames && member.nickname !== `${row.username} [${guildPrefix}]`) {
-                        await member.setNickname(`${row.username} [${guildPrefix}]`);
+                        try {
+                            await member.setNickname(`${row.username} [${guildPrefix}]`);
+                        } catch (ex) {
+                            sendMessage(guild, config.logChannel, `Failed to change nickname for ${member.user.username}.`);
+                        }
                     }
                 }
             }

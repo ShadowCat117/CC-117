@@ -3,6 +3,7 @@ const {
 } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
+const sendMessage = require('../functions/send_message');
 
 module.exports = {
     name: Events.GuildMemberUpdate,
@@ -38,10 +39,15 @@ module.exports = {
                         if (!validChange) {
                             const oldNickname = oldMember.nickname;
 
-                            if (oldNickname) {
-                                newMember.setNickname(oldNickname);
-                            } else {
-                                newMember.setNickname(null);
+                            // Attempt to change nickname, will fail if missing permissions
+                            try {
+                                if (oldNickname) {
+                                    newMember.setNickname(oldNickname);
+                                } else {
+                                    newMember.setNickname(null);
+                                }
+                            } catch (ex) {
+                                sendMessage(guild, config.logChannel, `Failed to change nickname for ${newMember.user.username}.`);
                             }
                         }
                     } catch (fileError) {
