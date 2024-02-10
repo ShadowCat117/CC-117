@@ -241,7 +241,7 @@ async function promotionProgress(interaction, force = false) {
         }
 
         if (promotionRequirements.includes('TOP')) {
-            if (contributionPos < contributionRequirement) {
+            if (contributionPos <= contributionRequirement) {
                 reqsMessage += `🟢 Is a top contributor (${contributionPos}/${contributionRequirement})\n`;
                 metRequirements++;
             } else {
