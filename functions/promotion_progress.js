@@ -54,7 +54,7 @@ async function promotionProgress(interaction, force = false) {
 
         const player = await findPlayer(nameToSearch, guildName, force);
 
-        if (player && player.message === 'Multiple possibilities found') {
+        if (player != null && player.message === 'Multiple possibilities found') {
             let textMessage = `Multiple players found with the username: ${nameToSearch}.`;
     
             for (let i = 0; i < player.playerUuids.length; i++) {
