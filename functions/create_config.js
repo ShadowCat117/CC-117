@@ -167,6 +167,7 @@ async function createConfig(client, guildId) {
                 recruiterEcoRequirement: false,
                 giveawayMessage: '',
                 giveawayRole: null,
+                chiefPromotions: [],
             };
 
             try {

@@ -160,7 +160,14 @@ async function checkForPromotions(interaction) {
     
                 const serverMember = await findDiscordUser(interaction.guild.members.cache.values(), username);
 
-                const playtimeRow = await getAsync(`SELECT averagePlaytime FROM ${tableName} WHERE UUID = ?`, [row.UUID]);
+                let playtimeRow;
+
+                try {
+                    playtimeRow = await getAsync(`SELECT averagePlaytime FROM ${tableName} WHERE UUID = ?`, [row.UUID]);
+                } catch (err) {
+                    playtimeRow = undefined;
+                    console.log(`No table exists: ${tableName}`);
+                }
 
                 let hasBuildRole = false;
                 let hasEcoRole = false;
@@ -202,7 +209,7 @@ async function checkForPromotions(interaction) {
         let counter = 0;
 
         promoteGuildMembers.forEach((player) => {
-            if (counter === 20) {
+            if (counter === 10) {
                 promoteMembersPage += '```';
                 pages.push(promoteMembersPage);
                 promoteMembersPage = '```\n' + player.toString();
@@ -213,7 +220,7 @@ async function checkForPromotions(interaction) {
             }
         });
 
-        if (counter <= 20) {
+        if (counter <= 10) {
             promoteMembersPage += '```';
             pages.push(promoteMembersPage);
         }
@@ -224,23 +231,31 @@ async function checkForPromotions(interaction) {
             let chiefCounter = 0;
 
             eligibleChiefs.forEach((player) => {
-                if (chiefCounter === 20) {
-                    promoteChiefsPage += '```';
-                    chiefPages.push(promoteChiefsPage);
-                    promoteChiefsPage = '```\n' + player.toString().substring(15);
-                    chiefCounter = 1;
-                } else {
-                    promoteChiefsPage += player.toString().substring(15);
-                    chiefCounter++;
+                if (config['chiefPromotions'] && !config['chiefPromotions'].includes(player.username)) {
+                    if (chiefCounter === 10) {
+                        promoteChiefsPage += '```';
+                        chiefPages.push(promoteChiefsPage);
+                        promoteChiefsPage = '```\n' + player.toString().substring(15);
+                        chiefCounter = 1;
+                    } else {
+                        promoteChiefsPage += player.toString().substring(15);
+                        chiefCounter++;
+                    }
+
+                    config['chiefPromotions'].push(player.username);
                 }
             });
 
-            if (chiefCounter <= 20) {
+            fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
+
+            if (chiefCounter <= 10) {
                 promoteChiefsPage += '```';
                 chiefPages.push(promoteChiefsPage);
             }
 
-            sendMessage(interaction.guild, config.highRankChannel, chiefPages[0]);
+            if (promoteChiefsPage !== '```\n```') {
+                await sendMessage(interaction.guild, config.highRankChannel, chiefPages[0]);
+            }
         }
 
         return new ButtonedMessage('', [], '', pages);

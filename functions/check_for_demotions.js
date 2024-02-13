@@ -193,7 +193,7 @@ async function checkForDemotions(interaction) {
         let counter = 0;
 
         demoteGuildMembers.forEach((player) => {
-            if (counter === 20) {
+            if (counter === 10) {
                 demoteMembersPage += '```';
                 pages.push(demoteMembersPage);
                 demoteMembersPage = '```\n' + player.toString();
@@ -204,7 +204,7 @@ async function checkForDemotions(interaction) {
             }
         });
 
-        if (counter <= 20) {
+        if (counter <= 10) {
             demoteMembersPage += '```';
             pages.push(demoteMembersPage);
         }

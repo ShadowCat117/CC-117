@@ -1105,6 +1105,32 @@ async function updateExceptions() {
     }
 }
 
+// Remove eligible chiefs from the list so they can be shown the next day
+async function removeEligibleChiefs() {
+    const configsPath = path.join(__dirname, 'configs');
+
+    try {
+        const files = await fs.readdir(configsPath);
+
+        // Loop through all config files
+        for (const file of files) {
+            const filePath = path.join(configsPath, file);
+
+            // Read the config
+            const data = await fs.readFile(filePath, 'utf8');
+            const config = JSON.parse(data);
+
+            // Clear the list
+            config['chiefPromotions'] = [];
+
+            // Update the config file
+            fs.writeFile(filePath, JSON.stringify(config, null, 2), 'utf-8');
+        }
+    } catch (err) {
+        console.error('Error updating exceptions:', err);
+    }
+}
+
 // Runs as fast as it can, as soon as it has done all operations it will run again
 async function runFreeFunction() {
     hitLimit = false;
@@ -1160,6 +1186,10 @@ async function runScheduledFunction() {
         // Updates the days for how long players are exempt from promotion/demotion
         console.log('Updating promotion and demotion exceptions.');
         await updateExceptions();
+
+        // Removes chiefs from the list so their promotion message can be displayed again
+        console.log('Removing eligible chief promotions.');
+        await removeEligibleChiefs();
 
         // Updates priority guilds with new set, allied and tracked guilds. Also add all members to priority.
         console.log('Adding used guilds to priority');
