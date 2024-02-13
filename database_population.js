@@ -376,14 +376,7 @@ async function updateGuilds() {
             );
 
             for (const guildName of guildsToDelete) {
-                // Delete all guilds from the table that no longer exist
-                const deleteQuery = 'DELETE FROM guilds WHERE name = ?';
-                await runAsync(deleteQuery, [guildName]);
-                console.log(`Deleted guild '${guildName}' from the 'guilds' table.`);
-
-                // For all members who were part of a deleted guilds, set their guild related stats to default
-                const updateQuery = 'UPDATE players SET guildName = NULL, guildRank = NULL, contributedGuildXP = 0, guildJoinDate = NULL WHERE guildName = ?';
-                await runAsync(updateQuery, [guildName]);
+                await deleteGuild(guildName);
             }
 
             // Update every guild that isn't in the table
@@ -659,6 +652,7 @@ async function removeGuildMembers(guildName, allUuids) {
         return;
     }
 }
+
 // Update what guild a player is in
 async function updatePlayersGuild(playerUuid, playerName, guildName, guildRank, contributedGuildXP, joinDate, isOnline, onlineWorld) {
     // Get player from table
@@ -739,6 +733,69 @@ async function updateGuildMembers() {
     } catch (err) {
         console.error('Error updating guild members: ', err);
         return;
+    }
+}
+
+async function deleteGuild(guildName) {
+    // Delete all guilds from the table that no longer exist
+    const deleteQuery = 'DELETE FROM guilds WHERE name = ?';
+    await runAsync(deleteQuery, [guildName]);
+
+    // For all members who were part of a deleted guilds, set their guild related stats to default
+    const updateQuery = 'UPDATE players SET guildName = NULL, guildRank = NULL, contributedGuildXP = 0, guildJoinDate = NULL WHERE guildName = ?';
+    await runAsync(updateQuery, [guildName]);
+
+    const configsPath = path.join(__dirname, 'configs');
+
+    try {
+        const files = await fs.readdir(configsPath);
+
+        // Loop through all config files
+        for (const file of files) {
+            const filePath = path.join(configsPath, file);
+
+            // Read the config
+            const data = await fs.readFile(filePath, 'utf8');
+            const config = JSON.parse(data);
+
+            // If a server has the deleted guild set as their guild, reset it
+            if (config['guildName'] === guildName) {
+                config['guildName'] = null;
+            }
+
+            // If a server is allied with the deleted guild, remove it from their allies
+            if (config['allies'].includes(guildName)) {
+                config['allies'] = config['allies'].filter(guild => guild !== guildName);
+            }
+
+            // If a server is tracking the deleted guild, remove it from their tracked list
+            if (config['trackedGuilds'].includes(guildName)) {
+                config['trackedGuilds'] = config['trackedGuilds'].filter(guild => guild !== guildName);
+            }
+
+            // Update the config file
+            fs.writeFile(filePath, JSON.stringify(config, null, 2), 'utf-8');
+        }
+
+        const filePath = path.join(__dirname, 'updateGuilds.json');
+
+        // Get priority guilds file
+        await fs.access(filePath);
+        const fileData = await fs.readFile(filePath, 'utf-8');
+        const updateGuildsFile = JSON.parse(fileData);
+
+        // Remove guild from priority guilds file
+        if (updateGuildsFile['guilds'].includes(guildName)) {
+            updateGuildsFile['guilds'] = updateGuildsFile['guilds'].filter(guild => guild !== guildName);
+        }
+
+        // Save new priority guilds file
+        const updatedData = JSON.stringify(updateGuildsFile);
+        await fs.writeFile(filePath, updatedData, 'utf-8');
+
+        console.log(`Deleted all references to ${guildName}.`);
+    } catch (err) {
+        console.error('Error updating exceptions:', err);
     }
 }
 
