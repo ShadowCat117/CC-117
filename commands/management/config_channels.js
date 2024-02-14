@@ -26,7 +26,8 @@ module.exports = {
                 }))
         .addChannelOption((option) =>
             option.setName('channel')
-                .setDescription('The channel value to set for the configuration option'),
+                .setDescription('The channel value to set for the configuration option')
+                .setRequired(true),
         ),
     ephemeral: true,
     async execute(interaction) {

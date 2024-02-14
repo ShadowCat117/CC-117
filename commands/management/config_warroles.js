@@ -37,7 +37,8 @@ module.exports = {
                 }))
         .addRoleOption((option) =>
             option.setName('role')
-                .setDescription('The role value to set for the configuration option'),
+                .setDescription('The role value to set for the configuration option')
+                .setRequired(true),
         ),
     ephemeral: true,
     async execute(interaction) {

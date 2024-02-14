@@ -88,7 +88,8 @@ module.exports = {
                 }))
         .addStringOption((option) =>
             option.setName('value')
-                .setDescription('The value to set for the configuration option'),
+                .setDescription('The value to set for the configuration option')
+                .setRequired(true),
         ),
     ephemeral: true,
     async execute(interaction) {

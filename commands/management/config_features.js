@@ -46,7 +46,8 @@ module.exports = {
                 }))
         .addBooleanOption((option) =>
             option.setName('enabled')
-                .setDescription('Enable or disable this feature.'),
+                .setDescription('Enable or disable this feature.')
+                .setRequired(true),
         ),
     ephemeral: true,
     async execute(interaction) {
