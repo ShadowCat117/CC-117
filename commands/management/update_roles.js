@@ -2,14 +2,14 @@ const {
     SlashCommandBuilder,
 } = require('discord.js');
 const createConfig = require('../../functions/create_config');
-const updateRanks = require('../../functions/update_ranks');
+const updateRoles = require('../../functions/update_roles');
 const fs = require('fs');
 const path = require('path');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('updateranks')
-        .setDescription('Updates the rank of every member of the server.'),
+        .setName('updateroles')
+        .setDescription('Updates the roles of every member of the server.'),
     ephemeral: false,
     async execute(interaction) {
         const guildId = interaction.guild.id;
@@ -54,11 +54,11 @@ module.exports = {
 
         } catch (error) {
             console.log(error);
-            await interaction.editReply('Error updating ranks.');
+            await interaction.editReply('Error updating roles.');
             return;
         }
 
-        const response = await updateRanks(interaction.guild);
+        const response = await updateRoles(interaction.guild);
 
         await interaction.editReply(response);
     },

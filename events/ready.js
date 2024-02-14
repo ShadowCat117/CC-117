@@ -1,5 +1,5 @@
 const { ActivityType, Events } = require('discord.js');
-const updateRanks = require('../functions/update_ranks');
+const updateRoles = require('../functions/update_roles');
 const fs = require('fs');
 const path = require('path');
 const MessageManager = require('../message_type/MessageManager');
@@ -28,17 +28,17 @@ async function hourlyTasks() {
                     config = JSON.parse(fileData);
                 }
 
-                // If the server has the hourly rank updates enabled, then update the ranks
-                if (config.updateRanks) {
-                    console.log(`Updating ranks for ${guild}`);
-                    const response = await updateRanks(guild);
+                // If the server has the hourly rank updates enabled, then update the roles
+                if (config.updateRoles) {
+                    console.log(`Updating roles for ${guild}`);
+                    const response = await updateRoles(guild);
 
                     // Only send a message to their log channel if any members were updated
                     // and currently ignore the problem message whilst it's persisting a lot
-                    if (response !== 'Updated roles for 0 members.' && response !== 'Updated roles for 0 members. (interrupted)' && response !== 'Problem updating ranks') {
+                    if (response !== 'Updated roles for 0 members.' && response !== 'Updated roles for 0 members. (interrupted)' && response !== 'Problem updating roles') {
                         MessageManager.sendMessage(guild, config.logChannel, response);
                     }
-                    console.log(`Updated ranks for ${guild}`);
+                    console.log(`Updated roles for ${guild}`);
                 } else {
                     continue;
                 }

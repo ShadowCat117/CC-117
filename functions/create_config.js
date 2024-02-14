@@ -15,7 +15,7 @@ async function createConfig(client, guildId) {
 
             const defaultData = {
                 adminRole: highestRole.id,
-                updateRanks: false,
+                updateRoles: false,
                 changeNicknames: false,
                 checkDuplicateNicknames: false,
                 logChannel: null,

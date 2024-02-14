@@ -14,8 +14,8 @@ module.exports = {
                 .setDescription('The configuration option to update')
                 .setRequired(true)
                 .addChoices({
-                    name: 'Update Ranks',
-                    value: 'updateRanks',
+                    name: 'Update Roles',
+                    value: 'updateRoles',
                 }, {
                     name: 'Change Nicknames',
                     value: 'changeNicknames',
@@ -101,9 +101,9 @@ module.exports = {
         const enabled = interaction.options.getBoolean('enabled');
 
         switch (option) {
-            case 'updateRanks':
+            case 'updateRoles':
                 if (enabled == null) {
-                    await interaction.editReply('Update Ranks requires an <enabled> input.');
+                    await interaction.editReply('Update Roles requires an <enabled> input.');
                     return;
                 }
 
@@ -187,7 +187,7 @@ module.exports = {
             }
 
             switch (option) {
-                case 'updateRanks':
+                case 'updateRoles':
                 case 'changeNicknames':
                 case 'checkDuplicateNicknames':
                 case 'logMessages':

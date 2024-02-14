@@ -154,7 +154,7 @@ module.exports = {
 
             configContent = '';
 
-            configContent += `Update Ranks Daily: ${config.updateRanks}\n`;
+            configContent += `Update Roles Daily: ${config.updateRoles}\n`;
             configContent += `Change nicknames to Minecraft username: ${config.changeNicknames}\n`;
             configContent += `Only allow unique nicknames: ${config.checkDuplicateNicknames}\n`;
             configContent += `Send messages to log channel: ${config.logMessages}\n`;

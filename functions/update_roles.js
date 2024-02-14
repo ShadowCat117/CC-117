@@ -29,7 +29,7 @@ async function getAsync(query, params) {
     });
 }
 
-async function updateRanks(guild) {
+async function updateRoles(guild) {
     const directoryPath = path.join(__dirname, '..', 'configs');
     const filePath = path.join(directoryPath, `${guild.id}.json`);
     let updatedMembers = 0;
@@ -262,7 +262,7 @@ async function updateRanks(guild) {
         }
     } catch (err) {
         console.log(err);
-        // return 'Problem updating ranks';
+        
         if (updatedMembers > 0) {
             messageEnd += ')';
             return (messageStart + messageEnd + ' (interrupted)');
@@ -272,4 +272,4 @@ async function updateRanks(guild) {
     }
 }
 
-module.exports = updateRanks;
+module.exports = updateRoles;
