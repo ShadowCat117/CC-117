@@ -155,6 +155,7 @@ async function updatePriorityPlayers() {
 
     try {
         let updatePlayersFile = {};
+        const updatedPlayers = [];
 
         try {
             // Get the priority players file
@@ -205,12 +206,21 @@ async function updatePriorityPlayers() {
                 await updatePlayer(priorityPlayer);
 
                 if (!hitLimit) {
-                    // Remove player from priority players file
-                    updatePlayersFile.players = updatePlayersFile.players.filter(player => player !== priorityPlayer);
+                    // Add player to updated players list
+                    updatedPlayers.push(priorityPlayer);
                     updated++;
                 }
             }
 
+            // Read file again
+            await fs.access(filePath);
+            const fileData = await fs.readFile(filePath, 'utf-8');
+            updatePlayersFile = JSON.parse(fileData);
+
+            // Filter file based on who has been updated
+            updatePlayersFile.players = updatePlayersFile.players.filter(player => !updatedPlayers.includes(player));
+
+            // Save file
             const updatedData = JSON.stringify(updatePlayersFile);
             await fs.writeFile(filePath, updatedData, 'utf-8');
 
