@@ -6,6 +6,7 @@ const path = require('path');
 let freeFunctionRuns = 0;
 let currentGuildIndex = 0;
 let hitLimit = false;
+let skipPriorityPlayers = false;
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 // Call run queries on the database with promises
@@ -151,6 +152,8 @@ async function updatePlayerStatus(players, playersCount) {
 
 // Updates players who are on the priority list
 async function updatePriorityPlayers() {
+    if (skipPriorityPlayers) return;
+    
     const filePath = path.join(__dirname, 'updatePlayers.json');
 
     try {
@@ -929,6 +932,8 @@ async function addPriorityGuilds(addSecondary) {
             });
         }
 
+        skipPriorityPlayers = true;
+
         // For each guild in the priority list, add all members of that list to the priority players list
         for (const priorityGuild of uniqueGuildNames) {
             // If not adding secondary guild members and priority guild is not primary, skip
@@ -945,6 +950,8 @@ async function addPriorityGuilds(addSecondary) {
                 await addPlayerToPriority(uuid);
             }
         }
+
+        skipPriorityPlayers = false;
 
         const filePath = path.join(__dirname, 'updateGuilds.json');
         let updateGuildsFile = {};
