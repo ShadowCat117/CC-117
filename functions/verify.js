@@ -54,6 +54,10 @@ async function verify(interaction, force = false) {
         return new ButtonedMessage(textMessage, player.playerUuids, MessageType.VERIFY, []);
     }
 
+    if (!player) {
+        return new ButtonedMessage('', [], '', [`Unknown player, ${nameToSearch.replace(/_/g, '\\_')}`]);
+    }
+
     const memberToCheck = await getAsync('SELECT UUID, username, guildName, guildRank, rank FROM players WHERE UUID = ?', [player.uuid]);
 
     if (!memberToCheck) {

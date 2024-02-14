@@ -51,7 +51,7 @@ async function updatePlayer(interaction, force = false) {
         }
 
         if (!player) {
-            return new ButtonedMessage('', [], '', [`Unable to find player named ${nameToSearch.replace(/_/g, '\\_')}, make sure they have logged into Wynncraft for at least 15 minutes.`]);
+            return new ButtonedMessage('', [], '', [`Unable to find player named ${nameToSearch.replace(/_/g, '\\_')}, make sure they have logged into Wynncraft for at least 15 minutes. Or if their username has changed, try using their previous username.`]);
         }
 
         updatePlayersFile.players = updatePlayersFile.players.filter(item => item !== null);

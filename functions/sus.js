@@ -58,6 +58,10 @@ async function sus(interaction, force = false) {
         return new ButtonedMessage(textMessage, player.playerUuids, MessageType.SUS, []);
     }
 
+    if (!player) {
+        return new ButtonedMessage('', [], '', [`Unknown player, ${nameToSearch.replace(/_/g, '\\_')}`]);
+    }
+
     const memberToCheck = await getAsync('SELECT username, guildName, guildRank, rank, veteran, firstJoin, completedQuests, totalCombatLevel, playtime FROM players WHERE UUID = ?', [player.uuid]);
 
     if (!memberToCheck) {

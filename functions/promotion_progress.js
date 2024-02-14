@@ -80,6 +80,10 @@ async function promotionProgress(interaction, force = false) {
             return new ButtonedMessage(textMessage, player.playerUuids, MessageType.PROMOTION_PROGRESS, []);
         }
 
+        if (!player) {
+            return new ButtonedMessage('', [], '', [`Unknown player, ${nameToSearch.replace(/_/g, '\\_')}`]);
+        }
+
         const promotionExceptions = config['promotionExceptions'] !== undefined ? config['promotionExceptions'] : {};
 
         const exemptUsernames = Object.keys(promotionExceptions);
