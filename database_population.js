@@ -737,7 +737,7 @@ async function updateGuildMembers() {
 }
 
 async function deleteGuild(guildName) {
-    // Delete all guilds from the table that no longer exist
+    // Delete guild from the table
     const deleteQuery = 'DELETE FROM guilds WHERE name = ?';
     await runAsync(deleteQuery, [guildName]);
 
