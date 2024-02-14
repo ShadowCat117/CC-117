@@ -81,7 +81,7 @@ async function promotionProgress(interaction, force = false) {
         }
 
         if (!player) {
-            return new ButtonedMessage('', [], '', [`Unknown player, ${nameToSearch.replace(/_/g, '\\_')}`]);
+            return new ButtonedMessage('', [], '', [`Unknown player, ${nameToSearch.replace(/_/g, '\\_')}. They may not be a member of ${guildName}`]);
         }
 
         const promotionExceptions = config['promotionExceptions'] !== undefined ? config['promotionExceptions'] : {};
