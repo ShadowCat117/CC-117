@@ -892,10 +892,11 @@ async function updateGuildActivity(currentHour, currentMinute) {
 }
 
 // Add guilds to priority list based on config files
-async function addPriorityGuilds() {
+async function addPriorityGuilds(addSecondary) {
     const configsPath = path.join(__dirname, 'configs');
 
     const uniqueGuildNames = [];
+    const primaryGuilds = [];
 
     try {
         const files = await fs.readdir(configsPath);
@@ -910,6 +911,7 @@ async function addPriorityGuilds() {
             // If config has a set guild and it isn't already present in the unique list, add it
             if (config.guildName && !uniqueGuildNames.includes(config.guildName)) {
                 uniqueGuildNames.push(config.guildName);
+                primaryGuilds.push(config.guildName);
             }
 
             // For each ally the config has, add it to the list if it isn't already present in the unique list
@@ -929,6 +931,9 @@ async function addPriorityGuilds() {
 
         // For each guild in the priority list, add all members of that list to the priority players list
         for (const priorityGuild of uniqueGuildNames) {
+            // If not adding secondary guild members and priority guild is not primary, skip
+            if (!addSecondary && !primaryGuilds.includes(priorityGuild)) continue;
+
             // Get all members of the guild
             const memberUuids = await allAsync('SELECT UUID FROM players WHERE guildName = ?', [priorityGuild]);
 
@@ -1259,6 +1264,14 @@ async function runScheduledFunction() {
         console.log('Completed quarter hourly tasks');
     }
 
+    // Update every 3 hours.
+    if ((now.getUTCHours() === 0 || now.getUTCHours() % 3 === 0) && now.getUTCMinutes() === 0) {
+        // Updates priority guilds with new set, allied and tracked guilds.
+        // Adds members of primary guilds to priority too. Secondary guild members are added daily.
+        console.log('Adding used guilds and members to priority');
+        await addPriorityGuilds(now.getUTCHours() === 0);
+    }
+
     // Update daily
     if (now.getUTCHours() === 0 && now.getUTCMinutes() === 0) {
         // Updates the days for how long players are exempt from promotion/demotion
@@ -1268,10 +1281,6 @@ async function runScheduledFunction() {
         // Removes chiefs from the list so their promotion message can be displayed again
         console.log('Removing eligible chief promotions.');
         await removeEligibleChiefs();
-
-        // Updates priority guilds with new set, allied and tracked guilds. Also add all members to priority.
-        console.log('Adding used guilds to priority');
-        await addPriorityGuilds();
 
         const dayOfWeek = daysOfWeek[now.getUTCDay()];
         const backupFilename = `database_backup_${dayOfWeek}.db`;
