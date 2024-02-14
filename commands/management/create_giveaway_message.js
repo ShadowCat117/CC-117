@@ -7,7 +7,7 @@ const {
 const fs = require('fs');
 const path = require('path');
 const createConfig = require('../../functions/create_config');
-const sendMessage = require('../../functions/send_message');
+const MessageManager = require('../../message_type/MessageManager');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -69,7 +69,7 @@ module.exports = {
                 return;
             }
 
-            const giveawayMessage = await sendMessage(interaction.guild, interaction.channel.id, message);
+            const giveawayMessage = await MessageManager.sendMessage(interaction.guild, interaction.channel.id, message);
 
             const giveawayButton = new ButtonBuilder()
                 .setCustomId('giveaway')

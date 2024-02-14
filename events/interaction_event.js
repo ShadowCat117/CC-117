@@ -22,7 +22,6 @@ const updateGuild = require('../functions/update_guild');
 const worldActivity = require('../functions/world_activity');
 const fs = require('fs');
 const path = require('path');
-const sendMessage = require('../functions/send_message');
 const promotionProgress = require('../functions/promotion_progress');
 const verify = require('../functions/verify');
 const addDemotionException = require('../functions/add_demotion_exception');
@@ -202,7 +201,7 @@ module.exports = {
                                     console.log(`Added warrer role to ${interaction.member.user.username}`);
                                 })
                                 .catch(() => {
-                                    sendMessage(interaction.guild, interaction.channel.id, `Failed to add warrer role to ${interaction.member.user.username}`);
+                                    MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to add warrer role to ${interaction.member.user.username}`);
                                 });
                         }
 
@@ -279,7 +278,7 @@ module.exports = {
                                 console.log(`Added war role to ${interaction.member.user.username}`);
                             })
                             .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add warrer role to ${interaction.member.user.username}`);
+                                MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to add warrer role to ${interaction.member.user.username}`);
                             });
                     }
 
@@ -292,7 +291,7 @@ module.exports = {
                                 console.log(`Removed tank role from ${interaction.member.user.username}`);
                             })
                             .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to remove tank role from ${interaction.member.user.username}`);
+                                MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to remove tank role from ${interaction.member.user.username}`);
                             });
 
                         replyMessage = `You no longer have the ${tankRole} role`;
@@ -302,7 +301,7 @@ module.exports = {
                                 console.log(`Added tank role to ${interaction.member.user.username}`);
                             })
                             .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add tank role to ${interaction.member.user.username}`);
+                                MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to add tank role to ${interaction.member.user.username}`);
                             });
 
                         replyMessage = `You now have the ${tankRole} role`;
@@ -329,7 +328,7 @@ module.exports = {
                                 console.log(`Added war role to ${interaction.member.user.username}`);
                             })
                             .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add warrer role to ${interaction.member.user.username}`);
+                                MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to add warrer role to ${interaction.member.user.username}`);
                             });
                     }
 
@@ -342,7 +341,7 @@ module.exports = {
                                 console.log(`Removed healer role from ${interaction.member.user.username}`);
                             })
                             .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to remove healer role from ${interaction.member.user.username}`);
+                                MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to remove healer role from ${interaction.member.user.username}`);
                             });
 
                         replyMessage = `You no longer have the ${healerRole} role`;
@@ -352,7 +351,7 @@ module.exports = {
                                 console.log(`Added healer role to ${interaction.member.user.username}`);
                             })
                             .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add healer role to ${interaction.member.user.username}`);
+                                MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to add healer role to ${interaction.member.user.username}`);
                             });
 
                         replyMessage = `You now have the ${healerRole} role`;
@@ -379,7 +378,7 @@ module.exports = {
                                 console.log(`Added war role to ${interaction.member.user.username}`);
                             })
                             .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add warrer role to ${interaction.member.user.username}`);
+                                MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to add warrer role to ${interaction.member.user.username}`);
                             });
                     }
 
@@ -392,7 +391,7 @@ module.exports = {
                                 console.log(`Removed damage role from ${interaction.member.user.username}`);
                             })
                             .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to remove damage role from ${interaction.member.user.username}`);
+                                MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to remove damage role from ${interaction.member.user.username}`);
                             });
 
                         replyMessage = `You no longer have the ${damageRole} role`;
@@ -402,7 +401,7 @@ module.exports = {
                                 console.log(`Added damage role to ${interaction.member.user.username}`);
                             })
                             .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add damage role to ${interaction.member.user.username}`);
+                                MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to add damage role to ${interaction.member.user.username}`);
                             });
 
                         replyMessage = `You now have the ${damageRole} role`;
@@ -429,7 +428,7 @@ module.exports = {
                                 console.log(`Added war role to ${interaction.member.user.username}`);
                             })
                             .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add warrer role to ${interaction.member.user.username}`);
+                                MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to add warrer role to ${interaction.member.user.username}`);
                             });
                     }
 
@@ -442,7 +441,7 @@ module.exports = {
                                 console.log(`Removed solo role from ${interaction.member.user.username}`);
                             })
                             .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to remove solo role from ${interaction.member.user.username}`);
+                                MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to remove solo role from ${interaction.member.user.username}`);
                             });
 
                         replyMessage = `You no longer have the ${soloRole} role`;
@@ -452,7 +451,7 @@ module.exports = {
                                 console.log(`Added solo role to ${interaction.member.user.username}`);
                             })
                             .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add solo role to ${interaction.member.user.username}`);
+                                MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to add solo role to ${interaction.member.user.username}`);
                             });
 
                         replyMessage = `You now have the ${soloRole} role`;
@@ -478,7 +477,7 @@ module.exports = {
                                 console.log(`Removed eco role from ${interaction.member.user.username}`);
                             })
                             .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to remove eco role from ${interaction.member.user.username}`);
+                                MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to remove eco role from ${interaction.member.user.username}`);
                             });
 
                         replyMessage = `You no longer have the ${ecoRole} role`;
@@ -488,7 +487,7 @@ module.exports = {
                                 console.log(`Added eco role to ${interaction.member.user.username}`);
                             })
                             .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add eco role to ${interaction.member.user.username}`);
+                                MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to add eco role to ${interaction.member.user.username}`);
                             });
 
                         replyMessage = `You now have the ${ecoRole} role`;
@@ -513,7 +512,7 @@ module.exports = {
                                 console.log(`Added warrer role to ${interaction.member.user.username}`);
                             })
                             .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add warrer role to ${interaction.member.user.username}`);
+                                MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to add warrer role to ${interaction.member.user.username}`);
                             });
                     }
 
@@ -524,7 +523,7 @@ module.exports = {
                                 console.log(`Added war role to ${interaction.member.user.username}`);
                             })
                             .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add war role to ${interaction.member.user.username}`);
+                                MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to add war role to ${interaction.member.user.username}`);
                             });
 
                             await interaction.followUp({
@@ -537,7 +536,7 @@ module.exports = {
                                 console.log(`Removed war role from ${interaction.member.user.username}`);
                             })
                             .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to remove war role from ${interaction.member.user.username}`);
+                                MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to remove war role from ${interaction.member.user.username}`);
                             });
 
                         await interaction.followUp({
@@ -571,7 +570,7 @@ module.exports = {
                                         console.log(`Removed war role ${role.name} from ${interaction.member.user.username}`);
                                     })
                                     .catch(() => {
-                                        sendMessage(interaction.guild, interaction.channel.id, `Failed to remove war role ${role} from ${interaction.member.user.username}`);
+                                        MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to remove war role ${role} from ${interaction.member.user.username}`);
                                     });
                             }
                         }
@@ -766,7 +765,7 @@ module.exports = {
                                     console.log(`Removed class role ${role.name} from ${interaction.member.user.username}`);
                                 })
                                 .catch(() => {
-                                    sendMessage(interaction.guild, interaction.channel.id, `Failed to remove class role ${role} from ${interaction.member.user.username}`);
+                                    MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to remove class role ${role} from ${interaction.member.user.username}`);
                                 });
                         }
                     }
@@ -777,7 +776,7 @@ module.exports = {
                                 console.log(`Added class role to ${interaction.member.user.username}`);
                             })
                             .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add class role to ${interaction.member.user.username}`);
+                                MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to add class role to ${interaction.member.user.username}`);
                             });
 
                     // Add archetype role
@@ -786,7 +785,7 @@ module.exports = {
                                 console.log(`Added archetype role to ${interaction.member.user.username}`);
                             })
                             .catch(() => {
-                                sendMessage(interaction.guild, interaction.channel.id, `Failed to add archetype role to ${interaction.member.user.username}`);
+                                MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to add archetype role to ${interaction.member.user.username}`);
                             });
 
                     const replyMessage = `You now have the ${classRole} class role with archetype ${archetypeRole}!`;
@@ -815,7 +814,7 @@ module.exports = {
                                     console.log(`Removed giveaway role from ${interaction.member.user.username}`);
                                 })
                                 .catch(() => {
-                                    sendMessage(interaction.guild, interaction.channel.id, `Failed to remove giveaway role from ${interaction.member.user.username}`);
+                                    MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to remove giveaway role from ${interaction.member.user.username}`);
                                 });
 
                             replyMessage = `You no longer have the ${giveawayRole} role`;
@@ -825,7 +824,7 @@ module.exports = {
                                     console.log(`Added giveaway role to ${interaction.member.user.username}`);
                                 })
                                 .catch(() => {
-                                    sendMessage(interaction.guild, interaction.channel.id, `Failed to add giveaway role to ${interaction.member.user.username}`);
+                                    MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to add giveaway role to ${interaction.member.user.username}`);
                                 });
 
                             replyMessage = `You now have the ${giveawayRole} role`;
@@ -1423,7 +1422,7 @@ module.exports = {
                 config = JSON.parse(fileData);
             }
 
-            sendMessage(interaction.guild, config.logChannel, 'Bad interaction, <@237296939245240330> fix me :)');
+            MessageManager.sendMessage(interaction.guild, config.logChannel, 'Bad interaction, <@237296939245240330> fix me :)');
 
             console.error(err);
         }

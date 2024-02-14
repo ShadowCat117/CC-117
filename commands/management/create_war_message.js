@@ -7,7 +7,7 @@ const {
 const fs = require('fs');
 const path = require('path');
 const createConfig = require('../../functions/create_config');
-const sendMessage = require('../../functions/send_message');
+const MessageManager = require('../../message_type/MessageManager');
 
 const warRoles = ['war', 'tank', 'healer', 'damage', 'solo', 'eco'];
 
@@ -81,7 +81,7 @@ module.exports = {
                 }
             }
 
-            const warMessage = await sendMessage(interaction.guild, interaction.channel.id, message);
+            const warMessage = await MessageManager.sendMessage(interaction.guild, interaction.channel.id, message);
 
             const warButton = new ButtonBuilder()
                 .setCustomId('war')

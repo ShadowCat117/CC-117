@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { Events } = require('discord.js');
-const sendMessage = require('../functions/send_message');
+const MessageManager = require('../message_type/MessageManager');
 
 module.exports = {
     name: Events.GuildMemberAdd,
@@ -37,9 +37,9 @@ module.exports = {
                                     // Then send the message
                                     if (joinMessage.includes('$user$')) {
                                         const userJoinMessage = joinMessage.replace('$user$', member.user);
-                                        sendMessage(guild, joinLeaveChannelId, userJoinMessage);
+                                        MessageManager.sendMessage(guild, joinLeaveChannelId, userJoinMessage);
                                     } else {
-                                        sendMessage(guild, joinLeaveChannelId, joinMessage);
+                                        MessageManager.sendMessage(guild, joinLeaveChannelId, joinMessage);
                                     }
                                 });
                             } else {
@@ -57,10 +57,10 @@ module.exports = {
 
                             if (unverifiedRole) {
                                 member.roles.add(unverifiedRole).catch(async () => {
-                                    sendMessage(guild, config.logChannel, `Unable to apply unverified role to ${member.displayName}, please make sure that the CC-117 role is above all roles you want it to be able to add/remove in the hierarchy and make sure you've set the unverified role with /config_roles Unverified Role <role>`);
+                                    MessageManager.sendMessage(guild, config.logChannel, `Unable to apply unverified role to ${member.displayName}, please make sure that the CC-117 role is above all roles you want it to be able to add/remove in the hierarchy and make sure you've set the unverified role with /config_roles Unverified Role <role>`);
                                 });
                             } else {
-                                sendMessage(guild, config.logChannel, `Unable to apply unverified role to ${member.displayName}. You have not set the unverified role with /config_roles Unverified Role <role>`);
+                                MessageManager.sendMessage(guild, config.logChannel, `Unable to apply unverified role to ${member.displayName}. You have not set the unverified role with /config_roles Unverified Role <role>`);
                             }
                         }
                     } catch (parseError) {

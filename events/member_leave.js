@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { Events } = require('discord.js');
-const sendMessage = require('../functions/send_message');
+const MessageManager = require('../message_type/MessageManager');
 
 module.exports = {
     name: Events.GuildMemberRemove,
@@ -46,9 +46,9 @@ module.exports = {
                                 // Then send the message
                                 if (leaveMessage.includes('$user$')) {
                                     const userLeaveMessage = leaveMessage.replace('$user$', member.user.username.replace(/_/g, '\\_'));
-                                    sendMessage(guild, joinLeaveChannelId, userLeaveMessage);
+                                    MessageManager.sendMessage(guild, joinLeaveChannelId, userLeaveMessage);
                                 } else {
-                                    sendMessage(guild, joinLeaveChannelId, leaveMessage);
+                                    MessageManager.sendMessage(guild, joinLeaveChannelId, leaveMessage);
                                 }
                             });
                         } else {

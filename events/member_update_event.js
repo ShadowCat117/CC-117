@@ -3,7 +3,7 @@ const {
 } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
-const sendMessage = require('../functions/send_message');
+const MessageManager = require('../message_type/MessageManager');
 
 module.exports = {
     name: Events.GuildMemberUpdate,
@@ -47,7 +47,7 @@ module.exports = {
                                     newMember.setNickname(null);
                                 }
                             } catch (ex) {
-                                sendMessage(guild, config.logChannel, `Failed to change nickname for ${newMember.user.username}.`);
+                                MessageManager.sendMessage(guild, config.logChannel, `Failed to change nickname for ${newMember.user.username}.`);
                             }
                         }
                     } catch (fileError) {

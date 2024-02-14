@@ -7,7 +7,7 @@ const {
 const fs = require('fs');
 const path = require('path');
 const createConfig = require('../../functions/create_config');
-const sendMessage = require('../../functions/send_message');
+const MessageManager = require('../../message_type/MessageManager');
 
 const classRoles = ['warrior', 'mage', 'archer', 'shaman', 'assassin', 'fallen', 'battleMonk', 'paladin', 'riftwalker', 'lightBender', 'arcanist', 'sharpshooter', 'trapper', 'boltslinger', 'ritualist', 'summoner', 'acolyte', 'acrobat', 'shadestepper', 'trickster'];
 
@@ -77,7 +77,7 @@ module.exports = {
                 }
             }
 
-            const classMessage = await sendMessage(interaction.guild, interaction.channel.id, message);
+            const classMessage = await MessageManager.sendMessage(interaction.guild, interaction.channel.id, message);
 
             const warriorButton = new ButtonBuilder()
                 .setCustomId('warrior')

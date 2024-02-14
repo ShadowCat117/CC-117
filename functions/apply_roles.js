@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const sendMessage = require('./send_message');
+const MessageManager = require('../message_type/MessageManager');
 const findPrefix = require('./find_prefix');
 const ContentTeamValue = require('../values/ContentTeamValue');
 const sqlite3 = require('sqlite3').verbose();
@@ -211,7 +211,7 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
             }
 
             if (errorMessage !== '' && config.logMessages) {
-                sendMessage(guild, config.logChannel, errorMessage);
+                MessageManager.sendMessage(guild, config.logChannel, errorMessage);
             }
 
             return response;
@@ -587,7 +587,7 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
         }
 
         if (errorMessage !== '' && config.logMessages) {
-            sendMessage(guild, config.logChannel, errorMessage);
+            MessageManager.sendMessage(guild, config.logChannel, errorMessage);
         }
 
         let response;
@@ -611,7 +611,7 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                     try {
                         await member.setNickname(row.username);
                     } catch (ex) {
-                        sendMessage(guild, config.logChannel, `Failed to change nickname for ${member.user.username}.`);
+                        MessageManager.sendMessage(guild, config.logChannel, `Failed to change nickname for ${member.user.username}.`);
                     }
                 }
             } else {
@@ -622,7 +622,7 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                         try {
                             await member.setNickname(`${row.username} [${guildPrefix}]`);
                         } catch (ex) {
-                            sendMessage(guild, config.logChannel, `Failed to change nickname for ${member.user.username}.`);
+                            MessageManager.sendMessage(guild, config.logChannel, `Failed to change nickname for ${member.user.username}.`);
                         }
                     }
                 }

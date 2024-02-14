@@ -3,7 +3,7 @@ const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const ButtonedMessage = require('../message_type/ButtonedMessage');
 const db = new sqlite3.Database('database/database.db');
-const sendMessage = require('./send_message');
+const MessageManager = require('../message_type/MessageManager');
 const GuildMemberPromotion = require('../message_objects/GuildMemberPromotion');
 
 async function allAsync(query, params) {
@@ -254,7 +254,7 @@ async function checkForPromotions(interaction) {
             }
 
             if (promoteChiefsPage !== '```\n```') {
-                await sendMessage(interaction.guild, config.highRankChannel, chiefPages[0]);
+                await MessageManager.sendButtonedMessage(interaction.guild, config.highRankChannel, new ButtonedMessage('', [], '', chiefPages));
             }
         }
 
