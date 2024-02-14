@@ -745,6 +745,17 @@ async function deleteGuild(guildName) {
     const updateQuery = 'UPDATE players SET guildName = NULL, guildRank = NULL, contributedGuildXP = 0, guildJoinDate = NULL WHERE guildName = ?';
     await runAsync(updateQuery, [guildName]);
 
+    // Get table friendly name for guild
+    const tableName = guildName.replaceAll(' ', '_');
+
+    // Check if table exists
+    const guildTableExists = await doesTableExist(tableName);
+
+    // Delete table for guild if exists
+    if (guildTableExists) {
+        await runAsync(`CREATE TABLE ${tableName} (UUID TEXT NOT NULL PRIMARY KEY, playtimeStart INT, averagePlaytime INT, averageCount INT)`);
+    }
+
     const configsPath = path.join(__dirname, 'configs');
 
     try {
