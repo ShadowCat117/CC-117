@@ -75,8 +75,10 @@ async function addDemotionException(interaction, force = false, exemptionPeriod 
         if (config['demotionExceptions'][player.username] === exemptionPeriod) {
             if (exemptionPeriod === -1) {
                 return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is already permanently exempt from demotions`]);
+            } else if (exemptionPeriod === 1) {
+                return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is already exempt from demotions for ${exemptionPeriod} day`]);
             } else {
-                return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is already exempt from demotions for ${exemptionPeriod} day(s)`]);
+                return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is already exempt from demotions for ${exemptionPeriod} days`]);
             }
         }
 
@@ -86,8 +88,10 @@ async function addDemotionException(interaction, force = false, exemptionPeriod 
 
         if (exemptionPeriod === -1) {
             return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is now permanently exempt from demotions`]);
+        } else if (exemptionPeriod === 1) {
+            return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is now exempt from demotions for ${exemptionPeriod} day`]);
         } else {
-            return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is now exempt from demotions for ${exemptionPeriod} day(s)`]);
+            return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is now exempt from demotions for ${exemptionPeriod} days`]);
         }
     } catch (err) {
         console.log(err);

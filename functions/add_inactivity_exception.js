@@ -74,7 +74,7 @@ async function addInactivityException(interaction, force = false, inactivityThre
 
         if (config['inactivityExceptions'][player.username] === inactivityThreshold) {
             if (inactivityThreshold === -1) {
-                return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is already exempt from inactivit`]);
+                return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is already exempt from inactivity`]);
             } else {
                 return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')}'s inactivity threshold is already ${inactivityThreshold}`]);
             }

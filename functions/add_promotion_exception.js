@@ -75,8 +75,10 @@ async function addPromotionException(interaction, force = false, exemptionPeriod
         if (config['promotionExceptions'][player.username] === exemptionPeriod) {
             if (exemptionPeriod === -1) {
                 return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is already permanently exempt from promotions`]);
+            } else if (exemptionPeriod === 1) {
+                return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is already exempt from promotions for ${exemptionPeriod} day`]);
             } else {
-                return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is already exempt from promotions for ${exemptionPeriod} day(s)`]);
+                return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is already exempt from promotions for ${exemptionPeriod} days`]);
             }
         }
 
@@ -86,8 +88,10 @@ async function addPromotionException(interaction, force = false, exemptionPeriod
 
         if (exemptionPeriod === -1) {
             return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is now permanently exempt from promotions`]);
+        } else if (exemptionPeriod === 1) {
+            return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is now exempt from promotions for ${exemptionPeriod} day`]);
         } else {
-            return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is now exempt from promotions for ${exemptionPeriod} day(s)`]);
+            return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is now exempt from promotions for ${exemptionPeriod} days`]);
         }
     } catch (err) {
         console.log(err);

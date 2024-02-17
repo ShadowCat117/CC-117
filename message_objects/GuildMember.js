@@ -27,18 +27,26 @@ class GuildMember {
     // Returns a formatted string of the guild member with all the stats listed
     toString() {
         if (this.averagePlaytime >= 0) {
-            return `${this.contributionPosition.padEnd(3)} ${this.username} ${this.guildRank}:\n${this.getOnlineStatus()}\nJoined ${this.joinDate} (${this.daysInGuild} days ago)\n${this.contributedGuildXP} (${this.getFormattedXPPerDay()})\n${this.wars} wars\n${this.averagePlaytime} hours per week\n\n`;
+            return `${this.contributionPosition.padEnd(3)} ${this.username} ${this.guildRank}:\n${this.getOnlineStatus()}\nJoined ${this.joinDate} (${this.daysInGuild} days ago)\n${this.contributedGuildXP} (${this.getFormattedXPPerDay()})\n${this.getWars()}\n${this.averagePlaytime} hours per week\n\n`;
         } else {
-            return `${this.contributionPosition.padEnd(3)} ${this.username} ${this.guildRank}:\n${this.getOnlineStatus()}\nJoined ${this.joinDate} (${this.daysInGuild} days ago)\n${this.contributedGuildXP} (${this.getFormattedXPPerDay()})\n${this.wars} wars\n\n`;
+            return `${this.contributionPosition.padEnd(3)} ${this.username} ${this.guildRank}:\n${this.getOnlineStatus()}\nJoined ${this.joinDate} (${this.daysInGuild} days ago)\n${this.contributedGuildXP} (${this.getFormattedXPPerDay()})\n${this.getWars()}\n\n`;
         }
     }
 
     // Return a string of if the player is online and what world they are on or offline
     getOnlineStatus() {
         if (this.onlineWorld) {
+            // If online
             return `Online on ${this.onlineWorld}`;
+        } else if (this.lastJoin === 1) {
+            // Last online yesterday
+            return `Offline, last seen ${this.lastJoin} day ago`;
+        } else if (this.lastJoin === 0) {
+            // Last online today
+            return 'Offline, last seen today.';
         } else {
-            return `Offline, last seen ${this.lastJoin} day(s) ago`;
+            // Last online 2+ days ago
+            return `Offline, last seen ${this.lastJoin} days ago`;
         }
     }
 
@@ -57,7 +65,18 @@ class GuildMember {
         } else {
             return `${xpPerDay.toFixed(2)}/day`;
         }
-    }    
+    }
+
+    // Get amount of wars completed.
+    getWars() {
+        if (this.wars === null) {
+            return '0 wars';
+        } else if (this.wars === 1) {
+            return '1 war';
+        } else {
+            return `${this.wars} wars`;
+        }
+    }
 }
 
 module.exports = GuildMember;
