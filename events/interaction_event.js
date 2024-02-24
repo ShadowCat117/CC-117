@@ -841,6 +841,296 @@ module.exports = {
                             ephemeral: true,
                         });
                     }
+                } else if (interaction.customId === 'activityOrder') {
+                    // Unknown message, set to "Data expired."
+                    if (!message) {
+                        interaction.editReply({
+                            content: 'Data expired.',
+                            components: [],
+                        });
+                        return;
+                    }
+
+                    // Get timezones file
+                    const timezoneFile = 'timezones.json';
+
+                    try {
+                        let timezones = {};
+            
+                        // Get or create timezones file
+                        if (fs.existsSync(timezoneFile)) {
+                            const fileData = fs.readFileSync(timezoneFile, 'utf-8');
+                            timezones = JSON.parse(fileData);
+                        } else {
+                            await new Promise((resolve, reject) => {
+                                fs.writeFile(timezoneFile, JSON.stringify(timezones, null, 2), (err) => {
+                                    if (err) {
+                                        console.log(err);
+                                        console.log('Error creating timezones file');
+                                        reject(err);
+                                    } else {
+                                        console.log('Created timezones file');
+                                        resolve();
+                                    }
+                                });
+                            });
+                        }
+
+                        // Save new timezone value for member
+                        timezones[interaction.member.id] = interaction.values;
+
+                        fs.writeFileSync(timezoneFile, JSON.stringify(timezones, null, 2), 'utf-8');
+            
+                    } catch (error) {
+                        console.log(error);
+                        await interaction.editReply('Error changing timezone');
+                        return;
+                    }
+
+                    // Run activeHours, pass in timezone from file for member and sort by activity
+                    const result = await activeHours(interaction, true, interaction.values, true);
+
+                    // Create row and string select menu for message
+                    const timezoneRow = new ActionRowBuilder();
+
+                    const timezoneSelection = new StringSelectMenuBuilder()
+                        .setCustomId('timezone')
+                        .setPlaceholder('Select timezone!')
+                        .addOptions(
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('PST')
+                                .setDescription('UTC-8')
+                                .setValue('-8'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('PDT')
+                                .setDescription('UTC-7')
+                                .setValue('-7'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('MDT')
+                                .setDescription('UTC-6')
+                                .setValue('-6'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('CDT')
+                                .setDescription('UTC-5')
+                                .setValue('-5'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('EDT')
+                                .setDescription('UTC-4')
+                                .setValue('-4'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('BRT')
+                                .setDescription('UTC-3')
+                                .setValue('-3'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('UTC')
+                                .setDescription('UTC+0')
+                                .setValue('0'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('BST')
+                                .setDescription('UTC+1')
+                                .setValue('1'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('CEST')
+                                .setDescription('UTC+2')
+                                .setValue('2'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('MSK')
+                                .setDescription('UTC+3')
+                                .setValue('3'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('GST')
+                                .setDescription('UTC+4')
+                                .setValue('4'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('IST')
+                                .setDescription('UTC+5:30')
+                                .setValue('5.5'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('CST/SNST')
+                                .setDescription('UTC+8')
+                                .setValue('8'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('JST')
+                                .setDescription('UTC+9')
+                                .setValue('9'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('AEST')
+                                .setDescription('UTC+10')
+                                .setValue('10'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('NZST')
+                                .setDescription('UTC+12')
+                                .setValue('12'),
+                        );
+
+                    timezoneRow.addComponents(timezoneSelection);
+
+                    // Create row for sort buttons
+                    const sortRow = new ActionRowBuilder();
+
+                    const activityOrderButton = new ButtonBuilder()
+                        .setCustomId('activityOrder')
+                        .setStyle(ButtonStyle.Secondary)
+                        .setLabel('Sort by activity')
+                        .setDisabled(true);
+
+                    const hourOrderButton = new ButtonBuilder()
+                        .setCustomId('timeOrder')
+                        .setStyle(ButtonStyle.Primary)
+                        .setLabel('Sort by time');
+
+                    sortRow.addComponents(activityOrderButton);
+                    sortRow.addComponents(hourOrderButton);
+
+                    interaction.editReply({
+                        content: result.pages[0],
+                        components: [timezoneRow, sortRow],
+                    });
+                } else if (interaction.customId === 'timeOrder') {
+                    // Unknown message, set to "Data expired."
+                    if (!message) {
+                        interaction.editReply({
+                            content: 'Data expired.',
+                            components: [],
+                        });
+                        return;
+                    }
+
+                    // Get timezones file
+                    const timezoneFile = 'timezones.json';
+
+                    try {
+                        let timezones = {};
+
+                        // Get or create timezones file
+                        if (fs.existsSync(timezoneFile)) {
+                            const fileData = fs.readFileSync(timezoneFile, 'utf-8');
+                            timezones = JSON.parse(fileData);
+                        } else {
+                            await new Promise((resolve, reject) => {
+                                fs.writeFile(timezoneFile, JSON.stringify(timezones, null, 2), (err) => {
+                                    if (err) {
+                                        console.log(err);
+                                        console.log('Error creating timezones file');
+                                        reject(err);
+                                    } else {
+                                        console.log('Created timezones file');
+                                        resolve();
+                                    }
+                                });
+                            });
+                        }
+
+                        // Save new timezone value for member
+                        timezones[interaction.member.id] = interaction.values;
+
+                        fs.writeFileSync(timezoneFile, JSON.stringify(timezones, null, 2), 'utf-8');
+
+                    } catch (error) {
+                        console.log(error);
+                        await interaction.editReply('Error changing timezone');
+                        return;
+                    }
+
+                    // Run activeHours, pass in timezone from file for member and sort by time
+                    const result = await activeHours(interaction, true, interaction.values, false);
+
+                    // Create row and string select menu for message
+                    const timezoneRow = new ActionRowBuilder();
+
+                    const timezoneSelection = new StringSelectMenuBuilder()
+                        .setCustomId('timezone')
+                        .setPlaceholder('Select timezone!')
+                        .addOptions(
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('PST')
+                                .setDescription('UTC-8')
+                                .setValue('-8'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('PDT')
+                                .setDescription('UTC-7')
+                                .setValue('-7'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('MDT')
+                                .setDescription('UTC-6')
+                                .setValue('-6'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('CDT')
+                                .setDescription('UTC-5')
+                                .setValue('-5'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('EDT')
+                                .setDescription('UTC-4')
+                                .setValue('-4'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('BRT')
+                                .setDescription('UTC-3')
+                                .setValue('-3'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('UTC')
+                                .setDescription('UTC+0')
+                                .setValue('0'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('BST')
+                                .setDescription('UTC+1')
+                                .setValue('1'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('CEST')
+                                .setDescription('UTC+2')
+                                .setValue('2'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('MSK')
+                                .setDescription('UTC+3')
+                                .setValue('3'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('GST')
+                                .setDescription('UTC+4')
+                                .setValue('4'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('IST')
+                                .setDescription('UTC+5:30')
+                                .setValue('5.5'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('CST/SNST')
+                                .setDescription('UTC+8')
+                                .setValue('8'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('JST')
+                                .setDescription('UTC+9')
+                                .setValue('9'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('AEST')
+                                .setDescription('UTC+10')
+                                .setValue('10'),
+                            new StringSelectMenuOptionBuilder()
+                                .setLabel('NZST')
+                                .setDescription('UTC+12')
+                                .setValue('12'),
+                        );
+
+                    timezoneRow.addComponents(timezoneSelection);
+
+                    // Create row for sort buttons
+                    const sortRow = new ActionRowBuilder();
+
+                    const activityOrderButton = new ButtonBuilder()
+                        .setCustomId('activityOrder')
+                        .setStyle(ButtonStyle.Primary)
+                        .setLabel('Sort by activity');
+
+                    const hourOrderButton = new ButtonBuilder()
+                        .setCustomId('timeOrder')
+                        .setStyle(ButtonStyle.Secondary)
+                        .setLabel('Sort by time')
+                        .setDisabled(true);
+
+                    sortRow.addComponents(activityOrderButton);
+                    sortRow.addComponents(hourOrderButton);
+
+                    interaction.editReply({
+                        content: result.pages[0],
+                        components: [timezoneRow, sortRow],
+                    });
                 } else {
                     // Unknown message, display "Data expired."
                     if (!message) {
@@ -859,8 +1149,28 @@ module.exports = {
                     // exact name.
                     switch (message.messageType) {
                         case MessageType.ACTIVE_HOURS:
+                            let timezoneOffset = 0;
+                            const timezoneFile = 'timezones.json';
+
+                            try {
+                                let timezones = {};
+
+                                if (fs.existsSync(timezoneFile)) {
+                                    const fileData = fs.readFileSync(timezoneFile, 'utf-8');
+                                    timezones = JSON.parse(fileData);
+
+                                    timezoneOffset = timezones[interaction.member.id];
+                                } else {
+                                    timezoneOffset = 0;
+                                }
+                            } catch (error) {
+                                console.log(error);
+                                await interaction.editReply('Error getting timezone');
+                                return;
+                            }
+
                             // Run active hours
-                            result = await activeHours(interaction, true);
+                            result = await activeHours(interaction, true, timezoneOffset);
 
                             // Handle response
                             if (result.pages[0] === 'No data') {
@@ -869,7 +1179,7 @@ module.exports = {
                                     components: [],
                                 });
                             } else {
-                                const row = new ActionRowBuilder();
+                                const timezoneRow = new ActionRowBuilder();
 
                                 const timezoneSelection = new StringSelectMenuBuilder()
                                     .setCustomId('timezone')
@@ -941,10 +1251,28 @@ module.exports = {
                                             .setValue('12'),
                                     );
 
-                                row.addComponents(timezoneSelection);
+                                timezoneRow.addComponents(timezoneSelection);
+
+                                // Create row for sort buttons
+                                const sortRow = new ActionRowBuilder();
+                    
+                                const activityOrderButton = new ButtonBuilder()
+                                    .setCustomId('activityOrder')
+                                    .setStyle(ButtonStyle.Secondary)
+                                    .setLabel('Sort by activity')
+                                    .setDisabled(true);
+                    
+                                const hourOrderButton = new ButtonBuilder()
+                                    .setCustomId('timeOrder')
+                                    .setStyle(ButtonStyle.Primary)
+                                    .setLabel('Sort by time');
+                    
+                                sortRow.addComponents(activityOrderButton);
+                                sortRow.addComponents(hourOrderButton);
+
                                 await interaction.editReply({
                                     content: result.pages[0],
-                                    components: [row],
+                                    components: [timezoneRow, sortRow],
                                 });
                             }
 
@@ -1331,7 +1659,7 @@ module.exports = {
                 const result = await activeHours(interaction, true, interaction.values);
 
                 // Create row and string select menu for message
-                const row = new ActionRowBuilder();
+                const timezoneRow = new ActionRowBuilder();
 
                 const timezoneSelection = new StringSelectMenuBuilder()
                     .setCustomId('timezone')
@@ -1403,11 +1731,28 @@ module.exports = {
                             .setValue('12'),
                     );
 
-                row.addComponents(timezoneSelection);
+                timezoneRow.addComponents(timezoneSelection);
+
+                // Create row for sort buttons
+                const sortRow = new ActionRowBuilder();
+    
+                const activityOrderButton = new ButtonBuilder()
+                    .setCustomId('activityOrder')
+                    .setStyle(ButtonStyle.Secondary)
+                    .setLabel('Sort by activity')
+                    .setDisabled(true);
+    
+                const hourOrderButton = new ButtonBuilder()
+                    .setCustomId('timeOrder')
+                    .setStyle(ButtonStyle.Primary)
+                    .setLabel('Sort by time');
+    
+                sortRow.addComponents(activityOrderButton);
+                sortRow.addComponents(hourOrderButton);
 
                 interaction.editReply({
                     content: result.pages[0],
-                    components: [row],
+                    components: [timezoneRow, sortRow],
                 });
             }
         } catch (err) {

@@ -67,7 +67,7 @@ module.exports = {
                 components: [],
             });
         } else {
-            const row = new ActionRowBuilder();
+            const timezoneRow = new ActionRowBuilder();
 
             const timezoneSelection = new StringSelectMenuBuilder()
                 .setCustomId('timezone')
@@ -139,11 +139,27 @@ module.exports = {
                         .setValue('12'),
                 );
 
-            row.addComponents(timezoneSelection);
+            timezoneRow.addComponents(timezoneSelection);
+
+            const sortRow = new ActionRowBuilder();
+
+            const activityOrderButton = new ButtonBuilder()
+                .setCustomId('activityOrder')
+                .setStyle(ButtonStyle.Secondary)
+                .setLabel('Sort by activity')
+                .setDisabled(true);
+
+            const hourOrderButton = new ButtonBuilder()
+                .setCustomId('timeOrder')
+                .setStyle(ButtonStyle.Primary)
+                .setLabel('Sort by time');
+
+            sortRow.addComponents(activityOrderButton);
+            sortRow.addComponents(hourOrderButton);
 
             const editedReply = await interaction.editReply({
                 content: response.pages[0],
-                components: [row],
+                components: [timezoneRow, sortRow],
             });
 
             response.setMessage(editedReply);

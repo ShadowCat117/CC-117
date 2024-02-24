@@ -18,18 +18,24 @@ function getAsync(query, params) {
     });
 }
 
-async function activeHours(interaction, force = false, timezoneOffset = 0) {
+async function activeHours(interaction, force = false, timezoneOffset = 0, sortByActivity = true) {
     let nameToSearch;
 
     if (interaction.options !== undefined) {
         nameToSearch = interaction.options.getString('guild_name');
-    } else if (interaction.customId && interaction.customId !== 'timezone') {
+    } else if (interaction.customId && interaction.customId !== 'timezone' && interaction.customId !== 'activityOrder' && interaction.customId !== 'timeOrder') {
         nameToSearch = interaction.customId;
     } else {
         const content = interaction.message.content;
         const regex = /```Active hours for (.*?) \(/;
         const match = content.match(regex);
         nameToSearch = match ? match[1] : null;
+    }
+
+    if (interaction.customId && interaction.customId === 'activityOrder') {
+        sortByActivity = true;
+    } else if (interaction.customId && interaction.customId === 'timeOrder') {
+        sortByActivity = false;
     }
 
     const guildName = await findGuild(nameToSearch, force);
@@ -115,7 +121,11 @@ async function activeHours(interaction, force = false, timezoneOffset = 0) {
 
                     let message = `\`\`\`Active hours for ${guildName} (${timezone}):\n\nTime    Avg. Online    Avg. Captain+`;
 
-                    guildActiveHours.sort((a, b) => a.compareTo(b));
+                    if (sortByActivity) {
+                        guildActiveHours.sort((a, b) => a.compareToActivity(b));
+                    } else {
+                        guildActiveHours.sort((a, b) => a.compareToTime(b));
+                    }
 
                     for (const hourActivity of guildActiveHours) {
                         message += `\n${hourActivity.toString()}`;

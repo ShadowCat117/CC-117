@@ -43,7 +43,7 @@ class GuildActiveHours {
     }
 
     // Sort active hours by average online, then by average captains
-    compareTo(other) {
+    compareToActivity(other) {
         if (parseFloat(this.averageOnline) > parseFloat(other.averageOnline)) {
             return -1;
         } else if (parseFloat(this.averageOnline) < parseFloat(other.averageOnline)) {
@@ -56,6 +56,15 @@ class GuildActiveHours {
             } else {
                 return 0;
             }
+        }
+    }
+
+    // Sort by hour
+    compareToTime(other) {
+        if (this.hour > other.hour) {
+            return 1;
+        } else {
+            return -1;
         }
     }
 }
