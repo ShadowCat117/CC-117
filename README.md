@@ -46,6 +46,7 @@ Administrator - member has an administrator role in Wynncraft
 Moderator
 Content Team
 Giveaway
+Events
 ```
 
 
@@ -157,7 +158,7 @@ Displays all the guilds that have been tracked in your server
 ```
 
 ```bash
-/creategiveawaymessage*
+/createguildeventsmessage*
 ```
 
 ```bash
