@@ -11,8 +11,8 @@ const MessageManager = require('../../message_type/MessageManager');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('creategiveawaymessage')
-        .setDescription('Sends a giveaway message with a button to get the giveaways role.'),
+        .setName('createguildeventsmessage')
+        .setDescription('Sends a message with buttons to get the giveaways and events roles.'),
     ephemeral: true,
     async execute(interaction) {
         const guildId = interaction.guild.id;
@@ -55,10 +55,10 @@ module.exports = {
                 return;
             }
 
-            const message = config['giveawayMessage'];
+            const message = config['guildEventsMessage'];
 
             if (!message) {
-                await interaction.editReply('You have not set a giveaway message with /config_values giveawayMessage.');
+                await interaction.editReply('You have not set a guilds event message with /config_values guildEventsMessage.');
 
                 return;
             }
@@ -69,23 +69,34 @@ module.exports = {
                 return;
             }
 
-            const giveawayMessage = await MessageManager.sendMessage(interaction.guild, interaction.channel.id, message);
+            if (!config['eventsRole']) {
+                await interaction.editReply('You have not set an events role.');
+
+                return;
+            }
+
+            const guildEventsMessage = await MessageManager.sendMessage(interaction.guild, interaction.channel.id, message);
 
             const giveawayButton = new ButtonBuilder()
                 .setCustomId('giveaway')
                 .setStyle(ButtonStyle.Success)
                 .setLabel('GIVEAWAY');
 
-            const row = new ActionRowBuilder().addComponents(giveawayButton);
+            const eventsButton = new ButtonBuilder()
+                .setCustomId('events')
+                .setStyle(ButtonStyle.Success)
+                .setLabel('EVENTS');
 
-            giveawayMessage.edit({
+            const row = new ActionRowBuilder().addComponents(giveawayButton, eventsButton);
+
+            guildEventsMessage.edit({
                 components: [row],
             });
 
-            await interaction.editReply('Created giveaway message');
+            await interaction.editReply('Created guild events message');
         } catch (error) {
             console.log(error);
-            await interaction.editReply('Error creating giveaway message.');
+            await interaction.editReply('Error creating guild events message.');
         }
     },
 };

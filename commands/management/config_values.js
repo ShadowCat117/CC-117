@@ -83,8 +83,8 @@ module.exports = {
                     name: 'War Level Requirement',
                     value: 'warLevelRequirement',
                 }, {
-                    name: 'Giveaway Message',
-                    value: 'giveawayMessage',
+                    name: 'Guild Events Message',
+                    value: 'guildEventsMessage',
                 }))
         .addStringOption((option) =>
             option.setName('value')
@@ -408,12 +408,12 @@ module.exports = {
                 }
 
                 break;
-            case 'giveawayMessage':
+            case 'guildEventsMessage':
                 if (valueStr == null) {
-                    await interaction.editReply('Giveaway Message requires a <value> input.');
+                    await interaction.editReply('Guild Events Message requires a <value> input.');
                     return;
                 } else if (valueStr.length > 750) {
-                    await interaction.editReply('Giveaway Message must be less than 750 characters.');
+                    await interaction.editReply('Guild Events Message must be less than 750 characters.');
                     return;
                 }
 
@@ -440,7 +440,7 @@ module.exports = {
                 case 'warClassMessage':
                 case 'classMessage':
                 case 'classArchetypeMessage':
-                case 'giveawayMessage':
+                case 'guildEventsMessage':
                     config[option] = valueStr;
                     break;
                 case 'chiefUpperThreshold':

@@ -76,6 +76,9 @@ module.exports = {
                 }, {
                     name: 'Giveaway Role',
                     value: 'giveawayRole',
+                }, {
+                    name: 'Events Role',
+                    value: 'eventsRole',
                 }))
         .addRoleOption((option) =>
             option.setName('role')
@@ -284,6 +287,13 @@ module.exports = {
                 }
 
                 break;
+            case 'eventsRole':
+                if (role == null) {
+                    await interaction.editReply('Events Role requires a <role> input.');
+                    return;
+                }
+
+                break;
             default:
                 await interaction.editReply('Invalid configuration option.');
                 return;
@@ -337,6 +347,7 @@ module.exports = {
                 case 'moderatorRole':
                 case 'contentTeamRole':
                 case 'giveawayRole':
+                case 'eventsRole':
                     config[option] = role.id;
                     break;
             }

@@ -841,6 +841,53 @@ module.exports = {
                             ephemeral: true,
                         });
                     }
+                } else if (interaction.customId === 'events') {
+                    // Get events role
+                    const eventsRole = interaction.guild.roles.cache.get(config['eventsRole']);
+                    // Get member of guild role
+                    const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
+
+                    // Get member roles
+                    const memberRoles = await interaction.member.roles.cache;
+
+                    let replyMessage;
+
+                    // If they have the guild member role
+                    if (memberRoles.has(memberOfRole.id)) {
+                        // Remove events role if they have it already, otherwise add it
+                        if (memberRoles.has(eventsRole.id)) {
+                            await interaction.member.roles.remove(eventsRole)
+                                .then(() => {
+                                    console.log(`Removed events role from ${interaction.member.user.username}`);
+                                })
+                                .catch(() => {
+                                    MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to remove events role from ${interaction.member.user.username}`);
+                                });
+
+                            replyMessage = `You no longer have the ${eventsRole} role`;
+                        } else {
+                            await interaction.member.roles.add(eventsRole)
+                                .then(() => {
+                                    console.log(`Added events role to ${interaction.member.user.username}`);
+                                })
+                                .catch(() => {
+                                    MessageManager.sendMessage(interaction.guild, interaction.channel.id, `Failed to add events role to ${interaction.member.user.username}`);
+                                });
+
+                            replyMessage = `You now have the ${eventsRole} role`;
+                        }
+
+                        await interaction.followUp({
+                            content: replyMessage,
+                            ephemeral: true,
+                        });
+                    } else {
+                        // Tell user they must be a guild member to get the events role
+                        await interaction.followUp({
+                            content: `Sorry, you need to be a member of ${config['guildName']} to use this.`,
+                            ephemeral: true,
+                        });
+                    }
                 } else if (interaction.customId === 'activityOrder') {
                     // Unknown message, set to "Data expired."
                     if (!message) {
