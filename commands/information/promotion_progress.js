@@ -42,11 +42,13 @@ module.exports = {
 
             const guildName = config.guildName;
 
+            // Command can only be ran if a guild is set
             if (!guildName) {
                 await interaction.editReply('The server you are in does not have a guild set.');
                 return;
             }
 
+            // If the member of role is used, then the user must have it
             if (addMemberOfRole) {
                 if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                     await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
@@ -54,9 +56,11 @@ module.exports = {
                 }
             }
 
+            // Call promotionProgress
             const response = await promotionProgress(interaction, false);
 
             if (response.componentIds.length > 0) {
+                // If the player name matches more than 1 player, show option to select correct player
                 const row = new ActionRowBuilder();
     
                 for (let i = 0; i < response.componentIds.length; i++) {
@@ -76,6 +80,7 @@ module.exports = {
     
                 MessageManager.addMessage(response);
             } else {
+                // Player found, show response
                 await interaction.editReply(response.pages[0]);
             }
         } catch (error) {

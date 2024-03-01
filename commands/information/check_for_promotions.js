@@ -38,11 +38,13 @@ module.exports = {
 
             const guildName = config.guildName;
 
+            // The command can only be ran if the server has a guild set
             if (!guildName) {
                 await interaction.editReply('The server you are in does not have a guild set.');
                 return;
             }
 
+            // If the member of role is used, then check if the user who ran the command has it
             if (addMemberOfRole) {
                 if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                     await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
@@ -55,9 +57,11 @@ module.exports = {
             return;
         }
 
+        // Call checkForPromotions
         const response = await checkForPromotions(interaction);
 
         if (response.pages.length > 1) {
+            // Show buttons for navigating between multiple pages
             const previousPage = new ButtonBuilder()
                 .setCustomId('previousPage')
                 .setStyle(ButtonStyle.Primary)
@@ -79,11 +83,13 @@ module.exports = {
 
             MessageManager.addMessage(response);
         } else if (response.pages[0] === '```\n```') {
+            // No players need promoting
             interaction.editReply({
                 content: 'No players found in your guild that need promoting.',
                 components: [],
             });
         } else {
+            // Only one page of promotions
             await interaction.editReply(response.pages[0]);
         }
     },

@@ -17,9 +17,11 @@ module.exports = {
                 .setRequired(true)),
     ephemeral: false,
     async execute(interaction) {
+        // Call worldActivity
         const response = await worldActivity(interaction);
 
         if (response.componentIds.length > 0) {
+            // Handle multiple guild options
             const row = new ActionRowBuilder();
 
             for (let i = 0; i < response.componentIds.length; i++) {
@@ -38,13 +40,12 @@ module.exports = {
             response.setMessage(editedReply);
 
             MessageManager.addMessage(response);
-        } else if (response.text === 'Nobody online') {
+        } else {
+            // Any other response
             interaction.editReply({
                 content: response.pages[0],
                 components: [],
             });
-        } else {
-            await interaction.editReply(response.pages[0]);
         }
     },
 };

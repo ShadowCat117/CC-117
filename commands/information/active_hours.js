@@ -23,6 +23,7 @@ module.exports = {
         let timezoneOffset = 0;
         const timezoneFile = 'timezones.json';
 
+        // Attempt to get the preferred timezone from the user that ran the command
         try {
             let timezones = {};
 
@@ -30,6 +31,7 @@ module.exports = {
                 const fileData = fs.readFileSync(timezoneFile, 'utf-8');
                 timezones = JSON.parse(fileData);
 
+                // Get their timezone
                 timezoneOffset = timezones[interaction.member.id];
             } else {
                 timezoneOffset = 0;
@@ -40,9 +42,11 @@ module.exports = {
             return;
         }
 
+        // Call the activeHours function, passing in the timezone
         const response = await activeHours(interaction, false, timezoneOffset);
 
         if (response.componentIds.length > 0) {
+            // Multiple guilds found with given input, present buttons with choices
             const row = new ActionRowBuilder();
 
             for (let i = 0; i < response.componentIds.length; i++) {
@@ -62,13 +66,16 @@ module.exports = {
 
             MessageManager.addMessage(response);
         } else if (response.pages[0] === 'No data' || response.pages[0] === `${interaction.options.getString('guild_name')} not found, try using the full exact guild name.`) {
+            // No data available for guild or unknown guild
             interaction.editReply({
                 content: `No activity data found for guild: ${interaction.options.getString('guild_name')}`,
                 components: [],
             });
         } else {
+            // Valid guild
             const timezoneRow = new ActionRowBuilder();
 
+            // Create string select menu with all timezone options
             const timezoneSelection = new StringSelectMenuBuilder()
                 .setCustomId('timezone')
                 .setPlaceholder('Select timezone!')
@@ -141,6 +148,7 @@ module.exports = {
 
             timezoneRow.addComponents(timezoneSelection);
 
+            // Create 2 buttons for sort types
             const sortRow = new ActionRowBuilder();
 
             const activityOrderButton = new ButtonBuilder()

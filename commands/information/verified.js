@@ -39,11 +39,13 @@ module.exports = {
 
             const guildName = config.guildName;
 
+            // Need a guild to run command
             if (!guildName) {
                 await interaction.editReply('The server you are in does not have a guild set.');
                 return;
             }
 
+            // Need member of role if used
             if (addMemberOfRole) {
                 if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                     await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
@@ -51,6 +53,7 @@ module.exports = {
                 }
             }
 
+            // Need to be owner or admin
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 await interaction.editReply('You do not have the required permissions to run this command.');
                 return;
@@ -61,9 +64,11 @@ module.exports = {
             return;
         }
 
+        // Call verified
         const response = await verified(interaction);
 
         if (response.pages.length > 1) {
+            // Handle multiple pages by adding navigation buttons
             const previousPage = new ButtonBuilder()
                 .setCustomId('previousPage')
                 .setStyle(ButtonStyle.Primary)
@@ -85,11 +90,13 @@ module.exports = {
 
             MessageManager.addMessage(response);
         } else if (response.pages[0] === '```\n```') {
+            // No players in the server are verified
             interaction.editReply({
                 content: 'No players in your server are verified.',
                 components: [],
             });
         } else {
+            // Only 1 page of results
             await interaction.editReply(response.pages[0]);
         }
     },

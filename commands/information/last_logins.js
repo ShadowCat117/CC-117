@@ -17,9 +17,11 @@ module.exports = {
                 .setRequired(true)),
     ephemeral: false,
     async execute(interaction) {
+        // Call lastLogins
         const response = await lastLogins(interaction);
 
         if (response.componentIds.length > 0) {
+            // Show options to select guild when input matches multiple guilds
             const row = new ActionRowBuilder();
 
             for (let i = 0; i < response.componentIds.length; i++) {
@@ -39,6 +41,7 @@ module.exports = {
 
             MessageManager.addMessage(response);
         } else if (response.pages.length > 1) {
+            // Show buttons for navigating multiple pages
             const previousPage = new ButtonBuilder()
                 .setCustomId('previousPage')
                 .setStyle(ButtonStyle.Primary)
@@ -60,11 +63,13 @@ module.exports = {
 
             MessageManager.addMessage(response);
         } else if (response.pages[0] === '```\n```') {
+            // No players in the guild
             interaction.editReply({
                 content: `No players found in the guild ${interaction.options.getString('guild_name')}`,
                 components: [],
             });
         } else {
+            // Show results for 1 page of results
             await interaction.editReply(response.pages[0]);
         }
     },

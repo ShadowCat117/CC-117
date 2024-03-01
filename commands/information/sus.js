@@ -40,6 +40,7 @@ module.exports = {
             const adminRoleId = config.adminRole;
             const memberRoles = interaction.member.roles.cache;
 
+            // Only owner or admins can run the command
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 await interaction.editReply('You do not have the required permissions to run this command.');
                 return;
@@ -49,9 +50,11 @@ module.exports = {
             return;
         }
 
+        // Call sus
         const response = await sus(interaction, false);
 
         if (response.componentIds.length > 0) {
+            // If multiple players found, present choice
             const row = new ActionRowBuilder();
 
             for (let i = 0; i < response.componentIds.length; i++) {
@@ -71,6 +74,7 @@ module.exports = {
 
             MessageManager.addMessage(response);
         } else {
+            // Show response
             await interaction.editReply(response.pages[0]);
         }
     },
