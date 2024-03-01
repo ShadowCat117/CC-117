@@ -35,14 +35,15 @@ module.exports = {
             const memberRoles = interaction.member.roles.cache;
             const addMemberOfRole = config.memberOf;
             const memberOfRole = config.memberOfRole;
-
             const guildName = config.guildName;
 
+            // Do not run command if no guild set
             if (!guildName) {
                 await interaction.editReply('The server you are in does not have a guild set.');
                 return;
             }
 
+            // If member of role is used, then require it to run command
             if (addMemberOfRole) {
                 if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                     await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
@@ -50,6 +51,7 @@ module.exports = {
                 }
             }
 
+            // Only owners and admins can run command
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 await interaction.editReply('You do not have the required permissions to run this command.');
                 return;
@@ -57,26 +59,31 @@ module.exports = {
 
             const message = config['guildEventsMessage'];
 
+            // If no events message, tell the user to set one
             if (!message) {
                 await interaction.editReply('You have not set a guilds event message with /config_values guildEventsMessage.');
 
                 return;
             }
 
+            // Check if the giveaway role exists and if not tell the user to set it
             if (!config['giveawayRole']) {
                 await interaction.editReply('You have not set a giveaway role.');
 
                 return;
             }
 
+            // Same for the events role
             if (!config['eventsRole']) {
                 await interaction.editReply('You have not set an events role.');
 
                 return;
             }
 
+            // Send guild events message
             const guildEventsMessage = await MessageManager.sendMessage(interaction.guild, interaction.channel.id, message);
 
+            // Add giveaway and events button
             const giveawayButton = new ButtonBuilder()
                 .setCustomId('giveaway')
                 .setStyle(ButtonStyle.Success)

@@ -54,11 +54,7 @@ module.exports = {
 
             const guildName = config.guildName;
 
-            if (!guildName) {
-                await interaction.editReply('The server you are in does not have a guild set.');
-                return;
-            }
-
+            // If the member of role is used, it is required
             if (addMemberOfRole) {
                 if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                     await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
@@ -66,11 +62,11 @@ module.exports = {
                 }
             }
 
+            // Can only be ran by the owner or an admin
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 await interaction.editReply('You do not have the required permissions to run this command.');
                 return;
             }
-
         } catch (error) {
             console.log(error);
             await interaction.editReply('Error changing config.');
@@ -80,6 +76,7 @@ module.exports = {
         const option = interaction.options.getString('option');
         const channel = interaction.options.getChannel('channel');
 
+        // Validate the options
         switch (option) {
             case 'logChannel':
                 if (channel == null) {
@@ -117,6 +114,7 @@ module.exports = {
                 config = JSON.parse(fileData);
             }
 
+            // Save the option to the config
             switch (option) {
                 case 'logChannel':
                 case 'joinLeaveChannel':
@@ -129,6 +127,7 @@ module.exports = {
 
             const botPermissions = channel.permissionsFor(interaction.client.user);
 
+            // If the bot does not have permission for the selected channel, tell the user
             if (!botPermissions.has(PermissionsBitField.Flags.SendMessages) || !botPermissions.has(PermissionsBitField.Flags.ViewChannel)) {
                 await interaction.editReply(`Configuration option \`${option}\` updated successfully to ${channel}.\n\nI currently do not have permission to send messages to that channel so please allow me to. I need View Channel & Send Messages.`);
             } else {

@@ -40,7 +40,15 @@ module.exports = {
             const memberRoles = interaction.member.roles.cache;
             const addMemberOfRole = config.memberOf;
             const memberOfRole = config.memberOfRole;
+            const guildName = config.guildName;
 
+            // A guild is required
+            if (!guildName) {
+                await interaction.editReply('The server you are in does not have a guild set.');
+                return;
+            }
+
+            // If the member of role is used it is required
             if (addMemberOfRole) {
                 if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                     await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
@@ -48,21 +56,17 @@ module.exports = {
                 }
             }
 
+            // Owner or admin role required
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 await interaction.editReply('You do not have the required permissions to run this command.');
                 return;
             }
 
-            const guildName = config.guildName;
-
-            if (!guildName) {
-                await interaction.editReply('The server you are in does not have a guild set.');
-                return;
-            }
-
+            // Call removeDemotionException
             const response = await removeDemotionException(interaction, false);
 
             if (response.componentIds.length > 0) {
+                // Multiple players found, present options
                 const row = new ActionRowBuilder();
     
                 for (let i = 0; i < response.componentIds.length; i++) {
@@ -82,6 +86,7 @@ module.exports = {
     
                 MessageManager.addMessage(response);
             } else {
+                // Found player, show response
                 await interaction.editReply(response.pages[0]);
             }
         } catch (error) {

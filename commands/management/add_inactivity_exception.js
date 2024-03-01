@@ -43,7 +43,15 @@ module.exports = {
             const memberRoles = interaction.member.roles.cache;
             const addMemberOfRole = config.memberOf;
             const memberOfRole = config.memberOfRole;
+            const guildName = config.guildName;
 
+            // A guild must be set to use this command
+            if (!guildName) {
+                await interaction.editReply('The server you are in does not have a guild set.');
+                return;
+            }
+
+            // If the member of role is used, require it
             if (addMemberOfRole) {
                 if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                     await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
@@ -51,20 +59,16 @@ module.exports = {
                 }
             }
 
+            // Only owners and admins can run this command
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 await interaction.editReply('You do not have the required permissions to run this command.');
                 return;
-            }
+            }  
 
-            const guildName = config.guildName;
-
-            if (!guildName) {
-                await interaction.editReply('The server you are in does not have a guild set.');
-                return;
-            }
-
+            // Get the inactivity period, if one was not provided default to -1 (infinite)
             let inactivityThreshold = interaction.options.getInteger('inactivity_threshold') ?? -1;
 
+            // If less than -1 then set it to -1
             if (inactivityThreshold < -1) {
                 inactivityThreshold = -1;
             }
@@ -72,6 +76,7 @@ module.exports = {
             const response = await addInactivityException(interaction, false, inactivityThreshold);
 
             if (response.componentIds.length > 0) {
+                // If multiple players were found, present choice
                 const row = new ActionRowBuilder();
     
                 for (let i = 0; i < response.componentIds.length; i++) {
@@ -91,6 +96,7 @@ module.exports = {
     
                 MessageManager.addMessage(response);
             } else {
+                // Found player, show response
                 await interaction.editReply(response.pages[0]);
             }
         } catch (error) {

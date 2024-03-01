@@ -39,6 +39,7 @@ module.exports = {
             const adminRoleId = config.adminRole;
             const memberRoles = interaction.member.roles.cache;
 
+            // Admin role required or server owner
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 await interaction.editReply('You do not have the required permissions to run this command.');
                 return;
@@ -46,13 +47,15 @@ module.exports = {
 
         } catch (error) {
             console.log(error);
-            await interaction.editReply('Error adding ally.');
+            await interaction.editReply('Error tracking guild.');
             return;
         }
 
+        // Call trackGuild
         const response = await trackGuild(interaction);
 
         if (response.componentIds.length > 0) {
+            // Multiple guilds found, show options
             const row = new ActionRowBuilder();
 
             for (let i = 0; i < response.componentIds.length; i++) {
@@ -72,6 +75,7 @@ module.exports = {
 
             MessageManager.addMessage(response);
         } else {
+            // Found guild, show response
             await interaction.editReply(response.pages[0]);
         }
     },

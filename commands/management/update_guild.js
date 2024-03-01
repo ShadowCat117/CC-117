@@ -17,9 +17,11 @@ module.exports = {
                 .setRequired(true)),
     ephemeral: true,
     async execute(interaction) {
+        // Call updateGuild
         const response = await updateGuild(interaction);
 
         if (response.componentIds.length > 0) {
+            // Multiple guilds found, show options
             const row = new ActionRowBuilder();
 
             for (let i = 0; i < response.componentIds.length; i++) {
@@ -39,6 +41,7 @@ module.exports = {
 
             MessageManager.addMessage(response);
         } else {
+            // Guild found, show response
             await interaction.editReply(response.pages[0]);
         }
     },

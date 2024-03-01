@@ -37,14 +37,15 @@ module.exports = {
             const memberRoles = interaction.member.roles.cache;
             const addMemberOfRole = config.memberOf;
             const memberOfRole = config.memberOfRole;
-
             const guildName = config.guildName;
 
+            // Do not run command if no guild set
             if (!guildName) {
                 await interaction.editReply('The server you are in does not have a guild set.');
                 return;
             }
 
+            // If member of role is used, then require it to run command
             if (addMemberOfRole) {
                 if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                     await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
@@ -52,6 +53,7 @@ module.exports = {
                 }
             }
 
+            // Only owners and admins can run command
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 await interaction.editReply('You do not have the required permissions to run this command.');
                 return;
@@ -60,15 +62,18 @@ module.exports = {
             const message = config['classMessage'];
 
             if (!message) {
+                // If no class message, tell the user to set one
                 await interaction.editReply('You have not set a class message with /config_values classMessage.');
 
                 return;
             } else if (!config['classArchetypeMessage']) {
+                // If no archetype message, tell the user to set one
                 await interaction.editReply('You have not set a class archetype message with /config_values classArchetypeMessage.');
 
                 return;
             }
 
+            // Loop through class roles and if one is not present, tell the user they need to set it
             for (const classRole of classRoles) {
                 if (!config[`${classRole}Role`]) {
                     await interaction.editReply(`You have not set a role for ${classRole}.`);
@@ -77,8 +82,10 @@ module.exports = {
                 }
             }
 
+            // Send class message
             const classMessage = await MessageManager.sendMessage(interaction.guild, interaction.channel.id, message);
 
+            // Add class buttons
             const warriorButton = new ButtonBuilder()
                 .setCustomId('warrior')
                 .setStyle(ButtonStyle.Primary)

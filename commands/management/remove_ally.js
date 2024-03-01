@@ -43,11 +43,13 @@ module.exports = {
 
             const guildName = config.guildName;
 
+            // A guild must be set to run this command
             if (!guildName) {
                 await interaction.editReply('The server you are in does not have a guild set.');
                 return;
             }
 
+            // If the member of role is used then the user needs it to run this command
             if (addMemberOfRole) {
                 if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                     await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
@@ -55,6 +57,7 @@ module.exports = {
                 }
             }
 
+            // Command can only be ran by owners or admins
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 await interaction.editReply('You do not have the required permissions to run this command.');
                 return;
@@ -66,9 +69,11 @@ module.exports = {
             return;
         }
 
+        // Call remove ally
         const response = await removeAlly(interaction);
 
         if (response.componentIds.length > 0) {
+            // When multiple guilds are found, present options
             const row = new ActionRowBuilder();
 
             for (let i = 0; i < response.componentIds.length; i++) {
@@ -88,6 +93,7 @@ module.exports = {
 
             MessageManager.addMessage(response);
         } else {
+            // Found guild, give response
             await interaction.editReply(response.pages[0]);
         }
     },

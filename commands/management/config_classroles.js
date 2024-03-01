@@ -104,11 +104,13 @@ module.exports = {
 
             const guildName = config.guildName;
 
+            // A guild must be set to run this command
             if (!guildName) {
                 await interaction.editReply('The server you are in does not have a guild set.');
                 return;
             }
 
+            // If the member of role is used, it is required
             if (addMemberOfRole) {
                 if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                     await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
@@ -116,11 +118,11 @@ module.exports = {
                 }
             }
 
+            // Can only be ran by the owner or an admin
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 await interaction.editReply('You do not have the required permissions to run this command.');
                 return;
             }
-
         } catch (error) {
             console.log(error);
             await interaction.editReply('Error changing config.');
@@ -130,6 +132,7 @@ module.exports = {
         const option = interaction.options.getString('option');
         const role = interaction.options.getRole('role');
 
+        // Validate the options
         switch (option) {
             case 'warriorRole':
                 if (role == null) {
@@ -292,6 +295,7 @@ module.exports = {
 
             let message;
 
+            // If the bot does not have permission to give the role, let the user know
             if (botRole) {
                 if (role.comparePositionTo(botRole) > 0) {
                     message = `Configuration option \`${option}\` updated successfully to ${role}.\n\nThe ${role} role is currently above the ${botRole} role in your hierarchy, this means that I will not be able to add that role to members, please change this so I can add the role correctly!`;
@@ -302,6 +306,7 @@ module.exports = {
                 message = `Configuration option \`${option}\` updated successfully to ${role}.\nFor some reason my role was not found on your server. Please try kicking and inviting me again to try and fix this. Your config options will be saved.`;
             }
 
+            // Save the option to the config
             switch (option) {
                 case 'warriorRole':
                 case 'fallenRole':

@@ -42,11 +42,13 @@ module.exports = {
 
             const guildName = config.guildName;
 
+            // Requires a set guild to run command
             if (!guildName) {
                 await interaction.editReply('The server you are in does not have a guild set.');
                 return;
             }
 
+            // If member of role is used, require it to run command
             if (addMemberOfRole) {
                 if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRoleCheck))) {
                     await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
@@ -54,11 +56,13 @@ module.exports = {
                 }
             }
 
+            // Only owners and admins can run command
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 await interaction.editReply('You do not have the required permissions to run this command.');
                 return;
             }
 
+            // Add all of the various config options to a page and go to a new page every so often
             configContent += `Guild: ${config.guildName}\n`;
             configContent += `Chief Inactivity Upper Threshold: ${config.chiefUpperThreshold}\n`;
             configContent += `Chief Inactivity Lower Threshold: ${config.chiefLowerThreshold}\n`;
@@ -102,6 +106,7 @@ module.exports = {
 
             configContent = '';
 
+            // If a user can be mentioned, replace it with a mention of the user that ran the command
             if (!config.joinMessage) {
                 configContent += `Join Message: ${config.joinMessage}\n`;
             } else if (config.joinMessage.includes('$user$')) {
@@ -110,6 +115,7 @@ module.exports = {
                 configContent += `Join Message: ${config.joinMessage.replace(/\\n/g, '\n')}\n`;
             }  
 
+            // Or in this case, just use their username
             if (!config.leaveMessage) {
                 configContent += `Leave Message: ${config.leaveMessage}\n`;
             } else if (config.joinMessage.includes('$user$')) {
@@ -171,6 +177,7 @@ module.exports = {
 
             const joinLeaveChannel = interaction.guild.channels.cache.get(config.joinLeaveChannel);
 
+            // Link the channel if a valid one is present
             if (joinLeaveChannel) {
                 configContent += `Join/Leave channel: ${joinLeaveChannel}\n`;
             } else {
@@ -197,6 +204,7 @@ module.exports = {
 
             configContent = '';
 
+            // @ The role if it is valid
             const adminRole = interaction.guild.roles.cache.get(adminRoleId);
 
             if (adminRole) {
@@ -687,8 +695,10 @@ module.exports = {
 
             pages.push(configContent);
 
+            // Create a ButtonedMessage with all of the pages of content
             const viewConfigMessage = new ButtonedMessage('', [], '', pages);
 
+            // We know it will be multiple pages so add buttons
             const previousPage = new ButtonBuilder()
                 .setCustomId('previousPage')
                 .setStyle(ButtonStyle.Primary)

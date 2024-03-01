@@ -35,11 +35,13 @@ module.exports = {
 
             const guildName = config.guildName;
 
+            // A guild is required to run the command
             if (!guildName) {
                 await interaction.editReply('The server you are in does not have a guild set.');
                 return;
             }
 
+            // Must be a member of the guild to run the command if the member of role is enabled
             if (addMemberOfRole) {
                 if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                     await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
@@ -47,19 +49,21 @@ module.exports = {
                 }
             }
 
+            // Must be the owner or an admin to run the command
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 await interaction.editReply('You do not have the required permissions to run this command.');
                 return;
             }
 
+            // Call updateRoles
+            const response = await updateRoles(interaction.guild);
+
+            // Show response
+            await interaction.editReply(response);
         } catch (error) {
             console.log(error);
             await interaction.editReply('Error updating roles.');
             return;
         }
-
-        const response = await updateRoles(interaction.guild);
-
-        await interaction.editReply(response);
     },
 };

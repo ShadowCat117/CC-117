@@ -112,11 +112,13 @@ module.exports = {
 
             const guildName = config.guildName;
 
+            // A guild must be set to run this command
             if (!guildName) {
                 await interaction.editReply('The server you are in does not have a guild set.');
                 return;
             }
 
+            // If the member of role is used, it is required
             if (addMemberOfRole) {
                 if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                     await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
@@ -124,11 +126,11 @@ module.exports = {
                 }
             }
 
+            // Can only be ran by the owner or an admin
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 await interaction.editReply('You do not have the required permissions to run this command.');
                 return;
             }
-
         } catch (error) {
             console.log(error);
             await interaction.editReply('Error changing config.');
@@ -140,6 +142,7 @@ module.exports = {
         const requirementNum = interaction.options.getInteger('requirement_number');
         let number;
 
+        // Validate the options
         switch (option) {
             case 'chiefPromotionRequirement':
                 if (requirementStr == null) {
@@ -277,6 +280,7 @@ module.exports = {
                 config = JSON.parse(fileData);
             }
 
+            // Save the option to the config
             switch (option) {
                 case 'chiefTimeRequirement':
                 case 'chiefRequirementsCount':
