@@ -41,23 +41,29 @@ module.exports = {
 
             const guildName = config.guildName;
 
+            // Guild set required
             if (!guildName) {
                 await interaction.editReply('The server you are in does not have a guild set.');
                 return;
             }
 
+            // If the server doesn't want duplicate nicknames then check if the person they are trying to verify as is verified
             if (config.checkDuplicateNicknames) {
+                // Check if the username is in use
                 const alreadyVerified = await validUsername(interaction.member, interaction.guild, username);
 
+                // If someone already has the nickname they want, let them know
                 if (!alreadyVerified) {
                     await interaction.editReply(`Someone in this server is already named ${formattedUsername}.`);
                     return;
                 }
             }
 
+            // Call verify
             const response = await verify(interaction, false);
 
             if (response.componentIds.length > 0) {
+                // If multiple matching usernames, present choice
                 const row = new ActionRowBuilder();
     
                 for (let i = 0; i < response.componentIds.length; i++) {
@@ -77,6 +83,7 @@ module.exports = {
     
                 MessageManager.addMessage(response);
             } else {
+                // Successfuly verified
                 await interaction.editReply(response.pages[0]);
             }
         } catch (error) {
@@ -86,7 +93,9 @@ module.exports = {
 };
 
 async function validUsername(verifyingMember, guild, nameToCheck) {
+    // Loop through all server members
     for (const member of guild.members.cache) {
+        // Ignore if member is the current member trying to verify
         if (member[0] === verifyingMember.id) {
             continue;
         }
@@ -94,14 +103,17 @@ async function validUsername(verifyingMember, guild, nameToCheck) {
         let nicknameToCheck = member[1].nickname;
         const usernameToCheck = member[1].user.username;
 
+        // If nickname given, remove guild prefix if there is one
         if (nicknameToCheck) {
             nicknameToCheck = nicknameToCheck.split(' [')[0];
         }
 
+        // If the nickname matches then return false for invalid username
         if (nameToCheck && (nameToCheck.toLowerCase() === (nicknameToCheck || '').toLowerCase() || nameToCheck.toLowerCase() === usernameToCheck.toLowerCase())) {
             return false;
         }
     }
 
+    // All members checked, no conflicting username found
     return true;
 }
