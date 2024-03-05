@@ -912,8 +912,12 @@ async function addPriorityGuilds(addSecondary) {
             const config = JSON.parse(data);
 
             // If config has a set guild and it isn't already present in the unique list, add it
-            if (config.guildName && !uniqueGuildNames.includes(config.guildName)) {
+            if (config.guildName !== '' && !uniqueGuildNames.includes(config.guildName)) {
                 uniqueGuildNames.push(config.guildName);
+            }
+
+            // Add the set guild as a primary guild if it isn't already on the primary list
+            if (config.guildName !== '' && !primaryGuilds.includes(config.guildName)) {
                 primaryGuilds.push(config.guildName);
             }
 
