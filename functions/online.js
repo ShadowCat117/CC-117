@@ -58,14 +58,14 @@ async function online(interaction, force = false) {
             onlinePlayers.sort((a, b) => a.compareTo(b));
 
             const pages = [];
-            let onlinePage = '```\n';
+            let onlinePage = `\`\`\`Current online players in ${guildName} (${onlinePlayers.length})\n`;
             let counter = 0;
 
             onlinePlayers.forEach((player) => {
                 if (counter === 30) {
                     onlinePage += '```';
                     pages.push(onlinePage);
-                    onlinePage = '```\n' + player.toString();
+                    onlinePage = `\`\`\`Current online players in ${guildName} (${onlinePlayers.length})\n` + player.toString();
                     counter = 1;
                 } else {
                     onlinePage += player.toString();
