@@ -52,6 +52,11 @@ module.exports = {
 
                         // If so, apply the unverified role to newly joined member
                         if (verifyMembers) {
+                            // Ignore bots
+                            if (member.user.bot) {
+                                return;
+                            }
+
                             // Get the unverified role
                             const unverifiedRole = guild.roles.cache.get(config.unverifiedRole);
 
