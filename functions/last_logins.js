@@ -216,14 +216,14 @@ async function lastLogins(interaction, force = false) {
                 playerLastLogins.sort((a, b) => a.compareTo(b));
 
                 const pages = [];
-                let lastLoginsPage = '```diff\n';
+                let lastLoginsPage = `\`\`\`diff\nLast logins for ${guildName}\n`;
                 let counter = 0;
 
                 playerLastLogins.forEach((player) => {
-                    if (counter === 30) {
+                    if (counter === 25) {
                         lastLoginsPage += '```';
                         pages.push(lastLoginsPage);
-                        lastLoginsPage = '```diff\n' + player.toString();
+                        lastLoginsPage = `\`\`\`diff\nLast logins for ${guildName}\n` + player.toString();
                         counter = 1;
                     } else {
                         lastLoginsPage += player.toString();
@@ -231,7 +231,7 @@ async function lastLogins(interaction, force = false) {
                     }
                 });
 
-                if (counter <= 30) {
+                if (counter <= 25) {
                     lastLoginsPage += '```';
                     pages.push(lastLoginsPage);
                 }
@@ -259,14 +259,14 @@ async function lastLogins(interaction, force = false) {
                 playerLastLogins.sort((a, b) => a.compareTo(b));
 
                 const pages = [];
-                let lastLoginsPage = '```\n';
+                let lastLoginsPage = `\`\`\`Last logins for ${guildName}\n`;
                 let counter = 0;
 
                 playerLastLogins.forEach((player) => {
-                    if (counter === 30) {
+                    if (counter === 25) {
                         lastLoginsPage += '```';
                         pages.push(lastLoginsPage);
-                        lastLoginsPage = '```\n' + player.toString();
+                        lastLoginsPage = `\`\`\`Last logins for ${guildName}\n` + player.toString();
                         counter = 1;
                     } else {
                         lastLoginsPage += player.toString();
@@ -274,7 +274,7 @@ async function lastLogins(interaction, force = false) {
                     }
                 });
 
-                if (counter <= 30) {
+                if (counter <= 25) {
                     lastLoginsPage += '```';
                     pages.push(lastLoginsPage);
                 }
