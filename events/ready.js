@@ -10,6 +10,11 @@ async function hourlyTasks() {
     let now = new Date();
 
     if (now.getUTCMinutes() == 0) {
+        // Update members of each server the bot is in
+        for (const guild of client.guilds.cache.values()) {
+            await guild.members.fetch();
+        }
+
         // Remove buttons from old message buttons.
         console.log('Removing old buttons');
         MessageManager.removeOldMessages();
@@ -69,11 +74,6 @@ module.exports = {
             }],
             status: 'online',
         });
-
-        // Update members of each server the bot is in
-        for (const guild of client.guilds.cache.values()) {
-            await guild.members.fetch();
-        }
 
         // Calculate time to run first hourly task at
         const now = new Date();
