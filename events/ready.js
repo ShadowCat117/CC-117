@@ -75,6 +75,11 @@ module.exports = {
             status: 'online',
         });
 
+        // Update members of each server the bot is in
+        for (const guild of client.guilds.cache.values()) {
+            await guild.members.fetch();
+        }
+
         // Calculate time to run first hourly task at
         const now = new Date();
         const timeUntilNextHour = (60 - now.getMinutes()) * 60 * 1000 - (now.getSeconds() * 1000 + now.getMilliseconds());
