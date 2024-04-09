@@ -1229,34 +1229,38 @@ async function removeEligibleChiefs() {
 async function runFreeFunction() {
     hitLimit = false;
 
-    // Updates the players that are online.
-    console.log('Updating all online players.');
-    await updateOnlinePlayers();
-    console.log('Updated all online players');
+    try {
+        // Updates the players that are online.
+        console.log('Updating all online players.');
+        await updateOnlinePlayers();
+        console.log('Updated all online players');
 
-    // // Update the list of priority guilds
-    await updatePriorityGuilds();
+        // // Update the list of priority guilds
+        await updatePriorityGuilds();
 
-    // Update the list of priority players
-    await updatePriorityPlayers();
+        // Update the list of priority players
+        await updatePriorityPlayers();
 
-    // Run everytime this function has been ran 10 times
-    if (freeFunctionRuns % 10 === 0) {
-        // Updates the guild and guild rank for each member of each guild.
-        console.log('Updating guild members');
-        await updateGuildMembers();
+        // Run everytime this function has been ran 10 times
+        if (freeFunctionRuns % 10 === 0) {
+            // Updates the guild and guild rank for each member of each guild.
+            console.log('Updating guild members');
+            await updateGuildMembers();
+        }
+
+        // Run after this function has been ran 50 times
+        if (freeFunctionRuns == 50) {
+            // Updates the guilds database with new guilds and removes deleted guilds.
+            console.log('Updating list of all guilds.');
+            await updateGuilds();
+
+            freeFunctionRuns = -1;
+        }
+
+        freeFunctionRuns++;
+    } catch (err) {
+        console.log(err);
     }
-
-    // Run after this function has been ran 50 times
-    if (freeFunctionRuns == 50) {
-        // Updates the guilds database with new guilds and removes deleted guilds.
-        console.log('Updating list of all guilds.');
-        await updateGuilds();
-
-        freeFunctionRuns = -1;
-    }
-
-    freeFunctionRuns++;
 
     // Run function again
     runFreeFunction();
