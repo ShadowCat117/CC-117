@@ -20,16 +20,21 @@ async function worldActivity(interaction, force = false) {
     let nameToSearch;
 
     if (interaction.options !== undefined) {
+        // Get guild name from command input
         nameToSearch = interaction.options.getString('guild_name');
     } else {
+        // Get guild name from selected button
         nameToSearch = interaction.customId;
     }
 
+    // Search for guild name in database
     const guildName = await findGuild(nameToSearch, force);
 
+    // When multiple guilds matching the inbut were found, should never happen if force is true
     if (guildName && guildName.message === 'Multiple possibilities found') {
         let textMessage = `Multiple guilds found with the name/prefix: ${nameToSearch}.`;
 
+        // Add all guild names found to message
         for (let i = 0; i < guildName.guildNames.length; i++) {
             const name = guildName.guildNames[i];
 
@@ -42,6 +47,7 @@ async function worldActivity(interaction, force = false) {
     }
 
     if (guildName) {
+        // Query database for worlds with players online in selected guild
         const query = `
             SELECT onlineWorld, COUNT(*) AS count
             FROM players
@@ -53,6 +59,7 @@ async function worldActivity(interaction, force = false) {
         try {
             const results = await allAsync(query, [guildName]);
 
+            // No players online
             if (results.length === 0) {
                 return new ButtonedMessage('Nobody online', [], '', [`Nobody online in ${guildName}`]);
             }
@@ -60,6 +67,7 @@ async function worldActivity(interaction, force = false) {
             let activeWorlds = [];
             let maxCount = 0;
 
+            // Sort through the worlds and only keep the ones with the most players on
             results.forEach((row) => {
                 const { onlineWorld, count } = row;
                 if (count > maxCount) {
@@ -70,10 +78,9 @@ async function worldActivity(interaction, force = false) {
                 }
             });
 
-            activeWorlds.sort((a, b) => a - b);
-
             let message;
 
+            // Get return message to be displayed, displaying / between multiple worlds
             if (maxCount > 1) {
                 message = `${guildName} is most active on world ${activeWorlds.join('/')} with ${maxCount} players`;
             } else {
@@ -86,6 +93,7 @@ async function worldActivity(interaction, force = false) {
             return new ButtonedMessage('', [], '', [`Error occurred while searching for world activity of ${guildName}`]);
         }
     } else {
+        // Unable to find guild
         return new ButtonedMessage('', [], '', [`${nameToSearch} not found, try using the full exact guild name.`]);
     }
 }

@@ -44,118 +44,172 @@ async function updateRoles(guild) {
             const fileData = await fs.readFile(filePath, 'utf-8');
             config = JSON.parse(fileData);
         } catch (err) {
-            return 'The server you are in does not have a guild set.';
+            return 'Error reading config file.';
         }
 
         const guildName = config.guildName;
-
-        if (!guildName) {
-            return 'The server you are in does not have a guild set.';
-        }
-
-        const rows = await allAsync('SELECT UUID, username FROM players WHERE guildName = ?', [guildName]);
 
         const verifiedServerMembers = [];
 
         const serverMembersToIgnore = [];
 
-        for (const serverMember of guild.members.cache.values()) {
-            if (serverMember.user.bot) {
-                continue;
-            }
+        // Verify members of set guild
+        if (guildName) {
+            // Get all members of guild
+            const rows = await allAsync('SELECT UUID, username FROM players WHERE guildName = ?', [guildName]);
 
-            for (let i = 0; i < rows.length; i++) {
-                const guildMember = rows[i];
-
-                let nickname = undefined;
-
-                if (serverMember.nickname) {
-                    nickname = serverMember.nickname.split(' [')[0];
+            // Loop through all server members
+            for (const serverMember of guild.members.cache.values()) {
+                // Ignore bots
+                if (serverMember.user.bot) {
+                    continue;
                 }
+    
+                // Loop through all guild members
+                for (let i = 0; i < rows.length; i++) {
+                    const guildMember = rows[i];
+    
+                    let nickname = undefined;
+    
+                    // If they have a nickname, remove the guild tag suffix
+                    if (serverMember.nickname) {
+                        nickname = serverMember.nickname.split(' [')[0];
+                    }
 
-                // Check for valid nickname first as that is more likely to be correct
-                if (guildMember.username === nickname) {
-                    const updated = await applyRoles(guild, guildMember.UUID, serverMember);
-
-                    serverMembersToIgnore.push(serverMember.user.username);
-
-                    const formattedName = serverMember.user.username.replace(/_/g, '\\_');
-
-                    if (updated > 0) {
-                        if (updatedMembers > 0) {
-                            messageEnd += `, ${formattedName}`;
-
-                            updatedMembers++;
-                            messageStart = `Updated roles for ${updatedMembers} members.`;
-                        } else {
-                            messageEnd += `\n(${formattedName}`;
-
-                            updatedMembers++;
-                            messageStart = `Updated roles for ${updatedMembers} member.`;
+                    // Temporary fix for a friend to allow them to have their new name
+                    if (guildMember.username === 'Owen_Rocks_3' && serverMember.user.id === '753700961364738158') {
+                        // Call applyRoles
+                        const updated = await applyRoles(guild, guildMember.UUID, serverMember);
+    
+                        // Set member as to be ignored in future loops
+                        serverMembersToIgnore.push(serverMember.user.username);
+    
+                        const formattedName = serverMember.user.username.replace(/_/g, '\\_');
+    
+                        if (updated > 0) {
+                            // Update message
+                            if (updatedMembers > 0) {
+                                messageEnd += `, ${formattedName}`;
+    
+                                updatedMembers++;
+                                messageStart = `Updated roles for ${updatedMembers} members.`;
+                            } else {
+                                messageEnd += `\n(${formattedName}`;
+    
+                                updatedMembers++;
+                                messageStart = `Updated roles for ${updatedMembers} member.`;
+                            }
                         }
-                    }
-
-                    if (verifiedServerMembers.indexOf(serverMember.user.username) === -1) {
-                        verifiedServerMembers.push(serverMember.user.username);
-                    }
-
-                    rows.splice(i, 1);
-                    break;
-                } else if (guildMember.username === serverMember.user.globalName || guildMember.username === serverMember.user.username) {
-                    const updated = await applyRoles(guild, guildMember.UUID, serverMember);
-
-                    serverMembersToIgnore.push(serverMember.user.username);
-
-                    const formattedName = serverMember.user.username.replace(/_/g, '\\_');
-
-                    if (updated > 0) {
-                        if (updatedMembers > 0) {
-                            messageEnd += `, ${formattedName}`;
-
-                            updatedMembers++;
-                            messageStart = `Updated roles for ${updatedMembers} members.`;
-                        } else {
-                            messageEnd += `\n(${formattedName}`;
-
-                            updatedMembers++;
-                            messageStart = `Updated roles for ${updatedMembers} member.`;
+    
+                        // Set member as one who has been verified
+                        if (verifiedServerMembers.indexOf(serverMember.user.username) === -1) {
+                            verifiedServerMembers.push(serverMember.user.username);
                         }
+    
+                        rows.splice(i, 1);
+                        break;
                     }
-
-                    if (verifiedServerMembers.indexOf(serverMember.user.username) === -1) {
-                        verifiedServerMembers.push(serverMember.user.username);
+    
+                    // Check for valid nickname first as that is more likely to be correct
+                    if (guildMember.username === nickname) {
+                        // Call applyRoles
+                        const updated = await applyRoles(guild, guildMember.UUID, serverMember);
+    
+                        // Set member as to be ignored in future loops
+                        serverMembersToIgnore.push(serverMember.user.username);
+    
+                        const formattedName = serverMember.user.username.replace(/_/g, '\\_');
+    
+                        if (updated > 0) {
+                            // Update message
+                            if (updatedMembers > 0) {
+                                messageEnd += `, ${formattedName}`;
+    
+                                updatedMembers++;
+                                messageStart = `Updated roles for ${updatedMembers} members.`;
+                            } else {
+                                messageEnd += `\n(${formattedName}`;
+    
+                                updatedMembers++;
+                                messageStart = `Updated roles for ${updatedMembers} member.`;
+                            }
+                        }
+    
+                        // Set member as one who has been verified
+                        if (verifiedServerMembers.indexOf(serverMember.user.username) === -1) {
+                            verifiedServerMembers.push(serverMember.user.username);
+                        }
+    
+                        rows.splice(i, 1);
+                        break;
+                    } else if (guildMember.username === serverMember.user.globalName || guildMember.username === serverMember.user.username) {
+                        // Call applyRoles
+                        const updated = await applyRoles(guild, guildMember.UUID, serverMember);
+    
+                        // Set member as to be ignored in future loops
+                        serverMembersToIgnore.push(serverMember.user.username);
+    
+                        const formattedName = serverMember.user.username.replace(/_/g, '\\_');
+    
+                        if (updated > 0) {
+                            // Update message
+                            if (updatedMembers > 0) {
+                                messageEnd += `, ${formattedName}`;
+    
+                                updatedMembers++;
+                                messageStart = `Updated roles for ${updatedMembers} members.`;
+                            } else {
+                                messageEnd += `\n(${formattedName}`;
+    
+                                updatedMembers++;
+                                messageStart = `Updated roles for ${updatedMembers} member.`;
+                            }
+                        }
+    
+                        // Set member as one who has been verified
+                        if (verifiedServerMembers.indexOf(serverMember.user.username) === -1) {
+                            verifiedServerMembers.push(serverMember.user.username);
+                        }
+    
+                        rows.splice(i, 1);
+                        break;
                     }
-
-                    rows.splice(i, 1);
-                    break;
                 }
             }
         }
 
+        // Loop through all set allies
         for (const allyGuild of config.allies) {
+            // Get members of current ally
             const allyRows = await allAsync('SELECT UUID, username FROM players WHERE guildName = ?', [allyGuild]);
 
+            // Loop through all server members
             for (const serverMember of guild.members.cache.values()) {
+                // Ignore bots and members who were verified previously
                 if (serverMember.user.bot || serverMembersToIgnore.includes(serverMember.user.username)) {
                     continue;
                 }
 
+                // Loop through guild members
                 for (let i = 0; i < allyRows.length; i++) {
                     const guildMember = allyRows[i];
 
                     let nickname = undefined;
 
+                    // Remove guild tag suffix from nickname
                     if (serverMember.nickname) {
                         nickname = serverMember.nickname.split(' [')[0];
                     }
 
                     // Check for valid nickname first as that is more likely to be correct
                     if (guildMember.username === nickname) {
+                        // Call applyRoles
                         const updated = await applyRoles(guild, guildMember.UUID, serverMember);
 
                         const formattedName = serverMember.user.username.replace(/_/g, '\\_');
 
                         if (updated > 0) {
+                            // Update message
                             if (updatedMembers > 0) {
                                 messageEnd += `, ${formattedName}`;
 
@@ -194,6 +248,7 @@ async function updateRoles(guild) {
                             }
                         }
 
+                        // Add as a verified server member
                         if (verifiedServerMembers.indexOf(serverMember.user.username) === -1) {
                             verifiedServerMembers.push(serverMember.user.username);
                         }
@@ -205,6 +260,7 @@ async function updateRoles(guild) {
             }
         }
 
+        // Loop through all remaining server members, skipping bots and verified members
         for (const serverMember of guild.members.cache.values()) {
             if (verifiedServerMembers.includes(serverMember.user.username) || serverMember.user.bot) {
                 continue;
@@ -216,15 +272,18 @@ async function updateRoles(guild) {
             if (serverMember.nickname) {
                 const nickname = serverMember.nickname.split(' [')[0];
 
+                // As we are now checking every single remaining member, try and limit what is checked by nickname is a valid username
                 if (minecraftNamePattern.test(nickname)) {
                     player = await getAsync('SELECT UUID FROM players WHERE username = ?', [nickname]);
                 }
             }
 
+            // No player found from nickname, test for valid global name and retry
             if (!player && minecraftNamePattern.test(serverMember.user.globalName)) {
                 player = await getAsync('SELECT UUID FROM players WHERE username = ?', [serverMember.user.globalName]);
             }
 
+            // Still no player, try username. Already has same constraints as a Minecraft username
             if (!player) {
                 player = await getAsync('SELECT UUID FROM players WHERE username = ?', [serverMember.user.username]);
             }
@@ -235,11 +294,13 @@ async function updateRoles(guild) {
                 uuid = player['UUID'];
             }
 
+            // Call applyRoles, telling it they are not a guild member or ally
             const updated = await applyRoles(guild, uuid, serverMember, true);
 
             const formattedName = serverMember.user.username.replace(/_/g, '\\_');
 
             if (updated > 0) {
+                // Update message
                 if (updatedMembers > 0) {
                     messageEnd += `, ${formattedName}`;
 
@@ -254,6 +315,7 @@ async function updateRoles(guild) {
             }
         }
 
+        // Return message
         if (updatedMembers > 0) {
             messageEnd += ')';
             return (messageStart + messageEnd);
@@ -263,6 +325,7 @@ async function updateRoles(guild) {
     } catch (err) {
         console.log(err);
         
+        // Currently concurrency errors can happen, so send a response when indication of interruption
         if (updatedMembers > 0) {
             messageEnd += ')';
             return (messageStart + messageEnd + ' (interrupted)');

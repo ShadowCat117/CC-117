@@ -2,35 +2,27 @@ const ButtonedMessage = require('../message_type/ButtonedMessage');
 const MessageType = require('../message_type/MessageType');
 const applyRoles = require('./apply_roles');
 const findPlayer = require('./find_player');
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('database/database.db');
-
-async function getAsync(query, params) {
-    return new Promise((resolve, reject) => {
-        db.get(query, params, function(err, rows) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(rows);
-            }
-        });
-    });
-}
 
 async function verify(interaction, force = false) {
     let nameToSearch;
 
     if (interaction.options !== undefined) {
+        // Get username from command option
         nameToSearch = interaction.options.getString('username');
     } else if (interaction.customId) {
+        // Get username from button id
         nameToSearch = interaction.customId;
     }
 
+    // Search for player, unknown guild
     const player = await findPlayer(nameToSearch, '', force);
 
+    // Multiple usernames found, should never happen if force is true
     if (player && player.message === 'Multiple possibilities found') {
         let textMessage = `Multiple players found with the username: ${nameToSearch}.`;
 
+        // Create list of player options, try to be as detailed as possible.
+        // Always show username and UUID, show guild if in guild and show rank if one is known.
         for (let i = 0; i < player.playerUuids.length; i++) {
             const uuid = player.playerUuids[i];
             const playerUsername = player.playerUsernames[i];
@@ -54,20 +46,17 @@ async function verify(interaction, force = false) {
         return new ButtonedMessage(textMessage, player.playerUuids, MessageType.VERIFY, []);
     }
 
+    // Unknown player
     if (!player) {
         return new ButtonedMessage('', [], '', [`Unknown player, ${nameToSearch.replace(/_/g, '\\_')}`]);
     }
 
-    const memberToCheck = await getAsync('SELECT UUID, username, guildName, guildRank, rank FROM players WHERE UUID = ?', [player.uuid]);
-
-    if (!memberToCheck) {
-        return new ButtonedMessage('', [], '', [`${nameToSearch.replace(/_/g, '\\_')} not found`]);
-    }
-
-    const response = await applyRoles(interaction.guild, memberToCheck.UUID, interaction.member);
+    // Call applyRoles with the found players UUID
+    const response = await applyRoles(interaction.guild, player.uuid, interaction.member);
 
     let verifyMessage;
 
+    // Determine response message
     switch (response) {
         case 1:
             verifyMessage = `Successfully verified as ${player.username.replace(/_/g, '\\_')}`;
