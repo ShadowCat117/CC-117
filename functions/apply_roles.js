@@ -214,7 +214,7 @@ async function applyRoles(guild, uuid, member) {
                 response = 1;
             }
 
-            if (row.discordId === null && member.id !== member.guild.ownerId) {
+            if (member.id !== member.guild.ownerId) {
                 try {
                     await member.setNickname(null);
                 } catch (ex) {
