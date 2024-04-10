@@ -16,7 +16,6 @@ async function createConfig(client, guildId) {
             const defaultData = {
                 adminRole: highestRole.id,
                 updateRoles: false,
-                changeNicknames: false,
                 checkDuplicateNicknames: false,
                 logChannel: null,
                 logMessages: false,
@@ -169,6 +168,7 @@ async function createConfig(client, guildId) {
                 giveawayRole: null,
                 chiefPromotions: [],
                 eventsRole: null,
+                addGuildPrefixes: false,
             };
 
             try {

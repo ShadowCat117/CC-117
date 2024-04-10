@@ -104,7 +104,7 @@ async function promotionProgress(interaction, force = false) {
         const warBuildRoles = [tankRole, healerRole, damageRole, soloRole];
 
         const guildMembers = await allAsync('SELECT UUID FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
-        const memberToCheck = await getAsync('SELECT UUID, username, guildRank, contributedGuildXP, highestClassLevel, guildJoinDate, wars FROM players WHERE UUID = ? AND guildName = ?', [player.uuid, guildName]);
+        const memberToCheck = await getAsync('SELECT UUID, username, guildRank, contributedGuildXP, highestClassLevel, guildJoinDate, wars, discordId FROM players WHERE UUID = ? AND guildName = ?', [player.uuid, guildName]);
 
         if (!memberToCheck) {
             return new ButtonedMessage('', [], '', [`${nameToSearch.replace(/_/g, '\\_')} is not a member of ${guildName}`]);
@@ -122,7 +122,7 @@ async function promotionProgress(interaction, force = false) {
         const differenceInMilliseconds = today - joinDate;
         const daysInGuild = Math.round(differenceInMilliseconds / (1000 * 60 * 60 * 24));
 
-        const serverMember = await findDiscordUser(interaction.guild.members.cache.values(), player.username);
+        const serverMember = await findDiscordUser(interaction.guild.members.cache.values(), player.username, memberToCheck.discordId);
 
         let hasBuildRole = false;
         let hasEcoRole = false;
@@ -311,10 +311,19 @@ async function promotionProgress(interaction, force = false) {
     }
 }
 
-async function findDiscordUser(serverMembers, username) {
+async function findDiscordUser(serverMembers, username, discordId) {
     for (const serverMember of serverMembers) {
         if (serverMember.user.bot) {
             continue;
+        }
+
+        // If they have a discord id registered, we can use that instead of checking the different names
+        if (discordId) {
+            if (discordId == serverMember.user.id) {
+                return serverMember;
+            } else {
+                continue;
+            }
         }
 
         if (username === serverMember.user.username || username === serverMember.user.globalName || username === serverMember.nickname) {

@@ -2,6 +2,20 @@ const ButtonedMessage = require('../message_type/ButtonedMessage');
 const MessageType = require('../message_type/MessageType');
 const applyRoles = require('./apply_roles');
 const findPlayer = require('./find_player');
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database('database/database.db');
+
+async function getAsync(query, params) {
+    return new Promise((resolve, reject) => {
+        db.get(query, params, function(err, rows) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+}
 
 async function verify(interaction, force = false) {
     let nameToSearch;
@@ -49,6 +63,13 @@ async function verify(interaction, force = false) {
     // Unknown player
     if (!player) {
         return new ButtonedMessage('', [], '', [`Unknown player, ${nameToSearch.replace(/_/g, '\\_')}`]);
+    }
+
+    const selectQuery = 'SELECT discordId FROM players WHERE UUID = ?';
+    const row = await getAsync(selectQuery, [player.uuid]);
+
+    if (row && row.discordId !== interaction.member.user.id) {
+        return new ButtonedMessage('', [], '', [`Someone else is registered as ${nameToSearch.replace(/_/g, '\\_')}. If you believe this is a mistake please let ShadowCat know`]);
     }
 
     // Call applyRoles with the found players UUID

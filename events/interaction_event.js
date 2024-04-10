@@ -31,6 +31,7 @@ const removeDemotionException = require('../functions/remove_demotion_exception'
 const removeInactivityException = require('../functions/remove_inactivity_exception');
 const removePromotionException = require('../functions/remove_promotion_exception');
 const updatePlayer = require('../functions/update_player');
+const registerUser = require('../functions/register_user');
 
 const warriorArchetypes = ['fallen', 'battleMonk', 'paladin'];
 const mageArchetypes = ['riftwalker', 'lightBender', 'arcanist'];
@@ -1498,6 +1499,22 @@ module.exports = {
                         case MessageType.PROMOTION_PROGRESS:
                             // Run promotionProgress
                             result = await promotionProgress(interaction, true);
+
+                            interaction.editReply({
+                                content: result.pages[0],
+                                components: [],
+                            });
+
+                            MessageManager.removeMessage(message);
+
+                            break;
+                        case MessageType.REGISTER_USER:
+                            // Get the discord ID from the message
+                            const lines = message.text.split('\n');
+                            const discordId = lines[lines.length - 1].trim();
+
+                            // Run promotionProgress
+                            result = await registerUser(interaction, discordId, true);
 
                             interaction.editReply({
                                 content: result.pages[0],

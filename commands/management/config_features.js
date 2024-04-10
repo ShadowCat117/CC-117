@@ -17,9 +17,6 @@ module.exports = {
                     name: 'Update Roles',
                     value: 'updateRoles',
                 }, {
-                    name: 'Change Nicknames',
-                    value: 'changeNicknames',
-                }, {
                     name: 'Check Duplicate Nicknames',
                     value: 'checkDuplicateNicknames',
                 }, {
@@ -105,13 +102,6 @@ module.exports = {
                 }
 
                 break;
-            case 'changeNicknames':
-                if (enabled == null) {
-                    await interaction.editReply('Change Nicknames requires an <enabled> input.');
-                    return;
-                }
-
-                break;
             case 'checkDuplicateNicknames':
                 if (enabled == null) {
                     await interaction.editReply('Check Duplicate Nicknames requires an <enabled> input.');
@@ -186,7 +176,6 @@ module.exports = {
             // Save the option to the config
             switch (option) {
                 case 'updateRoles':
-                case 'changeNicknames':
                 case 'checkDuplicateNicknames':
                 case 'logMessages':
                 case 'sendJoinLeaveMessages':
