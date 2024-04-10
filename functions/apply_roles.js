@@ -18,7 +18,7 @@ async function getAsync(query, params) {
     });
 }
 
-async function applyRoles(guild, uuid, member, nonGuildMember = false) {
+async function applyRoles(guild, uuid, member) {
     const guildId = guild.id;
     const directoryPath = path.join(__dirname, '..', 'configs');
     const filePath = path.join(directoryPath, `${guildId}.json`);
@@ -70,6 +70,8 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
         const warrerRole = guild.roles.cache.get(config['warrerRole']);
         const giveawayRole = guild.roles.cache.get(config['giveawayRole']);
         const eventsRole = guild.roles.cache.get(config['eventsRole']);
+
+        const allies = config['allies'];
 
         const guildRoles = [ownerRole, chiefRole, strategistRole, captainRole, recruiterRole, recruitRole];
         const rankRoles = [championRole, heroRole, vipPlusRole, vipRole];
@@ -232,7 +234,7 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
         const veteran = row.veteran;
         const serverRank = row.serverRank;
 
-        if (guildRank && !nonGuildMember) {
+        if (guildRank) {
             if (row.guildName === config.guildName) {
                 const guildRankRole = guild.roles.cache.get(config[guildRank.toLowerCase() + 'Role']);
 
@@ -285,7 +287,7 @@ async function applyRoles(guild, uuid, member, nonGuildMember = false) {
                             });
                     }
                 }
-            } else {
+            } else if (allies.includes(row.guildName)) {
                 let guildRankRole;
 
                 if (guildRank === 'OWNER') {

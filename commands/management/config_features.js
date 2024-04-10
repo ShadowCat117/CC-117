@@ -17,11 +17,11 @@ module.exports = {
                     name: 'Update Roles',
                     value: 'updateRoles',
                 }, {
-                    name: 'Change Nicknames',
-                    value: 'changeNicknames',
-                }, {
                     name: 'Check Duplicate Nicknames',
                     value: 'checkDuplicateNicknames',
+                }, {
+                    name: 'Add Guild Prefixes',
+                    value: 'addGuildPrefixes',
                 }, {
                     name: 'Send Log Messages',
                     value: 'logMessages',
@@ -105,16 +105,16 @@ module.exports = {
                 }
 
                 break;
-            case 'changeNicknames':
+            case 'checkDuplicateNicknames':
                 if (enabled == null) {
-                    await interaction.editReply('Change Nicknames requires an <enabled> input.');
+                    await interaction.editReply('Check Duplicate Nicknames requires an <enabled> input.');
                     return;
                 }
 
                 break;
-            case 'checkDuplicateNicknames':
+            case 'addGuildPrefixes':
                 if (enabled == null) {
-                    await interaction.editReply('Check Duplicate Nicknames requires an <enabled> input.');
+                    await interaction.editReply('Add Guild Prefixes requires an <enabled> input');
                     return;
                 }
 
@@ -186,8 +186,8 @@ module.exports = {
             // Save the option to the config
             switch (option) {
                 case 'updateRoles':
-                case 'changeNicknames':
                 case 'checkDuplicateNicknames':
+                case 'addGuildPrefixes':
                 case 'logMessages':
                 case 'sendJoinLeaveMessages':
                 case 'verifyMembers':

@@ -161,7 +161,6 @@ module.exports = {
             configContent = '';
 
             configContent += `Update Roles Daily: ${config.updateRoles}\n`;
-            configContent += `Change nicknames to Minecraft username: ${config.changeNicknames}\n`;
             configContent += `Only allow unique nicknames: ${config.checkDuplicateNicknames}\n`;
             configContent += `Send messages to log channel: ${config.logMessages}\n`;
             configContent += `Send join/leave messages: ${config.sendJoinLeaveMessages}\n`;
@@ -170,6 +169,7 @@ module.exports = {
             configContent += `Add Member of guild role: ${config.memberOf}\n`;
             configContent += `Add Level roles: ${config.levelRoles}\n`;
             configContent += `Add Server Rank roles: ${config.serverRankRoles}\n`;
+            configContent += `Add guild prefixes to nicknames for non guild members: ${config.addGuildPrefixes}\n`;
 
             pages.push(configContent);
 

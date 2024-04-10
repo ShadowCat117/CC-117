@@ -26,7 +26,7 @@ class VerifiedMember {
     // Returns a string for if the member has someone in the Discord server matching this username
     toString() {
         if (this.verifiedMember) {
-            return `+ Guild Member ${this.playerName} is verified as ${this.verifiedMember}.\n`;
+            return `+ Guild Member ${this.playerName} is verified as @${this.verifiedMember}.\n`;
         } else {
             return `- Guild Member ${this.playerName} is not verified.\n`;
         }
