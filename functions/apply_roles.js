@@ -632,7 +632,7 @@ async function applyRoles(guild, uuid, member) {
         // Don't update nickname for server owners as the bot won't have permission
         if (member.id !== member.guild.ownerId) {
             // No registered account, member of set guild or no guild
-            if (row.discordId === null && config.guildName === row.guildName || !row.guildName) {
+            if (row.discordId === null && (config.guildName === row.guildName || !row.guildName)) {
                 const validGlobalName = member.user.globalName === row.username;
                 let validNickname = member.nickname === row.username;
 
