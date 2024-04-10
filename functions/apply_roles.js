@@ -288,7 +288,6 @@ async function applyRoles(guild, uuid, member) {
                     }
                 }
             } else if (allies.includes(row.guildName)) {
-                console.log(row.guildName);
                 let guildRankRole;
 
                 if (guildRank === 'OWNER') {

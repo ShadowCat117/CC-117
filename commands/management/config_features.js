@@ -20,6 +20,9 @@ module.exports = {
                     name: 'Check Duplicate Nicknames',
                     value: 'checkDuplicateNicknames',
                 }, {
+                    name: 'Add Guild Prefixes',
+                    value: 'addGuildPrefixes',
+                }, {
                     name: 'Send Log Messages',
                     value: 'logMessages',
                 }, {
@@ -109,6 +112,13 @@ module.exports = {
                 }
 
                 break;
+            case 'addGuildPrefixes':
+                if (enabled == null) {
+                    await interaction.editReply('Add Guild Prefixes requires an <enabled> input');
+                    return;
+                }
+
+                break;
             case 'logMessages':
                 if (enabled == null) {
                     await interaction.editReply('Send Log Messages requires an <enabled> input.');
@@ -177,6 +187,7 @@ module.exports = {
             switch (option) {
                 case 'updateRoles':
                 case 'checkDuplicateNicknames':
+                case 'addGuildPrefixes':
                 case 'logMessages':
                 case 'sendJoinLeaveMessages':
                 case 'verifyMembers':
