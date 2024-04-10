@@ -666,8 +666,12 @@ async function applyRoles(guild, uuid, member) {
                         nicknameToSet = row.username;
                     }
 
-                    // Add guild prefix
-                    nicknameToSet = nicknameToSet + ` [${guildPrefix}]`;
+                    // Add prefix if one doesn't already exist
+                    if (nicknameToSet.endsWith(`[${guildPrefix}]`)) {
+                        nicknameToSet = nicknameToSet.split('[')[0] + ` [${guildPrefix}]`;
+                    } else {
+                        nicknameToSet = nicknameToSet + ` [${guildPrefix}]`;
+                    }
 
                     // Try to set the nickname
                     try {
