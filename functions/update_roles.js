@@ -100,8 +100,6 @@ async function updateRoles(guild) {
     
                         rows.splice(i, 1);
                         break;
-                    } else if (guildMember.discordId) {
-                        continue;
                     }
     
                     let nickname = undefined;
@@ -226,8 +224,6 @@ async function updateRoles(guild) {
     
                         allyRows.splice(i, 1);
                         break;
-                    } else if (guildMember.discordId) {
-                        continue;
                     }
 
                     let nickname = undefined;
@@ -311,33 +307,18 @@ async function updateRoles(guild) {
 
                 // As we are now checking every single remaining member, try and limit what is checked by nickname is a valid username
                 if (minecraftNamePattern.test(nickname)) {
-                    player = await getAsync('SELECT UUID, discordId FROM players WHERE username = ?', [nickname]);
-
-                    // If someone else is registered as this account then they can't be verified as this member
-                    if (player && player.discordId !== serverMember.user.id) {
-                        player = undefined;
-                    }
+                    player = await getAsync('SELECT UUID FROM players WHERE username = ?', [nickname]);
                 }
             }
 
             // No player found from nickname, test for valid global name and retry
             if (!player && minecraftNamePattern.test(serverMember.user.globalName)) {
                 player = await getAsync('SELECT UUID FROM players WHERE username = ?', [serverMember.user.globalName]);
-
-                // If someone else is registered as this account then they can't be verified as this member
-                if (player && player.discordId !== serverMember.user.id) {
-                    player = undefined;
-                }
             }
 
             // Still no player, try username. Already has same constraints as a Minecraft username
             if (!player) {
                 player = await getAsync('SELECT UUID FROM players WHERE username = ?', [serverMember.user.username]);
-
-                // If someone else is registered as this account then they can't be verified as this member
-                if (player && player.discordId !== serverMember.user.id) {
-                    player = undefined;
-                }
             }
 
             let uuid = null;
