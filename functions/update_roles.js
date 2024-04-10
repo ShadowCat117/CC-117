@@ -56,7 +56,7 @@ async function updateRoles(guild) {
         // Verify members of set guild
         if (guildName) {
             // Get all members of guild
-            const rows = await allAsync('SELECT UUID, username, discordId FROM players WHERE guildName = ?', [guildName]);
+            const rows = await allAsync('SELECT UUID, username FROM players WHERE guildName = ?', [guildName]);
 
             // Loop through all server members
             for (const serverMember of guild.members.cache.values()) {
@@ -64,12 +64,20 @@ async function updateRoles(guild) {
                 if (serverMember.user.bot) {
                     continue;
                 }
-
+    
                 // Loop through all guild members
                 for (let i = 0; i < rows.length; i++) {
                     const guildMember = rows[i];
+    
+                    let nickname = undefined;
+    
+                    // If they have a nickname, remove the guild tag suffix
+                    if (serverMember.nickname) {
+                        nickname = serverMember.nickname.split(' [')[0];
+                    }
 
-                    if (guildMember.discordId === serverMember.user.id) {
+                    // Temporary fix for a friend to allow them to have their new name
+                    if (guildMember.username === 'Owen_Rocks_3' && serverMember.user.id === '753700961364738158') {
                         // Call applyRoles
                         const updated = await applyRoles(guild, guildMember.UUID, serverMember);
     
@@ -100,13 +108,6 @@ async function updateRoles(guild) {
     
                         rows.splice(i, 1);
                         break;
-                    }
-    
-                    let nickname = undefined;
-    
-                    // If they have a nickname, remove the guild tag suffix
-                    if (serverMember.nickname) {
-                        nickname = serverMember.nickname.split(' [')[0];
                     }
     
                     // Check for valid nickname first as that is more likely to be correct
@@ -180,7 +181,7 @@ async function updateRoles(guild) {
         // Loop through all set allies
         for (const allyGuild of config.allies) {
             // Get members of current ally
-            const allyRows = await allAsync('SELECT UUID, username, discordId FROM players WHERE guildName = ?', [allyGuild]);
+            const allyRows = await allAsync('SELECT UUID, username FROM players WHERE guildName = ?', [allyGuild]);
 
             // Loop through all server members
             for (const serverMember of guild.members.cache.values()) {
@@ -192,39 +193,6 @@ async function updateRoles(guild) {
                 // Loop through guild members
                 for (let i = 0; i < allyRows.length; i++) {
                     const guildMember = allyRows[i];
-
-                    if (guildMember.discordId === serverMember.user.id) {
-                        // Call applyRoles
-                        const updated = await applyRoles(guild, guildMember.UUID, serverMember);
-    
-                        // Set member as to be ignored in future loops
-                        serverMembersToIgnore.push(serverMember.user.username);
-    
-                        const formattedName = serverMember.user.username.replace(/_/g, '\\_');
-    
-                        if (updated > 0) {
-                            // Update message
-                            if (updatedMembers > 0) {
-                                messageEnd += `, ${formattedName}`;
-    
-                                updatedMembers++;
-                                messageStart = `Updated roles for ${updatedMembers} members.`;
-                            } else {
-                                messageEnd += `\n(${formattedName}`;
-    
-                                updatedMembers++;
-                                messageStart = `Updated roles for ${updatedMembers} member.`;
-                            }
-                        }
-    
-                        // Set member as one who has been verified
-                        if (verifiedServerMembers.indexOf(serverMember.user.username) === -1) {
-                            verifiedServerMembers.push(serverMember.user.username);
-                        }
-    
-                        allyRows.splice(i, 1);
-                        break;
-                    }
 
                     let nickname = undefined;
 
@@ -298,11 +266,10 @@ async function updateRoles(guild) {
                 continue;
             }
 
-            // Try and get the player by seeing if there is a player with their discord ID registered
-            let player = await getAsync('SELECT UUID FROM players WHERE discordId = ?', [serverMember.user.id]);
+            let player;
 
             // Check for valid nickname first as that is more likely to be correct
-            if (!player && serverMember.nickname) {
+            if (serverMember.nickname) {
                 const nickname = serverMember.nickname.split(' [')[0];
 
                 // As we are now checking every single remaining member, try and limit what is checked by nickname is a valid username
@@ -327,8 +294,8 @@ async function updateRoles(guild) {
                 uuid = player['UUID'];
             }
 
-            // Call applyRoles
-            const updated = await applyRoles(guild, uuid, serverMember);
+            // Call applyRoles, telling it they are not a guild member or ally
+            const updated = await applyRoles(guild, uuid, serverMember, true);
 
             const formattedName = serverMember.user.username.replace(/_/g, '\\_');
 

@@ -18,7 +18,7 @@ async function getAsync(query, params) {
     });
 }
 
-async function applyRoles(guild, uuid, member) {
+async function applyRoles(guild, uuid, member, nonGuildMember = false) {
     const guildId = guild.id;
     const directoryPath = path.join(__dirname, '..', 'configs');
     const filePath = path.join(directoryPath, `${guildId}.json`);
@@ -71,8 +71,6 @@ async function applyRoles(guild, uuid, member) {
         const giveawayRole = guild.roles.cache.get(config['giveawayRole']);
         const eventsRole = guild.roles.cache.get(config['eventsRole']);
 
-        const allies = config['allies'];
-
         const guildRoles = [ownerRole, chiefRole, strategistRole, captainRole, recruiterRole, recruitRole];
         const rankRoles = [championRole, heroRole, vipPlusRole, vipRole];
         const allyRoles = [allyOwnerRole, allyRole];
@@ -82,7 +80,7 @@ async function applyRoles(guild, uuid, member) {
 
         const levelRoleLevels = [config['levelRoleOneLevel'], config['levelRoleTwoLevel'], config['levelRoleThreeLevel'], config['levelRoleFourLevel'], config['levelRoleFiveLevel'], config['levelRoleSixLevel'], config['levelRoleSevenLevel'], config['levelRoleEightLevel'], config['levelRoleNineLevel'], config['levelRoleTenLevel']];
 
-        const selectQuery = 'SELECT username, guildName, guildRank, rank, veteran, highestClassLevel, serverRank, discordId FROM players WHERE UUID = ?';
+        const selectQuery = 'SELECT username, guildName, guildRank, rank, veteran, highestClassLevel, serverRank FROM players WHERE UUID = ?';
         const selectParams = [uuid];
 
         const row = await getAsync(selectQuery, selectParams);
@@ -214,7 +212,7 @@ async function applyRoles(guild, uuid, member) {
                 response = 1;
             }
 
-            if (row.discordId === null && member.id !== member.guild.ownerId) {
+            if (member.id !== member.guild.ownerId) {
                 try {
                     await member.setNickname(null);
                 } catch (ex) {
@@ -234,7 +232,7 @@ async function applyRoles(guild, uuid, member) {
         const veteran = row.veteran;
         const serverRank = row.serverRank;
 
-        if (guildRank) {
+        if (guildRank && !nonGuildMember) {
             if (row.guildName === config.guildName) {
                 const guildRankRole = guild.roles.cache.get(config[guildRank.toLowerCase() + 'Role']);
 
@@ -287,8 +285,7 @@ async function applyRoles(guild, uuid, member) {
                             });
                     }
                 }
-            } else if (allies.includes(row.guildName)) {
-                console.log(row.guildName);
+            } else {
                 let guildRankRole;
 
                 if (guildRank === 'OWNER') {
@@ -629,10 +626,8 @@ async function applyRoles(guild, uuid, member) {
             response = 1;
         }
 
-        // Don't update nickname for server owners as the bot won't have permission
-        if (member.id !== member.guild.ownerId) {
-            // No registered account, member of set guild or no guild
-            if (row.discordId === null && config.guildName === row.guildName || !row.guildName) {
+        if (config.changeNicknames && member.id !== member.guild.ownerId) {
+            if (config.guildName === row.guildName || !row.guildName) {
                 const validGlobalName = member.user.globalName === row.username;
                 let validNickname = member.nickname === row.username;
 
@@ -647,34 +642,16 @@ async function applyRoles(guild, uuid, member) {
                         MessageManager.sendMessage(guild, config.logChannel, `Failed to change nickname for ${member.user.username}.`);
                     }
                 }
-            // In a guild and prefixes are enabled
-            } else if (row.guildName && config.addGuildPrefixes) {
-                const guildPrefix = await findPrefix(row.guildName);
+            } else {
+                if (row.guildName) {
+                    const guildPrefix = await findPrefix(row.guildName);
 
-                if (guildPrefix) {
-                    let nicknameToSet;
-
-                    // If a registered account, try and use existing nickname, then display name, then username
-                    if (row.discordId) {
-                        if (member.nickname !== null) {
-                            nicknameToSet = member.nickname;
-                        } else if (member.displayName !== null) {
-                            nicknameToSet = member.displayName;
-                        } else {
-                            nicknameToSet = member.user.username;
+                    if (guildPrefix && config.changeNicknames && member.nickname !== `${row.username} [${guildPrefix}]`) {
+                        try {
+                            await member.setNickname(`${row.username} [${guildPrefix}]`);
+                        } catch (ex) {
+                            MessageManager.sendMessage(guild, config.logChannel, `Failed to change nickname for ${member.user.username}.`);
                         }
-                    } else {
-                        nicknameToSet = row.username;
-                    }
-
-                    // Add guild prefix
-                    nicknameToSet = nicknameToSet + ` [${guildPrefix}]`;
-
-                    // Try to set the nickname
-                    try {
-                        await member.setNickname(nicknameToSet);
-                    } catch (ex) {
-                        MessageManager.sendMessage(guild, config.logChannel, `Failed to change nickname for ${member.user.username}.`);
                     }
                 }
             }

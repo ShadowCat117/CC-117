@@ -13,7 +13,7 @@ function findGuild(input, force = false) {
                 }
 
                 if (rows.length === 0) {
-                    resolve(null);
+                    resolve('Unknown guild');
                 } else if (rows.length === 1) {
                     resolve(rows[0].name);
                     db.close();

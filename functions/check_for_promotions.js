@@ -110,7 +110,7 @@ async function checkForPromotions(interaction) {
 
         const exemptUsernames = Object.keys(promotionExceptions);
 
-        const originalRows = await allAsync('SELECT UUID, username, guildRank, contributedGuildXP, highestClassLevel, guildJoinDate, wars, discordId FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
+        const originalRows = await allAsync('SELECT UUID, username, guildRank, contributedGuildXP, highestClassLevel, guildJoinDate, wars FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
 
         let filteredRows = originalRows.filter(player => player.guildRank !== 'OWNER' && player.guildRank !== 'CHIEF' && !exemptUsernames.includes(player.username));
         let checkForChiefPromotion = true;
@@ -150,7 +150,7 @@ async function checkForPromotions(interaction) {
             position++;
     
             if (filteredRows.includes(row)) {
-                const { username, guildRank, contributedGuildXP, highestClassLevel, wars, discordId } = row;
+                const { username, guildRank, contributedGuildXP, highestClassLevel, wars } = row;
                 const contributionPos = position;
     
                 const [year, month, day] = row.guildJoinDate.split('-');
@@ -158,7 +158,7 @@ async function checkForPromotions(interaction) {
                 const differenceInMilliseconds = today - joinDate;
                 const daysInGuild = Math.round(differenceInMilliseconds / (1000 * 60 * 60 * 24));
     
-                const serverMember = await findDiscordUser(interaction.guild.members.cache.values(), username, discordId);
+                const serverMember = await findDiscordUser(interaction.guild.members.cache.values(), username);
 
                 let playtimeRow;
 
@@ -265,19 +265,10 @@ async function checkForPromotions(interaction) {
     }
 }
 
-async function findDiscordUser(serverMembers, username, discordId) {
+async function findDiscordUser(serverMembers, username) {
     for (const serverMember of serverMembers) {
         if (serverMember.user.bot) {
             continue;
-        }
-
-        // If they have a discord id registered, we can use that instead of checking the different names
-        if (discordId) {
-            if (discordId == serverMember.user.id) {
-                return serverMember;
-            } else {
-                continue;
-            }
         }
 
         if (username === serverMember.user.username || username === serverMember.user.globalName || username === serverMember.nickname) {

@@ -38,7 +38,7 @@ async function verified(interaction) {
         }
 
         // Get all players in guild, sort a-z
-        const rows = await allAsync('SELECT username, discordId FROM players WHERE guildName = ? ORDER BY username DESC', [guildName]);
+        const rows = await allAsync('SELECT username FROM players WHERE guildName = ? ORDER BY username DESC', [guildName]);
 
         // No players in guild
         if (rows.length === 0) {
@@ -47,7 +47,7 @@ async function verified(interaction) {
 
         // Create the list of verified members
         const verifiedMembers = rows.map(row => {
-            return new VerifiedMember(row.username, row.discordId, interaction.guild.members.cache.values());
+            return new VerifiedMember(row.username, interaction.guild.members.cache.values());
         });
 
         const pages = [];
