@@ -4,16 +4,18 @@ class GuildMember {
     // guildRank: Guild rank of the member
     // lastJoin: How many days since the player last joined
     // contributedGuildXP: How much XP they have contributed to the guild
+    // isOnline: Is the guild member currently online
     // onlineWorld: What world they are currently online on
     // joinDate: When did they join the guild
     // daysInGuild: How many days they have been in the guild for
     // contributionPosition: Their contribution position
     // wars: How many wars have they participated in
     // averagePlaytime: How many hours per week does the player play
-    constructor(username, guildRank, lastJoin, contributedGuildXP, onlineWorld, joinDate, daysInGuild, contributionPosition, wars, averagePlaytime) {
+    constructor(username, guildRank, lastJoin, contributedGuildXP, isOnline, onlineWorld, joinDate, daysInGuild, contributionPosition, wars, averagePlaytime) {
         this.username = username;
         this.guildRank = `(${guildRank})`;
         this.lastJoin = lastJoin;
+        this.isOnline = isOnline;
         this.onlineWorld = onlineWorld;
         // Add commas between numbers for nicer viewing
         this.contributedGuildXP = contributedGuildXP.toLocaleString(); 
@@ -35,7 +37,7 @@ class GuildMember {
 
     // Return a string of if the player is online and what world they are on or offline
     getOnlineStatus() {
-        if (this.onlineWorld) {
+        if (this.isOnline) {
             // If online
             return `Online on ${this.onlineWorld}`;
         } else if (this.lastJoin === 1) {

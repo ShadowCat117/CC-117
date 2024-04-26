@@ -51,7 +51,7 @@ async function worldActivity(interaction, force = false) {
         const query = `
             SELECT onlineWorld, COUNT(*) AS count
             FROM players
-            WHERE guildName = ? AND onlineWorld IS NOT NULL
+            WHERE guildName = ? AND isOnline = 1 AND onlineWorld IS NOT NULL
             GROUP BY onlineWorld
             ORDER BY count DESC
             `;

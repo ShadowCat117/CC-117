@@ -61,7 +61,7 @@ async function guildStats(interaction, force = false) {
 
     if (guildName) {
         const guildRow = await getAsync('SELECT prefix, level, xpPercent, wars, rating FROM guilds WHERE name = ?', [guildName]);
-        const memberRows = await allAsync('SELECT UUID, username, guildRank, lastJoin, onlineWorld, contributedGuildXP, guildJoinDate, wars FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
+        const memberRows = await allAsync('SELECT UUID, username, guildRank, lastJoin, isOnline, onlineWorld, contributedGuildXP, guildJoinDate, wars FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
         const today = new Date();
 
         if (guildRow == undefined) {
@@ -127,12 +127,12 @@ async function guildStats(interaction, force = false) {
             if (tableExists) {
                 for (const player of activityRows) {
                     if (player.UUID === row.UUID && player.averagePlaytime >= 0) {
-                        return new GuildMember(username, guildRank, daysSinceLastJoin, contributedGuildXP, row.onlineWorld, row.guildJoinDate, daysInGuild, contributionPosition, wars, player.averagePlaytime);
+                        return new GuildMember(username, guildRank, daysSinceLastJoin, contributedGuildXP, row.isOnline, row.onlineWorld, row.guildJoinDate, daysInGuild, contributionPosition, wars, player.averagePlaytime);
                     }
                 }
             }
 
-            return new GuildMember(username, guildRank, daysSinceLastJoin, contributedGuildXP, row.onlineWorld, row.guildJoinDate, daysInGuild, contributionPosition, wars, -1);
+            return new GuildMember(username, guildRank, daysSinceLastJoin, contributedGuildXP, row.isOnline, row.onlineWorld, row.guildJoinDate, daysInGuild, contributionPosition, wars, -1);
         });
 
         let formattedXPPerDay;
