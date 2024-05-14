@@ -150,13 +150,11 @@ async function guildStats(interaction, force = false) {
             formattedXPPerDay = `${averageXpPerDay.toFixed(2)}/day`;
         }
 
-        const averagePlaytime = totalPlaytime / guildMembers.length;
-
-        const formattedPlaytime = `${averagePlaytime.toFixed(2)} hours`;
+        const formattedPlaytime = `${totalPlaytime.toFixed(2)} hours`;
 
         const pages = [];
         const guildLevel = guildRow.level ? guildRow.level : '?';
-        const weeklyPlaytime = totalPlaytime == 0 ? '' : `\nAverage weekly playtime: ${formattedPlaytime}`;
+        const weeklyPlaytime = totalPlaytime == 0 ? '' : `\nTotal weekly playtime: ${formattedPlaytime}`;
         let guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%)\nWars: ${guildRow.wars} Rating: ${guildRow.rating}\nXP per day: ${formattedXPPerDay}${weeklyPlaytime}\n\n`;
         let counter = 0;
 
