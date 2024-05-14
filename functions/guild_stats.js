@@ -61,7 +61,7 @@ async function guildStats(interaction, force = false) {
 
     if (guildName) {
         const guildRow = await getAsync('SELECT prefix, level, xpPercent, wars, rating FROM guilds WHERE name = ?', [guildName]);
-        const memberRows = await allAsync('SELECT UUID, username, guildRank, lastJoin, isOnline, onlineWorld, contributedGuildXP, guildJoinDate, playtime, wars FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
+        const memberRows = await allAsync('SELECT UUID, username, guildRank, lastJoin, isOnline, onlineWorld, contributedGuildXP, guildJoinDate, wars FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
         const today = new Date();
 
         if (guildRow == undefined) {
@@ -89,7 +89,6 @@ async function guildStats(interaction, force = false) {
             const {
                 username,
                 guildRank,
-                playtime,
                 wars,
             } = row;
 
@@ -119,10 +118,6 @@ async function guildStats(interaction, force = false) {
                 averageXpPerDay += contributedGuildXP / daysInGuild;
             }
 
-            if (playtime) {
-                totalPlaytime += playtime;
-            }
-
             const [lastJoinYear, lastJoinMonth, lastJoinDay] = row.lastJoin.split('-');
                 
             const lastJoinDate = new Date(lastJoinYear, lastJoinMonth - 1, lastJoinDay);
@@ -134,6 +129,7 @@ async function guildStats(interaction, force = false) {
             if (tableExists) {
                 for (const player of activityRows) {
                     if (player.UUID === row.UUID && player.averagePlaytime >= 0) {
+                        totalPlaytime += player.averagePlaytime;
                         return new GuildMember(username, guildRank, daysSinceLastJoin, contributedGuildXP, row.isOnline, row.onlineWorld, row.guildJoinDate, daysInGuild, contributionPosition, wars, player.averagePlaytime);
                     }
                 }
@@ -160,14 +156,15 @@ async function guildStats(interaction, force = false) {
 
         const pages = [];
         const guildLevel = guildRow.level ? guildRow.level : '?';
-        let guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%)\nWars: ${guildRow.wars} Rating: ${guildRow.rating}\nXP per day: ${formattedXPPerDay}\nAverage member playtime: ${formattedPlaytime}\n\n`;
+        const weeklyPlaytime = totalPlaytime == 0 ? '' : `\nAverage weekly playtime: ${formattedPlaytime}`;
+        let guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%)\nWars: ${guildRow.wars} Rating: ${guildRow.rating}\nXP per day: ${formattedXPPerDay}${weeklyPlaytime}\n\n`;
         let counter = 0;
 
         guildMembers.forEach((player) => {
             if (counter === 5) {
                 guildStatsPage += '```';
                 pages.push(guildStatsPage);
-                guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%)\nWars: ${guildRow.wars} Rating: ${guildRow.rating}\nXP per day: ${formattedXPPerDay}\n\n` + player.toString();
+                guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%)\nWars: ${guildRow.wars} Rating: ${guildRow.rating}\nXP per day: ${formattedXPPerDay}${weeklyPlaytime}\n\n` + player.toString();
                 counter = 1;
             } else {
                 guildStatsPage += player.toString();
