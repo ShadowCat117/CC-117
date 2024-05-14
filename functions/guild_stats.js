@@ -61,7 +61,7 @@ async function guildStats(interaction, force = false) {
 
     if (guildName) {
         const guildRow = await getAsync('SELECT prefix, level, xpPercent, wars, rating FROM guilds WHERE name = ?', [guildName]);
-        const memberRows = await allAsync('SELECT UUID, username, guildRank, lastJoin, isOnline, onlineWorld, contributedGuildXP, guildJoinDate, wars FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
+        const memberRows = await allAsync('SELECT UUID, username, guildRank, lastJoin, isOnline, onlineWorld, contributedGuildXP, guildJoinDate, playtime, wars FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
         const today = new Date();
 
         if (guildRow == undefined) {
@@ -81,12 +81,15 @@ async function guildStats(interaction, force = false) {
 
         let averageXpPerDay = 0;
 
+        let totalPlaytime = 0;
+
         const guildMembers = memberRows.map(row => {
             contributionPosition++;
 
             const {
                 username,
                 guildRank,
+                playtime,
                 wars,
             } = row;
 
@@ -114,6 +117,10 @@ async function guildStats(interaction, force = false) {
 
             if (daysInGuild !== 0) {
                 averageXpPerDay += contributedGuildXP / daysInGuild;
+            }
+
+            if (playtime) {
+                totalPlaytime += playtime;
             }
 
             const [lastJoinYear, lastJoinMonth, lastJoinDay] = row.lastJoin.split('-');
@@ -147,9 +154,13 @@ async function guildStats(interaction, force = false) {
             formattedXPPerDay = `${averageXpPerDay.toFixed(2)}/day`;
         }
 
+        const averagePlaytime = totalPlaytime / guildMembers.length;
+
+        const formattedPlaytime = `${averagePlaytime.toFixed(2)} hours`;
+
         const pages = [];
         const guildLevel = guildRow.level ? guildRow.level : '?';
-        let guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%)\nWars: ${guildRow.wars} Rating: ${guildRow.rating}\nXP per day: ${formattedXPPerDay}\n\n`;
+        let guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%)\nWars: ${guildRow.wars} Rating: ${guildRow.rating}\nXP per day: ${formattedXPPerDay}\nAverage member playtime: ${formattedPlaytime}\n\n`;
         let counter = 0;
 
         guildMembers.forEach((player) => {
