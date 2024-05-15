@@ -214,6 +214,9 @@ async function promotionProgress(interaction, force = false) {
             nextGuildRank = 'RECRUITER';
         }
 
+        // Add one extra for the forced time requirement
+        requirementsCount += 1;
+
         let metRequirements = 0;
 
         let timeMessage;
@@ -222,6 +225,7 @@ async function promotionProgress(interaction, force = false) {
             timeMessage = `🔴 Does not meet time requirement (${daysInGuild} days/${timeRequirement} days)\n`;
         } else {
             timeMessage = `🟢 Meets time requirement (${daysInGuild} days/${timeRequirement} days)\n`;
+            metRequirements++;
         }
 
         let reqsMessage = '';
