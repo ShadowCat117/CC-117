@@ -557,7 +557,7 @@ async function updateGuild(guildName) {
             average17, captains17, averageCount17, average18, captains18, averageCount18,
             average18, captains18, averageCount18, average19, captains19, averageCount19,
             average20, captains20, averageCount20, average21, captains21, averageCount21,
-            average22, captains22, averageCount22, average23, captains23, averageCount23,
+            average22, captains22, averageCount22, average23, captains23, averageCount23
         ) 
             VALUES (?, ?, ?, ?, ?, ?,
             -1, -1, 0, -1, -1, 0, -1, -1, 0, -1, -1, 0,
