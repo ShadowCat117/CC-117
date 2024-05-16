@@ -68,41 +68,18 @@ module.exports = {
                             // Loop through each hour
                             for (let i = 0; i < 24; i++) {
                                 const currentHour = i.toString().padStart(2, '0');
+                                const averageKey = 'average' + currentHour;
+                                const captainsKey = 'captains' + currentHour;
 
-                                // Loop through the 4 times each hour has activity tracked at
-                                for (let j = 0; j < 4; j++) {
-                                    let currentMinute;
+                                const query = 'SELECT ' + averageKey + ', ' + captainsKey + ' FROM guilds WHERE name = ?';
+                                const params = [tracked];
 
-                                    if (j === 0) {
-                                        currentMinute = '00';
-                                    } else if (j === 1) {
-                                        currentMinute = '15';
-                                    } else if (j === 2) {
-                                        currentMinute = '30';
-                                    } else if (j === 3) {
-                                        currentMinute = '45';
-                                    }
+                                const result = await getAsync(query, params);
 
-                                    // The time for current activity check
-                                    const currentTime = `${currentHour}${currentMinute}`;
-
-                                    // The column names in table for current average
-                                    const averageKey = 'average' + currentTime;
-                                    const captainsKey = 'captains' + currentTime;
-
-                                    const query = 'SELECT ' + averageKey + ', ' + captainsKey + ' FROM guilds WHERE name = ?';
-                                    const params = [tracked];
-
-                                    // Get the activity at current time
-                                    const result = await getAsync(query, params);
-
-                                    // If there is valid activity data
-                                    if (result[averageKey] !== null && result[averageKey] !== -1) {
-                                        // Increment average
-                                        averageOnline += result[averageKey];
-                                        averageCaptains += result[captainsKey];
-                                        divideBy++;
-                                    }
+                                if (result[averageKey] !== null && result[averageKey] !== -1) {
+                                    averageOnline += result[averageKey];
+                                    averageCaptains += result[captainsKey];
+                                    divideBy++;
                                 }
                             }
 

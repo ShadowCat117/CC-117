@@ -97,30 +97,13 @@ async function lastLogins(interaction, force = false) {
 
                 for (let i = 0; i < 24; i++) {
                     const currentHour = i.toString().padStart(2, '0');
+                    const averageKey = 'average' + currentHour;
 
-                    for (let j = 0; j < 4; j++) {
-                        let currentMinute;
+                    const result = await getAsync('SELECT ' + averageKey + ' FROM guilds WHERE name = ?', [guildName]);
 
-                        if (j === 0) {
-                            currentMinute = '00';
-                        } else if (j === 1) {
-                            currentMinute = '15';
-                        } else if (j === 2) {
-                            currentMinute = '30';
-                        } else if (j === 3) {
-                            currentMinute = '45';
-                        }
-
-                        const currentTime = `${currentHour}${currentMinute}`;
-
-                        const averageKey = 'average' + currentTime;
-
-                        const result = await getAsync('SELECT ' + averageKey + ' FROM guilds WHERE name = ?', [guildName]);
-
-                        if (result[averageKey] !== null && result[averageKey] !== -1) {
-                            averageOnline += result[averageKey];
-                            divideBy++;
-                        }
+                    if (result[averageKey] !== null && result[averageKey] !== -1) {
+                        averageOnline += result[averageKey];
+                        divideBy++;
                     }
                 }
 
