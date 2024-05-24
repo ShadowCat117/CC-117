@@ -93,6 +93,9 @@ module.exports = {
 };
 
 async function validUsername(verifyingMember, guild, nameToCheck) {
+    // Temporary fix to stop others verifying as friends old name
+    if (nameToCheck.toLowerCase() === 'owen_rocks_3') return false;
+    
     // Loop through all server members
     for (const member of guild.members.cache) {
         // Ignore if member is the current member trying to verify
