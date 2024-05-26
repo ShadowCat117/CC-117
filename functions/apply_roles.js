@@ -302,19 +302,6 @@ async function applyRoles(guild, uuid, member) {
                         errorMessage += `Ally owner role ${guildRank} is not defined in the config or is invalid.\n`;
                     }
                 } else {
-                    if (allyRole && !memberRoles.has(allyRole.id)) {
-                        await member.roles.add(allyRole)
-                            .then(() => {
-                                console.log(`Added ally role to ${member.user.username}`);
-                                hasUpdated = true;
-                            })
-                            .catch(() => {
-                                errorMessage += `Failed to add ally role to ${member.user.username}.\n`;
-                            });
-                    } else if (!allyRole) {
-                        errorMessage += 'Ally role is not defined in the config or is invalid.\n';
-                    }
-
                     if (allyOwnerRole && memberRoles.has(allyOwnerRole.id)) {
                         await member.roles.remove(allyOwnerRole)
                             .then(() => {
@@ -325,6 +312,19 @@ async function applyRoles(guild, uuid, member) {
                                 errorMessage += `Failed to remove ally owner role from ${member.user.username}.\n`;
                             });
                     }
+                }
+
+                if (allyRole && !memberRoles.has(allyRole.id)) {
+                    await member.roles.add(allyRole)
+                        .then(() => {
+                            console.log(`Added ally role to ${member.user.username}`);
+                            hasUpdated = true;
+                        })
+                        .catch(() => {
+                            errorMessage += `Failed to add ally role to ${member.user.username}.\n`;
+                        });
+                } else if (!allyRole) {
+                    errorMessage += 'Ally role is not defined in the config or is invalid.\n';
                 }
 
                 for (const role of memberRoles.values()) {
