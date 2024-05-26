@@ -288,25 +288,43 @@ async function applyRoles(guild, uuid, member) {
                     }
                 }
             } else if (allies.includes(row.guildName)) {
-                let guildRankRole;
-
                 if (guildRank === 'OWNER') {
-                    guildRankRole = guild.roles.cache.get(config['allyOwnerRole']);
+                    if (allyOwnerRole && !memberRoles.has(allyOwnerRole.id)) {
+                        await member.roles.add(allyOwnerRole)
+                            .then(() => {
+                                console.log(`Added ally owner role to ${member.user.username}`);
+                                hasUpdated = true;
+                            })
+                            .catch(() => {
+                                errorMessage += `Failed to add ally owner role to ${member.user.username}.\n`;
+                            });
+                    } else if (!allyOwnerRole) {
+                        errorMessage += `Ally owner role ${guildRank} is not defined in the config or is invalid.\n`;
+                    }
                 } else {
-                    guildRankRole = guild.roles.cache.get(config['allyRole']);
-                }
+                    if (allyRole && !memberRoles.has(allyRole.id)) {
+                        await member.roles.add(allyRole)
+                            .then(() => {
+                                console.log(`Added ally role to ${member.user.username}`);
+                                hasUpdated = true;
+                            })
+                            .catch(() => {
+                                errorMessage += `Failed to add ally role to ${member.user.username}.\n`;
+                            });
+                    } else if (!allyRole) {
+                        errorMessage += 'Ally role is not defined in the config or is invalid.\n';
+                    }
 
-                if (guildRankRole && !memberRoles.has(guildRankRole.id)) {
-                    await member.roles.add(guildRankRole)
-                        .then(() => {
-                            console.log(`Added ally guild rank role to ${member.user.username}`);
-                            hasUpdated = true;
-                        })
-                        .catch(() => {
-                            errorMessage += `Failed to add ally guild rank role to ${member.user.username}.\n`;
-                        });
-                } else if (!guildRankRole) {
-                    errorMessage += `Ally guild rank role ${guildRank} is not defined in the config or is invalid.\n`;
+                    if (allyOwnerRole && memberRoles.has(allyOwnerRole.id)) {
+                        await member.roles.remove(allyOwnerRole)
+                            .then(() => {
+                                console.log(`Removed ally owner role from ${member.user.username}`);
+                                hasUpdated = true;
+                            })
+                            .catch(() => {
+                                errorMessage += `Failed to remove ally owner role from ${member.user.username}.\n`;
+                            });
+                    }
                 }
 
                 for (const role of memberRoles.values()) {
