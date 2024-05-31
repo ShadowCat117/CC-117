@@ -32,6 +32,8 @@ const removeInactivityException = require('../functions/remove_inactivity_except
 const removePromotionException = require('../functions/remove_promotion_exception');
 const updatePlayer = require('../functions/update_player');
 const registerUser = require('../functions/register_user');
+const banPlayer = require('../functions/ban_player');
+const unbanPlayer = require('../functions/unban_player');
 
 const warriorArchetypes = ['fallen', 'battleMonk', 'paladin'];
 const mageArchetypes = ['riftwalker', 'lightBender', 'arcanist'];
@@ -1373,6 +1375,18 @@ module.exports = {
                             MessageManager.removeMessage(message);
 
                             break;
+                        case MessageType.BAN_PLAYER:
+                            // Run banPlayer
+                            result = await banPlayer(interaction, true);
+
+                            interaction.editReply({
+                                content: result.pages[0],
+                                components: [],
+                            });
+
+                            MessageManager.removeMessage(message);
+
+                            break;
                         case MessageType.GUILD_STATS:
                             // Run guildStats
                             result = await guildStats(interaction, true);
@@ -1608,6 +1622,18 @@ module.exports = {
                             MessageManager.removeMessage(message);
 
                             break;
+                        case MessageType.UNBAN_PLAYER:
+                                // Run unbanPlayer
+                                result = await unbanPlayer(interaction, true);
+    
+                                interaction.editReply({
+                                    content: result.pages[0],
+                                    components: [],
+                                });
+    
+                                MessageManager.removeMessage(message);
+    
+                                break;
                         case MessageType.UNTRACK_GUILD:
                             // Run untrackGuild
                             result = await untrackGuild(interaction, true);

@@ -169,6 +169,7 @@ async function createConfig(client, guildId) {
                 chiefPromotions: [],
                 eventsRole: null,
                 addGuildPrefixes: false,
+                bannedPlayers: [],
             };
 
             try {
