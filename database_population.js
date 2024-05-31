@@ -822,9 +822,9 @@ async function updateGuildActivity(currentHour, currentMinute) {
             let newCaptains;
 
             // Calculate new average
-            if (hourAverageCount >= 84) {
-                newAverage = currentAverage + currentOnline / 2;
-                newCaptains = currentCaptains + captainsOnline / 2;
+            if (hourAverageCount >= 42) {
+                newAverage = (currentAverage + currentOnline) / 2;
+                newCaptains = (currentCaptains + captainsOnline) / 2;
             } else if (currentAverage > 0) {
                 newAverage = (currentAverage * hourAverageCount + currentOnline) / (hourAverageCount + 1);
                 newCaptains = (currentCaptains * hourAverageCount + captainsOnline) / (hourAverageCount + 1);
@@ -834,23 +834,12 @@ async function updateGuildActivity(currentHour, currentMinute) {
             }
 
             // Increment hourAverageCount unless it has a week of data in which case it's reset to 1
-            if (currentMinute === 50) {
+            if (currentMinute === '50') {
                 if (hourAverageCount >= 42) {
                     hourAverageCount = 1;
                 }
             } else {
                 hourAverageCount += 1;
-            }
-
-            // Reset all averageCounts weekly
-            if (currentHour === '23' && currentMinute === 50) {
-                if (hourAverageCount >= 42) {
-                    for (let i = 0; i < 24; i++) {
-                        const hour = i.toString().padStart(2, '0');
-                        const resetQuery = 'UPDATE guilds SET averageCount' + hour + ' = 1 WHERE name = ?';
-                        await runAsync(resetQuery, [guildName]);
-                    }
-                }
             }
 
             // Update activity
