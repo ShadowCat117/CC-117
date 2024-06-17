@@ -24,7 +24,6 @@ const MessageType = {
   UPDATE_GUILD: 'UPDATE_GUILD',
   UPDATE_PLAYER: 'UPDATE_PLAYER',
   VERIFY: 'VERIFY',
-  WORLD_ACTIVITY: 'WORLD_ACTIVITY',
 };
 
 module.exports = MessageType;

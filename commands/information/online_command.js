@@ -90,6 +90,36 @@ module.exports = {
                         serverValue += onlinePlayer.server + '\n';
                     }
 
+                    // Count the number of players on each server
+                    const serverCounts = response.onlinePlayers.reduce((counts, player) => {
+                        counts[player.server] = (counts[player.server] || 0) + 1;
+                        return counts;
+                    }, {});
+                    
+                    // Find the amount on most active servers
+                    const maxCount = Math.max(...Object.values(serverCounts));
+                    
+                    // If the most active server has more than 1 member
+                    if (maxCount > 1) {
+                        // Filter the most active servers
+                        const activeServers = Object.keys(serverCounts).filter(server => serverCounts[server] === maxCount);
+
+                        // Sort activeServers by their WC
+                        activeServers.sort((a, b) => {
+                            const numA = parseInt(a.replace(/^\D+/g, ''));
+                            const numB = parseInt(b.replace(/^\D+/g, ''));
+
+                            return numA - numB;
+                        });
+
+                        // If only one server display that, otherwise join them together with /
+                        const activeServerValue = activeServers.length === 1
+                            ? `${maxCount} players on ${activeServers[0]}`
+                            : `${maxCount} players on ${activeServers.join('/')}`;
+                    
+                        responseEmbed.addFields({ name: 'Active Server', value: activeServerValue, inline: false });
+                    }
+
                     responseEmbed
                         .addFields(
                             { name: 'Username', value: usernameValue, inline: true },
