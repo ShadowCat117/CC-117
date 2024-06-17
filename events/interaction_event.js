@@ -20,7 +20,6 @@ const setGuild = require('../functions/set_guild');
 const sus = require('../functions/sus');
 const activeHours = require('../functions/active_hours');
 const updateGuild = require('../functions/update_guild');
-const worldActivity = require('../functions/world_activity');
 const fs = require('fs');
 const path = require('path');
 const promotionProgress = require('../functions/promotion_progress');
