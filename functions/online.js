@@ -1,21 +1,6 @@
-const sqlite3 = require('sqlite3').verbose();
+const axios = require('axios');
 const findGuild = require('./find_guild');
 const OnlineGuildMember = require('../message_objects/OnlineGuildMember');
-const ButtonedMessage = require('../message_type/ButtonedMessage');
-const MessageType = require('../message_type/MessageType');
-const db = new sqlite3.Database('database/database.db');
-
-async function allAsync(query, params) {
-    return new Promise((resolve, reject) => {
-        db.all(query, params, function(err, rows) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(rows);
-            }
-        });
-    });
-}
 
 async function online(interaction, force = false) {
     let nameToSearch;
@@ -23,64 +8,44 @@ async function online(interaction, force = false) {
     if (interaction.options !== undefined) {
         nameToSearch = interaction.options.getString('guild_name');
     } else {
-        nameToSearch = interaction.customId;
+        nameToSearch = interaction.customId.split('-')[1];
     }
 
     const guildName = await findGuild(nameToSearch, force);
 
     if (guildName && guildName.message === 'Multiple possibilities found') {
-        let textMessage = `Multiple guilds found with the name/prefix: ${nameToSearch}.`;
-
-        for (let i = 0; i < guildName.guildNames.length; i++) {
-            const name = guildName.guildNames[i];
-
-            textMessage += `\n${i + 1}. ${name}`;
-        }
-
-        textMessage += '\nClick button to choose guild.';
-
-        return new ButtonedMessage(textMessage, guildName.guildNames, MessageType.ONLINE, []);
+        return guildName.guildNames;
     }
 
     if (guildName) {
-        const rows = await allAsync('SELECT username, guildRank, onlineWorld FROM players WHERE guildName = ? AND isOnline = 1', [guildName]);
+        // FIXME: Handle errors better
+        const guildJson = (await axios.get(`https://api.wynncraft.com/v3/guild/${guildName}`)).data;
+
+        if (!guildJson || !guildJson.name) {
+            return ({ 'guildName': '', 'guildPrefix': '', 'onlinePlayers': [], 'onlineCount': -1, 'totalMembers': -1 });
+        }
+
+        const onlinePlayers = [];
+
+        for (const rank in guildJson.members) {
+            if (rank === 'total') continue;
+
+            const rankMembers = guildJson.members[rank];
+
+            for (const member in rankMembers) {
+                const guildMember = rankMembers[member];
                 
-            const onlinePlayers = rows.map(row => {
-                const {
-                    username,
-                    guildRank,
-                    onlineWorld,
-                } = row;
-
-                return new OnlineGuildMember(username, guildRank, onlineWorld);
-            });
-
-            onlinePlayers.sort((a, b) => a.compareTo(b));
-
-            const pages = [];
-            let onlinePage = `\`\`\`Current online players in ${guildName} (${onlinePlayers.length})\n`;
-            let counter = 0;
-
-            onlinePlayers.forEach((player) => {
-                if (counter === 30) {
-                    onlinePage += '```';
-                    pages.push(onlinePage);
-                    onlinePage = `\`\`\`Current online players in ${guildName} (${onlinePlayers.length})\n` + player.toString();
-                    counter = 1;
-                } else {
-                    onlinePage += player.toString();
-                    counter++;
+                if (guildMember.online) {
+                    onlinePlayers.push(new OnlineGuildMember(member, rank, guildMember.server));
                 }
-            });
-
-            if (counter <= 30) {
-                onlinePage += '```';
-                pages.push(onlinePage);
             }
+        }
 
-            return new ButtonedMessage('', [], '', pages);
+        onlinePlayers.sort((a, b) => a.compareTo(b));
+
+        return ({ 'guildName': guildName, 'guildPrefix': guildJson.prefix, 'onlinePlayers': onlinePlayers, 'onlineCount': guildJson.online, 'memberCount': guildJson.members.total });
     } else {
-        return new ButtonedMessage('', [], '', [`${nameToSearch} not found, try using the full exact guild name.`]);
+        return ({ 'guildName': '', 'guildPrefix': '', 'onlinePlayers': [], 'onlineCount': -1, 'totalMembers': -1 });
     }
 }
 
