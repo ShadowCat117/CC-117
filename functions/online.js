@@ -22,7 +22,7 @@ async function online(interaction, force = false) {
         const guildJson = (await axios.get(`https://api.wynncraft.com/v3/guild/${guildName}`)).data;
 
         if (!guildJson || !guildJson.name) {
-            return ({ 'guildName': '', 'guildPrefix': '', 'onlinePlayers': [], 'onlineCount': -1, 'totalMembers': -1 });
+            return ({ guildName: '', guildPrefix: '', onlinePlayers: [], onlineCount: -1, totalMembers: -1 });
         }
 
         const onlinePlayers = [];
@@ -43,9 +43,9 @@ async function online(interaction, force = false) {
 
         onlinePlayers.sort((a, b) => a.compareTo(b));
 
-        return ({ 'guildName': guildName, 'guildPrefix': guildJson.prefix, 'onlinePlayers': onlinePlayers, 'onlineCount': guildJson.online, 'memberCount': guildJson.members.total });
+        return ({ guildName: guildName, guildPrefix: guildJson.prefix, onlinePlayers: onlinePlayers, onlineCount: guildJson.online, memberCount: guildJson.members.total });
     } else {
-        return ({ 'guildName': '', 'guildPrefix': '', 'onlinePlayers': [], 'onlineCount': -1, 'totalMembers': -1 });
+        return ({ guildName: '', guildPrefix: '', onlinePlayers: [], onlineCount: -1, totalMembers: -1 });
     }
 }
 

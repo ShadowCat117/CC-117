@@ -75,6 +75,15 @@ module.exports = {
 
                     switch (functionToRun) {
                         case 'online': {
+                            const loadingEmbed = new EmbedBuilder()
+                                .setDescription(`Checking online players for ${parts[1]}`)
+                                .setColor(0x00ff00);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [loadingEmbed],
+                            });
+
                             const response = await online(interaction, true);
 
                             const responseEmbed = new EmbedBuilder()
@@ -115,6 +124,45 @@ module.exports = {
                                 components: [],
                                 embeds: [responseEmbed],
                             });
+
+                            break;
+                        }
+                        case 'sus': {
+                            const loadingEmbed = new EmbedBuilder()
+                                .setDescription('Calculating sus level for selected player')
+                                .setColor(0x00ff00);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [loadingEmbed],
+                            });
+
+                            const response = await sus(interaction, true);
+
+                            const publicProfileValue = response.publicProfile ? 'Player has a public profile' : 'Player has a private profile';
+
+                            // Valid player
+                            const responseEmbed = new EmbedBuilder()
+                                .setTitle(`Suspiciousness of ${response.username}: ${response.overallSusValue}%`)
+                                .setDescription('This is calculated from the following stats')
+                                .setThumbnail(`https://visage.surgeplay.com/bust/512/${response.uuid}.png`)
+                                .setColor(0x00ffff)
+                                .addFields(
+                                    { name: 'Join Date', value: response.joinSusData, inline: true },
+                                    { name: 'Playtime', value: response.playtimeSusData, inline: true },
+                                    { name: 'Time Spent Playing', value: response.timeSpentSusData, inline: true },
+                                    { name: 'Total Level', value: response.totalLevelSusData, inline: true },
+                                    { name: 'Quests Completed', value: response.questsSusData, inline: true },
+                                    { name: 'Rank', value: response.rankSusData, inline: true },
+                                    { name: 'Public Profile', value: publicProfileValue, inline: false },
+                                );
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [responseEmbed],
+                            });
+                            
+                            break;
                         }
                     }
                 }
