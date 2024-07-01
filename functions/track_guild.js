@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const findGuild = require('./find_guild');
+const findGuild = require('../database/database');
 const ButtonedMessage = require('../message_type/ButtonedMessage');
 const MessageType = require('../message_type/MessageType');
 

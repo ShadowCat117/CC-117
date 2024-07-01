@@ -70,13 +70,13 @@ module.exports = {
             try {
                 // Button interactions
                 if (interaction.isButton()) {
-                    const parts = interaction.customId.split('-');
+                    const parts = interaction.customId.split(':');
                     const functionToRun = parts[0];
 
                     switch (functionToRun) {
                         case 'online': {
                             const loadingEmbed = new EmbedBuilder()
-                                .setDescription(`Checking online players for ${parts[1]}`)
+                                .setDescription('Checking online players for selected guild')
                                 .setColor(0x00ff00);
 
                             await interaction.editReply({
@@ -139,7 +139,7 @@ module.exports = {
 
                             const response = await sus(interaction, true);
 
-                            const publicProfileValue = response.publicProfile ? 'Player has a public profile' : 'Player has a private profile';
+                            const publicProfileValue = `${response.username} has a ${response.publicProfile ? 'public' : 'private'} profile`;
 
                             // Valid player
                             const responseEmbed = new EmbedBuilder()

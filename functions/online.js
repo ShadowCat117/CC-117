@@ -1,5 +1,5 @@
 const axios = require('axios');
-const findGuild = require('./find_guild');
+const database = require('../database/database');
 const OnlineGuildMember = require('../message_objects/OnlineGuildMember');
 
 async function online(interaction, force = false) {
@@ -8,45 +8,52 @@ async function online(interaction, force = false) {
     if (interaction.options !== undefined) {
         nameToSearch = interaction.options.getString('guild_name');
     } else {
-        nameToSearch = interaction.customId.split('-')[1];
+        nameToSearch = interaction.customId.split(':')[1];
     }
 
-    const guildName = await findGuild(nameToSearch, force);
+    const guild = await database.findGuild(nameToSearch, force);
 
-    if (guildName && guildName.message === 'Multiple possibilities found') {
-        return guildName.guildNames;
+    if (guild && guild.message === 'Multiple possibilities found') {
+        return {
+            guildUuids: guild.guildUuids,
+            guildNames: guild.guildNames,
+            guildPrefixes: guild.guildPrefixes,
+        };
     }
 
-    if (guildName) {
-        // FIXME: Handle errors better
-        const guildJson = (await axios.get(`https://api.wynncraft.com/v3/guild/${guildName}`)).data;
+    let guildJson;
 
-        if (!guildJson || !guildJson.name) {
-            return ({ guildName: '', guildPrefix: '', onlinePlayers: [], onlineCount: -1, totalMembers: -1 });
-        }
-
-        const onlinePlayers = [];
-
-        for (const rank in guildJson.members) {
-            if (rank === 'total') continue;
-
-            const rankMembers = guildJson.members[rank];
-
-            for (const member in rankMembers) {
-                const guildMember = rankMembers[member];
-                
-                if (guildMember.online) {
-                    onlinePlayers.push(new OnlineGuildMember(member, rank, guildMember.server));
-                }
-            }
-        }
-
-        onlinePlayers.sort((a, b) => a.compareTo(b));
-
-        return ({ guildName: guildName, guildPrefix: guildJson.prefix, onlinePlayers: onlinePlayers, onlineCount: guildJson.online, memberCount: guildJson.members.total });
+    // If a guild was found, look for UUID to get guaranteed results, otherwise look for the name input
+    if (guild) {
+        guildJson = (await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${guild.uuid}`)).data;
     } else {
+        guildJson = (await axios.get(`https://api.wynncraft.com/v3/guild/${nameToSearch}`)).data;
+    }
+
+    // FIXME: Handle errors better
+    if (!guildJson || !guildJson.name) {
         return ({ guildName: '', guildPrefix: '', onlinePlayers: [], onlineCount: -1, totalMembers: -1 });
     }
+
+    const onlinePlayers = [];
+
+    for (const rank in guildJson.members) {
+        if (rank === 'total') continue;
+
+        const rankMembers = guildJson.members[rank];
+
+        for (const member in rankMembers) {
+            const guildMember = rankMembers[member];
+            
+            if (guildMember.online) {
+                onlinePlayers.push(new OnlineGuildMember(member, rank, guildMember.server));
+            }
+        }
+    }
+
+    onlinePlayers.sort((a, b) => a.compareTo(b));
+
+    return ({ guildName: guildJson.name, guildPrefix: guildJson.prefix, onlinePlayers: onlinePlayers, onlineCount: guildJson.online, memberCount: guildJson.members.total });
 }
 
 module.exports = online;

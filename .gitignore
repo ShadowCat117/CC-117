@@ -3,7 +3,8 @@ node_modules
 config.json
 testConfig.json
 configs
-database/
+database/database.db
+database/database.db-journal
 updateGuilds.json
 updatePlayers.json
 timezones.json

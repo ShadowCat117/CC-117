@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const ButtonedMessage = require('../message_type/ButtonedMessage');
 const MessageType = require('../message_type/MessageType');
-const findPlayer = require('./find_player');
+const findPlayer = require('../database/database');
 
 async function addDemotionException(interaction, force = false, exemptionPeriod = -1) {
     const guildId = interaction.guild.id;

@@ -6,6 +6,8 @@ const {
     SlashCommandBuilder,
 } = require('discord.js');
 const sus = require('../../functions/sus');
+const fs = require('fs');
+const path = require('path');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -62,7 +64,7 @@ module.exports = {
                     .addFields({ name: `Option ${i + 1}`, value: `${responseValue} [View Profile](https://wynncraft.com/stats/player/${uuid})` });
 
                 const button = new ButtonBuilder()
-                    .setCustomId(`sus-${uuid}`)
+                    .setCustomId(`sus:${uuid}`)
                     .setStyle(ButtonStyle.Primary)
                     .setLabel((i + 1).toString());
 
@@ -83,7 +85,23 @@ module.exports = {
                     .setDescription(`Unable to find a player using the name '${interaction.options.getString('username')}', try again using the exact player name.`)
                     .setColor(0xff0000);
             } else {
-                const publicProfileValue = response.publicProfile ? 'Player has a public profile' : 'Player has a private profile';
+                const publicProfileValue = `${response.username} has a ${response.publicProfile ? 'public' : 'private'} profile`;
+                let banReason;
+
+                try {
+                    const guildId = interaction.guild.id;
+                    const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
+                    let config = {};
+        
+                    if (fs.existsSync(filePath)) {
+                        const fileData = fs.readFileSync(filePath, 'utf-8');
+                        config = JSON.parse(fileData);
+
+                        banReason = config.bannedPlayers[response.username];
+                    }
+                } catch (err) {
+                    console.error('Error reading config file', err);
+                }
 
                 // Valid player
                 responseEmbed
@@ -100,6 +118,11 @@ module.exports = {
                         { name: 'Rank', value: response.rankSusData, inline: true },
                         { name: 'Public Profile', value: publicProfileValue, inline: false },
                     );
+
+                if (banReason !== undefined) {
+                    responseEmbed
+                    .addFields({ name: 'Banned from guild', value: banReason });
+                }
             }
         }
 

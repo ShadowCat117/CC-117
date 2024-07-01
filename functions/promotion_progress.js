@@ -1,7 +1,7 @@
 const ButtonedMessage = require('../message_type/ButtonedMessage');
 const fs = require('fs');
 const path = require('path');
-const findPlayer = require('./find_player');
+const findPlayer = require('../database/database');
 const MessageType = require('../message_type/MessageType');
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('database/database.db');

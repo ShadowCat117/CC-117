@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const MessageManager = require('../message_type/MessageManager');
-const findPrefix = require('./find_prefix');
+const findGuild = require('../database/database');
 const ContentTeamValue = require('../values/ContentTeamValue');
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('database/database.db');

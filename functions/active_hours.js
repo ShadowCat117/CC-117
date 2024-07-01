@@ -1,5 +1,5 @@
 const sqlite3 = require('sqlite3').verbose();
-const findGuild = require('./find_guild');
+const findGuild = require('../database/database');
 const GuildActiveHours = require('../message_objects/GuildActiveHours');
 const ButtonedMessage = require('../message_type/ButtonedMessage');
 const MessageType = require('../message_type/MessageType');

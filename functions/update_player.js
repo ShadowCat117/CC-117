@@ -2,7 +2,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const ButtonedMessage = require('../message_type/ButtonedMessage');
 const MessageType = require('../message_type/MessageType');
-const findPlayer = require('./find_player');
+const findPlayer = require('../database/database');
 
 async function updatePlayer(interaction, force = false) {
     const filePath = path.join(__dirname, '..', 'updatePlayers.json');

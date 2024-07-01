@@ -1,5 +1,6 @@
 const { ActivityType, Events } = require('discord.js');
 const updateRoles = require('../functions/update_roles');
+const database = require('../database/database');
 const fs = require('fs');
 const path = require('path');
 const MessageManager = require('../message_type/MessageManager');
@@ -63,6 +64,8 @@ module.exports = {
     name: Events.ClientReady,
     once: true,
     async execute(_client) {
+        await database.setup();
+
         client = _client;
         console.log(`Ready! Logged in as ${client.user.tag}`);
 

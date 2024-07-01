@@ -28,7 +28,7 @@ module.exports = {
 
         const responseEmbed = new EmbedBuilder();
 
-        if (response.length !== undefined) {
+        if (response.guildUuids !== undefined) {
             // Multiselector
             responseEmbed
                 .setTitle('Multiple guilds found')
@@ -37,12 +37,15 @@ module.exports = {
 
             const row = new ActionRowBuilder();
 
-            for (let i = 0; i < response.length; i++) {
+            for (let i = 0; i < response.guildUuids.length; i++) {
+                const guildPrefix = response.guildPrefixes[i];
+                const guildName = response.guildNames[i];
+
                 responseEmbed
-                    .addFields({ name: `Option ${i + 1}`, value: `[${response[i]}](https://wynncraft.com/stats/guild/${response[i].replaceAll(' ', '%20')})` });
+                    .addFields({ name: `Option ${i + 1}`, value: `[[${guildPrefix}] ${guildName}](https://wynncraft.com/stats/guild/${guildName.replaceAll(' ', '%20')})` });
 
                 const button = new ButtonBuilder()
-                    .setCustomId(`online-${response[i]}`)
+                    .setCustomId(`online:${response.guildUuids[i]}`)
                     .setStyle(ButtonStyle.Primary)
                     .setLabel((i + 1).toString());
 

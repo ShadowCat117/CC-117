@@ -1,7 +1,7 @@
 const ButtonedMessage = require('../message_type/ButtonedMessage');
 const MessageType = require('../message_type/MessageType');
 const applyRoles = require('./apply_roles');
-const findPlayer = require('./find_player');
+const findPlayer = require('../database/database');
 
 async function verify(interaction, force = false) {
     let nameToSearch;
