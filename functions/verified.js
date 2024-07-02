@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
-const ButtonedMessage = require('../message_type/ButtonedMessage');
 const db = new sqlite3.Database('database/database.db');
 const VerifiedMember = require('../message_objects/VerifiedMember');
 
@@ -34,7 +33,6 @@ async function verified(interaction) {
 
         // Return if no guild name set
         if (!guildName) {
-            return new ButtonedMessage('', [], '', ['You have not set a guild.']);
         }
 
         // Get all players in guild, sort a-z
@@ -42,7 +40,6 @@ async function verified(interaction) {
 
         // No players in guild
         if (rows.length === 0) {
-            return new ButtonedMessage('', [], '', [`No members of ${guildName} found.`]);
         }
 
         // Create the list of verified members
@@ -73,11 +70,8 @@ async function verified(interaction) {
             verifiedMembersPage += '```';
             pages.push(verifiedMembersPage);
         }
-
-        return new ButtonedMessage('', [], '', pages);
     } catch (error) {
         console.log(error);
-        return new ButtonedMessage('', [], '', ['Error checking for verified members.']);
     }
 }
 

@@ -8,7 +8,6 @@ const createConfig = require('../../functions/create_config');
 const fs = require('fs');
 const path = require('path');
 const removeDemotionException = require('../../functions/remove_demotion_exception');
-const MessageManager = require('../../message_type/MessageManager');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -83,9 +82,7 @@ module.exports = {
                 });
     
                 response.setMessage(editedReply);
-    
-                MessageManager.addMessage(response);
-            } else {
+                } else {
                 // Found player, show response
                 await interaction.editReply(response.pages[0]);
             }

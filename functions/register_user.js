@@ -1,5 +1,3 @@
-const ButtonedMessage = require('../message_type/ButtonedMessage');
-const MessageType = require('../message_type/MessageType');
 const fs = require('fs');
 const path = require('path');
 const findPlayer = require('../database/database');
@@ -76,26 +74,20 @@ async function registerUser(interaction, discordId, force = false) {
     
             textMessage += '\nClick button to choose player.';
             textMessage += `\n${discordId}`;
-    
-            return new ButtonedMessage(textMessage, player.playerUuids, MessageType.REGISTER_USER, []);
-        }
+            }
 
         if (!player) {
-            return new ButtonedMessage('', [], '', [`Unknown player, ${nameToSearch.replace(/_/g, '\\_')}. They may not be a member of ${guildName}`]);
         }
 
         try {
             // Remove any previous registered account and then add the new one
             await runAsync('UPDATE players SET discordId = NULL WHERE discordId = ?', [discordId]);
             await runAsync('UPDATE players SET discordId = ? WHERE UUID = ?', [discordId, player.uuid]);
-            return new ButtonedMessage('', [], '', [`Registered ${player.username}`]);
         } catch (error) {
             console.log(`Error registering user: ${error}`);
-            return new ButtonedMessage('', [], '', ['An error occured whilst trying to register user.']);
         }
     } catch (error) {
         console.log(error);
-        return new ButtonedMessage('', [], '', ['Unable to register user.']);
     }
 }
 

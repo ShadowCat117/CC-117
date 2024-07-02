@@ -6,7 +6,6 @@ const {
 } = require('discord.js');
 const createConfig = require('../../functions/create_config');
 const trackGuild = require('../../functions/track_guild');
-const MessageManager = require('../../message_type/MessageManager');
 const fs = require('fs');
 const path = require('path');
 
@@ -72,8 +71,6 @@ module.exports = {
             });
 
             response.setMessage(editedReply);
-
-            MessageManager.addMessage(response);
         } else {
             // Found guild, show response
             await interaction.editReply(response.pages[0]);

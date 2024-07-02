@@ -7,8 +7,6 @@ const {
 const fs = require('fs');
 const path = require('path');
 const createConfig = require('../../functions/create_config');
-const ButtonedMessage = require('../../message_type/ButtonedMessage');
-const MessageManager = require('../../message_type/MessageManager');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -696,7 +694,6 @@ module.exports = {
             pages.push(configContent);
 
             // Create a ButtonedMessage with all of the pages of content
-            const viewConfigMessage = new ButtonedMessage('', [], '', pages);
 
             // We know it will be multiple pages so add buttons
             const previousPage = new ButtonBuilder()
@@ -717,8 +714,6 @@ module.exports = {
             });
 
             viewConfigMessage.setMessage(editedReply);
-
-            MessageManager.addMessage(viewConfigMessage);
         } catch (error) {
             console.log(error);
             await interaction.editReply('Error viewing config.');

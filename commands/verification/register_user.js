@@ -5,7 +5,6 @@ const {
     SlashCommandBuilder,
 } = require('discord.js');
 const registerUser = require('../../functions/register_user');
-const MessageManager = require('../../message_type/MessageManager');
 const fs = require('fs');
 const path = require('path');
 const {
@@ -101,8 +100,6 @@ module.exports = {
             });
 
             response.setMessage(editedReply);
-
-            MessageManager.addMessage(response);
         } else {
             // Show response
             await interaction.editReply(response.pages[0]);

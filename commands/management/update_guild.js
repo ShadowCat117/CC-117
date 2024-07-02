@@ -5,7 +5,6 @@ const {
     SlashCommandBuilder,
 } = require('discord.js');
 const updateGuild = require('../../functions/update_guild');
-const MessageManager = require('../../message_type/MessageManager');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -38,8 +37,6 @@ module.exports = {
             });
 
             response.setMessage(editedReply);
-
-            MessageManager.addMessage(response);
         } else {
             // Guild found, show response
             await interaction.editReply(response.pages[0]);

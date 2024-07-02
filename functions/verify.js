@@ -1,5 +1,3 @@
-const ButtonedMessage = require('../message_type/ButtonedMessage');
-const MessageType = require('../message_type/MessageType');
 const applyRoles = require('./apply_roles');
 const findPlayer = require('../database/database');
 
@@ -42,13 +40,10 @@ async function verify(interaction, force = false) {
         }
 
         textMessage += '\nClick button to choose player.';
-
-        return new ButtonedMessage(textMessage, player.playerUuids, MessageType.VERIFY, []);
     }
 
     // Unknown player
     if (!player) {
-        return new ButtonedMessage('', [], '', [`Unknown player, ${nameToSearch.replace(/_/g, '\\_')}`]);
     }
 
     // Call applyRoles with the found players UUID
@@ -68,8 +63,6 @@ async function verify(interaction, force = false) {
             verifyMessage = 'Failed to verify';
             break;
     }
-
-    return new ButtonedMessage('', [], '', [verifyMessage]);
 }
 
 module.exports = verify;

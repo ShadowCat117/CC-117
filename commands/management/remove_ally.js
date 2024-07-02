@@ -6,7 +6,6 @@ const {
 } = require('discord.js');
 const createConfig = require('../../functions/create_config');
 const removeAlly = require('../../functions/remove_ally');
-const MessageManager = require('../../message_type/MessageManager');
 const fs = require('fs');
 const path = require('path');
 
@@ -90,8 +89,6 @@ module.exports = {
             });
 
             response.setMessage(editedReply);
-
-            MessageManager.addMessage(response);
         } else {
             // Found guild, give response
             await interaction.editReply(response.pages[0]);

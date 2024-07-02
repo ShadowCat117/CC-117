@@ -1,7 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const ButtonedMessage = require('../message_type/ButtonedMessage');
-const MessageType = require('../message_type/MessageType');
 const findPlayer = require('../database/database');
 
 async function removeDemotionException(interaction, force = false) {
@@ -50,26 +48,19 @@ async function removeDemotionException(interaction, force = false) {
             }
     
             textMessage += '\nClick button to choose player.';
-    
-            return new ButtonedMessage(textMessage, player.playerUuids, MessageType.REMOVE_DEMOTION_EXCEPTION, []);
-        }
+            }
 
         if (!player) {
-            return new ButtonedMessage('', [], '', [`${nameToSearch.replace(/_/g, '\\_')} is not a member of ${guildName}`]);
         }
 
         if (!config['demotionExceptions'] || !config['demotionExceptions'][player.username]) {
-            return new ButtonedMessage('', [], '', [`${player.username} is not exempt from demotions`]);
         }
 
         delete config['demotionExceptions'][player.username];
 
         fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
-
-        return new ButtonedMessage('', [], '', [`${player.username} is no longer exempt from demotions`]);
     } catch (err) {
         console.log(err);
-        return new ButtonedMessage('', [], '', ['Unable to remove demotion exception.']);
     }
 }
 

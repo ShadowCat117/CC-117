@@ -1,8 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const findGuild = require('../database/database');
-const ButtonedMessage = require('../message_type/ButtonedMessage');
-const MessageType = require('../message_type/MessageType');
 
 async function untrackGuild(interaction, force = false) {
     let nameToSearch;
@@ -33,7 +31,6 @@ async function untrackGuild(interaction, force = false) {
             guildName.guildNames = filteredGuildNames;
 
             if (filteredGuildNames.length === 0) {
-                return new ButtonedMessage('', [], '', [`Not tracking any guilds matching ${nameToSearch}.`]);
             } else if (filteredGuildNames.length === 1) {
                 guildName = filteredGuildNames[0];
             } else {
@@ -46,11 +43,8 @@ async function untrackGuild(interaction, force = false) {
                 }
 
                 textMessage += '\nClick button to choose guild.';
-
-                return new ButtonedMessage(textMessage, guildName.guildNames, MessageType.UNTRACK_GUILD, []);
             }
         } catch (error) {
-            return new ButtonedMessage('', [], '', ['Unable to untrack guild.']);
         }
     }
 
@@ -64,7 +58,6 @@ async function untrackGuild(interaction, force = false) {
             }
 
             if (!config.trackedGuilds.includes(guildName)) {
-                return new ButtonedMessage('', [], '', [`${guildName} is not being tracked.`]);
             }
 
             config.trackedGuilds = config.trackedGuilds.filter(item => item !== guildName);
@@ -74,13 +67,9 @@ async function untrackGuild(interaction, force = false) {
             }
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
-
-            return new ButtonedMessage('', [], '', [`${guildName} is no longer being tracked.`]);
         } catch (error) {
-            return new ButtonedMessage('', [], '', ['Unable to untrack guild.']);
         }
     } else {
-        return new ButtonedMessage('', [], '', [`${interaction.options.getString('guild_name')} not found, try using the full exact guild name.`]);
     }
 }
 

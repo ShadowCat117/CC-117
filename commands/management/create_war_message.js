@@ -7,7 +7,6 @@ const {
 const fs = require('fs');
 const path = require('path');
 const createConfig = require('../../functions/create_config');
-const MessageManager = require('../../message_type/MessageManager');
 
 const warRoles = ['war', 'tank', 'healer', 'damage', 'solo', 'eco'];
 
@@ -89,7 +88,6 @@ module.exports = {
             }
 
             // Send the message
-            const warMessage = await MessageManager.sendMessage(interaction.guild, interaction.channel.id, message);
 
             // Add the war button
             const warButton = new ButtonBuilder()

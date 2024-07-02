@@ -1,9 +1,9 @@
 const { ActivityType, Events } = require('discord.js');
 const updateRoles = require('../functions/update_roles');
 const database = require('../database/database');
+const messages = require('../functions/messages');
 const fs = require('fs');
 const path = require('path');
-const MessageManager = require('../message_type/MessageManager');
 let client;
 
 // Tasks to be ran every hour
@@ -18,7 +18,7 @@ async function hourlyTasks() {
 
         // Remove buttons from old message buttons.
         console.log('Removing old buttons');
-        MessageManager.removeOldMessages();
+        messages.removeOldMessages();
 
         // For each server the bot is in
         for (const guild of client.guilds.cache.values()) {
@@ -42,7 +42,6 @@ async function hourlyTasks() {
                     // Only send a message to their log channel if any members were updated
                     // and currently ignore the problem message whilst it's persisting a lot
                     if (response !== 'Updated roles for 0 members.' && response !== 'Updated roles for 0 members. (interrupted)' && response !== 'Problem updating roles') {
-                        MessageManager.sendMessage(guild, config.logChannel, response);
                     }
                     console.log(`Updated roles for ${guild}`);
                 } else {

@@ -4,7 +4,6 @@ const {
     ButtonStyle,
     SlashCommandBuilder,
 } = require('discord.js');
-const MessageManager = require('../../message_type/MessageManager');
 const guildStats = require('../../functions/guild_stats');
 
 module.exports = {
@@ -38,8 +37,6 @@ module.exports = {
             });
 
             response.setMessage(editedReply);
-
-            MessageManager.addMessage(response);
         } else if (response.pages.length > 1) {
             // Handle multiple pages
             const previousPage = new ButtonBuilder()
@@ -60,8 +57,6 @@ module.exports = {
             });
 
             response.setMessage(editedReply);
-
-            MessageManager.addMessage(response);
         } else if (response.pages[0] === '```\n```') {
             // No players in the guild
             interaction.editReply({

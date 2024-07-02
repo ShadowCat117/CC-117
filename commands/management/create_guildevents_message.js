@@ -7,7 +7,6 @@ const {
 const fs = require('fs');
 const path = require('path');
 const createConfig = require('../../functions/create_config');
-const MessageManager = require('../../message_type/MessageManager');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -81,7 +80,6 @@ module.exports = {
             }
 
             // Send guild events message
-            const guildEventsMessage = await MessageManager.sendMessage(interaction.guild, interaction.channel.id, message);
 
             // Add giveaway and events button
             const giveawayButton = new ButtonBuilder()

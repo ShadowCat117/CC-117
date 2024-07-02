@@ -7,7 +7,6 @@ const {
 const createConfig = require('../../functions/create_config');
 const fs = require('fs');
 const path = require('path');
-const MessageManager = require('../../message_type/MessageManager');
 const checkForDemotions = require('../../functions/check_for_demotions');
 
 module.exports = {
@@ -80,8 +79,6 @@ module.exports = {
             });
 
             response.setMessage(editedReply);
-
-            MessageManager.addMessage(response);
         } else if (response.pages[0] === '```\n```') {
             // No players need demoting
             interaction.editReply({

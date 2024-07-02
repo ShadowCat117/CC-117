@@ -1,7 +1,5 @@
 const fs = require('fs').promises;
 const path = require('path');
-const ButtonedMessage = require('../message_type/ButtonedMessage');
-const MessageType = require('../message_type/MessageType');
 const findPlayer = require('../database/database');
 
 async function updatePlayer(interaction, force = false) {
@@ -50,13 +48,10 @@ async function updatePlayer(interaction, force = false) {
             }
     
             textMessage += '\nClick button to choose player.';
-    
-            return new ButtonedMessage(textMessage, player.playerUuids, MessageType.UPDATE_PLAYER, []);
-        }
+            }
 
         // No player found
         if (!player) {
-            return new ButtonedMessage('', [], '', [`Unable to find player named ${nameToSearch.replace(/_/g, '\\_')}, make sure they have logged into Wynncraft for at least 15 minutes. Or if their username has changed, try using their previous username.`]);
         }
 
         // Filter file to remove null players
@@ -64,7 +59,6 @@ async function updatePlayer(interaction, force = false) {
 
         if (updatePlayersFile.players.includes(player.uuid)) {
             // If already in file, then ignore
-            return new ButtonedMessage('', [], '', [`${player.username} is already queued to be updated.`]);
         } else {
             // Add new player to file
             updatePlayersFile.players.unshift(player.uuid);
@@ -72,12 +66,9 @@ async function updatePlayer(interaction, force = false) {
             // Save file
             const updatedData = JSON.stringify(updatePlayersFile);
             await fs.writeFile(filePath, updatedData, 'utf-8');
-
-            return new ButtonedMessage('', [], '', [`${player.username} will be updated soon.`]);
         }
     } catch (err) {
         console.log(err);
-        return new ButtonedMessage('', [], '', ['Unable to update player.']);
     }
 }
 

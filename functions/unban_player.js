@@ -1,7 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const ButtonedMessage = require('../message_type/ButtonedMessage');
-const MessageType = require('../message_type/MessageType');
 const findPlayer = require('../database/database');
 
 async function unbanPlayer(interaction, force = false) {
@@ -50,22 +48,16 @@ async function unbanPlayer(interaction, force = false) {
             }
     
             textMessage += '\nClick button to choose player.';
-    
-            return new ButtonedMessage(textMessage, player.playerUuids, MessageType.UNBAN_PLAYER, []);
-        }
+            }
 
         if (!config['bannedPlayers'] || !config['bannedPlayers'][player.username]) {
-            return new ButtonedMessage('', [], '', [`${player.username} is not banned from ${guildName}`]);
         }
 
         delete config['bannedPlayers'][player.username];
 
         fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
-
-        return new ButtonedMessage('', [], '', [`${player.username} is no longer banned from ${guildName}`]);
     } catch (err) {
         console.log(err);
-        return new ButtonedMessage('', [], '', ['Unable to unban player.']);
     }
 }
 

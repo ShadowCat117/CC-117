@@ -1,7 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const ButtonedMessage = require('../message_type/ButtonedMessage');
-const MessageType = require('../message_type/MessageType');
 const findPlayer = require('../database/database');
 
 async function addInactivityException(interaction, force = false, inactivityThreshold = -1) {
@@ -50,12 +48,9 @@ async function addInactivityException(interaction, force = false, inactivityThre
             }
     
             textMessage += `\nClick button to choose player to add inactivity exception for ${inactivityThreshold} day(s).`;
-    
-            return new ButtonedMessage(textMessage, player.playerUuids, MessageType.ADD_INACTIVITY_EXCEPTION, []);
-        }
+            }
 
         if (!player) {
-            return new ButtonedMessage('', [], '', [`${nameToSearch.replace(/_/g, '\\_')} is not a member of ${guildName}`]);
         }
 
         if (interaction.message) {
@@ -74,9 +69,7 @@ async function addInactivityException(interaction, force = false, inactivityThre
 
         if (config['inactivityExceptions'][player.username] === inactivityThreshold) {
             if (inactivityThreshold === -1) {
-                return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is already exempt from inactivity`]);
             } else {
-                return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')}'s inactivity threshold is already ${inactivityThreshold}`]);
             }
         }
 
@@ -85,13 +78,10 @@ async function addInactivityException(interaction, force = false, inactivityThre
         fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
         if (inactivityThreshold === -1) {
-            return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is now exempt from inactivity`]);
         } else {
-            return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')}'s inactivity threshold is now ${inactivityThreshold}`]);
         }
     } catch (err) {
         console.log(err);
-        return new ButtonedMessage('', [], '', ['Unable to add inactivity exception.']);
     }
 }
 

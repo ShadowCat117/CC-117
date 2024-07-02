@@ -1,8 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const findGuild = require('../database/database');
-const ButtonedMessage = require('../message_type/ButtonedMessage');
-const MessageType = require('../message_type/MessageType');
 
 async function addAlly(interaction, force = false) {
     let nameToSearch;
@@ -33,7 +31,6 @@ async function addAlly(interaction, force = false) {
             guildName.guildNames = filteredGuildNames;
 
             if (guildName.guildNames.length === 0) {
-                return new ButtonedMessage('', [], '', [`Already allied with all guilds matching ${nameToSearch}.`]);
             } else if (guildName.guildNames.length === 1) {
                 guildName = filteredGuildNames[0];
             } else {
@@ -46,11 +43,8 @@ async function addAlly(interaction, force = false) {
                 }
 
                 textMessage += '\nClick button to choose guild.';
-
-                return new ButtonedMessage(textMessage, guildName.guildNames, MessageType.ADD_ALLY, []);
             }
         } catch (error) {
-            return new ButtonedMessage('', [], '', ['Unable to add ally.']);
         }
     }
 
@@ -66,23 +60,17 @@ async function addAlly(interaction, force = false) {
             config.allies = config.allies.filter(item => item !== null);
 
             if (config.allies.includes(guildName)) {
-                return new ButtonedMessage('', [], '', [`${guildName} is already added as an ally.`]);
             }
 
             if (config.guildName === guildName) {
-                return new ButtonedMessage('', [], '', [`Can't add ${guildName} as an ally as that is the guild your server is currently representing.`]);
             }
 
             config.allies.push(guildName);
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
-
-            return new ButtonedMessage('', [], '', [`Added ${guildName} as an ally.`]);
         } catch (error) {
-            return new ButtonedMessage('', [], '', ['Unable to add ally.']);
         }
     } else {
-        return new ButtonedMessage('', [], '', [`${interaction.options.getString('guild_name')} not found, try using the full exact guild name.`]);
     }
 }
 

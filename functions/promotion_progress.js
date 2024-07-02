@@ -1,8 +1,6 @@
-const ButtonedMessage = require('../message_type/ButtonedMessage');
 const fs = require('fs');
 const path = require('path');
 const findPlayer = require('../database/database');
-const MessageType = require('../message_type/MessageType');
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('database/database.db');
 const utilities = require('./utilities');
@@ -77,12 +75,9 @@ async function promotionProgress(interaction, force = false) {
             }
     
             textMessage += '\nClick button to choose player.';
-    
-            return new ButtonedMessage(textMessage, player.playerUuids, MessageType.PROMOTION_PROGRESS, []);
-        }
+            }
 
         if (!player) {
-            return new ButtonedMessage('', [], '', [`Unknown player, ${nameToSearch.replace(/_/g, '\\_')}. They may not be a member of ${guildName}`]);
         }
 
         const promotionExceptions = config['promotionExceptions'] !== undefined ? config['promotionExceptions'] : {};
@@ -91,9 +86,7 @@ async function promotionProgress(interaction, force = false) {
 
         if (exemptUsernames.includes(player.username)) {
             if (promotionExceptions[player.username] === -1) {
-                return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is exempt from promotions forever.`]);
             } else {
-                return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is exempt from promotions for ${promotionExceptions[player.username]} more day(s).`]);
             }
         }
 
@@ -108,7 +101,6 @@ async function promotionProgress(interaction, force = false) {
         const memberToCheck = await getAsync('SELECT UUID, username, guildRank, contributedGuildXP, highestClassLevel, guildJoinDate, wars FROM players WHERE UUID = ? AND guildName = ?', [player.uuid, guildName]);
 
         if (!memberToCheck) {
-            return new ButtonedMessage('', [], '', [`${nameToSearch.replace(/_/g, '\\_')} is not a member of ${guildName}`]);
         }
 
         const tableName = guildName.replaceAll(' ', '_');
@@ -158,9 +150,7 @@ async function promotionProgress(interaction, force = false) {
         let nextGuildRank;
 
         if (memberToCheck.guildRank === 'OWNER') {
-            return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is the owner of ${guildName}, they cannot be promoted.`]);
         } else if (memberToCheck.guildRank === 'CHIEF') {
-            return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is a chief of ${guildName}, they cannot be promoted.`]);
         } else if (memberToCheck.guildRank === 'STRATEGIST') {
             promotionRequirements = config.chiefPromotionRequirement;
             timeRequirement = config.chiefTimeRequirement;
@@ -308,11 +298,8 @@ async function promotionProgress(interaction, force = false) {
         const headerMessage = `${player.username.replace(/_/g, '\\_')} (${memberToCheck.guildRank}) has the following requirements for ${nextGuildRank} (${metRequirements}/${requirementsCount})\n`;
 
         const fullMessage = headerMessage + '\n' + timeMessage + '\n' + reqsMessage;
-
-        return new ButtonedMessage('', [], '', [fullMessage]);
     } catch (error) {
         console.log(error);
-        return new ButtonedMessage('', [], '', ['Unable to display promotion progress.']);
     }
 }
 

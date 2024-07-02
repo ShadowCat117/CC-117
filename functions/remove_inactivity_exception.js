@@ -1,7 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const ButtonedMessage = require('../message_type/ButtonedMessage');
-const MessageType = require('../message_type/MessageType');
 const findPlayer = require('../database/database');
 
 async function removeDemotionException(interaction, force = false) {
@@ -50,26 +48,19 @@ async function removeDemotionException(interaction, force = false) {
             }
     
             textMessage += '\nClick button to choose player.';
-    
-            return new ButtonedMessage(textMessage, player.playerUuids, MessageType.REMOVE_INACTIVITY_EXCEPTION, []);
-        }
+            }
 
         if (!player) {
-            return new ButtonedMessage('', [], '', [`${nameToSearch.replace(/_/g, '\\_')} is not a member of ${guildName}`]);
         }
 
         if (!config['inactivityExceptions'] || !config['inactivityExceptions'][player.username]) {
-            return new ButtonedMessage('', [], '', [`${player.username} does not have a custom inactivity threshold.`]);
         }
 
         delete config['inactivityExceptions'][player.username];
 
         fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
-
-        return new ButtonedMessage('', [], '', [`${player.username} no longer has a custom inactivity threshold.`]);
     } catch (err) {
         console.log(err);
-        return new ButtonedMessage('', [], '', ['Unable to remove inactivity exception.']);
     }
 }
 

@@ -6,7 +6,6 @@ const {
     StringSelectMenuOptionBuilder,
     SlashCommandBuilder,
 } = require('discord.js');
-const MessageManager = require('../../message_type/MessageManager');
 const activeHours = require('../../functions/active_hours');
 const fs = require('fs');
 
@@ -63,8 +62,6 @@ module.exports = {
             });
 
             response.setMessage(editedReply);
-
-            MessageManager.addMessage(response);
         } else if (response.pages[0] === 'No data' || response.pages[0] === `${interaction.options.getString('guild_name')} not found, try using the full exact guild name.`) {
             // No data available for guild or unknown guild
             interaction.editReply({
@@ -171,8 +168,6 @@ module.exports = {
             });
 
             response.setMessage(editedReply);
-
-            MessageManager.addMessage(response);
         }
     },
 };

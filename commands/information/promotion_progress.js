@@ -8,7 +8,6 @@ const createConfig = require('../../functions/create_config');
 const fs = require('fs');
 const path = require('path');
 const promotionProgress = require('../../functions/promotion_progress');
-const MessageManager = require('../../message_type/MessageManager');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -77,9 +76,7 @@ module.exports = {
                 });
     
                 response.setMessage(editedReply);
-    
-                MessageManager.addMessage(response);
-            } else {
+                } else {
                 // Player found, show response
                 await interaction.editReply(response.pages[0]);
             }

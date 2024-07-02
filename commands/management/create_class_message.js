@@ -7,7 +7,6 @@ const {
 const fs = require('fs');
 const path = require('path');
 const createConfig = require('../../functions/create_config');
-const MessageManager = require('../../message_type/MessageManager');
 
 const classRoles = ['warrior', 'mage', 'archer', 'shaman', 'assassin', 'fallen', 'battleMonk', 'paladin', 'riftwalker', 'lightBender', 'arcanist', 'sharpshooter', 'trapper', 'boltslinger', 'ritualist', 'summoner', 'acolyte', 'acrobat', 'shadestepper', 'trickster'];
 
@@ -83,7 +82,6 @@ module.exports = {
             }
 
             // Send class message
-            const classMessage = await MessageManager.sendMessage(interaction.guild, interaction.channel.id, message);
 
             // Add class buttons
             const warriorButton = new ButtonBuilder()

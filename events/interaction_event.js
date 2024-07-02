@@ -7,9 +7,7 @@ const {
     Events,
     EmbedBuilder,
 } = require('discord.js');
-const MessageManager = require('../message_type/MessageManager');
-const PagedMessage = require('../message_type/PagedMessage');
-const MessageType = require('../message_type/MessageType');
+const PagedMessage = require('../message_objects/PagedMessage');
 const utilities = require('../functions/utilities');
 const lastLogins = require('../functions/last_logins');
 const online = require('../functions/online');

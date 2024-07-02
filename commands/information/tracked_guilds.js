@@ -9,9 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('database/database.db');
-const ButtonedMessage = require('../../message_type/ButtonedMessage');
 const TrackedGuild = require('../../message_objects/TrackedGuild');
-const MessageManager = require('../../message_type/MessageManager');
 
 function getAsync(query, params) {
     return new Promise((resolve, reject) => {
@@ -148,7 +146,6 @@ module.exports = {
                         }
 
                         // Create the message response
-                        const trackedGuildsMessage = new ButtonedMessage('', [], '', pages);
 
                         if (pages.length > 1) {
                             // Add buttons if more than 1 page
@@ -170,8 +167,6 @@ module.exports = {
                             });
 
                             trackedGuildsMessage.setMessage(editedReply);
-
-                            MessageManager.addMessage(trackedGuildsMessage);
                         } else {
                             // 1 page of activity
                             await interaction.editReply({

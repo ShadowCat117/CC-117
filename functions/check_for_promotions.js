@@ -1,9 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
-const ButtonedMessage = require('../message_type/ButtonedMessage');
 const db = new sqlite3.Database('database/database.db');
-const MessageManager = require('../message_type/MessageManager');
 const GuildMemberPromotion = require('../message_objects/GuildMemberPromotion');
 const utilities = require('./utilities');
 
@@ -96,7 +94,6 @@ async function checkForPromotions(interaction) {
         const ecoRole = interaction.guild.roles.cache.get(config['ecoRole']);
 
         if (!guildName) {
-            return new ButtonedMessage('', [], '', ['You have not set a guild.']);
         }
 
         const promotionRequirements = [chiefPromotionRequirement, strategistPromotionRequirement, captainPromotionRequirement, recruiterPromotionRequirement];
@@ -138,7 +135,6 @@ async function checkForPromotions(interaction) {
         }
 
         if (filteredRows.length === 0) {
-            return new ButtonedMessage('', [], '', [`No members of ${guildName} need promoting`]);
         }
 
         let position = 0;
@@ -255,14 +251,11 @@ async function checkForPromotions(interaction) {
             }
 
             if (promoteChiefsPage !== '```\n```') {
-                await MessageManager.sendButtonedMessage(interaction.guild, config.highRankChannel, new ButtonedMessage('', [], '', chiefPages));
             }
         }
 
-        return new ButtonedMessage('', [], '', pages);
     } catch (error) {
         console.log(error);
-        return new ButtonedMessage('', [], '', ['Error checking for guild promotions.']);
     }
 }
 

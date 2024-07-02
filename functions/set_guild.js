@@ -1,8 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const findGuild = require('../database/database');
-const ButtonedMessage = require('../message_type/ButtonedMessage');
-const MessageType = require('../message_type/MessageType');
 
 async function setGuild(interaction, force = false) {
     let nameToSearch;
@@ -45,10 +43,8 @@ async function setGuild(interaction, force = false) {
 
                 textMessage += '\nClick button to choose guild.';
 
-                return new ButtonedMessage(textMessage, guildName.guildNames, MessageType.SET_GUILD, []);
             }
         } catch (error) {
-            return new ButtonedMessage('', [], '', ['Unable to set guild.']);
         }
     }
 
@@ -62,19 +58,14 @@ async function setGuild(interaction, force = false) {
             }
 
             if (config.guildName === guildName) {
-                return new ButtonedMessage('', [], '', [`You are already representing ${guildName}.`]);
             }
 
             config.guildName = guildName;
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
-
-            return new ButtonedMessage('', [], '', [`Set ${guildName} as your guild.`]);
         } catch (error) {
-            return new ButtonedMessage('', [], '', ['Unable to set guild.']);
         }
     } else {
-        return new ButtonedMessage('', [], '', [`${interaction.options.getString('guild_name')} not found, try using the full exact guild name.`]);
     }
 }
 

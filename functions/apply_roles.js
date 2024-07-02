@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const MessageManager = require('../message_type/MessageManager');
 const findGuild = require('../database/database');
 const ContentTeamValue = require('../values/ContentTeamValue');
 const sqlite3 = require('sqlite3').verbose();
@@ -223,7 +222,6 @@ async function applyRoles(guild, uuid, member) {
             }
 
             if (errorMessage !== '' && config.logMessages) {
-                MessageManager.sendMessage(guild, config.logChannel, errorMessage);
             }
 
             return response;
@@ -635,7 +633,6 @@ async function applyRoles(guild, uuid, member) {
         }
 
         if (errorMessage !== '' && config.logMessages) {
-            MessageManager.sendMessage(guild, config.logChannel, errorMessage);
         }
 
         let response;
@@ -659,7 +656,6 @@ async function applyRoles(guild, uuid, member) {
                     try {
                         await member.setNickname(row.username);
                     } catch (ex) {
-                        MessageManager.sendMessage(guild, config.logChannel, `Failed to change nickname for ${member.user.username}.`);
                     }
                 }
             } else {
@@ -670,7 +666,6 @@ async function applyRoles(guild, uuid, member) {
                         try {
                             await member.setNickname(`${row.username} [${guildPrefix}]`);
                         } catch (ex) {
-                            MessageManager.sendMessage(guild, config.logChannel, `Failed to change nickname for ${member.user.username}.`);
                         }
                     }
                 }

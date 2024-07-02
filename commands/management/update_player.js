@@ -5,7 +5,6 @@ const {
     ButtonStyle,
 } = require('discord.js');
 const updatePlayer = require('../../functions/update_player');
-const MessageManager = require('../../message_type/MessageManager');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -38,8 +37,6 @@ module.exports = {
             });
 
             response.setMessage(editedReply);
-
-            MessageManager.addMessage(response);
         } else {
             // Player found, show response
             await interaction.editReply(response.pages[0]);

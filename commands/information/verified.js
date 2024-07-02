@@ -7,7 +7,6 @@ const {
 const fs = require('fs');
 const path = require('path');
 const createConfig = require('../../functions/create_config');
-const MessageManager = require('../../message_type/MessageManager');
 const verified = require('../../functions/verified');
 
 module.exports = {
@@ -87,8 +86,6 @@ module.exports = {
             });
 
             response.setMessage(editedReply);
-
-            MessageManager.addMessage(response);
         } else if (response.pages[0] === '```\n```') {
             // No players in the server are verified
             interaction.editReply({

@@ -1,8 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 const findGuild = require('../database/database');
 const GuildActiveHours = require('../message_objects/GuildActiveHours');
-const ButtonedMessage = require('../message_type/ButtonedMessage');
-const MessageType = require('../message_type/MessageType');
 const TimezoneValue = require('../values/TimezoneValue');
 const db = new sqlite3.Database('database/database.db');
 
@@ -50,8 +48,6 @@ async function activeHours(interaction, force = false, timezoneOffset = 0, sortB
         }
 
         textMessage += '\nClick button to choose guild.';
-
-        return new ButtonedMessage(textMessage, guildName.guildNames, MessageType.ACTIVE_HOURS, []);
     }
 
     if (guildName) {
@@ -76,7 +72,6 @@ async function activeHours(interaction, force = false, timezoneOffset = 0, sortB
                     }
 
                     if (guildActiveHours.length === 0) {
-                        resolve(new ButtonedMessage('', [], '', ['No data']));
                     }
 
                     let timezone;
@@ -107,7 +102,6 @@ async function activeHours(interaction, force = false, timezoneOffset = 0, sortB
 
                     message += '```';
 
-                    const response = new ButtonedMessage('', [], '', [message]);
                     resolve(response);
                 } catch (error) {
                     reject(error);
@@ -117,7 +111,6 @@ async function activeHours(interaction, force = false, timezoneOffset = 0, sortB
             fetchData();
         });
     } else {
-        return new ButtonedMessage('', [], '', [`${nameToSearch} not found, try using the full exact guild name.`]);
     }
 }
 

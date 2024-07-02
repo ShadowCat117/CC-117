@@ -7,8 +7,6 @@ const {
 const createConfig = require('../../functions/create_config');
 const fs = require('fs');
 const path = require('path');
-const ButtonedMessage = require('../../message_type/ButtonedMessage');
-const MessageManager = require('../../message_type/MessageManager');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -95,7 +93,6 @@ module.exports = {
             }
 
             // Create ButtonedMessage response
-            const alliesMessage = new ButtonedMessage('', [], '', pages);
 
             if (pages.length > 1) {
                 // Add next/previous buttons if more than 1 page used
@@ -117,8 +114,6 @@ module.exports = {
                 });
 
                 alliesMessage.setMessage(editedReply);
-
-                MessageManager.addMessage(alliesMessage);
             } else {
                 // Show response with 1 page
                 await interaction.editReply({

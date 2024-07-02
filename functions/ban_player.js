@@ -1,7 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const ButtonedMessage = require('../message_type/ButtonedMessage');
-const MessageType = require('../message_type/MessageType');
 const findPlayer = require('../database/database');
 
 async function banPlayer(interaction, force = false, reason = 'Unknown reason') {
@@ -49,11 +47,9 @@ async function banPlayer(interaction, force = false, reason = 'Unknown reason') 
     
             textMessage += `\nClick button to choose player to add to banned list for reason ${reason}.`;
     
-            return new ButtonedMessage(textMessage, player.playerUuids, MessageType.BAN_PLAYER, []);
         }
 
         if (!player) {
-            return new ButtonedMessage('', [], '', [`Unknown player, ${nameToSearch.replace(/_/g, '\\_')}`]);
         }
 
         if (interaction.message) {
@@ -69,17 +65,13 @@ async function banPlayer(interaction, force = false, reason = 'Unknown reason') 
         }
 
         if (config['bannedPlayers'][player.username] === reason) {
-            return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is already banned for this reason`]);
         }
 
         config['bannedPlayers'][player.username] = reason;
 
         fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
-
-        return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is now banned for: ${reason}`]);
     } catch (err) {
         console.log(err);
-        return new ButtonedMessage('', [], '', ['Unable to ban player.']);
     }
 }
 

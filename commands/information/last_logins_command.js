@@ -8,7 +8,7 @@ const {
 const lastLogins = require('../../functions/last_logins');
 const utilities = require('../../functions/utilities');
 const messages = require('../../functions/messages');
-const PagedMessage = require('../../message_type/PagedMessage');
+const PagedMessage = require('../../message_objects/PagedMessage');
 
 module.exports = {
     data: new SlashCommandBuilder()

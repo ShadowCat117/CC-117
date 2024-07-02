@@ -1,8 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 const findGuild = require('../database/database');
 const GuildMember = require('../message_objects/GuildMember');
-const ButtonedMessage = require('../message_type/ButtonedMessage');
-const MessageType = require('../message_type/MessageType');
 const db = new sqlite3.Database('database/database.db');
 
 async function getAsync(query, params) {
@@ -55,8 +53,6 @@ async function guildStats(interaction, force = false) {
         }
 
         textMessage += '\nClick button to choose guild.';
-
-        return new ButtonedMessage(textMessage, guildName.guildNames, MessageType.GUILD_STATS, []);
     }
 
     if (guildName) {
@@ -65,7 +61,6 @@ async function guildStats(interaction, force = false) {
         const today = new Date();
 
         if (guildRow == undefined) {
-            return new ButtonedMessage('', [], '', [`${nameToSearch} not found, try using the full exact guild name.`]);
         }
 
         const tableName = guildName.replaceAll(' ', '_');
@@ -174,10 +169,7 @@ async function guildStats(interaction, force = false) {
             guildStatsPage += '```';
             pages.push(guildStatsPage);
         }
-
-        return new ButtonedMessage('', [], '', pages);
     } else {
-        return new ButtonedMessage('', [], '', [`${nameToSearch} not found, try using the full exact guild name.`]);
     }
 }
 
