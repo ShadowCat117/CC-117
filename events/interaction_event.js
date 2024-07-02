@@ -8,7 +8,9 @@ const {
     EmbedBuilder,
 } = require('discord.js');
 const MessageManager = require('../message_type/MessageManager');
+const PagedMessage = require('../message_type/PagedMessage');
 const MessageType = require('../message_type/MessageType');
+const utilities = require('../functions/utilities');
 const lastLogins = require('../functions/last_logins');
 const online = require('../functions/online');
 const guildStats = require('../functions/guild_stats');
@@ -34,6 +36,7 @@ const updatePlayer = require('../functions/update_player');
 const registerUser = require('../functions/register_user');
 const banPlayer = require('../functions/ban_player');
 const unbanPlayer = require('../functions/unban_player');
+const messages = require('../functions/messages');
 
 const warriorArchetypes = ['fallen', 'battleMonk', 'paladin'];
 const mageArchetypes = ['riftwalker', 'lightBender', 'arcanist'];
@@ -74,6 +77,126 @@ module.exports = {
                     const functionToRun = parts[0];
 
                     switch (functionToRun) {
+                        case 'previous': {
+                            await interaction.editReply({ embeds: [messages.getMessage(interaction.message.id).getPreviousPage()] });
+
+                            break;
+                        }
+                        case 'next': {
+                            await interaction.editReply({ embeds: [messages.getMessage(interaction.message.id).getNextPage()] });
+
+                            break;
+                        }
+                        case 'last_logins': {
+                            const loadingEmbed = new EmbedBuilder()
+                                .setDescription('Loading last logins for selected guild')
+                                .setColor(0x00ff00);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [loadingEmbed],
+                            });
+
+                            const response = await lastLogins(interaction, true);
+
+                            const embeds = [];
+                            const row = new ActionRowBuilder();
+
+                            if (response.playerLastLogins.length > 30) {
+                                const pages = [];
+                                for (let i = 0; i < response.playerLastLogins.length; i += 30) {
+                                    pages.push(response.playerLastLogins.slice(i, i + 30));
+                                }
+            
+                                for (const page of pages) {
+                                    const responseEmbed = new EmbedBuilder();
+                                    responseEmbed
+                                        .setTitle(`[${response.guildPrefix}] ${response.guildName} Last Logins`)
+                                        .setColor(0x00ffff);
+                                
+                                    let usernameValue = '';
+                                    let rankValue = '';
+                                    let lastLoginValue = '';
+                                
+                                    for (const player of page) {
+                                        usernameValue += player.username + '\n';
+                                        rankValue += player.guildRank + '\n';
+                                
+                                        if (player.online) {
+                                            lastLoginValue += 'Online now!\n';
+                                        } else {
+                                            lastLoginValue += utilities.getTimeSince(player.lastLogin) + ' ago\n';
+                                        }
+                                    }
+                                
+                                    responseEmbed
+                                        .addFields(
+                                            { name: 'Username', value: usernameValue, inline: true },
+                                            { name: 'Guild Rank', value: rankValue, inline: true },
+                                            { name: 'Last Login', value: lastLoginValue, inline: true },
+                                        );
+                                
+                                    embeds.push(responseEmbed);
+                                }
+            
+                                messages.addMessage(interaction.message.id, new PagedMessage(interaction.message, embeds));
+            
+                                const previousPage = new ButtonBuilder()
+                                    .setCustomId('previous')
+                                    .setStyle(ButtonStyle.Primary)
+                                    .setEmoji('⬅️');
+            
+                                const nextPage = new ButtonBuilder()
+                                    .setCustomId('next')
+                                    .setStyle(ButtonStyle.Primary)
+                                    .setEmoji('➡️');
+            
+                                row.addComponents(previousPage, nextPage);
+                            } else {
+                                const responseEmbed = new EmbedBuilder();
+            
+                                responseEmbed
+                                    .setTitle(`[${response.guildPrefix}] ${response.guildName} Last Logins`)
+                                    .setColor(0x00ffff);
+            
+                                if (response.playerLastLogins.length > 0) {
+                                    let usernameValue = '';
+                                    let rankValue = '';
+                                    let lastLoginValue = '';
+            
+                                    for (const player of response.playerLastLogins) {
+                                        usernameValue += player.username + '\n';
+                                        rankValue += player.guildRank + '\n';
+            
+                                        if (player.online) {
+                                            lastLoginValue += 'Online now!\n';
+                                        } else {
+                                            lastLoginValue += utilities.getTimeSince(player.lastLogin) + ' ago\n';
+                                        }
+                                    }
+            
+                                    responseEmbed
+                                        .addFields(
+                                            { name: 'Username', value: usernameValue, inline: true },
+                                            { name: 'Guild Rank', value: rankValue, inline: true },
+                                            { name: 'Last Login', value: lastLoginValue, inline: true },
+                                        );
+                                }
+            
+                                embeds.push(responseEmbed);
+                            }
+
+                            if (row.components.length > 0) {
+                                await interaction.editReply({ 
+                                    embeds: [embeds[0]],
+                                    components: [row],
+                                });
+                            } else {
+                                await interaction.editReply({ embeds: [embeds[0]] });
+                            }
+
+                            break;
+                        }
                         case 'online': {
                             const loadingEmbed = new EmbedBuilder()
                                 .setDescription('Checking online players for selected guild')
@@ -98,7 +221,7 @@ module.exports = {
 
                             if (playersInStream > 0) {
                                 responseEmbed
-                                    .addFields({ name: 'Streamers', value: `There are ${playersInStream} player(s) in /stream`, inline: false });
+                                    .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream`, inline: false });
                             }
 
                             if (response.onlinePlayers.length > 0) {
@@ -167,7 +290,6 @@ module.exports = {
                     }
                 }
             } catch (err) {
-                MessageManager.sendMessage(interaction.guild, config.logChannel, 'Bad interaction, <@237296939245240330> fix me :)');
                 console.log(err);
             }
         } catch (err) {

@@ -130,15 +130,13 @@ async function sus(interaction, force = false) {
         }
     }
 
-    const now = new Date();
-
     database.updatePlayer({
         uuid: playerJson.uuid,
         username: playerJson.username,
         guildUuid: guildUuid,
         guildRank: guildRank,
         online: playerJson.online,
-        lastLogin: now.toISOString(),
+        lastLogin: playerJson.lastJoin,
         supportRank: playerJson.supportRank,
         veteran: playerJson.veteran,
         wars: playerJson.globalData.wars,

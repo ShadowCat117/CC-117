@@ -2,6 +2,7 @@ const axios = require('axios');
 const fs = require('fs').promises;
 const sqlite3 = require('sqlite3').verbose();
 const database = new sqlite3.Database('database/database.db');
+const PlayerLastLogin = require('../message_objects/PlayerLastLogin');
 const RATE_LIMIT = 180;
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -177,6 +178,8 @@ async function handleOnlinePlayers(onlinePlayers) {
             }
         }
 
+        console.log('Handling offline players');
+
         await handleOfflinePlayers(uuids);
     } catch (error) {
         console.error('Error processing data:', error);
@@ -200,6 +203,8 @@ async function handleOfflinePlayers(onlinePlayers) {
             // Update weekly playtime and reset session start
             await runAsync('UPDATE players SET online = false, lastLogin = ?, weeklyPlaytime = ?, sessionStart = null WHERE uuid = ?', [now.toISOString(), (player.weeklyPlaytime + sessionDurationHours), player.uuid]);
         }
+
+        console.log('Updated activity for offline players');
     } catch (error) {
         console.error('Error processing data:', error);
     }
@@ -341,6 +346,79 @@ async function updatePlayer(player) {
     }
 }
 
+// Get the information for last login timestamps for each member of a guild.
+// First call the API to update the list of guild members to ensure the database is up to date and then 
+async function getLastLogins(guild) {
+    await waitForRateLimit();
+
+    const response = await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${guild}`);
+
+    remainingRateLimit = response.headers['ratelimit-remaining'];
+    rateLimitReset = response.headers['ratelimit-reset'];
+    const guildJson = response.data;
+
+    // If we got a valid response, then update the members of the guild
+    if (guildJson && guildJson.name) {
+        for (const rank in guildJson.members) {
+            if (rank === 'total') continue;
+    
+            const rankMembers = guildJson.members[rank];
+    
+            for (const member in rankMembers) {
+                const guildMember = rankMembers[member];
+
+                const existingPlayer = await getAsync('SELECT * FROM players WHERE uuid = ?', [guildMember.uuid]);
+
+                if (existingPlayer) {
+                    await runAsync('UPDATE players SET username = ?, guildUuid = ?, guildRank = ? WHERE uuid = ?', [member, guild, rank, guildMember.uuid]);
+                } else {
+                    await waitForRateLimit();
+
+                    const playerResponse = await axios.get(`https://api.wynncraft.com/v3/player/${guildMember.uuid}?fullResult=True`);
+
+                    remainingRateLimit = playerResponse.headers['ratelimit-remaining'];
+                    rateLimitReset = playerResponse.headers['ratelimit-reset'];
+                    const playerJson = playerResponse.data;
+
+                    if (playerJson && playerJson.username) {
+                        let highestCharcterLevel = 0;
+
+                        for (const character in playerJson.characters) {
+                            const characterJson = playerJson.characters[character];
+
+                            // If character level is higher than current tracked highest, set as new highest
+                            if (characterJson.level > highestCharcterLevel) {
+                                highestCharcterLevel = characterJson.level;
+                            }
+                        }
+
+                        const veteran = playerJson.veteran ? playerJson.veteran : 0;
+
+                        await runAsync('INSERT INTO players (uuid, username, guildUuid, guildRank, online, lastLogin, supportRank, veteran, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, 0, -1, 0)', [playerJson.uuid, playerJson.username, guild, rank, playerJson.online, playerJson.lastJoin, playerJson.supportRank, veteran, playerJson.globalData.wars, highestCharcterLevel]);
+                    }
+                }
+            }
+        }
+    }
+
+    const rows = await allAsync('SELECT username, guildRank, online, lastLogin FROM players WHERE guildUuid = ?', [guild]);
+
+    const playerLastLogins = rows.map(row => {
+        const {
+            username,
+            guildRank,
+            online,
+            lastLogin,
+        } = row;
+
+        return new PlayerLastLogin(username, guildRank, online, lastLogin);
+    });
+    
+    playerLastLogins.sort((a, b) => a.compareTo(b));
+
+    return playerLastLogins;
+}
+
 // Create a backup of the database
 async function createDatabaseBackup(backupFilename) {
     const sourceFile = 'database/database.db';
@@ -359,6 +437,8 @@ async function runFreeFunctions() {
 
     // If the player weekly activity is being updated, don't update the online players list
     if (!pausePlayerUpdates) {
+        console.log('Updating online players');
+
         // Get all of the online players by UUID
         const response = await axios.get('https://api.wynncraft.com/v3/player?identifier=uuid');
 
@@ -369,6 +449,8 @@ async function runFreeFunctions() {
         if (onlinePlayers) {
             await handleOnlinePlayers(onlinePlayers.players);
         }
+
+        console.log('Updated online players');
     }
 
     runFreeFunctions();
@@ -383,12 +465,13 @@ async function runScheduledFunctions() {
         console.log(`Updating guild activity at ${now.getUTCHours()}:${now.getUTCMinutes().toString().padStart(2, '0')}`);
         await updateGuildActivity(now.getUTCHours().toString().padStart(2, '0'), now.getUTCMinutes().toString().padStart(2, '0'));
 
-        console.log('Completed 10 minute tasks');
+        console.log(`Updated guild activity for ${now.getUTCHours()}:${now.getUTCMinutes().toString().padStart(2, '0')}`);
     }
 
     // Update hourly
     if (now.getUTCMinutes() === 0) {
         await waitForRateLimit();
+        console.log('Updating list of all guilds');
 
         // Get all guilds
         const response = await axios.get('https://api.wynncraft.com/v3/guild/list/guild?identifier=uuid');
@@ -400,6 +483,8 @@ async function runScheduledFunctions() {
         if (guildList) {
             await updateGuildList(guildList);
         }
+
+        console.log('Updated guild list');
     }
 
     // Update daily
@@ -408,18 +493,20 @@ async function runScheduledFunctions() {
         const dayOfWeek = DAYS_OF_WEEK[now.getUTCDay()];
         const backupFilename = `database_backup_${dayOfWeek}.db`;
 
-        console.log('Creating database backup');
+        console.log(`Creating database backup ${dayOfWeek}`);
         await createDatabaseBackup(backupFilename);
 
-        console.log('Completed daily tasks');
+        console.log(`Created database backup ${dayOfWeek}`);
     }
 
     // Update weekly
     if (now.getUTCDay() === 6) {
         console.log('Updating all player activity');
+
         pausePlayerUpdates = true;
         await updatePlayerActivity();
         pausePlayerUpdates = false;
+        
         console.log('Updated all player activity');
 
     }
@@ -471,5 +558,6 @@ module.exports = {
     findGuild,
     findPlayer,
     updatePlayer,
+    getLastLogins,
     setup,
 };

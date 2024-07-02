@@ -79,7 +79,7 @@ module.exports = {
 
                 if (playersInStream > 0) {
                     responseEmbed
-                        .addFields({ name: 'Streamers', value: `There are ${playersInStream} player(s) in /stream`, inline: false });
+                        .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream`, inline: false });
                 }
 
                 if (response.onlinePlayers.length > 0) {
