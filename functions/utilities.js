@@ -19,6 +19,21 @@ function getTimeSince(timestamp) {
     }
 }
 
+async function findDiscordUser(serverMembers, username) {
+    for (const serverMember of serverMembers) {
+        if (serverMember.user.bot) {
+            continue;
+        }
+
+        if (username === serverMember.user.username || username === serverMember.user.globalName || username === serverMember.nickname) {
+            return serverMember;
+        }
+    }
+
+    return null;
+}
+
 module.exports = {
     getTimeSince,
+    findDiscordUser,
 };

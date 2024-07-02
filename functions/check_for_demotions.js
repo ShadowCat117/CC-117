@@ -4,6 +4,7 @@ const sqlite3 = require('sqlite3').verbose();
 const ButtonedMessage = require('../message_type/ButtonedMessage');
 const db = new sqlite3.Database('database/database.db');
 const GuildMemberDemotion = require('../message_objects/GuildMemberDemotion');
+const utilities = require('./utilities');
 
 async function allAsync(query, params) {
     return new Promise((resolve, reject) => {
@@ -151,7 +152,7 @@ async function checkForDemotions(interaction) {
                 const differenceInMilliseconds = today - joinDate;
                 const daysInGuild = Math.round(differenceInMilliseconds / (1000 * 60 * 60 * 24));
 
-                const serverMember = await findDiscordUser(interaction.guild.members.cache.values(), username);
+                const serverMember = await utilities.findDiscordUser(interaction.guild.members.cache.values(), username);
 
                 const playtimeRow = await getAsync(`SELECT averagePlaytime FROM ${tableName} WHERE UUID = ?`, [row.UUID]);
 
@@ -214,20 +215,6 @@ async function checkForDemotions(interaction) {
         console.log(error);
         return new ButtonedMessage('', [], '', ['Error checking for guild demotions.']);
     }
-}
-
-async function findDiscordUser(serverMembers, username) {
-    for (const serverMember of serverMembers) {
-        if (serverMember.user.bot) {
-            continue;
-        }
-
-        if (username === serverMember.user.username || username === serverMember.user.globalName || username === serverMember.nickname) {
-            return serverMember;
-        }
-    }
-
-    return null;
 }
 
 module.exports = checkForDemotions;

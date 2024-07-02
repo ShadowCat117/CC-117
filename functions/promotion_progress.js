@@ -5,6 +5,7 @@ const findPlayer = require('../database/database');
 const MessageType = require('../message_type/MessageType');
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('database/database.db');
+const utilities = require('./utilities');
 
 async function getAsync(query, params) {
     return new Promise((resolve, reject) => {
@@ -122,7 +123,7 @@ async function promotionProgress(interaction, force = false) {
         const differenceInMilliseconds = today - joinDate;
         const daysInGuild = Math.round(differenceInMilliseconds / (1000 * 60 * 60 * 24));
 
-        const serverMember = await findDiscordUser(interaction.guild.members.cache.values(), player.username);
+        const serverMember = await utilities.findDiscordUser(interaction.guild.members.cache.values(), player.username);
 
         let hasBuildRole = false;
         let hasEcoRole = false;
@@ -313,20 +314,6 @@ async function promotionProgress(interaction, force = false) {
         console.log(error);
         return new ButtonedMessage('', [], '', ['Unable to display promotion progress.']);
     }
-}
-
-async function findDiscordUser(serverMembers, username) {
-    for (const serverMember of serverMembers) {
-        if (serverMember.user.bot) {
-            continue;
-        }
-
-        if (username === serverMember.user.username || username === serverMember.user.globalName || username === serverMember.nickname) {
-            return serverMember;
-        }
-    }
-
-    return null;
 }
 
 module.exports = promotionProgress;

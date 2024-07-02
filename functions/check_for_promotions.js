@@ -5,6 +5,7 @@ const ButtonedMessage = require('../message_type/ButtonedMessage');
 const db = new sqlite3.Database('database/database.db');
 const MessageManager = require('../message_type/MessageManager');
 const GuildMemberPromotion = require('../message_objects/GuildMemberPromotion');
+const utilities = require('./utilities');
 
 async function allAsync(query, params) {
     return new Promise((resolve, reject) => {
@@ -158,7 +159,7 @@ async function checkForPromotions(interaction) {
                 const differenceInMilliseconds = today - joinDate;
                 const daysInGuild = Math.round(differenceInMilliseconds / (1000 * 60 * 60 * 24));
     
-                const serverMember = await findDiscordUser(interaction.guild.members.cache.values(), username);
+                const serverMember = await utilities.findDiscordUser(interaction.guild.members.cache.values(), username);
 
                 let playtimeRow;
 
@@ -263,20 +264,6 @@ async function checkForPromotions(interaction) {
         console.log(error);
         return new ButtonedMessage('', [], '', ['Error checking for guild promotions.']);
     }
-}
-
-async function findDiscordUser(serverMembers, username) {
-    for (const serverMember of serverMembers) {
-        if (serverMember.user.bot) {
-            continue;
-        }
-
-        if (username === serverMember.user.username || username === serverMember.user.globalName || username === serverMember.nickname) {
-            return serverMember;
-        }
-    }
-
-    return null;
 }
 
 module.exports = checkForPromotions;
