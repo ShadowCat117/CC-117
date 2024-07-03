@@ -134,19 +134,31 @@ async function findPlayer(input, force = false) {
             };
         }
     } else {
-        const query = 'SELECT uuid, username FROM players WHERE UPPER(username) = UPPER(?)';
+        const query = 'SELECT uuid, username, guildUuid, guildRank, supportRank FROM players WHERE UPPER(username) = UPPER(?)';
         const players = await allAsync(query, [input]);
 
         if (players.length === 0) {
             return null;
         } else if (players.length > 1) {
-            const playeruuids = players.map((row) => row.uuid);
+            const playerUuids = players.map((row) => row.uuid);
             const playerUsernames = players.map((row) => row.username);
+            const playerRanks = players.map((row) => row.supportRank);
+            const playerGuildRanks = players.map((row) => row.guildRank);
+            const playerGuildNames = [];
+
+            for (const row of players) {
+                const guildQuery = 'SELECT name FROM guilds WHERE uuid = ?';
+                const guild = await getAsync(guildQuery, [row.guildUuid]);
+                playerGuildNames.push(guild.name);
+            }
 
             return {
                 message: 'Multiple possibilities found',
-                playeruuids: playeruuids,
+                playerUuids: playerUuids,
                 playerUsernames: playerUsernames,
+                playerRanks: playerRanks,
+                playerGuildRanks: playerGuildRanks,
+                playerGuildNames: playerGuildNames,
             };
         } else {
             return {
@@ -419,6 +431,18 @@ async function getLastLogins(guild) {
     return playerLastLogins;
 }
 
+// Returns the average playtime of the requested player.
+// If no playtime has yet been calculated it will return the playtime for the current week.
+async function getAveragePlaytime(player) {
+    const row = await getAsync('SELECT weeklyPlaytime, averagePlaytime FROM players WHERE uuid = ?', [player]);
+
+    if (!row) {
+        return -1;
+    } else {
+        return row.averagePlaytime !== -1 ? row.averagePlaytime : row.weeklyPlaytime;
+    }
+}
+
 // Create a backup of the database
 async function createDatabaseBackup(backupFilename) {
     const sourceFile = 'database/database.db';
@@ -559,5 +583,6 @@ module.exports = {
     findPlayer,
     updatePlayer,
     getLastLogins,
+    getAveragePlaytime,
     setup,
 };
