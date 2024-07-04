@@ -86,6 +86,50 @@ module.exports = {
 
                             break;
                         }
+                        case 'add_ally': {
+                            const loadingEmbed = new EmbedBuilder()
+                                .setDescription('Setting guild to selected guild.')
+                                .setColor(0x00ff00);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [loadingEmbed],
+                            });
+
+                            const response = await addAlly(interaction, true);
+
+                            if (response.error) {
+                                // Error
+                                const responseEmbed = new EmbedBuilder();
+                    
+                                responseEmbed
+                                    .setTitle('Error')
+                                    .setDescription(`${response.error}`)
+                                    .setColor(0xff0000);
+                    
+                                await interaction.editReply({ embeds: [responseEmbed] });
+                            } else {
+                                const responseEmbed = new EmbedBuilder();
+                    
+                                if (response.guildName === '') {
+                                    // Unknown guild
+                                    responseEmbed
+                                        .setTitle('Invalid guild')
+                                        .setDescription(`Unable to find a guild using the name/prefix '${interaction.options.getString('guild_name')}', try again using the exact guild name.`)
+                                        .setColor(0xff0000);
+                                } else {
+                                    // Valid guild
+                                    responseEmbed
+                                        .setTitle('Successfully added ally')
+                                        .setDescription(`${response.guildName} is now an allied guild.`)
+                                        .setColor(0x00ffff);
+                                }
+                    
+                                await interaction.editReply({ embeds: [responseEmbed] });
+                            }
+
+                            break;
+                        }
                         case 'last_logins': {
                             const loadingEmbed = new EmbedBuilder()
                                 .setDescription('Loading last logins for selected guild')
