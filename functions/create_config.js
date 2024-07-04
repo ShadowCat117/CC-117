@@ -1,14 +1,12 @@
-const fs = require('fs').promises;
+const fs = require('fs');
 const path = require('path');
 
 async function createConfig(client, guildId) {
     const directoryPath = path.join(__dirname, '..', 'configs');
     const filePath = path.join(directoryPath, `${guildId}.json`);
 
-    try {
-        await fs.access(filePath);
-    } catch (error) {
-        if (error.code === 'ENOENT') {
+    if (!fs.existsSync(filePath)) {
+        try {
             const guild = client.guilds.cache.get(guildId);
 
             const highestRole = guild.roles.cache.reduce((prev, role) => (role.position > prev.position ? role : prev));
@@ -172,15 +170,13 @@ async function createConfig(client, guildId) {
                 bannedPlayers: [],
             };
 
-            try {
-                await fs.writeFile(filePath, JSON.stringify(defaultData, null, 2));
-                console.log(`Created config file for guild ${guildId}`);
-            } catch (err) {
-                console.log(`Error creating config file for guild ${guildId}: ${err}`);
-            }
-        } else {
-            console.log(`Error accessing config file for guild ${guildId}: ${error}`);
+            await fs.writeFile(filePath, JSON.stringify(defaultData, null, 2));
+            console.log(`Created config file for guild ${guildId}`);
+        } catch (err) {
+            console.error(`Error creating config file for guild ${guildId}: ${err}`);
         }
+    } else {
+        console.error('createConfig called but config exists');
     }
 }
 
