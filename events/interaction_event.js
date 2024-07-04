@@ -88,7 +88,7 @@ module.exports = {
                         }
                         case 'add_ally': {
                             const loadingEmbed = new EmbedBuilder()
-                                .setDescription('Setting guild to selected guild.')
+                                .setDescription('Adding selected guild as ally.')
                                 .setColor(0x00ff00);
 
                             await interaction.editReply({
@@ -407,6 +407,50 @@ module.exports = {
                                 components: [],
                                 embeds: [responseEmbed],
                             });
+
+                            break;
+                        }
+                        case 'remove_ally': {
+                            const loadingEmbed = new EmbedBuilder()
+                                .setDescription('Removing selected guild from allies.')
+                                .setColor(0x00ff00);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [loadingEmbed],
+                            });
+
+                            const response = await removeAlly(interaction, true);
+
+                            if (response.error) {
+                                // Error
+                                const responseEmbed = new EmbedBuilder();
+                    
+                                responseEmbed
+                                    .setTitle('Error')
+                                    .setDescription(`${response.error}`)
+                                    .setColor(0xff0000);
+                    
+                                await interaction.editReply({ embeds: [responseEmbed] });
+                            } else {
+                                const responseEmbed = new EmbedBuilder();
+                    
+                                if (response.guildName === '') {
+                                    // Unknown guild
+                                    responseEmbed
+                                        .setTitle('Invalid guild')
+                                        .setDescription(`Unable to find a guild using the name/prefix '${interaction.options.getString('guild_name')}', try again using the exact guild name.`)
+                                        .setColor(0xff0000);
+                                } else {
+                                    // Valid guild
+                                    responseEmbed
+                                    .setTitle('Successfully removed ally')
+                                    .setDescription(`${response.guildName} is no longer an allied guild.`)
+                                    .setColor(0x00ffff);
+                                }
+                    
+                                await interaction.editReply({ embeds: [responseEmbed] });
+                            }
 
                             break;
                         }
