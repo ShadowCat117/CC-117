@@ -425,7 +425,7 @@ module.exports = {
                             if (response.error) {
                                 // Error
                                 const responseEmbed = new EmbedBuilder();
-                    
+
                                 responseEmbed
                                     .setTitle('Error')
                                     .setDescription(`${response.error}`)

@@ -169,6 +169,5 @@ module.exports = {
         } else {
             await interaction.editReply({ embeds: [embeds[0]] });
         }
-        
     },
 };
