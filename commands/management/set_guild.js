@@ -2,6 +2,7 @@ const {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
+    EmbedBuilder,
     SlashCommandBuilder,
 } = require('discord.js');
 const createConfig = require('../../functions/create_config');
@@ -19,6 +20,12 @@ module.exports = {
                 .setRequired(true)),
     ephemeral: true,
     async execute(interaction) {
+        const loadingEmbed = new EmbedBuilder()
+            .setDescription(`Setting guild to ${interaction.options.getString('guild_name')}`)
+            .setColor(0x00ff00);
+
+        await interaction.editReply({ embeds: [loadingEmbed] });
+
         const guildId = interaction.guild.id;
         const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
 
@@ -40,10 +47,12 @@ module.exports = {
 
             // Command can only be ran by owners or admins
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
-                await interaction.editReply('You do not have the required permissions to run this command.');
+                const errorEmbed = new EmbedBuilder()
+                    .setDescription('You do not have the required permissions to run this command.')
+                    .setColor(0xff0000);
+                await interaction.editReply({ embeds: [errorEmbed] });
                 return;
             }
-
         } catch (error) {
             console.log(error);
             await interaction.editReply('Error setting guild.');
@@ -53,27 +62,66 @@ module.exports = {
         // Call setGuild
         const response = await setGuild(interaction);
 
-        if (response.componentIds.length > 0) {
-            // When multiple guilds are found, present options
-            const row = new ActionRowBuilder();
+        const row = new ActionRowBuilder();
 
-            for (let i = 0; i < response.componentIds.length; i++) {
+        if (response.guildUuids !== undefined) {
+            const responseEmbed = new EmbedBuilder();
+
+            // Multiselector
+            responseEmbed
+                .setTitle('Multiple guilds found')
+                .setDescription(`More than 1 guild has the identifier ${interaction.options.getString('guild_name')}. Pick the intended guild from the following`)
+                .setColor(0x999999);
+
+            for (let i = 0; i < response.guildUuids.length; i++) {
+                const guildPrefix = response.guildPrefixes[i];
+                const guildName = response.guildNames[i];
+
+                responseEmbed
+                    .addFields({ name: `Option ${i + 1}`, value: `[[${guildPrefix}] ${guildName}](https://wynncraft.com/stats/guild/${guildName.replaceAll(' ', '%20')})` });
+
                 const button = new ButtonBuilder()
-                    .setCustomId(response.componentIds[i])
+                    .setCustomId(`set_guild:${response.guildUuids[i]}`)
                     .setStyle(ButtonStyle.Primary)
                     .setLabel((i + 1).toString());
+
                 row.addComponents(button);
             }
 
-            const editedReply = await interaction.editReply({
-                content: response.text,
+            await interaction.editReply({
                 components: [row],
+                embeds: [responseEmbed],
             });
 
-            response.setMessage(editedReply);
+            return;
+        } else if (response.error) {
+            // Error
+            const responseEmbed = new EmbedBuilder();
+
+            responseEmbed
+                .setTitle('Error')
+                .setDescription(`${response.error}`)
+                .setColor(0xff0000);
+
+            await interaction.editReply({ embeds: [responseEmbed] });
         } else {
-            // Found guild, give response
-            await interaction.editReply(response.pages[0]);
+            const responseEmbed = new EmbedBuilder();
+
+            if (response.guildName === '') {
+                // Unknown guild
+                responseEmbed
+                    .setTitle('Invalid guild')
+                    .setDescription(`Unable to find a guild using the name/prefix '${interaction.options.getString('guild_name')}', try again using the exact guild name.`)
+                    .setColor(0xff0000);
+            } else {
+                // Valid guild
+                responseEmbed
+                    .setTitle('Successfully set guild')
+                    .setDescription(`You are now representing ${response.guildName}`)
+                    .setColor(0x00ffff);
+            }
+
+            await interaction.editReply({ embeds: [responseEmbed] });
         }
     },
 };
