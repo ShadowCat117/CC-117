@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const findPlayer = require('../database/database');
+const database = require('../database/database');
 
 async function banPlayer(interaction, force = false, reason = 'Unknown reason') {
     const guildId = interaction.guild.id;
@@ -18,46 +18,26 @@ async function banPlayer(interaction, force = false, reason = 'Unknown reason') 
 
         if (interaction.options !== undefined) {
             nameToSearch = interaction.options.getString('username');
+            reason = interaction.options.getString('reason');
         } else if (interaction.customId) {
-            nameToSearch = interaction.customId;
+            nameToSearch = interaction.customId.split(':')[1];
         }
-
-        const player = await findPlayer(nameToSearch, '', force);
+    
+        const player = await database.findPlayer(nameToSearch, force);
 
         if (player && player.message === 'Multiple possibilities found') {
-            let textMessage = `Multiple players found with the username: ${nameToSearch}.`;
-    
-            for (let i = 0; i < player.playerUuids.length; i++) {
-                const uuid = player.playerUuids[i];
-                const playerUsername = player.playerUsernames[i];
-                const rank = player.playerRanks[i];
-                const guildRank = player.playerGuildRanks[i];
-                const playerGuildName = player.playerGuildNames[i];
-
-                if (!rank && !playerGuildName) {
-                    textMessage += `\n${i + 1}. ${playerUsername} (UUID: ${uuid})`;
-                } else if (!rank) {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${guildRank} of ${playerGuildName}. (UUID: ${uuid})`;
-                } else if (!playerGuildName) {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${rank}. (UUID: ${uuid})`;
-                } else {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${rank} and ${guildRank} of ${playerGuildName}. (UUID: ${uuid})`;
-                }
-            }
-    
-            textMessage += `\nClick button to choose player to add to banned list for reason ${reason}.`;
-    
+            return {
+                playerUuids: player.playerUuids,
+                playerUsernames: player.playerUsernames,
+                playerRanks: player.playerRanks,
+                playerGuildRanks: player.playerGuildRanks,
+                playerGuildNames: player.playerGuildNames,
+                reason: reason,
+            };
         }
 
         if (!player) {
-        }
-
-        if (interaction.message) {
-            // Get reason from message content
-            const messageContent = interaction.message.content;
-            const regex = /for reason\s(.*)/;
-            const match = messageContent.match(regex);
-            reason = match ? match[1] : reason;
+            return ({ error: `Unknown player ${nameToSearch}` });
         }
 
         if (!config['bannedPlayers']) {
@@ -65,13 +45,17 @@ async function banPlayer(interaction, force = false, reason = 'Unknown reason') 
         }
 
         if (config['bannedPlayers'][player.username] === reason) {
+            return ({ error: `${player.username} is already banned for ${reason}` });
         }
 
         config['bannedPlayers'][player.username] = reason;
 
         fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
+
+        return ({ username: player.username, reason: reason });
     } catch (err) {
         console.log(err);
+        return ({ error: 'Error trying to ban user.' });
     }
 }
 

@@ -55,7 +55,10 @@ module.exports = {
             }
         } catch (error) {
             console.log(error);
-            await interaction.editReply('Error setting guild.');
+            const errorEmbed = new EmbedBuilder()
+                    .setDescription('Error setting guild.')
+                    .setColor(0xff0000);
+            await interaction.editReply({ embeds: [errorEmbed] });
             return;
         }
 

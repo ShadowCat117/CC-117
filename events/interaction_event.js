@@ -461,6 +461,45 @@ module.exports = {
 
                             break;
                         }
+                        case 'ban_player': {
+                            const loadingEmbed = new EmbedBuilder()
+                                .setDescription('Banning selected player')
+                                .setColor(0x00ff00);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [loadingEmbed],
+                            });
+
+                            const response = await banPlayer(interaction, true, interaction.message.embeds[0].footer.text);
+
+                            const responseEmbed = new EmbedBuilder();
+
+                            if (response.error) {
+                                responseEmbed
+                                    .setTitle('Error')
+                                    .setDescription(`Unable to ban player: ${response.error}`)
+                                    .setColor(0xff0000);
+                            } else {
+                                if (response.username === '') {
+                                    // Unknown player
+                                    responseEmbed
+                                        .setTitle('Invalid username')
+                                        .setDescription(`Unable to find a player using the name '${interaction.options.getString('username')}', try again using the exact player name.`)
+                                        .setColor(0xff0000);
+                                } else {
+                                    // Valid player
+                                    responseEmbed
+                                        .setTitle(`${response.username} has been banned from your guild`)
+                                        .addFields({ name: 'Reason', value: `${response.reason}` })
+                                        .setColor(0x00ffff);
+                                }
+                            }
+                
+                            await interaction.editReply({ embeds: [responseEmbed] });
+
+                            break;
+                        }
                         case 'online': {
                             const loadingEmbed = new EmbedBuilder()
                                 .setDescription('Checking online players for selected guild')
