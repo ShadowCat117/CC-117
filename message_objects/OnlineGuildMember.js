@@ -4,7 +4,12 @@ class OnlineGuildMember {
     // guildRank: Guild rank of the player
     // server: What server the player is currently on
     constructor(username, guildRank, server) {
-        this.username = username.replaceAll('_', '\\_');
+        // Temporary, remove if Wynn ever fixes the name changing guild bug
+        if (username === 'Owen_Rocks_3') {
+            this.username = 'Amber\\_Rocks\\_3';
+        } else {
+            this.username = username.replaceAll('_', '\\_');
+        }
         this.guildRank = guildRank.charAt(0).toUpperCase() + guildRank.slice(1);
         this.server = server;
     }

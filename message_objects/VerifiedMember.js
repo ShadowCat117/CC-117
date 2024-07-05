@@ -5,7 +5,12 @@ class VerifiedMember {
     // username: Username of the guild member
     // members: Members of the Discord server
     constructor(username, members) {
-        this.username = username;
+        // Temporary, remove if Wynn ever fixes the name changing guild bug
+        if (username === 'Owen_Rocks_3') {
+            this.username = 'Amber\\_Rocks\\_3';
+        } else {
+            this.username = username.replaceAll('_', '\\_');
+        }
         this.members = members;
 
         this.findDiscordUser(username);

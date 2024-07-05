@@ -5,7 +5,13 @@ class PlayerLastLogin {
     // online: If the player is currently online
     // lastLogin: Timestamp for when the player last logged in
     constructor(username, guildRank, online, lastLogin) {
-        this.username = username.replaceAll('_', '\\_');
+        // Temporary, remove if Wynn ever fixes the name changing guild bug
+        if (username === 'Owen_Rocks_3') {
+            this.username = 'Amber\\_Rocks\\_3';
+        } else {
+            this.username = username.replaceAll('_', '\\_');
+        }
+
         // Capitalise the first letter as the database stores full lower case
         this.guildRank = guildRank.charAt(0).toUpperCase() + guildRank.slice(1);
         this.online = online;
