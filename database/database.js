@@ -3,6 +3,7 @@ const fs = require('fs').promises;
 const sqlite3 = require('sqlite3').verbose();
 const database = new sqlite3.Database('database/database.db');
 const PlayerLastLogin = require('../message_objects/PlayerLastLogin');
+const GuildActiveHours = require('../message_objects/GuildActiveHours');
 const RATE_LIMIT = 180;
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -431,6 +432,32 @@ async function getLastLogins(guild) {
     return playerLastLogins;
 }
 
+// Gets the active hours for a specific guild.
+async function getActiveHours(guild, timezoneOffset, sortByActivity) {
+    const guildActiveHours = [];
+
+    for (let i = 0; i < 24; i++) {
+        const currentHour = i.toString().padStart(2, '0');
+        const averageKey = 'average' + currentHour;
+        const captainsKey = 'captains' + currentHour;
+
+        const query = 'SELECT ' + averageKey + ', ' + captainsKey + ' FROM guilds WHERE uuid = ?';
+        const result = await getAsync(query, [guild]);
+
+        if (result[averageKey] !== null && result[averageKey] !== -1) {
+            guildActiveHours.push(new GuildActiveHours(currentHour, result[averageKey], result[captainsKey], timezoneOffset));
+        }
+    }
+
+    if (sortByActivity) {
+        guildActiveHours.sort((a, b) => a.compareToActivity(b));
+    } else {
+        guildActiveHours.sort((a, b) => a.compareToTime(b));
+    }
+
+    return guildActiveHours;
+}
+
 // Returns the average playtime of the requested player.
 // If no playtime has yet been calculated it will return the playtime for the current week.
 async function getAveragePlaytime(player) {
@@ -583,6 +610,7 @@ module.exports = {
     findPlayer,
     updatePlayer,
     getLastLogins,
+    getActiveHours,
     getAveragePlaytime,
     setup,
 };

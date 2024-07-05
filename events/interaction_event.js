@@ -86,6 +86,227 @@ module.exports = {
 
                             break;
                         }
+                        case 'active_hours': {
+                            const activeHoursFunction = parts[2];
+
+                            let timezoneOffset;
+                            let sortByActivity;
+
+                            switch (activeHoursFunction) {
+                                case 'activity': {
+                                    const loadingEmbed = new EmbedBuilder()
+                                        .setDescription('Sorting by activity.')
+                                        .setColor(0x00ff00);
+
+                                    await interaction.editReply({
+                                        components: [],
+                                        embeds: [loadingEmbed],
+                                    });
+
+                                    timezoneOffset = parts[3];
+                                    sortByActivity = true;
+
+                                    break;
+                                }
+                                case 'time': {
+                                    const loadingEmbed = new EmbedBuilder()
+                                        .setDescription('Sorting by time.')
+                                        .setColor(0x00ff00);
+
+                                    await interaction.editReply({
+                                        components: [],
+                                        embeds: [loadingEmbed],
+                                    });
+
+                                    timezoneOffset = parts[3];
+                                    sortByActivity = false;
+
+                                    break;
+                                }
+                                default: {
+                                    const loadingEmbed = new EmbedBuilder()
+                                        .setDescription('Looking up active hours for selected guild.')
+                                        .setColor(0x00ff00);
+
+                                    await interaction.editReply({
+                                        components: [],
+                                        embeds: [loadingEmbed],
+                                    });
+
+                                    timezoneOffset = parts[2];
+                                    sortByActivity = parts[3];
+
+                                    break;
+                                }
+                            }
+
+                            try {
+                                const preferencesFile = 'preferences.json';
+
+                                let preferences = {};
+
+                                if (fs.existsSync(preferencesFile)) {
+                                    const fileData = fs.readFileSync(preferencesFile, 'utf-8');
+                                    preferences = JSON.parse(fileData);
+                                } else {
+                                    await fs.writeFileSync(preferencesFile, JSON.stringify(preferences, null, 2), 'utf-8');
+                                }
+
+                                preferences[interaction.user.id] = { timezoneOffset: timezoneOffset, sortByActivity: sortByActivity };
+
+                                await fs.writeFileSync(preferencesFile, JSON.stringify(preferences, null, 2), 'utf-8');
+                            } catch (error) {
+                                console.error('Failed to save timezone and activity preferences: ', error);
+                            }
+
+                            const response = await activeHours(interaction, true, timezoneOffset, sortByActivity);
+
+                            if (response.activity.length === 0) {
+                                const responseEmbed = new EmbedBuilder();
+
+                                responseEmbed
+                                    .setTitle('No Data')
+                                    .setDescription(`There is no activity data for ${response.guildName}, try again later.`)
+                                    .setColor(0xff0000);
+
+                                await interaction.editReply({ embeds: [responseEmbed] });
+
+                                return;
+                            } else {
+                                const responseEmbed = new EmbedBuilder();
+                                const timezoneRow = new ActionRowBuilder();
+                                const sortRow = new ActionRowBuilder();
+
+                                // Create string select menu with all timezone options
+                                const timezoneSelection = new StringSelectMenuBuilder()
+                                    .setCustomId('timezone')
+                                    .setPlaceholder('Select timezone!')
+                                    .addOptions(
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('PST')
+                                            .setDescription('UTC-8')
+                                            .setValue(`active_hours:${response.guildUuid}:-8:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('PDT')
+                                            .setDescription('UTC-7')
+                                            .setValue(`active_hours:${response.guildUuid}:-7:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('MDT')
+                                            .setDescription('UTC-6')
+                                            .setValue(`active_hours:${response.guildUuid}:-6:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('CDT')
+                                            .setDescription('UTC-5')
+                                            .setValue(`active_hours:${response.guildUuid}:-5:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('EDT')
+                                            .setDescription('UTC-4')
+                                            .setValue(`active_hours:${response.guildUuid}:-4:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('BRT')
+                                            .setDescription('UTC-3')
+                                            .setValue(`active_hours:${response.guildUuid}:-3:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('UTC')
+                                            .setDescription('UTC+0')
+                                            .setValue(`active_hours:${response.guildUuid}:0:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('BST')
+                                            .setDescription('UTC+1')
+                                            .setValue(`active_hours:${response.guildUuid}:1:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('CEST')
+                                            .setDescription('UTC+2')
+                                            .setValue(`active_hours:${response.guildUuid}:2:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('MSK')
+                                            .setDescription('UTC+3')
+                                            .setValue(`active_hours:${response.guildUuid}:3:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('GST')
+                                            .setDescription('UTC+4')
+                                            .setValue(`active_hours:${response.guildUuid}:4:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('IST')
+                                            .setDescription('UTC+5:30')
+                                            .setValue(`active_hours:${response.guildUuid}:5.5:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('CST/SNST')
+                                            .setDescription('UTC+8')
+                                            .setValue(`active_hours:${response.guildUuid}:8:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('JST')
+                                            .setDescription('UTC+9')
+                                            .setValue(`active_hours:${response.guildUuid}:9:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('AEST')
+                                            .setDescription('UTC+10')
+                                            .setValue(`active_hours:${response.guildUuid}:10:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('NZST')
+                                            .setDescription('UTC+12')
+                                            .setValue(`active_hours:${response.guildUuid}:12:${sortByActivity}`),
+                                );
+
+                                timezoneRow.addComponents(timezoneSelection);
+
+                                const activityOrderButton = new ButtonBuilder()
+                                    .setCustomId(`active_hours:${response.guildUuid}:activity:${timezoneOffset}`)
+                                    .setLabel('Sort by activity');
+
+                                const hourOrderButton = new ButtonBuilder()
+                                    .setCustomId(`active_hours:${response.guildUuid}:time:${timezoneOffset}`)
+                                    .setLabel('Sort by time');
+
+                                if (sortByActivity) {
+                                    activityOrderButton
+                                        .setStyle(ButtonStyle.Secondary)
+                                        .setDisabled(true);
+
+                                    hourOrderButton
+                                        .setStyle(ButtonStyle.Primary);
+                                } else {
+                                    activityOrderButton
+                                        .setStyle(ButtonStyle.Primary);
+
+                                    hourOrderButton
+                                        .setStyle(ButtonStyle.Secondary)
+                                        .setDisabled(true);
+                                }
+
+                                sortRow.addComponents(activityOrderButton);
+                                sortRow.addComponents(hourOrderButton);
+
+                                responseEmbed
+                                    .setTitle(`[${response.guildPrefix}] ${response.guildName} Active Hours (${response.timezone})`)
+                                    .setURL(`https://wynncraft.com/stats/guild/${response.guildName.replaceAll(' ', '%20')}`)
+                                    .setColor(0x00ffff);
+
+                                let timeValue = '';
+                                let averageValue = '';
+                                let captainsValue = '';
+
+                                for (const hour of response.activity) {
+                                    timeValue += hour.hour + '\n';
+                                    averageValue += hour.averageOnline + '\n';
+                                    captainsValue += hour.averageCaptains + '\n';
+                                }
+
+                                responseEmbed
+                                    .addFields(
+                                        { name: 'Time', value: timeValue, inline: true },
+                                        { name: 'Average Players', value: averageValue, inline: true },
+                                        { name: 'Average Captain+\'s', value: captainsValue, inline: true },
+                                    );
+
+                                await interaction.editReply({ 
+                                    components: [timezoneRow, sortRow],
+                                    embeds: [responseEmbed],
+                                });
+                            }
+
+                            break;
+                        }
                         case 'add_ally': {
                             const loadingEmbed = new EmbedBuilder()
                                 .setDescription('Adding selected guild as ally.')
@@ -534,6 +755,183 @@ module.exports = {
                             });
                             
                             break;
+                        }
+                    }
+                } else if (interaction.isStringSelectMenu()) {
+                    const parts = interaction.values[0].split(':');
+                    const functionToRun = parts[0];
+
+                    switch (functionToRun) {
+                        case 'active_hours': {
+                            const timezoneOffset = parts[2];
+                            const sortByActivity = parts[3];
+
+                            try {
+                                const preferencesPath = path.join(__dirname, '..');
+                                const preferencesFile = path.join(preferencesPath, 'preferences.json');
+
+                                let preferences = {};
+
+                                if (fs.existsSync(preferencesFile)) {
+                                    const fileData = fs.readFileSync(preferencesFile, 'utf-8');
+                                    preferences = JSON.parse(fileData);
+                                } else {
+                                    await fs.writeFileSync(preferencesFile, JSON.stringify(preferences, null, 2), 'utf-8');
+                                }
+
+                                preferences[interaction.user.id] = { timezoneOffset: timezoneOffset, sortByActivity: sortByActivity };
+
+                                await fs.writeFileSync(preferencesFile, JSON.stringify(preferences, null, 2), 'utf-8');
+                            } catch (error) {
+                                console.error(error);
+                                console.error('Failed to save timezone and activity preferences');
+                            }
+
+                            const response = await activeHours(interaction, true, timezoneOffset, sortByActivity);
+
+                            if (response.activity.length === 0) {
+                                const responseEmbed = new EmbedBuilder();
+
+                                responseEmbed
+                                    .setTitle('No Data')
+                                    .setDescription(`There is no activity data for ${response.guildName}, try again later.`)
+                                    .setColor(0xff0000);
+
+                                await interaction.editReply({ embeds: [responseEmbed] });
+
+                                return;
+                            } else {
+                                const responseEmbed = new EmbedBuilder();
+                                const timezoneRow = new ActionRowBuilder();
+                                const sortRow = new ActionRowBuilder();
+
+                                // Create string select menu with all timezone options
+                                const timezoneSelection = new StringSelectMenuBuilder()
+                                    .setCustomId('timezone')
+                                    .setPlaceholder('Select timezone!')
+                                    .addOptions(
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('PST')
+                                            .setDescription('UTC-8')
+                                            .setValue(`active_hours:${response.guildUuid}:-8:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('PDT')
+                                            .setDescription('UTC-7')
+                                            .setValue(`active_hours:${response.guildUuid}:-7:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('MDT')
+                                            .setDescription('UTC-6')
+                                            .setValue(`active_hours:${response.guildUuid}:-6:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('CDT')
+                                            .setDescription('UTC-5')
+                                            .setValue(`active_hours:${response.guildUuid}:-5:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('EDT')
+                                            .setDescription('UTC-4')
+                                            .setValue(`active_hours:${response.guildUuid}:-4:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('BRT')
+                                            .setDescription('UTC-3')
+                                            .setValue(`active_hours:${response.guildUuid}:-3:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('UTC')
+                                            .setDescription('UTC+0')
+                                            .setValue(`active_hours:${response.guildUuid}:0:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('BST')
+                                            .setDescription('UTC+1')
+                                            .setValue(`active_hours:${response.guildUuid}:1:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('CEST')
+                                            .setDescription('UTC+2')
+                                            .setValue(`active_hours:${response.guildUuid}:2:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('MSK')
+                                            .setDescription('UTC+3')
+                                            .setValue(`active_hours:${response.guildUuid}:3:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('GST')
+                                            .setDescription('UTC+4')
+                                            .setValue(`active_hours:${response.guildUuid}:4:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('IST')
+                                            .setDescription('UTC+5:30')
+                                            .setValue(`active_hours:${response.guildUuid}:5.5:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('CST/SNST')
+                                            .setDescription('UTC+8')
+                                            .setValue(`active_hours:${response.guildUuid}:8:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('JST')
+                                            .setDescription('UTC+9')
+                                            .setValue(`active_hours:${response.guildUuid}:9:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('AEST')
+                                            .setDescription('UTC+10')
+                                            .setValue(`active_hours:${response.guildUuid}:10:${sortByActivity}`),
+                                        new StringSelectMenuOptionBuilder()
+                                            .setLabel('NZST')
+                                            .setDescription('UTC+12')
+                                            .setValue(`active_hours:${response.guildUuid}:12:${sortByActivity}`),
+                                );
+
+                                timezoneRow.addComponents(timezoneSelection);
+
+                                const activityOrderButton = new ButtonBuilder()
+                                    .setCustomId(`active_hours:${response.guildUuid}:activity:${timezoneOffset}`)
+                                    .setLabel('Sort by activity');
+
+                                const hourOrderButton = new ButtonBuilder()
+                                    .setCustomId(`active_hours:${response.guildUuid}:time:${timezoneOffset}`)
+                                    .setLabel('Sort by time');
+
+                                if (sortByActivity) {
+                                    activityOrderButton
+                                        .setStyle(ButtonStyle.Secondary)
+                                        .setDisabled(true);
+
+                                    hourOrderButton
+                                        .setStyle(ButtonStyle.Primary);
+                                } else {
+                                    activityOrderButton
+                                        .setStyle(ButtonStyle.Primary);
+
+                                    hourOrderButton
+                                        .setStyle(ButtonStyle.Secondary)
+                                        .setDisabled(true);
+                                }
+
+                                sortRow.addComponents(activityOrderButton);
+                                sortRow.addComponents(hourOrderButton);
+
+                                responseEmbed
+                                    .setTitle(`[${response.guildPrefix}] ${response.guildName} Active Hours (${response.timezone})`)
+                                    .setURL(`https://wynncraft.com/stats/guild/${response.guildName.replaceAll(' ', '%20')}`)
+                                    .setColor(0x00ffff);
+
+                                let timeValue = '';
+                                let averageValue = '';
+                                let captainsValue = '';
+
+                                for (const hour of response.activity) {
+                                    timeValue += hour.hour + '\n';
+                                    averageValue += hour.averageOnline + '\n';
+                                    captainsValue += hour.averageCaptains + '\n';
+                                }
+
+                                responseEmbed
+                                    .addFields(
+                                        { name: 'Time', value: timeValue, inline: true },
+                                        { name: 'Average Players', value: averageValue, inline: true },
+                                        { name: 'Average Captain+\'s', value: captainsValue, inline: true },
+                                    );
+
+                                await interaction.editReply({ 
+                                    components: [timezoneRow, sortRow],
+                                    embeds: [responseEmbed],
+                                });
+                            }
                         }
                     }
                 }
