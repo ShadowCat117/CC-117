@@ -32,7 +32,6 @@ const removeDemotionException = require('../functions/remove_demotion_exception'
 const removeInactivityException = require('../functions/remove_inactivity_exception');
 const removePromotionException = require('../functions/remove_promotion_exception');
 const updatePlayer = require('../functions/update_player');
-const registerUser = require('../functions/register_user');
 const banPlayer = require('../functions/ban_player');
 const unbanPlayer = require('../functions/unban_player');
 const messages = require('../functions/messages');
