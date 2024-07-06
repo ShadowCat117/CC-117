@@ -350,6 +350,186 @@ module.exports = {
 
                             break;
                         }
+                        case 'add_demotion_exception': {
+                            const loadingEmbed = new EmbedBuilder()
+                                .setDescription('Adding demotion exception for selected player')
+                                .setColor(0x00ff00);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [loadingEmbed],
+                            });
+
+                            const response = await addDemotionException(interaction, true, interaction.message.embeds[0].footer.text);
+
+                            const responseEmbed = new EmbedBuilder();
+
+                            if (response.error) {
+                                responseEmbed
+                                    .setTitle('Error')
+                                    .setDescription(`Unable to add demotion exception: ${response.error}`)
+                                    .setColor(0xff0000);
+                            } else {
+                                if (response.username === '') {
+                                    // Unknown player
+                                    responseEmbed
+                                        .setTitle('Invalid username')
+                                        .setDescription(`Unable to find a player using the name '${interaction.options.getString('username')}', try again using the exact player name.`)
+                                        .setColor(0xff0000);
+                                } else {
+                                    // Valid player
+                                    let duration;
+
+                                    if (response.duration === -1) {
+                                        duration = 'Exempt from demotions forever';
+                                    } else {
+                                        duration = `Exempt from demotions for ${response.duration} day${response.duration > 1 ? 's' : ''}`;
+                                    }
+
+                                    responseEmbed
+                                        .setTitle(`${response.username} is now exempt from demotions`)
+                                        .addFields({ name: 'Duration', value: `${duration}` })
+                                        .setColor(0x00ffff);
+                                }
+                            }
+                
+                            await interaction.editReply({ embeds: [responseEmbed] });
+
+                            break;
+                        }
+                        case 'add_inactivity_exception': {
+                            const loadingEmbed = new EmbedBuilder()
+                                .setDescription('Adding inactivity exception for selected player')
+                                .setColor(0x00ff00);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [loadingEmbed],
+                            });
+
+                            const response = await addInactivityException(interaction, true, interaction.message.embeds[0].footer.text);
+
+                            const responseEmbed = new EmbedBuilder();
+
+                            if (response.error) {
+                                responseEmbed
+                                    .setTitle('Error')
+                                    .setDescription(`Unable to add inactivity exception: ${response.error}`)
+                                    .setColor(0xff0000);
+                            } else {
+                                if (response.username === '') {
+                                    // Unknown player
+                                    responseEmbed
+                                        .setTitle('Invalid username')
+                                        .setDescription(`Unable to find a player using the name '${interaction.options.getString('username')}', try again using the exact player name.`)
+                                        .setColor(0xff0000);
+                                } else {
+                                    // Valid player
+                                    let duration;
+
+                                    if (response.duration === -1) {
+                                        duration = 'Exempt from inactivity forever';
+                                    } else {
+                                        duration = `Allowed to be inactive for ${response.duration} day${response.duration > 1 ? 's' : ''}`;
+                                    }
+
+                                    responseEmbed
+                                        .setTitle(`${response.username} now has a custom inactivity threshold`)
+                                        .addFields({ name: 'Duration', value: `${duration}` })
+                                        .setColor(0x00ffff);
+                                }
+                            }
+                
+                            await interaction.editReply({ embeds: [responseEmbed] });
+
+                            break;
+                        }
+                        case 'add_promotion_exception': {
+                            const loadingEmbed = new EmbedBuilder()
+                                .setDescription('Adding promotion exception for selected player')
+                                .setColor(0x00ff00);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [loadingEmbed],
+                            });
+
+                            const response = await addPromotionException(interaction, true, interaction.message.embeds[0].footer.text);
+
+                            const responseEmbed = new EmbedBuilder();
+
+                            if (response.error) {
+                                responseEmbed
+                                    .setTitle('Error')
+                                    .setDescription(`Unable to add promotion exception: ${response.error}`)
+                                    .setColor(0xff0000);
+                            } else {
+                                if (response.username === '') {
+                                    // Unknown player
+                                    responseEmbed
+                                        .setTitle('Invalid username')
+                                        .setDescription(`Unable to find a player using the name '${interaction.options.getString('username')}', try again using the exact player name.`)
+                                        .setColor(0xff0000);
+                                } else {
+                                    // Valid player
+                                    let duration;
+
+                                    if (response.duration === -1) {
+                                        duration = 'Exempt from promotions forever';
+                                    } else {
+                                        duration = `Exempt from promotions for ${response.duration} day${response.duration > 1 ? 's' : ''}`;
+                                    }
+                
+                                    responseEmbed
+                                        .setTitle(`${response.username} is now exempt from promotions`)
+                                        .addFields({ name: 'Duration', value: `${duration}` })
+                                        .setColor(0x00ffff);
+                                }
+                            }
+                
+                            await interaction.editReply({ embeds: [responseEmbed] });
+
+                            break;
+                        }
+                        case 'ban_player': {
+                            const loadingEmbed = new EmbedBuilder()
+                                .setDescription('Banning selected player')
+                                .setColor(0x00ff00);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [loadingEmbed],
+                            });
+
+                            const response = await banPlayer(interaction, true, interaction.message.embeds[0].footer.text);
+
+                            const responseEmbed = new EmbedBuilder();
+
+                            if (response.error) {
+                                responseEmbed
+                                    .setTitle('Error')
+                                    .setDescription(`Unable to ban player: ${response.error}`)
+                                    .setColor(0xff0000);
+                            } else {
+                                if (response.username === '') {
+                                    // Unknown player
+                                    responseEmbed
+                                        .setTitle('Invalid username')
+                                        .setDescription(`Unable to find a player using the name '${interaction.options.getString('username')}', try again using the exact player name.`)
+                                        .setColor(0xff0000);
+                                } else {
+                                    // Valid player
+                                    responseEmbed
+                                        .setTitle(`${response.username} has been banned from your guild`)
+                                        .addFields({ name: 'Reason', value: `${response.reason}` })
+                                        .setColor(0x00ffff);
+                                }
+                            }
+                
+                            await interaction.editReply({ embeds: [responseEmbed] });
+
+                            break;
+                        }
                         case 'last_logins': {
                             const loadingEmbed = new EmbedBuilder()
                                 .setDescription('Loading last logins for selected guild')
@@ -457,45 +637,6 @@ module.exports = {
                             } else {
                                 await interaction.editReply({ embeds: [embeds[0]] });
                             }
-
-                            break;
-                        }
-                        case 'ban_player': {
-                            const loadingEmbed = new EmbedBuilder()
-                                .setDescription('Banning selected player')
-                                .setColor(0x00ff00);
-
-                            await interaction.editReply({
-                                components: [],
-                                embeds: [loadingEmbed],
-                            });
-
-                            const response = await banPlayer(interaction, true, interaction.message.embeds[0].footer.text);
-
-                            const responseEmbed = new EmbedBuilder();
-
-                            if (response.error) {
-                                responseEmbed
-                                    .setTitle('Error')
-                                    .setDescription(`Unable to ban player: ${response.error}`)
-                                    .setColor(0xff0000);
-                            } else {
-                                if (response.username === '') {
-                                    // Unknown player
-                                    responseEmbed
-                                        .setTitle('Invalid username')
-                                        .setDescription(`Unable to find a player using the name '${interaction.options.getString('username')}', try again using the exact player name.`)
-                                        .setColor(0xff0000);
-                                } else {
-                                    // Valid player
-                                    responseEmbed
-                                        .setTitle(`${response.username} has been banned from your guild`)
-                                        .addFields({ name: 'Reason', value: `${response.reason}` })
-                                        .setColor(0x00ffff);
-                                }
-                            }
-                
-                            await interaction.editReply({ embeds: [responseEmbed] });
 
                             break;
                         }

@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
-const findPlayer = require('../database/database');
+const database = require('../database/database');
 
-async function addPromotionException(interaction, force = false, exemptionPeriod = -1) {
+async function addPromotionException(interaction, force = false, duration = -1) {
     const guildId = interaction.guild.id;
     const filePath = path.join(__dirname, '..', 'configs', `${guildId}.json`);
 
@@ -14,76 +14,60 @@ async function addPromotionException(interaction, force = false, exemptionPeriod
             config = JSON.parse(fileData);
         }
 
-        const guildName = config.guildName;
-
         let nameToSearch;
 
         if (interaction.options !== undefined) {
             nameToSearch = interaction.options.getString('username');
-        } else if (interaction.customId) {
-            nameToSearch = interaction.customId;
-        }
+            duration = interaction.options.getInteger('duration');
 
-        const player = await findPlayer(nameToSearch, guildName, force);
+            if (!duration) {
+                duration = -1;
+            }
+        } else if (interaction.customId) {
+            nameToSearch = interaction.customId.split(':')[1];
+        }
+    
+        const player = await database.findPlayer(nameToSearch, force);
 
         if (player && player.message === 'Multiple possibilities found') {
-            let textMessage = `Multiple players found with the username: ${nameToSearch}.`;
-    
-            for (let i = 0; i < player.playerUuids.length; i++) {
-                const uuid = player.playerUuids[i];
-                const playerUsername = player.playerUsernames[i];
-                const rank = player.playerRanks[i];
-                const guildRank = player.playerGuildRanks[i];
-                const playerGuildName = player.playerGuildNames[i];
-
-                if (!rank && !playerGuildName) {
-                    textMessage += `\n${i + 1}. ${playerUsername} (UUID: ${uuid})`;
-                } else if (!rank) {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${guildRank} of ${playerGuildName}. (UUID: ${uuid})`;
-                } else if (!playerGuildName) {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${rank}. (UUID: ${uuid})`;
-                } else {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${rank} and ${guildRank} of ${playerGuildName}. (UUID: ${uuid})`;
-                }
-            }
-    
-            textMessage += `\nClick button to choose player to add promotion exception for ${exemptionPeriod} day(s).`;
-            }
-
-        if (!player) {
+            return {
+                playerUuids: player.playerUuids,
+                playerUsernames: player.playerUsernames,
+                playerRanks: player.playerRanks,
+                playerGuildRanks: player.playerGuildRanks,
+                playerGuildNames: player.playerGuildNames,
+                duration: duration,
+            };
         }
 
-        if (interaction.message) {
-            // Get exemption period from message content
-            const messageContent = interaction.message.content;
-            const regex = /for\s(-?\d+)/;
-            const match = messageContent.match(regex);
-            exemptionPeriod = match ? match[1] : exemptionPeriod;
-
-            exemptionPeriod = parseInt(exemptionPeriod);
+        if (!player) {
+            return ({ error: `Unknown player ${nameToSearch}` });
         }
 
         if (!config['promotionExceptions']) {
             config['promotionExceptions'] = {};
         }
 
-        if (config['promotionExceptions'][player.username] === exemptionPeriod) {
-            if (exemptionPeriod === -1) {
-            } else if (exemptionPeriod === 1) {
+        if (config['promotionExceptions'][player.username] === duration) {
+            let durationStr;
+
+            if (duration === -1) {
+                durationStr = `${player.username} is already exempt from promotions forever`;
             } else {
+                durationStr = `${player.username} is already exempt from promotions for ${duration} day${duration > 1 ? 's' : ''}.`;
             }
+
+            return ({ error: `${durationStr}` });
         }
 
-        config['promotionExceptions'][player.username] = exemptionPeriod;
+        config['promotionExceptions'][player.username] = duration;
 
         fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
-        if (exemptionPeriod === -1) {
-        } else if (exemptionPeriod === 1) {
-        } else {
-        }
+        return ({ username: player.username, duration: duration });
     } catch (err) {
         console.log(err);
+        return ({ error: 'Error trying to add promotion exception.' });
     }
 }
 

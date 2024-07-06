@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
-const findPlayer = require('../database/database');
+const database = require('../database/database');
 
-async function addInactivityException(interaction, force = false, inactivityThreshold = -1) {
+async function addInactivityException(interaction, force = false, duration = -1) {
     const guildId = interaction.guild.id;
     const filePath = path.join(__dirname, '..', 'configs', `${guildId}.json`);
 
@@ -14,74 +14,60 @@ async function addInactivityException(interaction, force = false, inactivityThre
             config = JSON.parse(fileData);
         }
 
-        const guildName = config.guildName;
-
         let nameToSearch;
 
         if (interaction.options !== undefined) {
             nameToSearch = interaction.options.getString('username');
-        } else if (interaction.customId) {
-            nameToSearch = interaction.customId;
-        }
+            duration = interaction.options.getInteger('duration');
 
-        const player = await findPlayer(nameToSearch, guildName, force);
+            if (!duration) {
+                duration = -1;
+            }
+        } else if (interaction.customId) {
+            nameToSearch = interaction.customId.split(':')[1];
+        }
+    
+        const player = await database.findPlayer(nameToSearch, force);
 
         if (player && player.message === 'Multiple possibilities found') {
-            let textMessage = `Multiple players found with the username: ${nameToSearch}.`;
-    
-            for (let i = 0; i < player.playerUuids.length; i++) {
-                const uuid = player.playerUuids[i];
-                const playerUsername = player.playerUsernames[i];
-                const rank = player.playerRanks[i];
-                const guildRank = player.playerGuildRanks[i];
-                const playerGuildName = player.playerGuildNames[i];
-
-                if (!rank && !playerGuildName) {
-                    textMessage += `\n${i + 1}. ${playerUsername} (UUID: ${uuid})`;
-                } else if (!rank) {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${guildRank} of ${playerGuildName}. (UUID: ${uuid})`;
-                } else if (!playerGuildName) {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${rank}. (UUID: ${uuid})`;
-                } else {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${rank} and ${guildRank} of ${playerGuildName}. (UUID: ${uuid})`;
-                }
-            }
-    
-            textMessage += `\nClick button to choose player to add inactivity exception for ${inactivityThreshold} day(s).`;
-            }
-
-        if (!player) {
+            return {
+                playerUuids: player.playerUuids,
+                playerUsernames: player.playerUsernames,
+                playerRanks: player.playerRanks,
+                playerGuildRanks: player.playerGuildRanks,
+                playerGuildNames: player.playerGuildNames,
+                duration: duration,
+            };
         }
 
-        if (interaction.message) {
-            // Get exemption period from message content
-            const messageContent = interaction.message.content;
-            const regex = /for\s(-?\d+)/;
-            const match = messageContent.match(regex);
-            inactivityThreshold = match ? match[1] : inactivityThreshold;
-
-            inactivityThreshold = parseInt(inactivityThreshold);
+        if (!player) {
+            return ({ error: `Unknown player ${nameToSearch}` });
         }
 
         if (!config['inactivityExceptions']) {
             config['inactivityExceptions'] = {};
         }
 
-        if (config['inactivityExceptions'][player.username] === inactivityThreshold) {
-            if (inactivityThreshold === -1) {
+        if (config['inactivityExceptions'][player.username] === duration) {
+            let durationStr;
+
+            if (duration === -1) {
+                durationStr = `${player.username} is already allowed to be inactive forever`;
             } else {
+                durationStr = `${player.username} is already allowed to be inactive for ${duration} day${duration > 1 ? 's' : ''}.`;
             }
+
+            return ({ error: `${durationStr}` });
         }
 
-        config['inactivityExceptions'][player.username] = inactivityThreshold;
+        config['inactivityExceptions'][player.username] = duration;
 
         fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
-        if (inactivityThreshold === -1) {
-        } else {
-        }
+        return ({ username: player.username, duration: duration });
     } catch (err) {
         console.log(err);
+        return ({ error: 'Error trying to add inactivity exception.' });
     }
 }
 
