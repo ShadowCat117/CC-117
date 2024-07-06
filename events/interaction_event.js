@@ -794,6 +794,44 @@ module.exports = {
                             
                             break;
                         }
+                        case 'unban_player': {
+                            const loadingEmbed = new EmbedBuilder()
+                                .setDescription('Unbanning selected player')
+                                .setColor(0x00ff00);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [loadingEmbed],
+                            });
+
+                            const response = await unbanPlayer(interaction, true);
+
+                            const responseEmbed = new EmbedBuilder();
+
+                            if (response.error) {
+                                responseEmbed
+                                    .setTitle('Error')
+                                    .setDescription(`Unable to unban player: ${response.error}`)
+                                    .setColor(0xff0000);
+                            } else {
+                                if (response.username === '') {
+                                    // Unknown player
+                                    responseEmbed
+                                        .setTitle('Invalid username')
+                                        .setDescription(`Unable to find a player using the name '${interaction.options.getString('username')}', try again using the exact player name.`)
+                                        .setColor(0xff0000);
+                                } else {
+                                    // Valid player
+                                    responseEmbed
+                                        .setTitle(`${response.username} has been unbanned from your guild`)
+                                        .setColor(0x00ffff);
+                                }
+                            }
+                
+                            await interaction.editReply({ embeds: [responseEmbed] });
+
+                            break;
+                        }
                     }
                 } else if (interaction.isStringSelectMenu()) {
                     const parts = interaction.values[0].split(':');

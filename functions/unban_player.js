@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const findPlayer = require('../database/database');
+const database = require('../database/database');
 
 async function unbanPlayer(interaction, force = false) {
     const guildId = interaction.guild.id;
@@ -14,50 +14,43 @@ async function unbanPlayer(interaction, force = false) {
             config = JSON.parse(fileData);
         }
 
-        const guildName = config.guildName;
-
         let nameToSearch;
 
         if (interaction.options !== undefined) {
             nameToSearch = interaction.options.getString('username');
         } else if (interaction.customId) {
-            nameToSearch = interaction.customId;
+            nameToSearch = interaction.customId.split(':')[1];
         }
-
-        const player = await findPlayer(nameToSearch, '', force);
+    
+        const player = await database.findPlayer(nameToSearch, force);
 
         if (player && player.message === 'Multiple possibilities found') {
-            let textMessage = `Multiple players found with the username: ${nameToSearch}.`;
-    
-            for (let i = 0; i < player.playerUuids.length; i++) {
-                const uuid = player.playerUuids[i];
-                const playerUsername = player.playerUsernames[i];
-                const rank = player.playerRanks[i];
-                const guildRank = player.playerGuildRanks[i];
-                const playerGuildName = player.playerGuildNames[i];
+            return {
+                playerUuids: player.playerUuids,
+                playerUsernames: player.playerUsernames,
+                playerRanks: player.playerRanks,
+                playerGuildRanks: player.playerGuildRanks,
+                playerGuildNames: player.playerGuildNames,
+            };
+        }
 
-                if (!rank && !playerGuildName) {
-                    textMessage += `\n${i + 1}. ${playerUsername} (UUID: ${uuid})`;
-                } else if (!rank) {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${guildRank} of ${playerGuildName}. (UUID: ${uuid})`;
-                } else if (!playerGuildName) {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${rank}. (UUID: ${uuid})`;
-                } else {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${rank} and ${guildRank} of ${playerGuildName}. (UUID: ${uuid})`;
-                }
-            }
-    
-            textMessage += '\nClick button to choose player.';
-            }
+        if (!player) {
+            return ({ error: `Unknown player ${nameToSearch}` });
+        }
 
         if (!config['bannedPlayers'] || !config['bannedPlayers'][player.username]) {
+            return ({ error: `${player.username} is not banned.` });
         }
+
 
         delete config['bannedPlayers'][player.username];
 
         fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
+
+        return ({ username: player.username });
     } catch (err) {
         console.log(err);
+        return ({ error: 'Error trying to unban user.' });
     }
 }
 
