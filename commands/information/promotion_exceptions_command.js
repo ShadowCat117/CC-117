@@ -13,12 +13,12 @@ const PagedMessage = require('../../message_objects/PagedMessage');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('demotionexceptions')
-        .setDescription('Check who in your guild is exempt from demotion.'),
+        .setName('promotionexceptions')
+        .setDescription('Check who in your guild is exempt from promotion.'),
     ephemeral: true,
     async execute(interaction) {
         const loadingEmbed = new EmbedBuilder()
-            .setDescription('Loading demotion exceptions.')
+            .setDescription('Loading promotion exceptions.')
             .setColor(0x00ff00);
 
         const message = await interaction.editReply({ embeds: [loadingEmbed] });
@@ -71,40 +71,40 @@ module.exports = {
                 }
             }
 
-            // No players are exempt from demotion
-            if (!config['demotionExceptions'] || Object.keys(config['demotionExceptions']).length === 0) {
+            // No players are exempt from promotion
+            if (!config['promotionExceptions'] || Object.keys(config['promotionExceptions']).length === 0) {
                 responseEmbed
                     .setTitle('Error')
-                    .setDescription('No players are currently exempt from being demoted.')
+                    .setDescription('No players are currently exempt from being promoted.')
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
             }
 
-            if (Object.keys(config['demotionExceptions']).length > 25) {
+            if (Object.keys(config['promotionExceptions']).length > 25) {
                 const embeds = [];
                 const row = new ActionRowBuilder();
 
                 const pages = [];
-                for (let i = 0; i < Object.keys(config['demotionExceptions']).length; i += 25) {
-                    pages.push(Object.keys(config['demotionExceptions']).slice(i, i + 25));
+                for (let i = 0; i < Object.keys(config['promotionExceptions']).length; i += 25) {
+                    pages.push(Object.keys(config['promotionExceptions']).slice(i, i + 25));
                 }
 
                 for (const page of pages) {
                     const pageEmbed = new EmbedBuilder();
 
                     pageEmbed
-                        .setTitle(`${guildName} Demotion Exceptions`)
-                        .setDescription('These players are exempt from being demoted.')
+                        .setTitle(`${guildName} Promotion Exceptions`)
+                        .setDescription('These players are exempt from being promoted.')
                         .setColor(0x00ffff);
 
                     for (const player in page) {
                         let duration;
 
-                        if (config['demotionExceptions'][page[player]] === -1) {
-                            duration = 'Exempt from demotions forever';
+                        if (config['promotionExceptions'][page[player]] === -1) {
+                            duration = 'Exempt from promotions forever';
                         } else {
-                            duration = `Exempt from demotions for ${config['demotionExceptions'][page[player]]} day${config['demotionExceptions'][page[player]] > 1 ? 's' : ''}`;
+                            duration = `Exempt from promotions for ${config['promotionExceptions'][page[player]]} day${config['promotionExceptions'][page[player]] > 1 ? 's' : ''}`;
                         }
 
                         pageEmbed.addFields({ name: page[player], value: duration });
@@ -133,17 +133,17 @@ module.exports = {
                 });
             } else {
                 responseEmbed
-                    .setTitle(`${guildName} Demotion Exceptions`)
-                    .setDescription('These players are exempt from being demoted.')
+                    .setTitle(`${guildName} Promotion Exceptions`)
+                    .setDescription('These players are exempt from being promoted.')
                     .setColor(0x00ffff);
 
-                for (const player in config['demotionExceptions']) {
+                for (const player in config['promotionExceptions']) {
                     let duration;
 
-                    if (config['demotionExceptions'][player] === -1) {
-                        duration = 'Exempt from demotions forever';
+                    if (config['promotionExceptions'][player] === -1) {
+                        duration = 'Exempt from promotions forever';
                     } else {
-                        duration = `Exempt from demotions for ${config['demotionExceptions'][player]} day${config['demotionExceptions'][player] > 1 ? 's' : ''}`;
+                        duration = `Exempt from promotions for ${config['promotionExceptions'][player]} day${config['promotionExceptions'][player] > 1 ? 's' : ''}`;
                     }
                     
                     responseEmbed.addFields({ name: player, value: duration });
@@ -155,7 +155,7 @@ module.exports = {
             console.log(error);
             responseEmbed
                     .setTitle('Error')
-                    .setDescription('Error viewing demotion exceptions.')
+                    .setDescription('Error viewing promotion exceptions.')
                     .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
