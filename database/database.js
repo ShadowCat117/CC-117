@@ -298,10 +298,8 @@ async function updatePlayerActivity() {
         const now = new Date();
         const currentTimestamp = now.toISOString();
 
-        // Get current average at current hour
-        const query = 'SELECT uuid, sessionStart, weeklyPlaytime, averagePlaytime, averageCount FROM players WHERE weeklyPlaytime != 0 OR sessionStart IS NOT NULL';
         // Get all players and their weekly playtimes
-        const players = await allAsync(query);
+        const players = await allAsync('SELECT uuid, sessionStart, weeklyPlaytime, averagePlaytime, averageCount FROM players');
 
         for (const player of players) {
             let newSessionStart = null;
