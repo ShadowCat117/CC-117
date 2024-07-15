@@ -594,7 +594,7 @@ async function setup() {
     await runAsync('CREATE INDEX IF NOT EXISTS idx_guildName ON guilds (name);');
 
     // If the players table does not exist, create it
-    await runAsync('CREATE TABLE IF NOT EXISTS players (uuid TEXT NOT NULL PRIMARY KEY, username TEXT, guildUuid TEXT, guildRank TEXT, online BOOLEAN, lastLogin TEXT, supportRank TEXT, veteran BOOLEAN, serverRank, TEXT, wars INT, highestCharacterLevel INT, sessionStart TEXT, weeklyPlaytime DECIMAL, averagePlaytime DECIMAL, averageCount INT, FOREIGN KEY (guildUuid) REFERENCES guilds(uuid));');
+    await runAsync('CREATE TABLE IF NOT EXISTS players (uuid TEXT NOT NULL PRIMARY KEY, username TEXT, guildUuid TEXT, guildRank TEXT, online BOOLEAN, lastLogin TEXT, supportRank TEXT, veteran BOOLEAN, serverRank TEXT, wars INT, highestCharacterLevel INT, sessionStart TEXT, weeklyPlaytime DECIMAL, averagePlaytime DECIMAL, averageCount INT, FOREIGN KEY (guildUuid) REFERENCES guilds(uuid));');
     await runAsync('CREATE INDEX IF NOT EXISTS idx_playerGuild ON players (guildUuid);');
 
     console.log('Database setup complete');
