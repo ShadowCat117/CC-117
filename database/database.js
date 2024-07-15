@@ -187,7 +187,7 @@ async function handleOnlinePlayers(onlinePlayers) {
                 }
             } else {
                 // Insert new player with available details
-                await runAsync('INSERT INTO players (uuid, username, guildUuid, guildRank, online, lastLogin, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, null, null, null, true, ?, -1, -1, ?, 0, -1, 0)', [uuid, now.toISOString(), now.toISOString()]);
+                await runAsync('INSERT INTO players (uuid, username, guildUuid, guildRank, online, lastLogin, serverRank, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, null, null, null, true, ?, null, -1, -1, ?, 0, -1, 0)', [uuid, now.toISOString(), now.toISOString()]);
             }
         }
 
@@ -350,10 +350,10 @@ async function updatePlayer(player) {
 
     if (existingPlayer) {
         // Update existing player, don't update online or lastLogin as that is handled elsewhere
-        await runAsync('UPDATE players SET username = ?, guildUuid = ?, guildRank = ?, supportRank = ?, veteran = ?, wars = ?, highestCharacterLevel = ? WHERE uuid = ?', [player.username, player.guildUuid, player.guildRank, player.supportRank, player.veteran, player.wars, player.highestCharcterLevel, player.uuid]);
+        await runAsync('UPDATE players SET username = ?, guildUuid = ?, guildRank = ?, supportRank = ?, veteran = ?, serverRank = ?, wars = ?, highestCharacterLevel = ? WHERE uuid = ?', [player.username, player.guildUuid, player.guildRank, player.supportRank, player.veteran, player.serverRank, player.wars, player.highestCharcterLevel, player.uuid]);
     } else {
         // Insert new player
-        await runAsync('INSERT INTO players (uuid, username, guildUuid, guildRank, online, lastLogin, supportRank, veteran, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, 0, -1, 0)', [player.uuid, player.username, player.guildUuid, player.guildRank, player.online, player.lastLogin, player.supportRank, player.veteran, player.wars, player.highestCharcterLevel]);
+        await runAsync('INSERT INTO players (uuid, username, guildUuid, guildRank, online, lastLogin, supportRank, veteran, serverRank, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, 0, -1, 0)', [player.uuid, player.username, player.guildUuid, player.guildRank, player.online, player.lastLogin, player.supportRank, player.veteran, player.serverRank, player.wars, player.highestCharcterLevel]);
     }
 }
 
@@ -405,7 +405,7 @@ async function getLastLogins(guild) {
 
                         const veteran = playerJson.veteran ? playerJson.veteran : 0;
 
-                        await runAsync('INSERT INTO players (uuid, username, guildUuid, guildRank, online, lastLogin, supportRank, veteran, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, 0, -1, 0)', [playerJson.uuid, playerJson.username, guild, rank, playerJson.online, playerJson.lastJoin, playerJson.supportRank, veteran, playerJson.globalData.wars, highestCharcterLevel]);
+                        await runAsync('INSERT INTO players (uuid, username, guildUuid, guildRank, online, lastLogin, supportRank, veteran, serverRank, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, 0, -1, 0)', [playerJson.uuid, playerJson.username, guild, rank, playerJson.online, playerJson.lastJoin, playerJson.supportRank, veteran, playerJson.rank, playerJson.globalData.wars, highestCharcterLevel]);
                     }
                 }
             }
@@ -594,7 +594,7 @@ async function setup() {
     await runAsync('CREATE INDEX IF NOT EXISTS idx_guildName ON guilds (name);');
 
     // If the players table does not exist, create it
-    await runAsync('CREATE TABLE IF NOT EXISTS players (uuid TEXT NOT NULL PRIMARY KEY, username TEXT, guildUuid TEXT, guildRank TEXT, online BOOLEAN, lastLogin TEXT, supportRank TEXT, veteran BOOLEAN, wars INT, highestCharacterLevel INT, sessionStart TEXT, weeklyPlaytime DECIMAL, averagePlaytime DECIMAL, averageCount INT, FOREIGN KEY (guildUuid) REFERENCES guilds(uuid));');
+    await runAsync('CREATE TABLE IF NOT EXISTS players (uuid TEXT NOT NULL PRIMARY KEY, username TEXT, guildUuid TEXT, guildRank TEXT, online BOOLEAN, lastLogin TEXT, supportRank TEXT, veteran BOOLEAN, serverRank, TEXT, wars INT, highestCharacterLevel INT, sessionStart TEXT, weeklyPlaytime DECIMAL, averagePlaytime DECIMAL, averageCount INT, FOREIGN KEY (guildUuid) REFERENCES guilds(uuid));');
     await runAsync('CREATE INDEX IF NOT EXISTS idx_playerGuild ON players (guildUuid);');
 
     console.log('Database setup complete');

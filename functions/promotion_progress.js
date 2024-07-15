@@ -322,6 +322,20 @@ async function promotionProgress(interaction, force = false) {
             }
         }
 
+        database.updatePlayer({
+            uuid: playerJson.uuid,
+            username: playerJson.username,
+            guildUuid: playerJson.guild.uuid,
+            guildRank: guildRank,
+            online: playerJson.online,
+            lastLogin: playerJson.lastJoin,
+            supportRank: playerJson.supportRank,
+            veteran: playerJson.veteran,
+            serverRank: playerJson.rank,
+            wars: playerJson.globalData.wars,
+            highestCharcterLevel: highestCharcterLevel,
+        });
+
         return ({
             uuid: playerJson.uuid,
             username: playerJson.username,

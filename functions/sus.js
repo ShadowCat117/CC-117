@@ -139,6 +139,7 @@ async function sus(interaction, force = false) {
         lastLogin: playerJson.lastJoin,
         supportRank: playerJson.supportRank,
         veteran: playerJson.veteran,
+        serverRank: playerJson.rank,
         wars: playerJson.globalData.wars,
         highestCharcterLevel: highestCharcterLevel,
     });
