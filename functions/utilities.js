@@ -35,7 +35,7 @@ async function findDiscordUser(serverMembers, username) {
 
 async function checkValidUsername(memberToCheck, guild, nameToCheck) {
     // Temporary, remove if Wynn ever fixes the name changing guild bug
-    if (nameToCheck.toLowerCase() === 'owen_rocks_3') return false;
+    if (nameToCheck.toLowerCase() === 'owen_rocks_3' && memberToCheck.id !== '753700961364738158') return false;
     
     // Loop through all server members
     for (const member of guild.members.cache) {

@@ -78,7 +78,14 @@ async function verify(interaction, force = false) {
         }
     }
 
-    const playerInfo = new PlayerInfo(playerJson.username, guildName, guildPrefix, guildRank, supportRank, veteran, serverRank, highestCharcterLevel);
+    let username = playerJson.username;
+
+    // Temporary, remove if Wynn ever fixes the name changing guild bug
+    if (username === 'Owen_Rocks_3') {
+        username = 'Amber_Rocks_3';
+    }
+
+    const playerInfo = new PlayerInfo(username, guildName, guildPrefix, guildRank, supportRank, veteran, serverRank, highestCharcterLevel);
 
     const response = await applyRoles(interaction.guild, interaction.member, playerInfo);
 

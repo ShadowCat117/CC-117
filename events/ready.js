@@ -1,9 +1,10 @@
-const { ActivityType, Events } = require('discord.js');
+const { ActivityType, Events, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const updateRoles = require('../functions/update_roles');
 const database = require('../database/database');
 const messages = require('../functions/messages');
 const fs = require('fs');
 const path = require('path');
+const PagedMessage = require('../message_objects/PagedMessage');
 let client;
 
 // Tasks to be ran every hour
@@ -39,10 +40,114 @@ async function hourlyTasks() {
                     console.log(`Updating roles for ${guild}`);
                     const response = await updateRoles(guild);
 
-                    // Only send a message to their log channel if any members were updated
-                    // and currently ignore the problem message whilst it's persisting a lot
-                    if (response !== 'Updated roles for 0 members.' && response !== 'Updated roles for 0 members. (interrupted)' && response !== 'Problem updating roles') {
+                    // Only send a message if log channel is enabled and valid and any changes were made.
+                    if (response.length !== 0 && config.logMessages && config.logChannel) {
+                        const embeds = [];
+                        const row = new ActionRowBuilder();
+
+                        if (response.length > 5) {
+                            const pages = [];
+                            for (let i = 0; i < response.length; i += 5) {
+                                pages.push(response.slice(i, i + 5));
+                            }
+                
+                            for (const page of pages) {
+                                const responseEmbed = new EmbedBuilder();
+                
+                                responseEmbed
+                                    .setTitle(`Updated roles for ${response.length} members`)
+                                    .setColor(0x00ffff);
+                            
+                                for (const player of page) {
+                                    let appliedChanges = 'Applied changes: \n';
+                
+                                    for (const update of player.updates) {
+                                        appliedChanges += `${update}\n`;
+                                    }
+                
+                                    for (const error of player.errors) {
+                                        appliedChanges += `${error}\n`;
+                                    }
+                
+                                    appliedChanges += `User: ${player.member}`;
+                
+                                    let name = player.username;
+                
+                                    if (!name) {
+                                        name = `${player.member.user.username} Unverified`;
+                                    }
+                
+                                    responseEmbed.addFields({ name: `${name}`, value: `${appliedChanges}` });
+                                }
+                            
+                                embeds.push(responseEmbed);
+                            }
+                
+                            const previousPage = new ButtonBuilder()
+                                .setCustomId('previous')
+                                .setStyle(ButtonStyle.Primary)
+                                .setEmoji('⬅️');
+                
+                            const nextPage = new ButtonBuilder()
+                                .setCustomId('next')
+                                .setStyle(ButtonStyle.Primary)
+                                .setEmoji('➡️');
+                
+                            row.addComponents(previousPage, nextPage);
+                        } else {
+                            const responseEmbed = new EmbedBuilder();
+                
+                            responseEmbed
+                                .setTitle(`Updated roles for ${response.length} members`)
+                                .setColor(0x00ffff);
+                
+                            for (const player of response) {
+                                let appliedChanges = 'Applied changes: \n';
+                
+                                for (const update of player.updates) {
+                                    appliedChanges += `${update}\n`;
+                                }
+                
+                                for (const error of player.errors) {
+                                    appliedChanges += `${error}\n`;
+                                }
+                
+                                appliedChanges += `User: ${player.member}`;
+                
+                                let name = player.username;
+                
+                                if (!name) {
+                                    name = `${player.member.user.username} Unverified`;
+                                }
+                
+                                responseEmbed.addFields({ name: `${name}`, value: `${appliedChanges}` });
+                            }
+                
+                            embeds.push(responseEmbed);
+                        }
+
+                        const channel = guild.channels.cache.get(config.logChannel);
+
+                        if (channel) {
+                            try {
+                                if (row.components.length > 0) {
+                                    const message = await channel.send({ 
+                                        embeds: [embeds[0]],
+                                        components: [row],
+                                    });
+        
+                                    messages.addMessage(message.id, new PagedMessage(message, embeds));
+                                } else {
+                                    await channel.send({ embeds: [embeds[0]] });
+                                }
+                            } catch (error) {
+                                console.log(`Failed to send update roles message to channel ${config.logChannel} in guild ${guild.id}`);
+                            }
+                        } else {
+                            console.log(`${config.logChannel} not found for guild ${guild.id}`);
+                        }
                     }
+
                     console.log(`Updated roles for ${guild}`);
                 } else {
                     continue;

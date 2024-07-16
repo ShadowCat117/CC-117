@@ -206,7 +206,7 @@ async function applyRoles(guild, member, playerInfo) {
                     });
             }
 
-            if (member.id !== member.guild.ownerId) {
+            if (member.id !== member.guild.ownerId && member.nickname) {
                 try {
                     await member.setNickname(null);
                     updates.push('Removed nickname');
@@ -595,7 +595,7 @@ async function applyRoles(guild, member, playerInfo) {
             if (verifiedRole && !memberRoles.has(verifiedRole.id)) {
                 await member.roles.add(verifiedRole)
                     .then(() => {
-                        console.log(`Added unverified role ${verifiedRole.name} to ${member.user.username}`);
+                        console.log(`Added verified role ${verifiedRole.name} to ${member.user.username}`);
                         updates.push(`Added ${verifiedRole}.`);
                     })
                     .catch(() => {
@@ -609,7 +609,7 @@ async function applyRoles(guild, member, playerInfo) {
             nickname = username;
 
             if (member.id !== member.guild.ownerId) {
-                if (config.addGuildPrefixes && guildPrefix !== null && guildName !== config.guildName) {
+                if (config.addGuildPrefixes && guildPrefix && guildName !== config.guildName) {
                     nickname += ` [${guildPrefix}]`;
                 }
 

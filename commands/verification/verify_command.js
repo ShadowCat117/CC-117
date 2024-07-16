@@ -178,8 +178,6 @@ module.exports = {
                 .setTitle(`${interaction.member.user.username} has verified as ${response.username}`)
                 .addFields({ name: 'User', value: `${interaction.member}` });
 
-            console.log(interaction.member);
-
             const channel = interaction.guild.channels.cache.get(config.logChannel);
 
             if (channel) {
