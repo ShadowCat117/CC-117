@@ -64,7 +64,7 @@ module.exports = {
 // guild: The Discord server they are changing their nickname in
 async function validUsername(newMember, guild) {
     // Temporary fix to stop others verifying as friends old name
-    if (newMember.nickname.toLowerCase() === 'owen_rocks_3') return false;
+    if (newMember.nickname && newMember.nickname.toLowerCase() === 'owen_rocks_3') return false;
 
     // Loop through all members of the server
     for (const member of guild.members.cache) {

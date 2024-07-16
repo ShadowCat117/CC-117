@@ -973,6 +973,69 @@ module.exports = {
 
                             break;
                         }
+                        case 'verify': {
+                            const loadingEmbed = new EmbedBuilder()
+                                .setDescription('Verifying as selected player')
+                                .setColor(0x00ff00);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [loadingEmbed],
+                            });
+
+                            const response = await verify(interaction, true);
+
+                            const responseEmbed = new EmbedBuilder();
+
+                            if (response.updates.length > 0 || response.errors.length > 0) {
+                                // Valid player, with changes
+                                responseEmbed
+                                    .setTitle(`Verified as ${response.username}`)
+                                    .setColor(0x00ffff);
+        
+                                let appliedChanges = 'Applied changes: \n';
+        
+                                for (const update of response.updates) {
+                                    appliedChanges += `${update}\n`;
+                                }
+        
+                                for (const error of response.errors) {
+                                    appliedChanges += `${error}\n`;
+                                }
+        
+                                responseEmbed.setDescription(appliedChanges);
+                            } else {
+                                responseEmbed
+                                    .setTitle(`Verified as ${response.username}`)
+                                    .setDescription('No changes')
+                                    .setColor(0x999999);
+                            }
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [responseEmbed],
+                            });
+
+                            if (response.updates.length > 0 || response.errors.length > 0 && config.logMessages && config.logChannel) {
+                                responseEmbed
+                                    .setTitle(`${interaction.member.user.username} has verified as ${response.username}`)
+                                    .addFields({ name: 'User', value: `${interaction.member}` });
+                    
+                                const channel = interaction.guild.channels.cache.get(config.logChannel);
+                    
+                                if (channel) {
+                                    try {
+                                        await channel.send({ embeds: [responseEmbed] });
+                                    } catch (error) {
+                                        console.log(`Failed to send verification message to channel ${config.logChannel} in guild ${interaction.guild.id}`);
+                                    }
+                                } else {
+                                    console.log(`${config.logChannel} not found for guild ${interaction.guild.id}`);
+                                }
+                            }
+                            
+                            break;
+                        }
                     }
                 } else if (interaction.isStringSelectMenu()) {
                     const parts = interaction.values[0].split(':');

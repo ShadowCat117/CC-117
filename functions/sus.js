@@ -14,7 +14,7 @@ async function sus(interaction, force = false) {
         nameToSearch = interaction.customId.split(':')[1];
     }
 
-    const player = await database.findPlayer(nameToSearch, '', force);
+    const player = await database.findPlayer(nameToSearch, force);
 
     if (player && player.message === 'Multiple possibilities found') {
         return {

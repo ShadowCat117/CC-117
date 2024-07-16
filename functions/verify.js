@@ -1,68 +1,106 @@
+const axios = require('axios');
 const applyRoles = require('./apply_roles');
-const findPlayer = require('../database/database');
+const database = require('../database/database');
+const PlayerInfo = require('../message_objects/PlayerInfo');
 
 async function verify(interaction, force = false) {
     let nameToSearch;
 
     if (interaction.options !== undefined) {
-        // Get username from command option
         nameToSearch = interaction.options.getString('username');
     } else if (interaction.customId) {
-        // Get username from button id
-        nameToSearch = interaction.customId;
+        nameToSearch = interaction.customId.split(':')[1];
     }
 
-    // Search for player, unknown guild
-    const player = await findPlayer(nameToSearch, '', force);
+    const player = await database.findPlayer(nameToSearch, force);
 
-    // Multiple usernames found, should never happen if force is true
     if (player && player.message === 'Multiple possibilities found') {
-        let textMessage = `Multiple players found with the username: ${nameToSearch}.`;
+        return {
+            playerUuids: player.playerUuids,
+            playerUsernames: player.playerUsernames,
+            playerRanks: player.playerRanks,
+            playerGuildRanks: player.playerGuildRanks,
+            playerGuildNames: player.playerGuildNames,
+        };
+    }
 
-        // Create list of player options, try to be as detailed as possible.
-        // Always show username and UUID, show guild if in guild and show rank if one is known.
-        for (let i = 0; i < player.playerUuids.length; i++) {
-            const uuid = player.playerUuids[i];
-            const playerUsername = player.playerUsernames[i];
-            const rank = player.playerRanks[i];
-            const guildRank = player.playerGuildRanks[i];
-            const playerGuildName = player.playerGuildNames[i];
+    let playerJson;
 
-            if (!rank && !playerGuildName) {
-                textMessage += `\n${i + 1}. ${playerUsername} (UUID: ${uuid})`;
-            } else if (!rank) {
-                textMessage += `\n${i + 1}. ${playerUsername}, ${guildRank} of ${playerGuildName}. (UUID: ${uuid})`;
-            } else if (!playerGuildName) {
-                textMessage += `\n${i + 1}. ${playerUsername}, ${rank}. (UUID: ${uuid})`;
-            } else {
-                textMessage += `\n${i + 1}. ${playerUsername}, ${rank} and ${guildRank} of ${playerGuildName}. (UUID: ${uuid})`;
+    // If a player was found, look for UUID to get guaranteed results, otherwise look for the name input
+    if (player) {
+        playerJson = (await axios.get(`https://api.wynncraft.com/v3/player/${player.uuid}?fullResult=True`)).data;
+    } else {
+        try {
+            playerJson = (await axios.get(`https://api.wynncraft.com/v3/player/${nameToSearch}?fullResult=True`)).data;
+        } catch (err) {
+            // 300 indicates a multi selector
+            if (err.response.status === 300) {
+                return {
+                    playerUuids: Object.keys(err.response.data),
+                    playerUsernames: Object.values(err.response.data).map((entry) => entry.storedName),
+                    playerRanks: [],
+                    playerGuildRanks: [],
+                    playerGuildNames: [],
+                };
             }
         }
-
-        textMessage += '\nClick button to choose player.';
     }
 
-    // Unknown player
-    if (!player) {
+    // FIXME: Handle errors better
+    if (!playerJson || !playerJson.username) {
+        return ({ username: '' });
     }
 
-    // Call applyRoles with the found players UUID
-    const response = await applyRoles(interaction.guild, player.uuid, interaction.member);
+    let guildUuid = null;
+    let guildName = null;
+    let guildPrefix = null;
+    let guildRank = null;
 
-    let verifyMessage;
-
-    // Determine response message
-    switch (response) {
-        case 1:
-            verifyMessage = `Successfully verified as ${player.username.replace(/_/g, '\\_')}`;
-            break;
-        case 2:
-            verifyMessage = `Successfully verified as ally ${player.username.replace(/_/g, '\\_')}`;
-            break;
-        default:
-            verifyMessage = 'Failed to verify';
-            break;
+    if (playerJson.guild) {
+        guildUuid = playerJson.guild.uuid;
+        guildName = playerJson.guild.name;
+        guildPrefix = playerJson.guild.prefix;
+        guildRank = playerJson.guild.rank.toLowerCase();
     }
+
+    const supportRank = playerJson.supportRank;
+    const veteran = playerJson.veteran;
+    const serverRank = playerJson.rank;
+
+    let highestCharcterLevel = 0;
+
+    for (const character in playerJson.characters) {
+        const characterJson = playerJson.characters[character];
+
+        // If character level is higher than current tracked highest, set as new highest
+        if (characterJson.level > highestCharcterLevel) {
+            highestCharcterLevel = characterJson.level;
+        }
+    }
+
+    const playerInfo = new PlayerInfo(playerJson.username, guildName, guildPrefix, guildRank, supportRank, veteran, serverRank, highestCharcterLevel);
+
+    const response = await applyRoles(interaction.guild, interaction.member, playerInfo);
+
+    database.updatePlayer({
+        uuid: playerJson.uuid,
+        username: playerJson.username,
+        guildUuid: guildUuid,
+        guildRank: guildRank,
+        online: playerJson.online,
+        lastLogin: playerJson.lastJoin,
+        supportRank: supportRank,
+        veteran: veteran,
+        serverRank: serverRank,
+        wars: playerJson.globalData.wars,
+        highestCharcterLevel: highestCharcterLevel,
+    });
+
+    return ({
+        username: playerInfo.username,
+        updates: response.updates,
+        errors: response.errors,
+    });
 }
 
 module.exports = verify;

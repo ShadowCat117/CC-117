@@ -33,7 +33,37 @@ async function findDiscordUser(serverMembers, username) {
     return null;
 }
 
+async function checkValidUsername(memberToCheck, guild, nameToCheck) {
+    // Temporary, remove if Wynn ever fixes the name changing guild bug
+    if (nameToCheck.toLowerCase() === 'owen_rocks_3') return false;
+    
+    // Loop through all server members
+    for (const member of guild.members.cache) {
+        // Ignore if member is the current member trying to verify
+        if (member[0] === memberToCheck.id) {
+            continue;
+        }
+
+        let nicknameToCheck = member[1].nickname;
+        const usernameToCheck = member[1].user.username;
+
+        // If nickname given, remove guild prefix if there is one
+        if (nicknameToCheck) {
+            nicknameToCheck = nicknameToCheck.split(' [')[0];
+        }
+
+        // If the nickname matches then return false for invalid username
+        if (nameToCheck && (nameToCheck.toLowerCase() === (nicknameToCheck || '').toLowerCase() || nameToCheck.toLowerCase() === usernameToCheck.toLowerCase())) {
+            return false;
+        }
+    }
+
+    // All members checked, no conflicting username found
+    return true;
+}
+
 module.exports = {
     getTimeSince,
     findDiscordUser,
+    checkValidUsername,
 };
