@@ -35,11 +35,11 @@ async function unbanPlayer(interaction, force = false) {
         }
 
         if (!player) {
-            return ({ error: `Unknown player ${nameToSearch}` });
+            return ({ error: `Unknown player ${nameToSearch.replaceAll('_', '\\_')}` });
         }
 
         if (!config['bannedPlayers'] || !config['bannedPlayers'][player.username]) {
-            return ({ error: `${player.username} is not banned.` });
+            return ({ error: `${player.username.replaceAll('_', '\\_')} is not banned.` });
         }
 
 
@@ -47,7 +47,7 @@ async function unbanPlayer(interaction, force = false) {
 
         fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
-        return ({ username: player.username });
+        return ({ username: player.username.replaceAll('_', '\\_') });
     } catch (err) {
         console.log(err);
         return ({ error: 'Error trying to unban user.' });

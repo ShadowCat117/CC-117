@@ -37,7 +37,7 @@ async function banPlayer(interaction, force = false, reason = 'Unknown reason') 
         }
 
         if (!player) {
-            return ({ error: `Unknown player ${nameToSearch}` });
+            return ({ error: `Unknown player ${nameToSearch.replaceAll('_', '\\_')}` });
         }
 
         if (!config['bannedPlayers']) {
@@ -45,14 +45,14 @@ async function banPlayer(interaction, force = false, reason = 'Unknown reason') 
         }
 
         if (config['bannedPlayers'][player.username] === reason) {
-            return ({ error: `${player.username} is already banned for ${reason}` });
+            return ({ error: `${player.username.replaceAll('_', '\\_')} is already banned for ${reason}` });
         }
 
         config['bannedPlayers'][player.username] = reason;
 
         fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
-        return ({ username: player.username, reason: reason });
+        return ({ username: player.username.replaceAll('_', '\\_'), reason: reason });
     } catch (err) {
         console.log(err);
         return ({ error: 'Error trying to ban user.' });

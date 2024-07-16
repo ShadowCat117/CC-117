@@ -41,7 +41,7 @@ async function addInactivityException(interaction, force = false, duration = -1)
         }
 
         if (!player) {
-            return ({ error: `Unknown player ${nameToSearch}` });
+            return ({ error: `Unknown player ${nameToSearch.replaceAll('_', '\\_')}` });
         }
 
         if (!config['inactivityExceptions']) {
@@ -52,9 +52,9 @@ async function addInactivityException(interaction, force = false, duration = -1)
             let durationStr;
 
             if (duration === -1) {
-                durationStr = `${player.username} is already allowed to be inactive forever`;
+                durationStr = `${player.username.replaceAll('_', '\\_')} is already allowed to be inactive forever`;
             } else {
-                durationStr = `${player.username} is already allowed to be inactive for ${duration} day${duration > 1 ? 's' : ''}.`;
+                durationStr = `${player.username.replaceAll('_', '\\_')} is already allowed to be inactive for ${duration} day${duration > 1 ? 's' : ''}.`;
             }
 
             return ({ error: `${durationStr}` });
@@ -64,7 +64,7 @@ async function addInactivityException(interaction, force = false, duration = -1)
 
         fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
-        return ({ username: player.username, duration: duration });
+        return ({ username: player.username.replaceAll('_', '\\_'), duration: duration });
     } catch (err) {
         console.log(err);
         return ({ error: 'Error trying to add inactivity exception.' });
