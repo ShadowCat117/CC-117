@@ -1049,6 +1049,50 @@ module.exports = {
                             
                             break;
                         }
+                        case 'track_guild': {
+                            const loadingEmbed = new EmbedBuilder()
+                                .setDescription('Tracking selected guild.')
+                                .setColor(0x00ff00);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [loadingEmbed],
+                            });
+
+                            const response = await trackGuild(interaction, true);
+
+                            if (response.error) {
+                                // Error
+                                const responseEmbed = new EmbedBuilder();
+                    
+                                responseEmbed
+                                    .setTitle('Error')
+                                    .setDescription(`${response.error}`)
+                                    .setColor(0xff0000);
+                    
+                                await interaction.editReply({ embeds: [responseEmbed] });
+                            } else {
+                                const responseEmbed = new EmbedBuilder();
+                    
+                                if (response.guildName === '') {
+                                    // Unknown guild
+                                    responseEmbed
+                                        .setTitle('Invalid guild')
+                                        .setDescription(`Unable to find a guild using the name/prefix '${interaction.options.getString('guild_name')}', try again using the exact guild name.`)
+                                        .setColor(0xff0000);
+                                } else {
+                                    // Valid guild
+                                    responseEmbed
+                                        .setTitle('Successfully tracked guild')
+                                        .setDescription(`${response.guildName} is now being tracked.`)
+                                        .setColor(0x00ffff);
+                                }
+                    
+                                await interaction.editReply({ embeds: [responseEmbed] });
+                            }
+
+                            break;
+                        }
                         case 'unban_player': {
                             const loadingEmbed = new EmbedBuilder()
                                 .setDescription('Unbanning selected player')
@@ -1084,6 +1128,50 @@ module.exports = {
                             }
                 
                             await interaction.editReply({ embeds: [responseEmbed] });
+
+                            break;
+                        }
+                        case 'untrack_guild': {
+                            const loadingEmbed = new EmbedBuilder()
+                                .setDescription('Untracking selected guild.')
+                                .setColor(0x00ff00);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [loadingEmbed],
+                            });
+
+                            const response = await untrackGuild(interaction, true);
+
+                            if (response.error) {
+                                // Error
+                                const responseEmbed = new EmbedBuilder();
+
+                                responseEmbed
+                                    .setTitle('Error')
+                                    .setDescription(`${response.error}`)
+                                    .setColor(0xff0000);
+                    
+                                await interaction.editReply({ embeds: [responseEmbed] });
+                            } else {
+                                const responseEmbed = new EmbedBuilder();
+                    
+                                if (response.guildName === '') {
+                                    // Unknown guild
+                                    responseEmbed
+                                        .setTitle('Invalid guild')
+                                        .setDescription(`Unable to find a guild using the name/prefix '${interaction.options.getString('guild_name')}', try again using the exact guild name.`)
+                                        .setColor(0xff0000);
+                                } else {
+                                    // Valid guild
+                                    responseEmbed
+                                        .setTitle('Successfully untracked guild')
+                                        .setDescription(`${response.guildName} is no longer being tracked.`)
+                                        .setColor(0x00ffff);
+                                }
+                    
+                                await interaction.editReply({ embeds: [responseEmbed] });
+                            }
 
                             break;
                         }
