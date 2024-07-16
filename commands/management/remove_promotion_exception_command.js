@@ -108,7 +108,7 @@ module.exports = {
                             .addFields({ name: `Option ${i + 1}`, value: `${responseValue} [View Profile](https://wynncraft.com/stats/player/${uuid})` });
         
                         const button = new ButtonBuilder()
-                            .setCustomId(`removepromotionexception:${uuid}`)
+                            .setCustomId(`remove_promotion_exception:${uuid}`)
                             .setStyle(ButtonStyle.Primary)
                             .setLabel((i + 1).toString());
         
