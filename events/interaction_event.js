@@ -854,6 +854,120 @@ module.exports = {
 
                             break;
                         }
+                        case 'remove_demotion_exception': {
+                            const loadingEmbed = new EmbedBuilder()
+                                .setDescription('Removing demotion exception from selected player')
+                                .setColor(0x00ff00);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [loadingEmbed],
+                            });
+
+                            const response = await removeDemotionException(interaction, true);
+
+                            const responseEmbed = new EmbedBuilder();
+
+                            if (response.error) {
+                                responseEmbed
+                                    .setTitle('Error')
+                                    .setDescription(`Unable to remove demotion exception: ${response.error}`)
+                                    .setColor(0xff0000);
+                            } else {
+                                if (response.username === '') {
+                                    // Unknown player
+                                    responseEmbed
+                                        .setTitle('Invalid username')
+                                        .setDescription(`Unable to find a player using the name '${interaction.options.getString('username')}', try again using the exact player name.`)
+                                        .setColor(0xff0000);
+                                } else {
+                                    // Valid player
+                                    responseEmbed
+                                        .setTitle(`${response.username} is no longer exempt from demotion.`)
+                                        .setColor(0x00ffff);
+                                }
+                            }
+                
+                            await interaction.editReply({ embeds: [responseEmbed] });
+
+                            break;
+                        }
+                        case 'remove_inactivity_exception': {
+                            const loadingEmbed = new EmbedBuilder()
+                                .setDescription('Removing inactivity exception from selected player')
+                                .setColor(0x00ff00);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [loadingEmbed],
+                            });
+
+                            const response = await removeInactivityException(interaction, true);
+
+                            const responseEmbed = new EmbedBuilder();
+
+                            if (response.error) {
+                                responseEmbed
+                                    .setTitle('Error')
+                                    .setDescription(`Unable to remove inactivity exception: ${response.error}`)
+                                    .setColor(0xff0000);
+                            } else {
+                                if (response.username === '') {
+                                    // Unknown player
+                                    responseEmbed
+                                        .setTitle('Invalid username')
+                                        .setDescription(`Unable to find a player using the name '${interaction.options.getString('username')}', try again using the exact player name.`)
+                                        .setColor(0xff0000);
+                                } else {
+                                    // Valid player
+                                    responseEmbed
+                                        .setTitle(`${response.username} is no longer exempt from inactivity.`)
+                                        .setColor(0x00ffff);
+                                }
+                            }
+                
+                            await interaction.editReply({ embeds: [responseEmbed] });
+
+                            break;
+                        }
+                        case 'remove_promotion_exception': {
+                            const loadingEmbed = new EmbedBuilder()
+                                .setDescription('Removing promotion exception from selected player')
+                                .setColor(0x00ff00);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [loadingEmbed],
+                            });
+
+                            const response = await removePromotionException(interaction, true);
+
+                            const responseEmbed = new EmbedBuilder();
+
+                            if (response.error) {
+                                responseEmbed
+                                    .setTitle('Error')
+                                    .setDescription(`Unable to remove promotion exception: ${response.error}`)
+                                    .setColor(0xff0000);
+                            } else {
+                                if (response.username === '') {
+                                    // Unknown player
+                                    responseEmbed
+                                        .setTitle('Invalid username')
+                                        .setDescription(`Unable to find a player using the name '${interaction.options.getString('username')}', try again using the exact player name.`)
+                                        .setColor(0xff0000);
+                                } else {
+                                    // Valid player
+                                    responseEmbed
+                                        .setTitle(`${response.username} is no longer exempt from promotion.`)
+                                        .setColor(0x00ffff);
+                                }
+                            }
+                
+                            await interaction.editReply({ embeds: [responseEmbed] });
+
+                            break;
+                        }
                         case 'set_guild': {
                             const loadingEmbed = new EmbedBuilder()
                                 .setDescription('Setting guild to selected guild.')
