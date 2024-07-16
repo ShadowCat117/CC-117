@@ -101,11 +101,11 @@ async function sus(interaction, force = false) {
     } else if (rank === 'vipplus') {
         rankSusData = 'VIP+';
     } else {
-        rankSusData = rank.toUpperCase();
+        rankSusData = rank.charAt(0).toUpperCase() + rank.slice(1);
     }
 
     if (playerJson.veteran === true) {
-        rankSusData += ' (VET)';
+        rankSusData += ' (Vet.)';
     }
 
     rankSusData += `\n${rankSusValue.toFixed(2)}%`;
