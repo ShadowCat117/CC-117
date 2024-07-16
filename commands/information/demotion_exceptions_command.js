@@ -107,7 +107,7 @@ module.exports = {
                             duration = `Exempt from demotions for ${config['demotionExceptions'][page[player]]} day${config['demotionExceptions'][page[player]] > 1 ? 's' : ''}`;
                         }
 
-                        pageEmbed.addFields({ name: page[player], value: duration });
+                        pageEmbed.addFields({ name: page[player].replaceAll('_', '\\_'), value: duration });
                     }
 
                     embeds.push(pageEmbed);
@@ -146,7 +146,7 @@ module.exports = {
                         duration = `Exempt from demotions for ${config['demotionExceptions'][player]} day${config['demotionExceptions'][player] > 1 ? 's' : ''}`;
                     }
                     
-                    responseEmbed.addFields({ name: player, value: duration });
+                    responseEmbed.addFields({ name: player.replaceAll('_', '\\_'), value: duration });
                 }
 
                 await interaction.editReply({ embeds: [responseEmbed] });

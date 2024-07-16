@@ -107,7 +107,7 @@ module.exports = {
                             duration = `Allowed to be inactive for ${config['inactivityExceptions'][page[player]]} day${config['inactivityExceptions'][page[player]] > 1 ? 's' : ''}`;
                         }
 
-                        pageEmbed.addFields({ name: page[player], value: duration });
+                        pageEmbed.addFields({ name: page[player].replaceAll('_', '\\_'), value: duration });
                     }
 
                     embeds.push(pageEmbed);
@@ -146,7 +146,7 @@ module.exports = {
                         duration = `Allowed to be inactive for ${config['inactivityExceptions'][player]} day${config['inactivityExceptions'][player] > 1 ? 's' : ''}`;
                     }
                     
-                    responseEmbed.addFields({ name: player, value: duration });
+                    responseEmbed.addFields({ name: player.replaceAll('_', '\\_'), value: duration });
                 }
 
                 await interaction.editReply({ embeds: [responseEmbed] });

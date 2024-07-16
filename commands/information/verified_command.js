@@ -82,7 +82,7 @@ module.exports = {
                         let verifiedValue = '';
                     
                         for (const player of page) {
-                            usernameValue += player.username.replaceAll('_', '\\_') + '\n';
+                            usernameValue += player.username + '\n';
                     
                             if (player.verifiedMember) {
                                 verifiedValue += `<@${player.verifiedMember}>\n`;
@@ -125,7 +125,7 @@ module.exports = {
                         let verifiedValue = '';
 
                         for (const player of response.verifiedMembers) {
-                            usernameValue += player.username.replaceAll('_', '\\_') + '\n';
+                            usernameValue += player.username + '\n';
                     
                             if (player.verifiedMember) {
                                 verifiedValue += `${player.verifiedMember}\n`;

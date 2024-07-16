@@ -99,7 +99,7 @@ module.exports = {
                         .setColor(0x00ffff);
 
                     for (const player in page) {
-                        pageEmbed.addFields({ name: page[player], value: config['bannedPlayers'][page[player]] });
+                        pageEmbed.addFields({ name: page[player].replaceAll('_', '\\_'), value: config['bannedPlayers'][page[player]] });
                     }
 
                     embeds.push(pageEmbed);
@@ -130,7 +130,7 @@ module.exports = {
                     .setColor(0x00ffff);
 
                 for (const player in config['bannedPlayers']) {
-                    responseEmbed.addFields({ name: player, value: config['bannedPlayers'][player] });
+                    responseEmbed.addFields({ name: player.replaceAll('_', '\\_'), value: config['bannedPlayers'][player] });
                 }
 
                 await interaction.editReply({ embeds: [responseEmbed] });
