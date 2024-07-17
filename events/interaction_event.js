@@ -20,7 +20,7 @@ const untrackGuild = require('../functions/untrack_guild');
 const setGuild = require('../functions/set_guild');
 const sus = require('../functions/sus');
 const activeHours = require('../functions/active_hours');
-const updateGuild = require('../functions/update_guild');
+const updateGuildMembers = require('../functions/update_guild_members');
 const fs = require('fs');
 const path = require('path');
 const promotionProgress = require('../functions/promotion_progress');
@@ -1154,24 +1154,36 @@ module.exports = {
                     
                                 await interaction.editReply({ embeds: [responseEmbed] });
                             } else {
-                                const responseEmbed = new EmbedBuilder();
-                    
-                                if (response.guildName === '') {
-                                    // Unknown guild
-                                    responseEmbed
-                                        .setTitle('Invalid guild')
-                                        .setDescription(`Unable to find a guild using the name/prefix '${interaction.options.getString('guild_name')}', try again using the exact guild name.`)
-                                        .setColor(0xff0000);
-                                } else {
-                                    // Valid guild
-                                    responseEmbed
-                                        .setTitle('Successfully untracked guild')
-                                        .setDescription(`${response.guildName} is no longer being tracked.`)
-                                        .setColor(0x00ffff);
-                                }
+                                const responseEmbed = new EmbedBuilder()
+                                    .setTitle('Successfully untracked guild')
+                                    .setDescription(`${response.guildName} is no longer being tracked.`)
+                                    .setColor(0x00ffff);
                     
                                 await interaction.editReply({ embeds: [responseEmbed] });
                             }
+
+                            break;
+                        }
+                        case 'update_guild_members': {
+                            const loadingEmbed = new EmbedBuilder()
+                                .setDescription('Updating guild members for selected guild')
+                                .setColor(0x00ff00);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [loadingEmbed],
+                            });
+
+                            // Call updateGuildMembers
+                            const response = await updateGuildMembers(interaction, true);
+
+                            const responseEmbed = new EmbedBuilder()
+                                .setTitle(`[${response.guildPrefix}] ${response.guildName} Members Updated`)
+                                .setURL(`https://wynncraft.com/stats/guild/${response.guildName.replaceAll(' ', '%20')}`)
+                                .setDescription('Stored stats for guild members (used in updating roles and checking for guild wide promotions/demotions) will be updated soon!')
+                                .setColor(0x00ffff);
+
+                            await interaction.editReply({ embeds: [responseEmbed] });
 
                             break;
                         }

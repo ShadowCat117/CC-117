@@ -1,74 +1,162 @@
-const fs = require('fs').promises;
+const fs = require('fs');
 const path = require('path');
-const findPlayer = require('../database/database');
+const axios = require('axios');
+const database = require('../database/database');
 
 async function updatePlayer(interaction, force = false) {
-    const filePath = path.join(__dirname, '..', 'updatePlayers.json');
+    const guildId = interaction.guild.id;
+    const filePath = path.join(__dirname, '..', 'configs', `${guildId}.json`);
 
     try {
-        let updatePlayersFile = {};
+        let config = {};
 
-        // Access priority players file
-        const fileData = await fs.readFile(filePath, 'utf-8');
-        updatePlayersFile = JSON.parse(fileData);
+        if (fs.existsSync(filePath)) {
+            const fileData = fs.readFileSync(filePath, 'utf-8');
+            config = JSON.parse(fileData);
+        }
+
+        const guildName = config.guildName;
 
         let nameToSearch;
 
-        // Get name from command or button interaction
         if (interaction.options !== undefined) {
-            nameToSearch = interaction.options.getString('player');
+            nameToSearch = interaction.options.getString('username');
         } else if (interaction.customId) {
-            nameToSearch = interaction.customId;
+            nameToSearch = interaction.customId.split(':')[1];
         }
 
-        const player = await findPlayer(nameToSearch, '', force);
+        let player = await database.findPlayer(nameToSearch, force);
 
-        // Multiple players found matching name
-        if (player && player.message === 'Multiple possibilities found') {
-            let textMessage = `Multiple players found with the username: ${nameToSearch}.`;
-    
-            // Loop through each possible player adding to the message
+        if (player != null && player.message === 'Multiple possibilities found') {
+            const possiblePlayers = [];
+
             for (let i = 0; i < player.playerUuids.length; i++) {
                 const uuid = player.playerUuids[i];
-                const playerUsername = player.playerUsernames[i];
-                const rank = player.playerRanks[i];
-                const guildRank = player.playerGuildRanks[i];
-                const playerGuildName = player.playerGuildNames[i];
+                const username = player.playerUsernames[i];
 
-                // Always show username and UUID, show guild name/rank if possible and donator rank
-                if (!rank && !playerGuildName) {
-                    textMessage += `\n${i + 1}. ${playerUsername} (UUID: ${uuid})`;
-                } else if (!rank) {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${guildRank} of ${playerGuildName}. (UUID: ${uuid})`;
-                } else if (!playerGuildName) {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${rank}. (UUID: ${uuid})`;
-                } else {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${rank} and ${guildRank} of ${playerGuildName}. (UUID: ${uuid})`;
+                if (player.playerGuildNames[i] === guildName) {
+                    possiblePlayers.push({ uuid: uuid, username: username });
                 }
             }
-    
-            textMessage += '\nClick button to choose player.';
+
+            if (possiblePlayers.length === 1) {
+                player = possiblePlayers[0];
+            } else {
+                return {
+                    playerUuids: player.playerUuids,
+                    playerUsernames: player.playerUsernames,
+                    playerRanks: player.playerRanks,
+                    playerGuildRanks: player.playerGuildRanks,
+                    playerGuildNames: player.playerGuildNames,
+                };
+            }
+        }
+
+        let playerJson;
+
+        // If a player was found, look for UUID to get guaranteed results, otherwise look for the name input
+        if (player) {
+            playerJson = (await axios.get(`https://api.wynncraft.com/v3/player/${player.uuid}?fullResult=True`)).data;
+        } else {
+            try {
+                playerJson = (await axios.get(`https://api.wynncraft.com/v3/player/${nameToSearch}?fullResult=True`)).data;
+            } catch (err) {
+                // 300 indicates a multi selector
+                if (err.response.status === 300) {
+                    return {
+                        playerUuids: Object.keys(err.response.data),
+                        playerUsernames: Object.values(err.response.data).map((entry) => entry.storedName),
+                        playerRanks: [],
+                        playerGuildRanks: [],
+                        playerGuildNames: [],
+                    };
+                }
+            }
+        }
+
+        // FIXME: Handle errors better
+        if (!playerJson || !playerJson.username) {
+            return ({ username: '' });
+        }
+
+        const veteran = playerJson.veteran ? playerJson.veteran : false;
+        let highestCharcterLevel = 0;
+
+        for (const character in playerJson.characters) {
+            const characterJson = playerJson.characters[character];
+
+            // If character level is higher than current tracked highest, set as new highest
+            if (characterJson.level > highestCharcterLevel) {
+                highestCharcterLevel = characterJson.level;
+            }
+        }
+
+        let guildUuid = null;
+        let guildRank = null;
+        let joinTimestamp = null;
+        let contributedGuildXP = 0;
+
+        if (playerJson.guild) {
+            const guildJson = (await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${playerJson.guild.uuid}?identifier=uuid`)).data;
+
+            // FIXME: Handle errors better
+            if (!guildJson || !guildJson.name) {
+                return ({ username: playerJson.username, error: 'Failed to retrieve guild info' });
             }
 
-        // No player found
-        if (!player) {
+            guildUuid = guildJson.uuid;
+
+            for (const rank in guildJson.members) {
+                if (rank === 'total') continue;
+        
+                const rankMembers = guildJson.members[rank];
+        
+                for (const member in rankMembers) {
+                    const guildMember = rankMembers[member];
+                    
+                    if (member === playerJson.uuid) {
+                        guildRank = rank;
+                        joinTimestamp = guildMember.joined;
+                        contributedGuildXP = guildMember.contributed;
+                        break;
+                    }
+                }
+    
+                if (guildRank) {
+                    break;
+                }
+            }
         }
 
-        // Filter file to remove null players
-        updatePlayersFile.players = updatePlayersFile.players.filter(item => item !== null);
+        database.updatePlayer({
+            uuid: playerJson.uuid,
+            username: playerJson.username,
+            guildUuid: guildUuid,
+            guildRank: guildRank,
+            contributed: contributedGuildXP,
+            guildJoined: joinTimestamp,
+            online: playerJson.online,
+            lastLogin: playerJson.lastJoin,
+            supportRank: playerJson.supportRank,
+            veteran: veteran,
+            serverRank: playerJson.rank,
+            wars: playerJson.globalData.wars,
+            highestCharcterLevel: highestCharcterLevel,
+        });
 
-        if (updatePlayersFile.players.includes(player.uuid)) {
-            // If already in file, then ignore
-        } else {
-            // Add new player to file
-            updatePlayersFile.players.unshift(player.uuid);
+        return ({ username: playerJson.username });
+    } catch (error) {
+        console.error(error);
 
-            // Save file
-            const updatedData = JSON.stringify(updatePlayersFile);
-            await fs.writeFile(filePath, updatedData, 'utf-8');
+        let username;
+
+        if (interaction.options !== undefined) {
+            username = interaction.options.getString('username');
+        } else if (interaction.customId) {
+            username = interaction.customId;
         }
-    } catch (err) {
-        console.log(err);
+
+        return ({ username: username, error: 'An error occured' });
     }
 }
 

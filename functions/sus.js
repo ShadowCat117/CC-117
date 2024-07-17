@@ -130,15 +130,19 @@ async function sus(interaction, force = false) {
         }
     }
 
+    const veteran = playerJson.veteran ? playerJson.veteran : false;
+
     database.updatePlayer({
         uuid: playerJson.uuid,
         username: playerJson.username,
         guildUuid: guildUuid,
         guildRank: guildRank,
+        contributed: null,
+        guildJoined: null,
         online: playerJson.online,
         lastLogin: playerJson.lastJoin,
         supportRank: playerJson.supportRank,
-        veteran: playerJson.veteran,
+        veteran: veteran,
         serverRank: playerJson.rank,
         wars: playerJson.globalData.wars,
         highestCharcterLevel: highestCharcterLevel,

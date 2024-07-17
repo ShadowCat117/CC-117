@@ -1,11 +1,14 @@
 const axios = require('axios');
 const fs = require('fs').promises;
+const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const database = new sqlite3.Database('database/database.db');
 const PlayerLastLogin = require('../message_objects/PlayerLastLogin');
 const GuildActiveHours = require('../message_objects/GuildActiveHours');
 const RATE_LIMIT = 180;
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const priorityGuilds = [];
+const priorityPlayers = [];
 
 let remainingRateLimit = RATE_LIMIT;
 let rateLimitReset;
@@ -187,7 +190,7 @@ async function handleOnlinePlayers(onlinePlayers) {
                 }
             } else {
                 // Insert new player with available details
-                await runAsync('INSERT INTO players (uuid, username, guildUuid, guildRank, online, lastLogin, serverRank, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, null, null, null, true, ?, null, -1, -1, ?, 0, -1, 0)', [uuid, now.toISOString(), now.toISOString()]);
+                await runAsync('INSERT INTO players (uuid, username, guildUuid, guildRank, contributed, guildJoined, online, lastLogin, serverRank, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, null, null, null, 0, null, true, ?, null, -1, -1, ?, 0, -1, 0)', [uuid, now.toISOString(), now.toISOString()]);
             }
         }
 
@@ -341,6 +344,162 @@ async function updatePlayerActivity() {
     }
 }
 
+async function setPriorityGuilds() {
+    const configsPath = path.join(__dirname, '..', 'configs');
+
+    try {
+        // Read all config files
+        const configFiles = await fs.readdir(configsPath);
+
+        for (const file of configFiles) {
+            const configFilePath = path.join(configsPath, file);
+
+            const data = await fs.readFile(configFilePath, 'utf8');
+            const config = JSON.parse(data);
+
+            if (config.guildName) {
+                const uuid = (await findGuild(config.guildName)).uuid;
+
+                if (uuid && !priorityGuilds.includes(uuid)) {
+                    priorityGuilds.push(uuid);
+                } else if (!uuid) {
+                    console.error(`Invalid set guild ${config.guildName}, should be findable.`);
+                }
+            }
+
+            for (const guild of config.allies) {
+                const uuid = (await findGuild(guild)).uuid;
+
+                if (uuid && !priorityGuilds.includes(uuid)) {
+                    priorityGuilds.push(uuid);
+                } else if (!uuid) {
+                    console.error(`Invalid set guild ${guild}, should be findable.`);
+                }
+            }
+
+            for (const guild of config.trackedGuilds) {
+                const uuid = (await findGuild(guild)).uuid;
+
+                if (uuid && !priorityGuilds.includes(uuid)) {
+                    priorityGuilds.push(uuid);
+                } else if (!uuid) {
+                    console.error(`Invalid set guild ${guild}, should be findable.`);
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error setting priority guilds', error);
+    }
+
+    console.log(priorityGuilds);
+}
+
+async function updatePriorityGuilds() {
+    if (priorityGuilds.length === 0) return;
+    console.log('Updating 5 priority guilds');
+    let updated = 0;
+
+    for (const guild of priorityGuilds) {
+        if (updated === 5) break;
+
+        await waitForRateLimit();
+
+        const response = await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${guild}`);
+
+        remainingRateLimit = response.headers['ratelimit-remaining'];
+        rateLimitReset = response.headers['ratelimit-reset'];
+        const guildJson = response.data;
+
+        if (guildJson && guildJson.name) {
+            for (const rank in guildJson.members) {
+                if (rank === 'total') continue;
+        
+                const rankMembers = guildJson.members[rank];
+        
+                for (const member in rankMembers) {
+                    const guildMember = rankMembers[member];
+
+                    // Check if the UUID exists in the players table
+                    const existingPlayer = await getAsync('SELECT * FROM players WHERE uuid = ?', [guildMember.uuid]);
+
+                    if (existingPlayer) {
+                        // Update existing player
+                        await runAsync('UPDATE players SET username = ?, guildUuid = ?, guildRank = ?, contributed = ?, guildJoined = ? WHERE uuid = ?', [member, guildJson.uuid, rank, guildMember.contributed, guildMember.joined, guildMember.uuid]);
+                    } else {
+                        // Insert new player
+                        await runAsync('INSERT INTO players (uuid, username, guildUuid, guildRank, contributed, guildJoined, online, lastLogin, supportRank, veteran, serverRank, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, ?, ?, ?, ?, ?, false, null, null, false, null, 0, 1, null, 0, -1, 0)', [guildMember.uuid, member, guildJson.uuid, rank, guildMember.contributed, guildMember.joined]);
+                    }
+
+                    if (!priorityPlayers.includes(guildMember.uuid)) {
+                        priorityPlayers.push(guildMember.uuid);
+                    }
+                }
+            }
+        }
+
+        updated++;    
+    }
+
+    console.log(`Updated ${updated} priority guilds.`);
+}
+
+async function updatePriorityPlayers() {
+    if (priorityPlayers.length === 0) return;
+    console.log('Updating 5 priority players');
+    let updated = 0;
+
+    for (const player of priorityPlayers) {
+        if (updated === 5) break;
+
+        await waitForRateLimit();
+
+        const response = await axios.get(`https://api.wynncraft.com/v3/player/${player}?fullResult=True`);
+
+        remainingRateLimit = response.headers['ratelimit-remaining'];
+        rateLimitReset = response.headers['ratelimit-reset'];
+        const playerJson = response.data;
+
+        if (playerJson && playerJson.username) {
+            let highestCharcterLevel = 0;
+
+            for (const character in playerJson.characters) {
+                const characterJson = playerJson.characters[character];
+
+                // If character level is higher than current tracked highest, set as new highest
+                if (characterJson.level > highestCharcterLevel) {
+                    highestCharcterLevel = characterJson.level;
+                }
+            }
+
+            let guildUuid = null;
+            let guildRank = null;
+
+            if (playerJson.guild) {
+                guildUuid = playerJson.guild.uuid;
+                guildRank = playerJson.guild.rank.toLowerCase();
+            }
+
+            const veteran = playerJson.veteran ? playerJson.veteran : false;
+
+            const existingPlayer = await getAsync('SELECT * FROM players WHERE uuid = ?', [playerJson.uuid]);
+
+            if (existingPlayer) {
+                await runAsync('UPDATE players SET username = ?, guildUuid = ?, guildRank = ?, supportRank = ?, veteran = ?, serverRank = ?, wars = ?, highestCharacterLevel = ? WHERE uuid = ?', [playerJson.username, guildUuid, guildRank, playerJson.supportRank, veteran, playerJson.rank, playerJson.globalData.wars, highestCharcterLevel, playerJson.uuid]);
+            } else {                  
+                await runAsync('INSERT INTO players (uuid, username, guildUuid, guildRank, contributed, guildJoined, online, lastLogin, supportRank, veteran, serverRank, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, ?, ?, ?, 0, null, 0, ?, ?, ?, ?, ?, ?, null, 0, -1, 0)', [playerJson.uuid, playerJson.username, guildUuid, guildRank, playerJson.lastJoin, playerJson.supportRank, veteran, playerJson.rank, playerJson.globalData.wars, highestCharcterLevel]);
+
+                if (guildUuid && !priorityGuilds.includes(guildUuid)) {
+                    priorityGuilds.push(guildUuid);
+                }
+            }
+        }
+
+        updated++;    
+    }
+
+    console.log(`Updated ${updated} priority players.`);
+}
+
 // When the bot calls the api for player info, we can update the database
 // information for that player
 // player: The details of the player to update
@@ -349,11 +508,35 @@ async function updatePlayer(player) {
     const existingPlayer = await getAsync('SELECT * FROM players WHERE uuid = ?', [player.uuid]);
 
     if (existingPlayer) {
+        const contributed = player.contributed ? player.contributed : existingPlayer.contributed ? existingPlayer.contributed : 0;
+        const guildJoined = player.guildJoined ? player.guildJoined : existingPlayer.guildJoined ? existingPlayer.guildJoined : null;
         // Update existing player, don't update online or lastLogin as that is handled elsewhere
-        await runAsync('UPDATE players SET username = ?, guildUuid = ?, guildRank = ?, supportRank = ?, veteran = ?, serverRank = ?, wars = ?, highestCharacterLevel = ? WHERE uuid = ?', [player.username, player.guildUuid, player.guildRank, player.supportRank, player.veteran, player.serverRank, player.wars, player.highestCharcterLevel, player.uuid]);
+        await runAsync('UPDATE players SET username = ?, guildUuid = ?, guildRank = ?, contributed = ?, guildJoined = ?, supportRank = ?, veteran = ?, serverRank = ?, wars = ?, highestCharacterLevel = ? WHERE uuid = ?', [player.username, player.guildUuid, player.guildRank, contributed, guildJoined, player.supportRank, player.veteran, player.serverRank, player.wars, player.highestCharcterLevel, player.uuid]);
     } else {
+        const contributed = player.contributed ? player.contributed : 0;
+        const guildJoined = player.guildJoined ? player.guildJoined : null;
         // Insert new player
-        await runAsync('INSERT INTO players (uuid, username, guildUuid, guildRank, online, lastLogin, supportRank, veteran, serverRank, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, 0, -1, 0)', [player.uuid, player.username, player.guildUuid, player.guildRank, player.online, player.lastLogin, player.supportRank, player.veteran, player.serverRank, player.wars, player.highestCharcterLevel]);
+        await runAsync('INSERT INTO players (uuid, username, guildUuid, guildRank, contributed, guildJoined, online, lastLogin, supportRank, veteran, serverRank, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, 0, -1, 0)', [player.uuid, player.username, player.guildUuid, player.guildRank, contributed, guildJoined, player.online, player.lastLogin, player.supportRank, player.veteran, player.serverRank, player.wars, player.highestCharcterLevel]);
+    }
+}
+
+// When the updateguildmembers command is ran, we get a list of all the guild members for that guild and we can update their guild related info
+async function updateGuildMembers(uuid, guildMembers) {
+    for (const guildMember of guildMembers) {
+        // Check if the UUID exists in the players table
+        const existingPlayer = await getAsync('SELECT * FROM players WHERE uuid = ?', [guildMember.uuid]);
+
+        if (existingPlayer) {
+            // Update existing player
+            await runAsync('UPDATE players SET username = ?, guildUuid = ?, guildRank = ?, contributed = ?, guildJoined = ? WHERE uuid = ?', [guildMember.username, uuid, guildMember.rank, guildMember.contributed, guildMember.joined, guildMember.uuid]);
+        } else {
+            // Insert new player
+            await runAsync('INSERT INTO players (uuid, username, guildUuid, guildRank, contributed, guildJoined, online, lastLogin, supportRank, veteran, serverRank, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, ?, ?, ?, ?, ?, false, null, null, false, null, 0, 1, null, 0, -1, 0)', [guildMember.uuid, guildMember.username, uuid, guildMember.rank, guildMember.contributed, guildMember.joined]);
+        }
+
+        if (!priorityPlayers.includes(guildMember.uuid)) {
+            priorityPlayers.push(guildMember.uuid);
+        }
     }
 }
 
@@ -381,7 +564,7 @@ async function getLastLogins(guild) {
                 const existingPlayer = await getAsync('SELECT * FROM players WHERE uuid = ?', [guildMember.uuid]);
 
                 if (existingPlayer) {
-                    await runAsync('UPDATE players SET username = ?, guildUuid = ?, guildRank = ? WHERE uuid = ?', [member, guild, rank, guildMember.uuid]);
+                    await runAsync('UPDATE players SET username = ?, guildUuid = ?, guildRank = ?, contributed = ?, guildJoined = ? WHERE uuid = ?', [member, guild, rank, guildMember.contributed, guildMember.joined, guildMember.uuid]);
                 } else {
                     await waitForRateLimit();
 
@@ -403,9 +586,9 @@ async function getLastLogins(guild) {
                             }
                         }
 
-                        const veteran = playerJson.veteran ? playerJson.veteran : 0;
+                        const veteran = playerJson.veteran ? playerJson.veteran : false;
 
-                        await runAsync('INSERT INTO players (uuid, username, guildUuid, guildRank, online, lastLogin, supportRank, veteran, serverRank, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, 0, -1, 0)', [playerJson.uuid, playerJson.username, guild, rank, playerJson.online, playerJson.lastJoin, playerJson.supportRank, veteran, playerJson.rank, playerJson.globalData.wars, highestCharcterLevel]);
+                        await runAsync('INSERT INTO players (uuid, username, guildUuid, guildRank, contributed, guildJoined, online, lastLogin, supportRank, veteran, serverRank, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, 0, -1, 0)', [playerJson.uuid, playerJson.username, guild, rank, guildMember.contributed, guildMember.joined, playerJson.online, playerJson.lastJoin, playerJson.supportRank, veteran, playerJson.rank, playerJson.globalData.wars, highestCharcterLevel]);
                     }
                 }
             }
@@ -519,12 +702,20 @@ async function runScheduledFunctions() {
     let now = new Date();
 
     // Update every 10 minutes
-    if (now.getUTCMinutes() % 10 == 0) {
+    if (now.getUTCMinutes() % 10 === 0) {
         // Updates the average online players & captain+'s for each guild.
         console.log(`Updating guild activity at ${now.getUTCHours()}:${now.getUTCMinutes().toString().padStart(2, '0')}`);
         await updateGuildActivity(now.getUTCHours().toString().padStart(2, '0'), now.getUTCMinutes().toString().padStart(2, '0'));
 
         console.log(`Updated guild activity for ${now.getUTCHours()}:${now.getUTCMinutes().toString().padStart(2, '0')}`);
+
+        await updatePriorityGuilds();
+        await updatePriorityPlayers();
+    }
+
+    // Update twice an hour
+    if (now.getUTCMinutes() % 30 === 0) {
+        await setPriorityGuilds();
     }
 
     // Update hourly
@@ -604,7 +795,7 @@ async function setup() {
     await runAsync('CREATE INDEX IF NOT EXISTS idx_guildName ON guilds (name);');
 
     // If the players table does not exist, create it
-    await runAsync('CREATE TABLE IF NOT EXISTS players (uuid TEXT NOT NULL PRIMARY KEY, username TEXT, guildUuid TEXT, guildRank TEXT, online BOOLEAN, lastLogin TEXT, supportRank TEXT, veteran BOOLEAN, serverRank TEXT, wars INT, highestCharacterLevel INT, sessionStart TEXT, weeklyPlaytime DECIMAL, averagePlaytime DECIMAL, averageCount INT, FOREIGN KEY (guildUuid) REFERENCES guilds(uuid));');
+    await runAsync('CREATE TABLE IF NOT EXISTS players (uuid TEXT NOT NULL PRIMARY KEY, username TEXT, guildUuid TEXT, guildRank TEXT, contributed INT, guildJoined TEXT, online BOOLEAN, lastLogin TEXT, supportRank TEXT, veteran BOOLEAN, serverRank TEXT, wars INT, highestCharacterLevel INT, sessionStart TEXT, weeklyPlaytime DECIMAL, averagePlaytime DECIMAL, averageCount INT, FOREIGN KEY (guildUuid) REFERENCES guilds(uuid));');
     await runAsync('CREATE INDEX IF NOT EXISTS idx_playerGuild ON players (guildUuid);');
 
     console.log('Database setup complete');
@@ -617,6 +808,7 @@ module.exports = {
     findGuild,
     findPlayer,
     updatePlayer,
+    updateGuildMembers,
     getLastLogins,
     getActiveHours,
     getAveragePlaytime,

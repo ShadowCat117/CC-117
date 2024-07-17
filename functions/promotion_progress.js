@@ -131,13 +131,32 @@ async function promotionProgress(interaction, force = false) {
                     contributionPos = guildMember.contributionRank;
                     joinTimestamp = new Date(guildMember.joined);
                     contributedGuildXP = guildMember.contributed;
+                    break;
                 }
+            }
+
+            if (contributionPos !== -1) {
+                break;
             }
         }
 
-        if (contributionPos === -1) {
-            return ({ username: playerJson.username, unableToPromote: 'error' });
-        }
+        const veteran = playerJson.veteran ? playerJson.veteran : false;
+
+        database.updatePlayer({
+            uuid: playerJson.uuid,
+            username: playerJson.username,
+            guildUuid: playerJson.guild.uuid,
+            guildRank: guildRank,
+            contributed: contributedGuildXP,
+            guildJoined: playerJson.guild.joined,
+            online: playerJson.online,
+            lastLogin: playerJson.lastJoin,
+            supportRank: playerJson.supportRank,
+            veteran: veteran,
+            serverRank: playerJson.rank,
+            wars: playerJson.globalData.wars,
+            highestCharcterLevel: highestCharcterLevel,
+        });
 
         const tankRole = interaction.guild.roles.cache.get(config['tankRole']);
         const healerRole = interaction.guild.roles.cache.get(config['healerRole']);
@@ -321,20 +340,6 @@ async function promotionProgress(interaction, force = false) {
                 metRequirements++;
             }
         }
-
-        database.updatePlayer({
-            uuid: playerJson.uuid,
-            username: playerJson.username,
-            guildUuid: playerJson.guild.uuid,
-            guildRank: guildRank,
-            online: playerJson.online,
-            lastLogin: playerJson.lastJoin,
-            supportRank: playerJson.supportRank,
-            veteran: playerJson.veteran,
-            serverRank: playerJson.rank,
-            wars: playerJson.globalData.wars,
-            highestCharcterLevel: highestCharcterLevel,
-        });
 
         return ({
             uuid: playerJson.uuid,

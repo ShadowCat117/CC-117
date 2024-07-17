@@ -100,7 +100,7 @@ module.exports = {
         if (response.length === 0) {
             const responseEmbed = new EmbedBuilder()
                 .setTitle('No roles updated')
-                .setDescription('Everyone is up to date, if you believe this is wrong you can run /updateguild <guildName> or /updateplayer <playerName> to update known guild/player info and try again later.')
+                .setDescription('Everyone is up to date, if you believe this is wrong you can run /updateguildmembers <guildName> or /updateplayer <playerName> to update known guild member/player info and try again later.')
                 .setColor(0x999999);
 
             embeds.push(responseEmbed);

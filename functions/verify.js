@@ -64,7 +64,7 @@ async function verify(interaction, force = false) {
     }
 
     const supportRank = playerJson.supportRank;
-    const veteran = playerJson.veteran;
+    const veteran = playerJson.veteran ? playerJson.veteran : false;
     const serverRank = playerJson.rank;
 
     let highestCharcterLevel = 0;
@@ -94,6 +94,8 @@ async function verify(interaction, force = false) {
         username: playerJson.username,
         guildUuid: guildUuid,
         guildRank: guildRank,
+        contributed: null,
+        guildJoined: null,
         online: playerJson.online,
         lastLogin: playerJson.lastJoin,
         supportRank: supportRank,
