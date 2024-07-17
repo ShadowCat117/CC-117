@@ -5,9 +5,6 @@ testConfig.json
 configs
 database/database.db
 database/database.db-journal
-updateGuilds.json
-updatePlayers.json
 preferences.json
 deploy-commands.js
 index.js
-events/message_delete.js
