@@ -9,7 +9,7 @@ function getTimeSince(timestamp) {
     const days = Math.floor(hours / 24);
 
     if (days > 0) {
-        return `${days} day${days > 1 ? 's' : ''}`;
+        return `${days.toLocaleString()} day${days > 1 ? 's' : ''}`;
     } else if (hours > 0) {
         return `${hours} hour${hours > 1 ? 's' : ''}`;
     } else if (minutes > 0) {
@@ -17,6 +17,37 @@ function getTimeSince(timestamp) {
     } else {
         return `${seconds} second${seconds > 1 ? 's' : ''}`;
     }
+}
+
+function getFormattedXPPerDay(xp, timestamp) {
+    let days = daysSince(timestamp);
+
+    days = days > 0 ? days : 1;
+
+    const xpPerDay = xp / days;
+
+    // Display at billions, millions, thousands per day or below
+    if (xpPerDay >= 1000000000) {
+        return `${(xpPerDay / 1000000000).toFixed(1)}B/day`;
+    } else if (xpPerDay >= 1000000) {
+        return `${(xpPerDay / 1000000).toFixed(1)}M/day`;
+    } else if (xpPerDay >= 1000) {
+        return `${(xpPerDay / 1000).toFixed(1)}k/day`;
+    } else {
+        return `${xpPerDay.toFixed(2)}/day`;
+    }
+}
+
+function daysSince(timestamp) {
+    const now = new Date();
+    const startTime = new Date(timestamp);
+
+    const timeDifference = now - startTime;
+    const seconds = Math.floor(timeDifference / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+
+    return Math.floor(hours / 24);
 }
 
 async function findDiscordUser(serverMembers, username) {
@@ -64,6 +95,8 @@ async function checkValidUsername(memberToCheck, guild, nameToCheck) {
 
 module.exports = {
     getTimeSince,
+    getFormattedXPPerDay,
+    daysSince,
     findDiscordUser,
     checkValidUsername,
 };

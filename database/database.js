@@ -639,6 +639,30 @@ async function getActiveHours(guild, timezoneOffset, sortByActivity) {
     return guildActiveHours;
 }
 
+// Returns the timestamp for when a player was last online.
+// An assumption is made from the caller that the player is offline.
+async function getLastLogin(player) {
+    const row = await getAsync('SELECT lastLogin FROM players WHERE uuid = ?', [player]);
+
+    if (row) {
+        return row.lastLogin;
+    } else {
+        return null;
+    }
+}
+
+// Returns the number of wars a player has participated in as part of the guild.
+// Note, currently the database stores all wars not guild specific. This may or may not be changed.
+async function getWars(player) {
+    const row = await getAsync('SELECT wars FROM players WHERE uuid = ?', [player]);
+
+    if (row) {
+        return row.wars;
+    } else {
+        return 0;
+    }
+}
+
 // Returns the average playtime of the requested player.
 // If no playtime has yet been calculated it will return the playtime for the current week.
 async function getAveragePlaytime(player) {
@@ -811,6 +835,8 @@ module.exports = {
     updateGuildMembers,
     getLastLogins,
     getActiveHours,
+    getLastLogin,
+    getWars,
     getAveragePlaytime,
     getAllPlayerInfo,
     setup,

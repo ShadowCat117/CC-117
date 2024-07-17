@@ -1,87 +1,53 @@
+const utilities = require('../functions/utilities');
+
 class GuildMember {
     // Creates a guild member object
     // username: Username of the guild member
     // guildRank: Guild rank of the member
     // lastJoin: How many days since the player last joined
-    // contributedGuildXP: How much XP they have contributed to the guild
-    // isOnline: Is the guild member currently online
-    // onlineWorld: What world they are currently online on
+    // contributed: How much XP they have contributed to the guild
+    // contributionRank: What position is the member in for contributed XP
+    // online: Is the guild member currently online
+    // server: What world they are currently online on
     // joinDate: When did they join the guild
-    // daysInGuild: How many days they have been in the guild for
-    // contributionPosition: Their contribution position
     // wars: How many wars have they participated in
     // averagePlaytime: How many hours per week does the player play
-    constructor(username, guildRank, lastJoin, contributedGuildXP, isOnline, onlineWorld, joinDate, daysInGuild, contributionPosition, wars, averagePlaytime) {
+    constructor(username, guildRank, lastJoin, contributed, contributionRank, online, server, joinDate, wars, averagePlaytime) {
         // Temporary, remove if Wynn ever fixes the name changing guild bug
         if (username === 'Owen_Rocks_3') {
             this.username = 'Amber\\_Rocks\\_3';
         } else {
             this.username = username.replaceAll('_', '\\_');
         }
-        this.guildRank = `(${guildRank})`;
-        this.lastJoin = lastJoin;
-        this.isOnline = isOnline;
-        this.onlineWorld = onlineWorld;
-        // Add commas between numbers for nicer viewing
-        this.contributedGuildXP = contributedGuildXP.toLocaleString(); 
+        this.guildRank = guildRank.charAt(0).toUpperCase() + guildRank.slice(1);
+        this.lastLogin = lastJoin;
+        this.online = online;
+        this.server = server;
+        this.contributed = contributed;
+        this.localeContributed = contributed.toLocaleString();
+        this.contributionRank = contributionRank;
         this.joinDate = joinDate;
-        this.daysInGuild = daysInGuild;
-        this.contributionPosition = `${contributionPosition}.`;
-        this.wars = wars;
+        this.wars = wars.toLocaleString();
         this.averagePlaytime = parseFloat(averagePlaytime.toFixed(2));
     }
 
-    // Returns a formatted string of the guild member with all the stats listed
-    toString() {
-        if (this.averagePlaytime >= 0) {
-            return `${this.contributionPosition.padEnd(3)} ${this.username} ${this.guildRank}:\n${this.getOnlineStatus()}\nJoined ${this.joinDate} (${this.daysInGuild} days ago)\n${this.contributedGuildXP} (${this.getFormattedXPPerDay()})\n${this.getWars()}\n${this.averagePlaytime} hours per week\n\n`;
-        } else {
-            return `${this.contributionPosition.padEnd(3)} ${this.username} ${this.guildRank}:\n${this.getOnlineStatus()}\nJoined ${this.joinDate} (${this.daysInGuild} days ago)\n${this.contributedGuildXP} (${this.getFormattedXPPerDay()})\n${this.getWars()}\n\n`;
-        }
-    }
-
-    // Return a string of if the player is online and what world they are on or offline
+    // Return a string of if the player is online and what world they are on or offline and time since last login
     getOnlineStatus() {
-        if (this.isOnline) {
+        if (this.online) {
             // If online
-            return `Online on ${this.onlineWorld}`;
-        } else if (this.lastJoin === 1) {
-            // Last online yesterday
-            return `Offline, last seen ${this.lastJoin} day ago`;
-        } else if (this.lastJoin === 0) {
-            // Last online today
-            return 'Offline, last seen today.';
+            return `Online on ${this.server}`;
         } else {
-            // Last online 2+ days ago
-            return `Offline, last seen ${this.lastJoin} days ago`;
+            return `Offline, last seen ${utilities.getTimeSince(this.lastLogin)} ago`;
         }
     }
 
-    // Format the amount of XP the player earns per day.
-    getFormattedXPPerDay() {
-        const contributedXP = parseFloat(this.contributedGuildXP.replace(/,/g, ''));
-        const xpPerDay = contributedXP / this.daysInGuild;
-    
-        // Display at billions, millions, thousands per day or below
-        if (xpPerDay >= 1000000000) {
-            return `${(xpPerDay / 1000000000).toFixed(1)}B/day`;
-        } else if (xpPerDay >= 1000000) {
-            return `${(xpPerDay / 1000000).toFixed(1)}M/day`;
-        } else if (xpPerDay >= 1000) {
-            return `${(xpPerDay / 1000).toFixed(1)}k/day`;
+    // Compare against another GuildMember for sorting.
+    // Sort by contributionRank
+    compareTo(other) {
+        if (this.contributionRank < other.contributionRank) {
+            return -1;
         } else {
-            return `${xpPerDay.toFixed(2)}/day`;
-        }
-    }
-
-    // Get amount of wars completed.
-    getWars() {
-        if (this.wars === null) {
-            return '0 wars';
-        } else if (this.wars === 1) {
-            return '1 war';
-        } else {
-            return `${this.wars} wars`;
+            return 1;
         }
     }
 }

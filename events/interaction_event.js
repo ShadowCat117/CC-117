@@ -530,6 +530,121 @@ module.exports = {
 
                             break;
                         }
+                        case 'guild_stats': {
+                            const loadingEmbed = new EmbedBuilder()
+                                .setDescription('Loading stats for selected guild')
+                                .setColor(0x00ff00);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [loadingEmbed],
+                            });
+
+                            const response = await guildStats(interaction, true);
+
+                            const embeds = [];
+                            const row = new ActionRowBuilder();
+
+                            if (response.members.length > 5) {
+                                const pages = [];
+                                for (let i = 0; i < response.members.length; i += 5) {
+                                    pages.push(response.members.slice(i, i + 5));
+                                }
+            
+                                for (const page of pages) {
+                                    const responseEmbed = new EmbedBuilder()
+                                        .setTitle(`[${response.guildPrefix}] ${response.guildName} Stats`)
+                                        .setColor(0x00ffff);
+            
+                                    let description = `Level: ${response.level} (${response.xpPercent}%)\n`;
+                                    description += `Held Territories: ${response.territories}\n`;
+                                    
+                                    if (response.currentRating !== -1) {
+                                        description += `Season Rating: ${response.currentRating}\n`;
+                                    }
+            
+                                    if (response.previousRating !== -1) {
+                                        description += `Previous Rating: ${response.previousRating}\n`;
+                                    }
+            
+                                    description += `Wars: ${response.wars}\n`;
+                                    description += `XP/day: ${utilities.getFormattedXPPerDay(response.averageXpPerDay)}\n`;
+                                    description += `Total weekly playtime: ${response.totalPlaytime} hour${response.totalPlaytime === 1 ? '' : 's'}`;
+            
+                                    responseEmbed.setDescription(description);
+            
+                                    for (const member of page) {
+                                        let memberDetails = `${member.getOnlineStatus()}\n`;
+                                        memberDetails += `Joined ${utilities.getTimeSince(member.joinDate)} ago\n`;
+                                        memberDetails += `${member.localeContributed} (${utilities.getFormattedXPPerDay(member.contributed, member.joinDate)})\n`;
+                                        memberDetails += `${member.wars} war${member.wars === 1 ? '' : 's'}\n`;
+                                        memberDetails += `${member.averagePlaytime} hours per week`;
+            
+                                        responseEmbed.addFields({ name: `${member.contributionRank}. ${member.username} (${member.guildRank})`, value: `${memberDetails}` });
+                                    }
+            
+                                    embeds.push(responseEmbed);
+                                }
+            
+                                messages.addMessage(interaction.message.id, new PagedMessage(interaction.message, embeds));
+            
+                                const previousPage = new ButtonBuilder()
+                                    .setCustomId('previous')
+                                    .setStyle(ButtonStyle.Primary)
+                                    .setEmoji('⬅️');
+            
+                                const nextPage = new ButtonBuilder()
+                                    .setCustomId('next')
+                                    .setStyle(ButtonStyle.Primary)
+                                    .setEmoji('➡️');
+            
+                                row.addComponents(previousPage, nextPage);
+                            } else {
+                                const responseEmbed = new EmbedBuilder()
+                                        .setTitle(`[${response.guildPrefix}] ${response.guildName} Stats`)
+                                        .setColor(0x00ffff);
+            
+                                let description = `Level: ${response.level} (${response.xpPercent}%)\n`;
+                                description += `Held Territories: ${response.territories}\n`;
+                                
+                                if (response.currentRating !== -1) {
+                                    description += `Season Rating: ${response.currentRating}\n`;
+                                }
+            
+                                if (response.previousRating !== -1) {
+                                    description += `Previous Rating: ${response.previousRating}\n`;
+                                }
+            
+                                description += `Wars: ${response.wars}\n`;
+                                description += `XP/day: ${utilities.getFormattedXPPerDay(response.averageXpPerDay)}\n`;
+                                description += `Total weekly playtime: ${response.totalPlaytime} hour${response.totalPlaytime === 1 ? '' : 's'}`;
+            
+                                responseEmbed.setDescription(description);
+            
+                                for (const member of response.members) {
+                                    let memberDetails = `${member.getOnlineStatus()}\n`;
+                                    memberDetails += `Joined ${utilities.getTimeSince(member.joinDate)} ago\n`;
+                                    memberDetails += `${member.localeContributed} (${utilities.getFormattedXPPerDay(member.contributed, member.joinDate)})\n`;
+                                    memberDetails += `${member.wars} war${member.wars === 1 ? '' : 's'}\n`;
+                                    memberDetails += `${member.averagePlaytime} hours per week`;
+            
+                                    responseEmbed.addFields({ name: `${member.username} (${member.guildRank})`, value: `${memberDetails}` });
+                                }
+            
+                                embeds.push(responseEmbed);
+                            }
+
+                            if (row.components.length > 0) {
+                                await interaction.editReply({ 
+                                    embeds: [embeds[0]],
+                                    components: [row],
+                                });
+                            } else {
+                                await interaction.editReply({ embeds: [embeds[0]] });
+                            }
+
+                            break;
+                        }
                         case 'last_logins': {
                             const loadingEmbed = new EmbedBuilder()
                                 .setDescription('Loading last logins for selected guild')
