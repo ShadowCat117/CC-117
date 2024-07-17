@@ -1302,6 +1302,28 @@ module.exports = {
 
                             break;
                         }
+                        case 'update_player': {
+                            const loadingEmbed = new EmbedBuilder()
+                                .setDescription('Updating selected player')
+                                .setColor(0x00ff00);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [loadingEmbed],
+                            });
+
+                            // Call updateGuildMembers
+                            const response = await updatePlayer(interaction, true);
+
+                            const responseEmbed = new EmbedBuilder()
+                                .setTitle(`Updated ${response.username}`)
+                                .setDescription('Updated all known information about player, guild wide promotion/demotion check and role applying should now be accurate for this player.')
+                                .setColor(0x00ffff);
+
+                            await interaction.editReply({ embeds: [responseEmbed] });
+
+                            break;
+                        }
                         case 'verify': {
                             const loadingEmbed = new EmbedBuilder()
                                 .setDescription('Verifying as selected player')
