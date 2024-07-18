@@ -666,12 +666,28 @@ async function getWars(player) {
 // Returns the average playtime of the requested player.
 // If no playtime has yet been calculated it will return the playtime for the current week.
 async function getAveragePlaytime(player) {
-    const row = await getAsync('SELECT weeklyPlaytime, averagePlaytime FROM players WHERE uuid = ?', [player]);
+    const row = await getAsync('SELECT sessionStart, weeklyPlaytime, averagePlaytime FROM players WHERE uuid = ?', [player]);
 
     if (!row) {
         return -1;
     } else {
-        return row.averagePlaytime !== -1 ? row.averagePlaytime : row.weeklyPlaytime;
+        if (row.averagePlaytime !== -1) {
+            return row.averagePlaytime;
+        } else {
+            // No average playtime yet, use current weekly playtime
+            let weeklyPlaytime = row.weeklyPlaytime;
+
+            // If in an active session, add current sessions playtime
+            if (row.sessionStart) {
+                const now = new Date();
+                const sessionStart = new Date(row.sessionStart);
+                const sessionDurationHours = (now - sessionStart) / (1000 * 60 * 60);
+
+                weeklyPlaytime += sessionDurationHours;
+            }
+
+            return weeklyPlaytime;
+        }
     }
 }
 
