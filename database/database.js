@@ -5,6 +5,7 @@ const sqlite3 = require('sqlite3').verbose();
 const database = new sqlite3.Database('database/database.db');
 const PlayerLastLogin = require('../message_objects/PlayerLastLogin');
 const GuildActiveHours = require('../message_objects/GuildActiveHours');
+const TrackedGuild = require('../message_objects/TrackedGuild');
 const RATE_LIMIT = 180;
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const priorityGuilds = [];
@@ -691,6 +692,79 @@ async function getAveragePlaytime(player) {
     }
 }
 
+// Returns a list of TrackedGuild objects, for every guild passed in.
+async function getGuildActivities(guilds) {
+    const trackedGuilds = [];
+    let averageQuery = 'SELECT uuid, name, prefix';
+
+    for (let i = 0; i < 24; i++) {
+        const currentHour = i.toString().padStart(2, '0');
+        const averageKey = 'average' + currentHour;
+        const captainsKey = 'captains' + currentHour;
+
+        averageQuery += ', ' + averageKey + ', ' + captainsKey;
+    }
+
+    const placeholders = guilds.map(() => '?').join(', ');
+
+    averageQuery += ` FROM guilds WHERE name IN (${placeholders})`;
+
+    const averageResult = await allAsync(averageQuery, guilds);
+
+    for (const guild in averageResult) {
+        const trackedGuild = averageResult[guild];
+
+        let totalAverageOnline = 0;
+        let totalAverageCaptains = 0;
+        let divideBy = 0;
+
+        for (let i = 0; i < 24; i++) {
+            const currentHour = i.toString().padStart(2, '0');
+            const averageKey = 'average' + currentHour;
+            const captainsKey = 'captains' + currentHour;
+
+            const hourAverageOnline = trackedGuild[averageKey];
+            const hourAverageCaptains = trackedGuild[captainsKey];
+
+            if (hourAverageOnline !== -1) {
+                totalAverageOnline += hourAverageOnline;
+                totalAverageCaptains += hourAverageCaptains;
+
+                divideBy++;
+            }
+        }
+
+        if (divideBy !== 0) {
+            const averageOnline = totalAverageOnline / divideBy;
+            const averageCaptains = totalAverageCaptains / divideBy;
+            let currentOnline = 0;
+            let currentCaptains = 0;
+
+            const onlineMembers = await getOnlineGuildMembers(trackedGuild.uuid);
+
+            for (const member in onlineMembers) {
+                currentOnline++;
+
+                if (onlineMembers[member].guildRank !== 'recruit' && onlineMembers[member].guildRank !== 'recruiter') {
+                    currentCaptains++;
+                }
+            }
+
+            trackedGuilds.push(new TrackedGuild(trackedGuild.name, trackedGuild.prefix, averageOnline, averageCaptains, currentOnline, currentCaptains));
+        }
+    }
+
+    trackedGuilds.sort((a, b) => a.compareTo(b));
+
+    return trackedGuilds;
+}
+
+async function getOnlineGuildMembers(guild) {
+    const query = 'SELECT guildRank FROM players WHERE online = true AND guildUuid = ?';
+
+    return await allAsync(query, guild);
+}
+
 // Returns all the player info that is used in updating roles
 async function getAllPlayerInfo() {
     const query = 
@@ -854,6 +928,7 @@ module.exports = {
     getLastLogin,
     getWars,
     getAveragePlaytime,
+    getGuildActivities,
     getAllPlayerInfo,
     setup,
 };
