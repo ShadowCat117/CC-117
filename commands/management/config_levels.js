@@ -1,4 +1,5 @@
 const {
+    EmbedBuilder,
     SlashCommandBuilder,
 } = require('discord.js');
 const fs = require('fs');
@@ -9,51 +10,31 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('config_levels')
         .setDescription('Update configuration options for level roles')
-        .addStringOption((option) =>
-            option.setName('option')
-                .setDescription('The configuration option to update')
-                .setRequired(true)
-                .addChoices({
-                    name: 'Level One Level',
-                    value: 'levelRoleOneLevel',
-                }, {
-                    name: 'Level Two Level',
-                    value: 'levelRoleTwoLevel',
-                }, {
-                    name: 'Level Three Level',
-                    value: 'levelRoleThreeLevel',
-                }, {
-                    name: 'Level Four Level',
-                    value: 'levelRoleFourLevel',
-                }, {
-                    name: 'Level Five Level',
-                    value: 'levelRoleFiveLevel',
-                }, {
-                    name: 'Level Six Level',
-                    value: 'levelRoleSixLevel',
-                }, {
-                    name: 'Level Seven Level',
-                    value: 'levelRoleSevenLevel',
-                }, {
-                    name: 'Level Eight Level',
-                    value: 'levelRoleEightLevel',
-                }, {
-                    name: 'Level Nine Level',
-                    value: 'levelRoleNineLevel',
-                }, {
-                    name: 'Level Ten Level',
-                    value: 'levelRoleTenLevel',
-                }))                
-        .addStringOption((option) =>
-            option.setName('value')
-                .setDescription('The value to set for the configuration option')
+        .addIntegerOption((option) =>
+            option.setName('level')
+                .setDescription('The level for this role to represent')
+                .setRequired(true))               
+        .addRoleOption((option) =>
+            option.setName('role')
+                .setDescription('The role for the given level to be associated with.')
                 .setRequired(true),
         ),
     ephemeral: true,
     async execute(interaction) {
-        try {
-            let config = {};
+        const level = interaction.options.getInteger('level');
+        const role = interaction.options.getRole('role');
 
+        const loadingEmbed = new EmbedBuilder()
+            .setDescription(`Setting level ${level} role to ${role}`)
+            .setColor(0x00ff00);
+
+        await interaction.editReply({ embeds: [loadingEmbed] });
+
+        let config = {};
+
+        const responseEmbed = new EmbedBuilder();
+
+        try {
             const guildId = interaction.guild.id;
             const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
 
@@ -69,197 +50,62 @@ module.exports = {
 
             const adminRoleId = config.adminRole;
             const memberRoles = interaction.member.roles.cache;
-            const addMemberOfRole = config.memberOf;
             const memberOfRole = config.memberOfRole;
 
-            const guildName = config.guildName;
-
             // If the member of role is used, it is required
-            if (addMemberOfRole) {
-                if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
-                    await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
-                    return;
-                }
+            if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
+                responseEmbed
+                    .setDescription('You do not have the required permissions to run this command.')
+                    .setColor(0xff0000);
+                await interaction.editReply({ embeds: [responseEmbed] });
+                return;
             }
 
             // Can only be ran by the owner or an admin
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
-                await interaction.editReply('You do not have the required permissions to run this command.');
+                responseEmbed
+                    .setDescription('You do not have the required permissions to run this command.')
+                    .setColor(0xff0000);
+                await interaction.editReply({ embeds: [responseEmbed] });
                 return;
             }
         } catch (error) {
-            console.log(error);
-            await interaction.editReply('Error changing config.');
+            console.error(error);
+            responseEmbed
+                .setDescription('Error changing config.')
+                .setColor(0xff0000);
+            await interaction.editReply({ embeds: [responseEmbed] });
             return;
         }
 
-        const option = interaction.options.getString('option');
-        const valueStr = interaction.options.getString('value');
-        let number;
-
-        // Validate the options
-        switch (option) {
-            case 'levelRoleOneLevel':
-                if (!valueStr) {
-                    await interaction.editReply('Level One Level requires a <value> input.');
-                    return;
-                } else if (isNaN(valueStr)) {
-                    await interaction.editReply('Level One Level requires <value> to be a number input.');
-                    return;
-                } else {
-                    number = parseInt(valueStr);
-                }
-
-                break;
-            case 'levelRoleTwoLevel':
-                if (!valueStr) {
-                    await interaction.editReply('Level Two Level requires a <value> input.');
-                    return;
-                } else if (isNaN(valueStr)) {
-                    await interaction.editReply('Level Two Level requires <value> to be a number input.');
-                    return;
-                } else {
-                    number = parseInt(valueStr);
-                }
-
-                break;
-            case 'levelRoleThreeLevel':
-                if (!valueStr) {
-                    await interaction.editReply('Level Three Level requires a <value> input.');
-                    return;
-                } else if (isNaN(valueStr)) {
-                    await interaction.editReply('Level Three Level requires <value> to be a number input.');
-                    return;
-                } else {
-                    number = parseInt(valueStr);
-                }
-
-                break;
-            case 'levelRoleFourLevel':
-                if (!valueStr) {
-                    await interaction.editReply('Level Four Level requires a <value> input.');
-                    return;
-                } else if (isNaN(valueStr)) {
-                    await interaction.editReply('Level Four Level requires <value> to be a number input.');
-                    return;
-                } else {
-                    number = parseInt(valueStr);
-                }
-
-                break;
-            case 'levelRoleFiveLevel':
-                if (!valueStr) {
-                    await interaction.editReply('Level Five Level requires a <value> input.');
-                    return;
-                } else if (isNaN(valueStr)) {
-                    await interaction.editReply('Level Five Level requires <value> to be a number input.');
-                    return;
-                } else {
-                    number = parseFloat(valueStr);
-                }
-
-                break;
-            case 'levelRoleSixLevel':
-                if (!valueStr) {
-                    await interaction.editReply('Level Six Level requires a <value> input.');
-                    return;
-                } else if (isNaN(valueStr)) {
-                    await interaction.editReply('Level Six Level requires <value> to be a number input.');
-                    return;
-                } else {
-                    number = parseInt(valueStr);
-                }
-
-                break;
-            case 'levelRoleSevenLevel':
-                if (!valueStr) {
-                    await interaction.editReply('Level Seven Level requires a <value> input.');
-                    return;
-                } else if (isNaN(valueStr)) {
-                    await interaction.editReply('Level Seven Level requires <value> to be a number input.');
-                    return;
-                } else {
-                    number = parseInt(valueStr);
-                }
-
-                break;
-            case 'levelRoleEightLevel':
-                if (!valueStr) {
-                    await interaction.editReply('Level Eight Level requires a <value> input.');
-                    return;
-                } else if (isNaN(valueStr)) {
-                    await interaction.editReply('Level Eight Level requires <value> to be a number input.');
-                    return;
-                } else {
-                    number = parseFloat(valueStr);
-                }
-
-                break;
-            case 'levelRoleNineLevel':
-                if (!valueStr) {
-                    await interaction.editReply('Level Nine Level requires a <value> input.');
-                    return;
-                } else if (isNaN(valueStr)) {
-                    await interaction.editReply('Level Nine Level requires <value> to be a number input.');
-                    return;
-                } else {
-                    number = parseInt(valueStr);
-                }
-
-                break;
-            case 'levelRoleTenLevel':
-                if (!valueStr) {
-                    await interaction.editReply('Level Ten Level requires a <value> input.');
-                    return;
-                } else if (isNaN(valueStr)) {
-                    await interaction.editReply('Level Ten Level requires <value> to be a number input.');
-                    return;
-                } else {
-                    number = parseInt(valueStr);
-                }
-
-                break;
-            default:
-                await interaction.editReply('Invalid configuration option.');
-                return;
+        if (level < 1 || level > 106) {
+            responseEmbed
+            .setTitle('Invalid level')
+                .setDescription('Level must be in the range 1-106.')
+                .setFooter({ text: 'If level cap has increased this will be changed soon.' })
+                .setColor(0xff0000);
+            await interaction.editReply({ embeds: [responseEmbed] });
+            return;
         }
 
         const guildId = interaction.guild.id;
         const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
 
         try {
-            let config = {};
-            if (fs.existsSync(filePath)) {
-                const fileData = fs.readFileSync(filePath, 'utf-8');
-                config = JSON.parse(fileData);
-            }
-
-            // Save the option to the config
-            switch (option) {
-                case 'levelRoleOneLevel':
-                case 'levelRoleTwoLevel':
-                case 'levelRoleThreeLevel':
-                case 'levelRoleFourLevel':
-                case 'levelRoleFiveLevel':
-                case 'levelRoleSixLevel':
-                case 'levelRoleSevenLevel':
-                case 'levelRoleEightLevel':
-                case 'levelRoleNineLevel':
-                case 'levelRoleTenLevel':
-                    config[option] = number;
-                    break;
-            }
+            config['levelRoles'][level] = role.id;
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
-            if (valueStr) {
-                await interaction.editReply(`Configuration option \`${option}\` updated successfully to ${valueStr}.`);
-            } else {
-                await interaction.editReply(`Configuration option \`${option}\` updated successfully to ${number}.`);
-            }
+            responseEmbed
+                .setDescription(`Level ${level} role set to ${role}.`)
+                .setColor(0x00ffff);
         } catch (error) {
-            console.log(`Error updating configuration option: ${error}`);
-            await interaction.editReply('An error occurred while updating the configuration option.');
+            console.error(`Error updating configuration option: ${error}`);
+            responseEmbed
+                .setDescription('An error occured whilst updating config file.')
+                .setColor(0xff0000);
         }
+
+        await interaction.editReply({ embeds: [responseEmbed] });
     },
 };

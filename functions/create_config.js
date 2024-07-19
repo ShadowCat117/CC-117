@@ -35,6 +35,7 @@ async function createConfig(client, guildId) {
                 vetRole: null,
                 unverifiedRole: null,
                 memberOfRole: null,
+                levelRoles: {},
                 chiefUpperThreshold: 730,
                 chiefLowerThreshold: 365,
                 strategistUpperThreshold: 50,
