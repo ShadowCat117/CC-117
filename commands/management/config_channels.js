@@ -1,4 +1,5 @@
 const {
+    EmbedBuilder,
     SlashCommandBuilder,
     PermissionsBitField,
 } = require('discord.js');
@@ -20,9 +21,6 @@ module.exports = {
                 }, {
                     name: 'Join/Leave Channel',
                     value: 'joinLeaveChannel',
-                }, {
-                    name: 'High Rank Channel',
-                    value: 'highRankChannel',
                 }))
         .addChannelOption((option) =>
             option.setName('channel')
@@ -31,6 +29,17 @@ module.exports = {
         ),
     ephemeral: true,
     async execute(interaction) {
+        const option = interaction.options.getString('option');
+        const channel = interaction.options.getChannel('channel');
+
+        const loadingEmbed = new EmbedBuilder()
+            .setDescription(`Setting ${option} to ${channel}}`)
+            .setColor(0x00ff00);
+
+        await interaction.editReply({ embeds: [loadingEmbed] });
+
+        const responseEmbed = new EmbedBuilder();
+
         try {
             let config = {};
 
@@ -49,59 +58,32 @@ module.exports = {
 
             const adminRoleId = config.adminRole;
             const memberRoles = interaction.member.roles.cache;
-            const addMemberOfRole = config.memberOf;
             const memberOfRole = config.memberOfRole;
 
-            const guildName = config.guildName;
-
             // If the member of role is used, it is required
-            if (addMemberOfRole) {
-                if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
-                    await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
-                    return;
-                }
+            if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
+                responseEmbed
+                    .setDescription('You do not have the required permissions to run this command.')
+                    .setColor(0xff0000);
+                await interaction.editReply({ embeds: [responseEmbed] });
+                return;
             }
 
             // Can only be ran by the owner or an admin
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
-                await interaction.editReply('You do not have the required permissions to run this command.');
+                responseEmbed
+                    .setDescription('You do not have the required permissions to run this command.')
+                    .setColor(0xff0000);
+                await interaction.editReply({ embeds: [responseEmbed] });
                 return;
             }
         } catch (error) {
-            console.log(error);
-            await interaction.editReply('Error changing config.');
+            console.error(error);
+            responseEmbed
+                .setDescription('Error changing config.')
+                .setColor(0xff0000);
+            await interaction.editReply({ embeds: [responseEmbed] });
             return;
-        }
-
-        const option = interaction.options.getString('option');
-        const channel = interaction.options.getChannel('channel');
-
-        // Validate the options
-        switch (option) {
-            case 'logChannel':
-                if (channel == null) {
-                    await interaction.editReply('Log Channel requires a <channel> input.');
-                    return;
-                }
-
-                break;
-            case 'joinLeaveChannel':
-                if (channel == null) {
-                    await interaction.editReply('Join/Leave Channel requires a <channel> input.');
-                    return;
-                }
-
-                break;
-            case 'highRankChannel':
-                if (channel == null) {
-                    await interaction.editReply('High Rank Channel requires a <channel> input.');
-                    return;
-                }
-
-                break;
-            default:
-                await interaction.editReply('Invalid configuration option.');
-                return;
         }
 
         const guildId = interaction.guild.id;
@@ -129,13 +111,21 @@ module.exports = {
 
             // If the bot does not have permission for the selected channel, tell the user
             if (!botPermissions.has(PermissionsBitField.Flags.SendMessages) || !botPermissions.has(PermissionsBitField.Flags.ViewChannel)) {
-                await interaction.editReply(`Configuration option \`${option}\` updated successfully to ${channel}.\n\nI currently do not have permission to send messages to that channel so please allow me to. I need View Channel & Send Messages.`);
+                responseEmbed
+                    .setDescription(`Configuration option \`${option}\` updated successfully to ${channel}.\n\nI currently do not have permission to send messages to that channel so please allow me to. I need View Channel & Send Messages.`)
+                    .setColor(0x00ffff);
             } else {
-                await interaction.editReply(`Configuration option \`${option}\` updated successfully to ${channel}.`);
+                responseEmbed
+                    .setDescription(`Configuration option \`${option}\` updated successfully to ${channel}.`)
+                    .setColor(0x00ffff);
             }
         } catch (error) {
-            console.log(`Error updating configuration option: ${error}`);
-            await interaction.editReply('An error occurred while updating the configuration option.');
+            console.error(`Error updating configuration option: ${error}`);
+            responseEmbed
+                .setDescription('An error occured whilst updating config file.')
+                .setColor(0xff0000);
         }
+
+        await interaction.editReply({ embeds: [responseEmbed] });
     },
 };
