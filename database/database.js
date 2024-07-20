@@ -695,7 +695,7 @@ async function getGuildActivities(guilds) {
 
     const placeholders = guilds.map(() => '?').join(', ');
 
-    averageQuery += ` FROM guilds WHERE name IN (${placeholders})`;
+    averageQuery += ` FROM guilds WHERE uuid IN (${placeholders})`;
 
     const averageResult = await allAsync(averageQuery, guilds);
 
