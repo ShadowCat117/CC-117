@@ -48,7 +48,7 @@ module.exports = {
 
             // If member of role is used, require it to run command
             if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRoleCheck))) {
-                const guildName = await database.findGuild(guildUuid, true);
+                const guildName = (await database.findGuild(guildUuid, true)).name;
                 await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
                 return;
             }
@@ -59,7 +59,7 @@ module.exports = {
                 return;
             }
 
-            const guildName = await database.findGuild(guildUuid, true);
+            const guildName = (await database.findGuild(guildUuid, true)).name;
 
             // Add all of the various config options to a page and go to a new page every so often
             configContent += `Guild: ${guildName}\n`;

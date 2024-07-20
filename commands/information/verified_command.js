@@ -64,7 +64,7 @@ module.exports = {
             if (response.guildName === '') {
                 const responseEmbed = new EmbedBuilder();
 
-                const guildName = await database.findGuild(guildUuid, true);
+                const guildName = (await database.findGuild(guildUuid, true)).name;
 
                 // Unknown guild
                 responseEmbed

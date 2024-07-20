@@ -65,7 +65,7 @@ module.exports = {
                     await interaction.editReply({ embeds: [responseEmbed] });
                     return;
                 } else if (interaction.member.id !== interaction.member.guild.ownerId && (memberOfRole && !memberRoles.has(memberOfRole))) {
-                    const guildName = await database.findGuild(guildUuid, true);
+                    const guildName = (await database.findGuild(guildUuid, true)).name;
                     const responseEmbed = new EmbedBuilder()
                             .setTitle('Missing Permissions')
                             .setDescription(`You must be a member of ${guildName} to use this command.`)

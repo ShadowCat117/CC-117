@@ -112,7 +112,7 @@ module.exports = {
 
             // If the member of role is used, it is required
             if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
-                const guildName = await database.findGuild(guildUuid, true);
+                const guildName = (await database.findGuild(guildUuid, true)).name;
                 await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
                 return;
             }

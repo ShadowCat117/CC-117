@@ -59,7 +59,7 @@ module.exports = {
                 return;
             }
 
-            const guildName = await database.findGuild(guildUuid, true);
+            const guildName = (await database.findGuild(guildUuid, true)).name;
 
             // If the member of role is used, check the user has it to let them run the command
             if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {

@@ -35,7 +35,7 @@ const updatePlayer = require('../functions/update_player');
 const banPlayer = require('../functions/ban_player');
 const unbanPlayer = require('../functions/unban_player');
 const messages = require('../functions/messages');
-const database = require('../../database/database');
+const database = require('../database/database');
 
 const warriorArchetypes = ['fallen', 'battleMonk', 'paladin'];
 const mageArchetypes = ['riftwalker', 'lightBender', 'arcanist'];

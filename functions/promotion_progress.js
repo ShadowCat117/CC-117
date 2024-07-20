@@ -28,31 +28,16 @@ async function promotionProgress(interaction, force = false) {
             nameToSearch = interaction.customId.split(':')[1];
         }
 
-        let player = await database.findPlayer(nameToSearch, force);
+        const player = await database.findPlayer(nameToSearch, force);
 
         if (player != null && player.message === 'Multiple possibilities found') {
-            const possiblePlayers = [];
-
-            for (let i = 0; i < player.playerUuids.length; i++) {
-                const uuid = player.playerUuids[i];
-                const username = player.playerUsernames[i];
-
-                if (player.playerGuildNames[i] === guildName) {
-                    possiblePlayers.push({ uuid: uuid, username: username });
-                }
-            }
-
-            if (possiblePlayers.length === 1) {
-                player = possiblePlayers[0];
-            } else {
-                return {
-                    playerUuids: player.playerUuids,
-                    playerUsernames: player.playerUsernames,
-                    playerRanks: player.playerRanks,
-                    playerGuildRanks: player.playerGuildRanks,
-                    playerGuildNames: player.playerGuildNames,
-                };
-            }
+            return {
+                playerUuids: player.playerUuids,
+                playerUsernames: player.playerUsernames,
+                playerRanks: player.playerRanks,
+                playerGuildRanks: player.playerGuildRanks,
+                playerGuildNames: player.playerGuildNames,
+            };
         }
 
         let playerJson;
@@ -82,7 +67,7 @@ async function promotionProgress(interaction, force = false) {
             return ({ username: playerJson.username, unableToPromote: 'error' });
         }
 
-        if (!playerJson.guild || playerJson.guild.name !== guildName) {
+        if (!playerJson.guild || playerJson.guild.uuid !== guildUuid) {
             return ({ username: playerJson.username, unableToPromote: 'guild' });
         }
 

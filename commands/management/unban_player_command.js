@@ -138,7 +138,7 @@ module.exports = {
                         .setDescription(`Unable to find a player using the name '${interaction.options.getString('username')}', try again using the exact player name.`)
                         .setColor(0xff0000);
                 } else {
-                    const guildName = await database.findGuild(guildUuid, true);
+                    const guildName = (await database.findGuild(guildUuid, true)).name;
                     // Valid player
                     responseEmbed
                         .setTitle(`${response.username} has been unbanned from ${guildName}`)

@@ -50,7 +50,7 @@ module.exports = {
                 await interaction.editReply({ embeds: [errorEmbed] });
             }
 
-            const guildName = await database.findGuild(guildUuid, true);
+            const guildName = (await database.findGuild(guildUuid, true)).name;
 
             // Call promotionProgress
             const response = await promotionProgress(interaction);

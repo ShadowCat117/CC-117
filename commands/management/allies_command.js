@@ -49,7 +49,7 @@ module.exports = {
             const embeds = [];
             const errorEmbed = new EmbedBuilder();
 
-            const guildName = await database.findGuild(guildUuid, true);
+            const guildName = (await database.findGuild(guildUuid, true)).name;
 
             if (!guildUuid) {
                 // Need a set guild to run this command               
@@ -129,7 +129,7 @@ module.exports = {
                 let alliesValue = '';
 
                 for (const ally of config.allies) {
-                    const allyName = await database.findGuild(ally, true);
+                    const allyName = (await database.findGuild(ally, true)).name;
                     alliesValue += `${allyName}\n`;
                 }
 
