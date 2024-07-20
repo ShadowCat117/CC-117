@@ -9,6 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const verified = require('../../functions/verified');
 const messages = require('../../functions/messages');
+const database = require('../../database/database');
 const PagedMessage = require('../../message_objects/PagedMessage');
 
 module.exports = {
@@ -33,29 +34,37 @@ module.exports = {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
             } else {
-                await interaction.editReply({ 
-                    content: 'You do not have a guild set. Use /setguild to set one.',
-                    embeds: [], 
-                });
+                const responseEmbed = new EmbedBuilder()
+                    .setTitle('Error')
+                    .setDescription('You do not have a guild set. Use /setguild to set one')
+                    .setColor(0xff0000);
+
+                await interaction.editReply({ embeds: [responseEmbed] });
+                return;
             }
 
-            const guildName = config.guildName;
+            const guildUuid = config.guild;
 
-            if (!guildName || guildName === '') {
-                await interaction.editReply({ 
-                    content: 'You do not have a guild set. Use /setguild to set one.',
-                    embeds: [], 
-                });
+            if (!guildUuid) {
+                const responseEmbed = new EmbedBuilder()
+                    .setTitle('Error')
+                    .setDescription('You do not have a guild set. Use /setguild to set one')
+                    .setColor(0xff0000);
+
+                await interaction.editReply({ embeds: [responseEmbed] });
+                return;
             }
 
             // Call verified
-            const response = await verified(guildName, interaction);
+            const response = await verified(guildUuid, interaction);
 
             const embeds = [];
             const row = new ActionRowBuilder();
 
             if (response.guildName === '') {
                 const responseEmbed = new EmbedBuilder();
+
+                const guildName = await database.findGuild(guildUuid, true);
 
                 // Unknown guild
                 responseEmbed

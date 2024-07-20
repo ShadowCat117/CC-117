@@ -358,13 +358,9 @@ async function setPriorityGuilds() {
             const data = await fs.readFile(configFilePath, 'utf8');
             const config = JSON.parse(data);
 
-            if (config.guildName) {
-                const uuid = (await findGuild(config.guildName)).uuid;
-
-                if (uuid && !priorityGuilds.includes(uuid)) {
-                    priorityGuilds.push(uuid);
-                } else if (!uuid) {
-                    console.error(`Invalid set guild ${config.guildName}, should be findable.`);
+            if (config.guild) {
+                if (!priorityGuilds.includes(config.guild)) {
+                    priorityGuilds.push(config.guild);
                 }
             }
 

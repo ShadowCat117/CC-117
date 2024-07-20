@@ -4,6 +4,7 @@ const {
 const fs = require('fs');
 const path = require('path');
 const createConfig = require('../../functions/create_config');
+const database = require('../../database/database');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -111,17 +112,15 @@ module.exports = {
 
             const adminRoleId = config.adminRole;
             const memberRoles = interaction.member.roles.cache;
-            const addMemberOfRole = config.memberOf;
             const memberOfRole = config.memberOfRole;
 
-            const guildName = config.guildName;
+            const guildUuid = config.guild;
 
             // If the member of role is used, it is required
-            if (addMemberOfRole) {
-                if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
-                    await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
-                    return;
-                }
+            if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
+                const guildName = await database.findGuild(guildUuid, true);
+                await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
+                return;
             }
 
             // Can only be ran by the owner or an admin

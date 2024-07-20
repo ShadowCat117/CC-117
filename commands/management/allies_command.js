@@ -9,6 +9,7 @@ const createConfig = require('../../functions/create_config');
 const fs = require('fs');
 const path = require('path');
 const messages = require('../../functions/messages');
+const database = require('../../database/database');
 const PagedMessage = require('../../message_objects/PagedMessage');
 
 module.exports = {
@@ -40,16 +41,17 @@ module.exports = {
                 config = JSON.parse(fileData);
             }
 
-            const addMemberOfRole = config.memberOf;
             const memberOfRole = config.memberOfRole;
             const memberRoles = interaction.member.roles.cache;
 
-            const guildName = config.guildName;
+            const guildUuid = config.guild;
 
             const embeds = [];
             const errorEmbed = new EmbedBuilder();
 
-            if (!guildName) {
+            const guildName = await database.findGuild(guildUuid, true);
+
+            if (!guildUuid) {
                 // Need a set guild to run this command               
                 errorEmbed
                     .setTitle('Error')
@@ -65,7 +67,7 @@ module.exports = {
                         .setColor(0x00ffff);
 
                 embeds.push(errorEmbed);
-            } else if (addMemberOfRole) {
+            } else if (memberOfRole) {
                 // If member of role is used make sure they have the role
                 if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                     errorEmbed

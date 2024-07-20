@@ -10,6 +10,7 @@ const path = require('path');
 const createConfig = require('../../functions/create_config');
 const updateRoles = require('../../functions/update_roles');
 const messages = require('../../functions/messages');
+const database = require('../../database/database');
 const PagedMessage = require('../../message_objects/PagedMessage');
 
 module.exports = {
@@ -38,10 +39,10 @@ module.exports = {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
 
-                const guildName = config.guildName;
+                const guildUuid = config.guild;
 
                 // Guild set required
-                if (!guildName) {
+                if (!guildUuid) {
                     const responseEmbed = new EmbedBuilder()
                             .setTitle('No Guild Set')
                             .setDescription('The server you are in does not have a guild set.')
@@ -64,9 +65,10 @@ module.exports = {
                     await interaction.editReply({ embeds: [responseEmbed] });
                     return;
                 } else if (interaction.member.id !== interaction.member.guild.ownerId && (memberOfRole && !memberRoles.has(memberOfRole))) {
+                    const guildName = await database.findGuild(guildUuid, true);
                     const responseEmbed = new EmbedBuilder()
                             .setTitle('Missing Permissions')
-                            .setDescription(`You must be a member of ${config.guildName} to use this command.`)
+                            .setDescription(`You must be a member of ${guildName} to use this command.`)
                             .setColor(0xff0000);
 
                     await interaction.editReply({ embeds: [responseEmbed] });

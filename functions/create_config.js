@@ -51,7 +51,7 @@ async function createConfig(client, guildId) {
                 averageRequirement: 5,
                 newPlayerMinimumTime: 14,
                 newPlayerThreshold: 5,
-                guildName: null,
+                guild: null,
                 allies: [],
                 trackedGuilds: [],
                 chiefPromotionRequirement: ['NONE'],

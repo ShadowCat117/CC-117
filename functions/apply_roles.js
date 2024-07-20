@@ -218,7 +218,7 @@ async function applyRoles(guild, member, playerInfo) {
         } else {
             // Verified member, change nickname to match username and remove unverified role.
             const username = playerInfo.username;
-            const guildName = playerInfo.guildName;
+            const guildUuid = playerInfo.guildUuid;
             const guildPrefix = playerInfo.guildPrefix;
             const guildRank = playerInfo.guildRank;
             const supportRank = playerInfo.supportRank;
@@ -226,7 +226,7 @@ async function applyRoles(guild, member, playerInfo) {
             const serverRank = playerInfo.serverRank;
             const level = playerInfo.highestCharacterLevel;
 
-            if (guildName === config.guildName) {
+            if (guildUuid === config.guild) {
                 // Guild member, apply guild rank role and member of role.
                 const guildRankRole = guild.roles.cache.get(config[guildRank + 'Role']);
 
@@ -328,6 +328,7 @@ async function applyRoles(guild, member, playerInfo) {
                 }
             }
 
+            // FIXME: Allies still use guild name
             if (allies.includes(guildName)) {
                 // Add ally role and ally owner role if owner
                 if (guildRank === 'owner') {
@@ -609,7 +610,7 @@ async function applyRoles(guild, member, playerInfo) {
             nickname = username;
 
             if (member.id !== member.guild.ownerId) {
-                if (config.addGuildPrefixes && guildPrefix && guildName !== config.guildName) {
+                if (config.addGuildPrefixes && guildPrefix && guildUuid !== config.guild) {
                     nickname += ` [${guildPrefix}]`;
                 }
 

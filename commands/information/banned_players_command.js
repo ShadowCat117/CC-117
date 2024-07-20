@@ -9,6 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const createConfig = require('../../functions/create_config');
 const messages = require('../../functions/messages');
+const database = require('../../database/database');
 const PagedMessage = require('../../message_objects/PagedMessage');
 
 module.exports = {
@@ -43,13 +44,12 @@ module.exports = {
             }
 
             const memberRoles = interaction.member.roles.cache;
-            const addMemberOfRole = config.memberOf;
             const memberOfRole = config.memberOfRole;
 
-            const guildName = config.guildName;
+            const guildUuid = config.guild;
 
             // Command can only be ran if the server has a guild set
-            if (!guildName) {
+            if (!guildUuid) {
                 responseEmbed
                     .setTitle('Error')
                     .setDescription('You do not have a guild set.')
@@ -59,16 +59,16 @@ module.exports = {
                 return;
             }
 
+            const guildName = await database.findGuild(guildUuid, true);
+
             // If the member of role is used, check the user has it to let them run the command
-            if (addMemberOfRole) {
-                if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
-                    responseEmbed
-                        .setTitle('Error')
-                        .setDescription(`You must be a member of ${guildName} to run this command.`)
-                        .setColor(0xff0000);
-                    await interaction.editReply({ embeds: [responseEmbed] });
-                    return;
-                }
+            if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
+                responseEmbed
+                    .setTitle('Error')
+                    .setDescription(`You must be a member of ${guildName} to run this command.`)
+                    .setColor(0xff0000);
+                await interaction.editReply({ embeds: [responseEmbed] });
+                return;
             }
 
             // No players are on the banned list

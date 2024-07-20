@@ -8,6 +8,7 @@ const {
 const fs = require('fs');
 const path = require('path');
 const promotionProgress = require('../../functions/promotion_progress');
+const database = require('../../database/database');
 const PromotionValue = require('../../values/PromotionValue');
 
 module.exports = {
@@ -39,9 +40,9 @@ module.exports = {
                 config = JSON.parse(fileData);
             }
 
-            const guildName = config.guildName;
+            const guildUuid = config.guild;
 
-            if (guildName === '') {
+            if (!guildUuid) {
                 const errorEmbed = new EmbedBuilder()
                     .setDescription('You have not set a guild, do so using /setguild')
                     .setColor(0xff0000);
@@ -49,7 +50,9 @@ module.exports = {
                 await interaction.editReply({ embeds: [errorEmbed] });
             }
 
-            // Call sus
+            const guildName = await database.findGuild(guildUuid, true);
+
+            // Call promotionProgress
             const response = await promotionProgress(interaction);
 
             const responseEmbed = new EmbedBuilder();

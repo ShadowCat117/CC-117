@@ -35,6 +35,7 @@ const updatePlayer = require('../functions/update_player');
 const banPlayer = require('../functions/ban_player');
 const unbanPlayer = require('../functions/unban_player');
 const messages = require('../functions/messages');
+const database = require('../../database/database');
 
 const warriorArchetypes = ['fallen', 'battleMonk', 'paladin'];
 const mageArchetypes = ['riftwalker', 'lightBender', 'arcanist'];
@@ -829,6 +830,7 @@ module.exports = {
 
                             if (response.unableToPromote) {
                                 const reason = response.unableToPromote;
+                                const guildName = await database.findGuild(config.guild, true);
         
                                 switch (reason) {
                                     case 'error':
@@ -839,17 +841,17 @@ module.exports = {
                                     case 'guild':
                                         // Not in guild
                                         responseEmbed
-                                            .setDescription(`${response.username} is not a member of ${config.guildName}.`);
+                                            .setDescription(`${response.username} is not a member of ${guildName}.`);
                                         break;
                                     case 'owner':
                                         // Is owner
                                         responseEmbed
-                                            .setDescription(`${response.username} is the Owner of ${config.guildName}. They are unable to be promoted.`);
+                                            .setDescription(`${response.username} is the Owner of ${guildName}. They are unable to be promoted.`);
                                         break;
                                     case 'chief':
                                         // Is chief
                                         responseEmbed
-                                            .setDescription(`${response.username} is a Chief of ${config.guildName}. Only the Owner can decide if they should be promoted.`);
+                                            .setDescription(`${response.username} is a Chief of ${guildName}. Only the Owner can decide if they should be promoted.`);
                                         break;
                                     default:
                                         // Exempt

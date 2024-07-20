@@ -1,8 +1,8 @@
 const axios = require('axios');
 const VerifiedMember = require('../message_objects/VerifiedMember');
 
-async function verified(guildName, interaction) {
-    const guildJson = (await axios.get(`https://api.wynncraft.com/v3/guild/${guildName}`)).data;
+async function verified(guildUuid, interaction) {
+    const guildJson = (await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${guildUuid}`)).data;
     
     // FIXME: Handle errors better
     if (!guildJson || !guildJson.name) {

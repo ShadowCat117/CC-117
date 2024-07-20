@@ -18,7 +18,7 @@ async function promotionProgress(interaction, force = false) {
             config = JSON.parse(fileData);
         }
 
-        const guildName = config.guildName;
+        const guildUuid = config.guild;
 
         let nameToSearch;
 

@@ -7,6 +7,7 @@ const {
 const fs = require('fs');
 const path = require('path');
 const createConfig = require('../../functions/create_config');
+const database = require('../../database/database');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -35,23 +36,21 @@ module.exports = {
 
             const adminRoleId = config.adminRole;
             const memberRoles = interaction.member.roles.cache;
-            const addMemberOfRole = config.memberOf;
             const memberOfRoleCheck = config.memberOfRole;
 
-            const guildName = config.guildName;
+            const guildUuid = config.guild;
 
             // Requires a set guild to run command
-            if (!guildName) {
+            if (!guildUuid) {
                 await interaction.editReply('The server you are in does not have a guild set.');
                 return;
             }
 
             // If member of role is used, require it to run command
-            if (addMemberOfRole) {
-                if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRoleCheck))) {
-                    await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
-                    return;
-                }
+            if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRoleCheck))) {
+                const guildName = await database.findGuild(guildUuid, true);
+                await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
+                return;
             }
 
             // Only owners and admins can run command
@@ -60,8 +59,10 @@ module.exports = {
                 return;
             }
 
+            const guildName = await database.findGuild(guildUuid, true);
+
             // Add all of the various config options to a page and go to a new page every so often
-            configContent += `Guild: ${config.guildName}\n`;
+            configContent += `Guild: ${guildName}\n`;
             configContent += `Chief Inactivity Upper Threshold: ${config.chiefUpperThreshold}\n`;
             configContent += `Chief Inactivity Lower Threshold: ${config.chiefLowerThreshold}\n`;
             configContent += `Chief Promotion Requirements: ${config.chiefPromotionRequirement}\n`;

@@ -42,7 +42,7 @@ async function checkForDemotions(interaction) {
             config = JSON.parse(fileData);
         }
 
-        const guildName = config.guildName;
+        const guildUuid = config.guild;
         const chiefPromotionRequirement = config.chiefPromotionRequirement;
         const strategistPromotionRequirement = config.strategistPromotionRequirement;
         const captainPromotionRequirement = config.captainPromotionRequirement;

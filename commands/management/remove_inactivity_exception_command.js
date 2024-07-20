@@ -48,7 +48,7 @@ module.exports = {
 
             const adminRoleId = config.adminRole;
             const memberRoles = interaction.member.roles.cache;
-            const guildName = config.guildName;
+            const guildUuid = config.guild;
 
             // Command can only be ran by owners or admins
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
@@ -61,7 +61,7 @@ module.exports = {
             }
 
             // Need a set guild to run this command 
-            if (!guildName) {
+            if (!guildUuid) {
                 errorEmbed
                     .setTitle('Error')
                     .setDescription('You do not have a guild set.')

@@ -4,6 +4,7 @@ const {
 const fs = require('fs');
 const path = require('path');
 const createConfig = require('../../functions/create_config');
+const database = require('../../database/database');
 const PromotionValue = require('../../values/PromotionValue');
 
 module.exports = {
@@ -107,23 +108,21 @@ module.exports = {
 
             const adminRoleId = config.adminRole;
             const memberRoles = interaction.member.roles.cache;
-            const addMemberOfRole = config.memberOf;
             const memberOfRole = config.memberOfRole;
 
-            const guildName = config.guildName;
+            const guildUuid = config.guild;
 
             // A guild must be set to run this command
-            if (!guildName) {
+            if (!guildUuid) {
                 await interaction.editReply('The server you are in does not have a guild set.');
                 return;
             }
 
             // If the member of role is used, it is required
-            if (addMemberOfRole) {
-                if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
-                    await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
-                    return;
-                }
+            if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
+                const guildName = await database.findGuild(guildUuid, true);
+                await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
+                return;
             }
 
             // Can only be ran by the owner or an admin

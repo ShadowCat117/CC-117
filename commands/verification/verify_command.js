@@ -41,10 +41,10 @@ module.exports = {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
 
-                const guildName = config.guildName;
+                const guildUuid = config.guild;
 
                 // Guild set required
-                if (!guildName) {
+                if (!guildUuid) {
                     responseEmbed
                             .setTitle('No Guild Set')
                             .setDescription('The server you are in does not have a guild set.')

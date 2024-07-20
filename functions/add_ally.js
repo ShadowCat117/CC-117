@@ -38,7 +38,8 @@ async function addAlly(interaction, force = false) {
                 return ({ error: `${guild.name} is already an ally.` });
             }
 
-            if (config.guildName === guild.name) {
+            // FIXME: Allies still stored as names
+            if (config.guild === guild.name) {
                 return ({ error: `You are representing ${guild.name}.` });
             }
 

@@ -52,13 +52,11 @@ async function verify(interaction, force = false) {
     }
 
     let guildUuid = null;
-    let guildName = null;
     let guildPrefix = null;
     let guildRank = null;
 
     if (playerJson.guild) {
         guildUuid = playerJson.guild.uuid;
-        guildName = playerJson.guild.name;
         guildPrefix = playerJson.guild.prefix;
         guildRank = playerJson.guild.rank.toLowerCase();
     }
@@ -85,7 +83,7 @@ async function verify(interaction, force = false) {
         username = 'Amber_Rocks_3';
     }
 
-    const playerInfo = new PlayerInfo(username, guildName, guildPrefix, guildRank, supportRank, veteran, serverRank, highestCharcterLevel);
+    const playerInfo = new PlayerInfo(username, guildUuid, guildPrefix, guildRank, supportRank, veteran, serverRank, highestCharcterLevel);
 
     const response = await applyRoles(interaction.guild, interaction.member, playerInfo);
 

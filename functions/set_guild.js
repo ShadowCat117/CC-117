@@ -33,12 +33,12 @@ async function setGuild(interaction, force = false) {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
             }
-
-            if (config.guildName === guild.name) {
+            
+            if (config.guild === guild.uuid) {
                 return ({ error: `You have already set your guild to ${guild.name}` });
             }
 
-            config.guildName = guild.name;
+            config.guild = guild.uuid;
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 

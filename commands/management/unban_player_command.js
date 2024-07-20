@@ -9,6 +9,7 @@ const createConfig = require('../../functions/create_config');
 const unbanPlayer = require('../../functions/unban_player');
 const fs = require('fs');
 const path = require('path');
+const database = require('../../database/database');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -48,7 +49,7 @@ module.exports = {
 
             const adminRoleId = config.adminRole;
             const memberRoles = interaction.member.roles.cache;
-            const guildName = config.guildName;
+            const guildUuid = config.guild;
 
             // Command can only be ran by owners or admins
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
@@ -61,7 +62,7 @@ module.exports = {
             }
 
             // Need a set guild to run this command 
-            if (!guildName) {      
+            if (!guildUuid) {      
                 errorEmbed
                     .setTitle('Error')
                     .setDescription('You do not have a guild set.')
@@ -137,6 +138,7 @@ module.exports = {
                         .setDescription(`Unable to find a player using the name '${interaction.options.getString('username')}', try again using the exact player name.`)
                         .setColor(0xff0000);
                 } else {
+                    const guildName = await database.findGuild(guildUuid, true);
                     // Valid player
                     responseEmbed
                         .setTitle(`${response.username} has been unbanned from ${guildName}`)
