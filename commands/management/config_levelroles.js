@@ -8,7 +8,7 @@ const createConfig = require('../../functions/create_config');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('config_levels')
+        .setName('config_levelroles')
         .setDescription('Update configuration options for level roles')
         .addIntegerOption((option) =>
             option.setName('level')
