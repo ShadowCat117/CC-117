@@ -34,11 +34,11 @@ async function trackGuild(interaction, force = false) {
                 config = JSON.parse(fileData);
             }
 
-            if (config.trackedGuilds.includes(guild.name)) {
+            if (config.trackedGuilds.includes(guild.uuid)) {
                 return ({ error: `${guild.name} is already being tracked.` });
             }
 
-            config.trackedGuilds.push(guild.name);
+            config.trackedGuilds.push(guild.uuid);
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 

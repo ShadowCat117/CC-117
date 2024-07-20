@@ -34,11 +34,11 @@ async function removeAlly(interaction, force = false) {
                 config = JSON.parse(fileData);
             }
 
-            if (!config.allies.includes(guild.name)) {
+            if (!config.allies.includes(guild.uuid)) {
                 return ({ error: `${guild.name} is not an ally.` });
             }
 
-            config.allies = config.allies.filter(item => item !== guild.name);
+            config.allies = config.allies.filter(item => item !== guild.uuid);
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 

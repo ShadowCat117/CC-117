@@ -97,7 +97,8 @@ module.exports = {
                     let alliesValue = '';
 
                     for (const ally of page) {
-                        alliesValue += `${ally}\n`;
+                        const allyName = await database.findGuild(ally, true);
+                        alliesValue += `${allyName}\n`;
                     }
 
                     responseEmbed.addFields({ name: 'Allies', value: alliesValue });
@@ -128,7 +129,8 @@ module.exports = {
                 let alliesValue = '';
 
                 for (const ally of config.allies) {
-                    alliesValue += `${ally}\n`;
+                    const allyName = await database.findGuild(ally, true);
+                    alliesValue += `${allyName}\n`;
                 }
 
                 responseEmbed.addFields({ name: 'Allies', value: alliesValue });

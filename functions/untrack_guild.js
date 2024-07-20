@@ -34,11 +34,11 @@ async function untrackGuild(interaction, force = false) {
                 config = JSON.parse(fileData);
             }
 
-            if (!config.trackedGuilds.includes(guild.name)) {
+            if (!config.trackedGuilds.includes(guild.uuid)) {
                 return ({ error: `${guild.name} is not being tracked.` });
             }
 
-            config.trackedGuilds = config.trackedGuilds.filter(item => item !== guild.name);
+            config.trackedGuilds = config.trackedGuilds.filter(item => item !== guild.uuid);
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 

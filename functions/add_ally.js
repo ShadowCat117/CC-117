@@ -34,16 +34,15 @@ async function addAlly(interaction, force = false) {
                 config = JSON.parse(fileData);
             }
 
-            if (config.allies.includes(guild.name)) {
+            if (config.allies.includes(guild.uuid)) {
                 return ({ error: `${guild.name} is already an ally.` });
             }
 
-            // FIXME: Allies still stored as names
-            if (config.guild === guild.name) {
+            if (config.guild === guild.uuid) {
                 return ({ error: `You are representing ${guild.name}.` });
             }
 
-            config.allies.push(guild.name);
+            config.allies.push(guild.uuid);
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 

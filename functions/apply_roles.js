@@ -328,8 +328,7 @@ async function applyRoles(guild, member, playerInfo) {
                 }
             }
 
-            // FIXME: Allies still use guild name
-            if (allies.includes(guildName)) {
+            if (allies.includes(guildUuid)) {
                 // Add ally role and ally owner role if owner
                 if (guildRank === 'owner') {
                     if (allyOwnerRole && !memberRoles.has(allyOwnerRole.id)) {

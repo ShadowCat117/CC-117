@@ -365,22 +365,14 @@ async function setPriorityGuilds() {
             }
 
             for (const guild of config.allies) {
-                const uuid = (await findGuild(guild)).uuid;
-
-                if (uuid && !priorityGuilds.includes(uuid)) {
-                    priorityGuilds.push(uuid);
-                } else if (!uuid) {
-                    console.error(`Invalid set guild ${guild}, should be findable.`);
+                if (!priorityGuilds.includes(guild)) {
+                    priorityGuilds.push(guild);
                 }
             }
 
             for (const guild of config.trackedGuilds) {
-                const uuid = (await findGuild(guild)).uuid;
-
-                if (uuid && !priorityGuilds.includes(uuid)) {
-                    priorityGuilds.push(uuid);
-                } else if (!uuid) {
-                    console.error(`Invalid set guild ${guild}, should be findable.`);
+                if (!priorityGuilds.includes(guild)) {
+                    priorityGuilds.push(guild);
                 }
             }
         }
