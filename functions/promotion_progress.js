@@ -132,8 +132,6 @@ async function promotionProgress(interaction, force = false) {
             username: playerJson.username,
             guildUuid: playerJson.guild.uuid,
             guildRank: guildRank,
-            contributed: contributedGuildXP,
-            guildJoined: playerJson.guild.joined,
             online: playerJson.online,
             lastLogin: playerJson.lastJoin,
             supportRank: playerJson.supportRank,

@@ -63,8 +63,6 @@ async function updatePlayer(interaction, force = false) {
 
     let guildUuid = null;
     let guildRank = null;
-    let joinTimestamp = null;
-    let contributedGuildXP = 0;
 
     if (playerJson.guild) {
         const guildJson = (await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${playerJson.guild.uuid}?identifier=uuid`)).data;
@@ -81,13 +79,9 @@ async function updatePlayer(interaction, force = false) {
     
             const rankMembers = guildJson.members[rank];
     
-            for (const member in rankMembers) {
-                const guildMember = rankMembers[member];
-                
+            for (const member in rankMembers) {               
                 if (member === playerJson.uuid) {
                     guildRank = rank;
-                    joinTimestamp = guildMember.joined;
-                    contributedGuildXP = guildMember.contributed;
                     break;
                 }
             }
@@ -103,8 +97,6 @@ async function updatePlayer(interaction, force = false) {
         username: playerJson.username,
         guildUuid: guildUuid,
         guildRank: guildRank,
-        contributed: contributedGuildXP,
-        guildJoined: joinTimestamp,
         online: playerJson.online,
         lastLogin: playerJson.lastJoin,
         supportRank: playerJson.supportRank,

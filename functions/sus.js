@@ -137,8 +137,6 @@ async function sus(interaction, force = false) {
         username: playerJson.username,
         guildUuid: guildUuid,
         guildRank: guildRank,
-        contributed: null,
-        guildJoined: null,
         online: playerJson.online,
         lastLogin: playerJson.lastJoin,
         supportRank: playerJson.supportRank,
