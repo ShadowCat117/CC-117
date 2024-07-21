@@ -30,14 +30,13 @@ module.exports = {
 
         await interaction.editReply({ embeds: [loadingEmbed] });
 
+        const guildId = interaction.guild.id;
+        const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
         let config = {};
 
         const responseEmbed = new EmbedBuilder();
 
         try {
-            const guildId = interaction.guild.id;
-            const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
-
             if (fs.existsSync(filePath)) {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
@@ -87,9 +86,6 @@ module.exports = {
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
         }
-
-        const guildId = interaction.guild.id;
-        const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
 
         try {
             config['levelRoles'][level] = role.id;

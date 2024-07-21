@@ -8,78 +8,33 @@ const createConfig = require('../../functions/create_config');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('config_roles')
-        .setDescription('Update role configurations')
+        .setName('config_warroles')
+        .setDescription('Update war role configurations')
         .addStringOption((option) =>
             option.setName('option')
                 .setDescription('The role option to update')
                 .setRequired(true)
                 .addChoices({
-                    name: 'Admin Role',
-                    value: 'adminRole',
+                    name: 'War Role',
+                    value: 'warRole',
                 }, {
-                    name: 'Owner Role',
-                    value: 'ownerRole',
+                    name: 'Tank Role',
+                    value: 'tankRole',
                 }, {
-                    name: 'Chief Role',
-                    value: 'chiefRole',
+                    name: 'Healer Role',
+                    value: 'healerRole',
                 }, {
-                    name: 'Strategist Role',
-                    value: 'strategistRole',
+                    name: 'Damage Role',
+                    value: 'damageRole',
                 }, {
-                    name: 'Captain Role',
-                    value: 'captainRole',
+                    name: 'Solo Role',
+                    value: 'soloRole',
                 }, {
-                    name: 'Recruiter Role',
-                    value: 'recruiterRole',
+                    name: 'Eco Role',
+                    value: 'ecoRole',
                 }, {
-                    name: 'Recruit Role',
-                    value: 'recruitRole',
-                }, {
-                    name: 'Ally Owner Role',
-                    value: 'allyOwnerRole',
-                }, {
-                    name: 'Ally Role',
-                    value: 'allyRole',
-                }, {
-                    name: 'Champion Role',
-                    value: 'championRole',
-                }, {
-                    name: 'Hero Role',
-                    value: 'heroRole',
-                }, {
-                    name: 'VIP+ Role',
-                    value: 'vipPlusRole',
-                }, {
-                    name: 'VIP Role',
-                    value: 'vipRole',
-                }, {
-                    name: 'Veteran Role',
-                    value: 'vetRole',
-                }, {
-                    name: 'Verified Role',
-                    value: 'verifiedRole',
-                }, {
-                    name: 'Unverified Role',
-                    value: 'unverifiedRole',
-                }, {
-                    name: 'Member of Guild Role',
-                    value: 'memberOfRole',
-                }, {
-                    name: 'Administrator Role',
-                    value: 'administratorRole',
-                }, {
-                    name: 'Moderator Role',
-                    value: 'moderatorRole',
-                }, {
-                    name: 'Content Team Role',
-                    value: 'contentTeamRole',
-                }, {
-                    name: 'Giveaway Role',
-                    value: 'giveawayRole',
-                }, {
-                    name: 'Events Role',
-                    value: 'eventsRole',
+                    name: 'Warrer Role',
+                    value: 'warrerRole',
                 }))
         .addRoleOption((option) =>
             option.setName('role')
@@ -152,8 +107,7 @@ module.exports = {
 
             // If the bot does not have permission to give the role, let the user know
             if (botRole) {
-                if (role.comparePositionTo(botRole) > 0 && option !== 'adminRole') {
-                    // Admin role is not applied to anyone so it doesn't need permission to handle it
+                if (role.comparePositionTo(botRole) > 0) {
                     message = `Configuration option ${option} updated successfully to ${role}.\n\nThe ${role} role is currently above the ${botRole} role in your hierarchy, this means that I will not be able to add that role to or remove that role from members, please change this so I can manage the role correctly!`;
                 } else {
                     message = `Configuration option ${option} updated successfully to ${role}.`;
@@ -164,28 +118,13 @@ module.exports = {
 
             // Save the option to the config
             switch (option) {
-                case 'adminRole':
-                case 'ownerRole':
-                case 'chiefRole':
-                case 'strategistRole':
-                case 'captainRole':
-                case 'recruiterRole':
-                case 'recruitRole':
-                case 'allyOwnerRole':
-                case 'allyRole':
-                case 'championRole':
-                case 'heroRole':
-                case 'vipPlusRole':
-                case 'vipRole':
-                case 'vetRole':
-                case 'verifiedRole':
-                case 'unverifiedRole':
-                case 'memberOfRole':
-                case 'administratorRole':
-                case 'moderatorRole':
-                case 'contentTeamRole':
-                case 'giveawayRole':
-                case 'eventsRole':
+                case 'warRole':
+                case 'tankRole':
+                case 'healerRole':
+                case 'damageRole':
+                case 'soloRole':
+                case 'ecoRole':
+                case 'warrerRole':
                     config[option] = role.id;
                     break;
             }
