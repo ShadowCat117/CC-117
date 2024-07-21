@@ -102,11 +102,11 @@ module.exports = {
             // If the bot does not have permission for the selected channel, tell the user
             if (!botPermissions.has(PermissionsBitField.Flags.SendMessages) || !botPermissions.has(PermissionsBitField.Flags.ViewChannel)) {
                 responseEmbed
-                    .setDescription(`Configuration option \`${option}\` updated successfully to ${channel}.\n\nI currently do not have permission to send messages to that channel so please allow me to. I need View Channel & Send Messages.`)
+                    .setDescription(`Configuration option ${option} updated successfully to ${channel}.\n\nI currently do not have permission to send messages to that channel so please allow me to. I need View Channel & Send Messages.`)
                     .setColor(0x00ffff);
             } else {
                 responseEmbed
-                    .setDescription(`Configuration option \`${option}\` updated successfully to ${channel}.`)
+                    .setDescription(`Configuration option ${option} updated successfully to ${channel}.`)
                     .setColor(0x00ffff);
             }
         } catch (error) {
