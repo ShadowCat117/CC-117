@@ -90,7 +90,6 @@ module.exports = {
             switch (option) {
                 case 'logChannel':
                 case 'joinLeaveChannel':
-                case 'highRankChannel':
                     config[option] = channel.id;
                     break;
             }
