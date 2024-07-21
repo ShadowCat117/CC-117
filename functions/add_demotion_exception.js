@@ -48,7 +48,7 @@ async function addDemotionException(interaction, force = false, duration = -1) {
             config['demotionExceptions'] = {};
         }
 
-        if (config['demotionExceptions'][player.username] === duration) {
+        if (config['demotionExceptions'][player.uuid] === duration) {
             let durationStr;
 
             if (duration === -1) {
@@ -60,7 +60,7 @@ async function addDemotionException(interaction, force = false, duration = -1) {
             return ({ error: `${durationStr}` });
         }
 
-        config['demotionExceptions'][player.username] = duration;
+        config['demotionExceptions'][player.uuid] = duration;
 
         fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 

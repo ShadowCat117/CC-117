@@ -48,7 +48,7 @@ async function addInactivityException(interaction, force = false, duration = -1)
             config['inactivityExceptions'] = {};
         }
 
-        if (config['inactivityExceptions'][player.username] === duration) {
+        if (config['inactivityExceptions'][player.uuid] === duration) {
             let durationStr;
 
             if (duration === -1) {
@@ -60,7 +60,7 @@ async function addInactivityException(interaction, force = false, duration = -1)
             return ({ error: `${durationStr}` });
         }
 
-        config['inactivityExceptions'][player.username] = duration;
+        config['inactivityExceptions'][player.uuid] = duration;
 
         fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 

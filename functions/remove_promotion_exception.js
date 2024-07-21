@@ -38,11 +38,11 @@ async function removePromotionException(interaction, force = false) {
             return ({ error: `Unknown player ${nameToSearch.replaceAll('_', '\\_')}` });
         }
 
-        if (!config['promotionExceptions'] || !config['promotionExceptions'][player.username]) {
+        if (!config['promotionExceptions'] || !config['promotionExceptions'][player.uuid]) {
             return ({ error: `${player.username.replaceAll('_', '\\_')} is not exempt from promotion.` });
         }
 
-        delete config['promotionExceptions'][player.username];
+        delete config['promotionExceptions'][player.uuid];
 
         fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 

@@ -44,11 +44,11 @@ async function banPlayer(interaction, force = false, reason = 'Unknown reason') 
             config['bannedPlayers'] = {};
         }
 
-        if (config['bannedPlayers'][player.username] === reason) {
+        if (config['bannedPlayers'][player.uuid] === reason) {
             return ({ error: `${player.username.replaceAll('_', '\\_')} is already banned for ${reason}` });
         }
 
-        config['bannedPlayers'][player.username] = reason;
+        config['bannedPlayers'][player.uuid] = reason;
 
         fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 

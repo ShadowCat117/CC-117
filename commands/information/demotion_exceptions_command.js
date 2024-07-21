@@ -107,7 +107,8 @@ module.exports = {
                             duration = `Exempt from demotions for ${config['demotionExceptions'][page[player]]} day${config['demotionExceptions'][page[player]] > 1 ? 's' : ''}`;
                         }
 
-                        pageEmbed.addFields({ name: page[player].replaceAll('_', '\\_'), value: duration });
+                        const username = (await database.findPlayer(page[player], true)).username;
+                        pageEmbed.addFields({ name: username.replaceAll('_', '\\_'), value: duration });
                     }
 
                     embeds.push(pageEmbed);
@@ -146,7 +147,8 @@ module.exports = {
                         duration = `Exempt from demotions for ${config['demotionExceptions'][player]} day${config['demotionExceptions'][player] > 1 ? 's' : ''}`;
                     }
                     
-                    responseEmbed.addFields({ name: player.replaceAll('_', '\\_'), value: duration });
+                    const username = (await database.findPlayer(player, true)).username;
+                    responseEmbed.addFields({ name: username.replaceAll('_', '\\_'), value: duration });
                 }
 
                 await interaction.editReply({ embeds: [responseEmbed] });

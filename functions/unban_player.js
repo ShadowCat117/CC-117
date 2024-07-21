@@ -38,12 +38,12 @@ async function unbanPlayer(interaction, force = false) {
             return ({ error: `Unknown player ${nameToSearch.replaceAll('_', '\\_')}` });
         }
 
-        if (!config['bannedPlayers'] || !config['bannedPlayers'][player.username]) {
+        if (!config['bannedPlayers'] || !config['bannedPlayers'][player.uuid]) {
             return ({ error: `${player.username.replaceAll('_', '\\_')} is not banned.` });
         }
 
 
-        delete config['bannedPlayers'][player.username];
+        delete config['bannedPlayers'][player.uuid];
 
         fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 

@@ -87,8 +87,8 @@ async function promotionProgress(interaction, force = false) {
 
         const exemptUsernames = Object.keys(promotionExceptions);
 
-        if (exemptUsernames.includes(playerJson.username)) {
-            return ({ username: playerJson.username, unableToPromote: promotionExceptions[playerJson.username] });
+        if (exemptUsernames.includes(playerJson.uuid)) {
+            return ({ username: playerJson.username, unableToPromote: promotionExceptions[playerJson.uuid] });
         }
 
         const guildJson = (await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${playerJson.guild.uuid}?identifier=uuid`)).data;

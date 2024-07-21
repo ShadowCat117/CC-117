@@ -38,11 +38,11 @@ async function removeDemotionException(interaction, force = false) {
             return ({ error: `Unknown player ${nameToSearch.replaceAll('_', '\\_')}` });
         }
 
-        if (!config['demotionExceptions'] || !config['demotionExceptions'][player.username]) {
+        if (!config['demotionExceptions'] || !config['demotionExceptions'][player.uuid]) {
             return ({ error: `${player.username.replaceAll('_', '\\_')} is not exempt from demotions.` });
         }
 
-        delete config['demotionExceptions'][player.username];
+        delete config['demotionExceptions'][player.uuid];
 
         fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 

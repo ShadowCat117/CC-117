@@ -38,11 +38,11 @@ async function removeInactivityException(interaction, force = false) {
             return ({ error: `Unknown player ${nameToSearch.replaceAll('_', '\\_')}` });
         }
 
-        if (!config['inactivityExceptions'] || !config['inactivityExceptions'][player.username]) {
+        if (!config['inactivityExceptions'] || !config['inactivityExceptions'][player.uuid]) {
             return ({ error: `${player.username.replaceAll('_', '\\_')} is not exempt from inactivity.` });
         }
 
-        delete config['inactivityExceptions'][player.username];
+        delete config['inactivityExceptions'][player.uuid];
 
         fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
