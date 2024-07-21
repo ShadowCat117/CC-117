@@ -9,7 +9,7 @@ const createConfig = require('../../functions/create_config');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('config_inactivityvalues')
-        .setDescription('Update inactivity configuration options')
+        .setDescription('Update value configuration options')
         .addStringOption((option) =>
             option.setName('option')
                 .setDescription('The configuration option to update')
@@ -62,6 +62,9 @@ module.exports = {
                 }, {
                     name: 'Total Member Threshold',
                     value: 'memberThreshold',
+                }, {
+                    name: 'War Level Requirement',
+                    value: 'warLevelRequirement',
                 }))
         .addIntegerOption((option) =>
             option.setName('value')
@@ -145,6 +148,7 @@ module.exports = {
                 case 'newPlayerMinimumTime':
                 case 'newPlayerThreshold':
                 case 'memberThreshold':
+                case 'warLevelRequirement':
                     config[option] = value;
                     break;
             }
