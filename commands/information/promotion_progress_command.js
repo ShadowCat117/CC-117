@@ -125,6 +125,12 @@ module.exports = {
                                 responseEmbed
                                     .setDescription('An error occured whilst checking for promotion progress.');
                                 break;
+                            case 'missing': {
+                                // Some values are missing for promotions
+                                responseEmbed
+                                    .setDescription('Missing values for promotions. Configuration has not been set up fully.');
+                                break;
+                            }
                             case 'guild':
                                 // Not in guild
                                 responseEmbed

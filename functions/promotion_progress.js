@@ -200,12 +200,12 @@ async function promotionProgress(interaction, force = false) {
             timeRequirement = config.chiefTimeRequirement;
             requirementsCount = config.chiefRequirementsCount;
 
-            XPRequirement = config.chiefXPRequirement;
-            levelRequirement = config.chiefLevelRequirement;
-            contributionRequirement = config.chiefContributorRequirement;
-            optionalTimeRequirement = config.chiefOptionalTimeRequirement;
-            warsRequirement = config.chiefWarsRequirement;
-            weeklyPlaytimeRequirement = config.chiefWeeklyPlaytimeRequirement;
+            XPRequirement = promotionRequirements[PromotionValue.XP];
+            levelRequirement = promotionRequirements[PromotionValue.LEVEL];
+            contributionRequirement = promotionRequirements[PromotionValue.TOP];
+            optionalTimeRequirement = promotionRequirements[PromotionValue.TIME];
+            warsRequirement = promotionRequirements[PromotionValue.WARS];
+            weeklyPlaytimeRequirement = promotionRequirements[PromotionValue.PLAYTIME];
 
             nextGuildRank = 'Chief';
         } else if (guildRank === 'captain') {
@@ -213,12 +213,12 @@ async function promotionProgress(interaction, force = false) {
             timeRequirement = config.strategistTimeRequirement;
             requirementsCount = config.strategistRequirementsCount;
 
-            XPRequirement = config.strategistXPRequirement;
-            levelRequirement = config.strategistLevelRequirement;
-            contributionRequirement = config.strategistContributorRequirement;
-            optionalTimeRequirement = config.strategistOptionalTimeRequirement;
-            warsRequirement = config.strategistWarsRequirement;
-            weeklyPlaytimeRequirement = config.strategistWeeklyPlaytimeRequirement;
+            XPRequirement = promotionRequirements[PromotionValue.XP];
+            levelRequirement = promotionRequirements[PromotionValue.LEVEL];
+            contributionRequirement = promotionRequirements[PromotionValue.TOP];
+            optionalTimeRequirement = promotionRequirements[PromotionValue.TIME];
+            warsRequirement = promotionRequirements[PromotionValue.WARS];
+            weeklyPlaytimeRequirement = promotionRequirements[PromotionValue.PLAYTIME];
 
             nextGuildRank = 'Strategist';
         } else if (guildRank === 'recruiter') {
@@ -226,12 +226,12 @@ async function promotionProgress(interaction, force = false) {
             timeRequirement = config.captainTimeRequirement;
             requirementsCount = config.captainRequirementsCount;
 
-            XPRequirement = config.captainXPRequirement;
-            levelRequirement = config.captainLevelRequirement;
-            contributionRequirement = config.captainContributorRequirement;
-            optionalTimeRequirement = config.captainOptionalTimeRequirement;
-            warsRequirement = config.captainWarsRequirement;
-            weeklyPlaytimeRequirement = config.captainWeeklyPlaytimeRequirement;
+            XPRequirement = promotionRequirements[PromotionValue.XP];
+            levelRequirement = promotionRequirements[PromotionValue.LEVEL];
+            contributionRequirement = promotionRequirements[PromotionValue.TOP];
+            optionalTimeRequirement = promotionRequirements[PromotionValue.TIME];
+            warsRequirement = promotionRequirements[PromotionValue.WARS];
+            weeklyPlaytimeRequirement = promotionRequirements[PromotionValue.PLAYTIME];
 
             nextGuildRank = 'Captain';
         } else if (guildRank === 'recruit') {
@@ -239,18 +239,22 @@ async function promotionProgress(interaction, force = false) {
             timeRequirement = config.recruiterTimeRequirement;
             requirementsCount = config.recruiterRequirementsCount;
 
-            XPRequirement = config.recruiterXPRequirement;
-            levelRequirement = config.recruiterLevelRequirement;
-            contributionRequirement = config.recruiterContributorRequirement;
-            optionalTimeRequirement = config.recruiterOptionalTimeRequirement;
-            warsRequirement = config.recruiterWarsRequirement;
-            weeklyPlaytimeRequirement = config.recruiterWeeklyPlaytimeRequirement;
+            XPRequirement = promotionRequirements[PromotionValue.XP];
+            levelRequirement = promotionRequirements[PromotionValue.LEVEL];
+            contributionRequirement = promotionRequirements[PromotionValue.TOP];
+            optionalTimeRequirement = promotionRequirements[PromotionValue.TIME];
+            warsRequirement = promotionRequirements[PromotionValue.WARS];
+            weeklyPlaytimeRequirement = promotionRequirements[PromotionValue.PLAYTIME];
 
             nextGuildRank = 'Recruiter';
         }
 
         // Add one extra for the forced time requirement
         requirementsCount += 1;
+
+        if (Object.keys(promotionRequirements).length < requirementsCount) {
+            return ({ username: playerJson.username, unableToPromote: 'missing' });
+        }
 
         let metRequirements = 0;
 
@@ -260,7 +264,7 @@ async function promotionProgress(interaction, force = false) {
 
         const requirements = [];
 
-        if (promotionRequirements.includes(PromotionValue.XP)) {
+        if (promotionRequirements[PromotionValue.XP]) {
             requirements.push(new PromotionRequirement(PromotionValue.XP, contributedGuildXP, XPRequirement));
 
             if (contributedGuildXP >= XPRequirement) {
@@ -268,7 +272,7 @@ async function promotionProgress(interaction, force = false) {
             }
         }
 
-        if (promotionRequirements.includes(PromotionValue.LEVEL)) {
+        if (promotionRequirements[PromotionValue.LEVEL]) {           
             requirements.push(new PromotionRequirement(PromotionValue.LEVEL, highestCharcterLevel, levelRequirement));
 
             if (highestCharcterLevel >= levelRequirement) {
@@ -276,7 +280,7 @@ async function promotionProgress(interaction, force = false) {
             }
         }
 
-        if (promotionRequirements.includes(PromotionValue.TOP)) {
+        if (promotionRequirements[PromotionValue.TOP]) {
             requirements.push(new PromotionRequirement(PromotionValue.TOP, contributionPos, contributionRequirement));
 
             if (contributionPos <= contributionRequirement) {
@@ -284,7 +288,7 @@ async function promotionProgress(interaction, force = false) {
             }
         }
 
-        if (promotionRequirements.includes(PromotionValue.TIME)) {
+        if (promotionRequirements[PromotionValue.TIME]) {  
             requirements.push(new PromotionRequirement(PromotionValue.TIME, daysInGuild, optionalTimeRequirement));
 
             if (daysInGuild >= optionalTimeRequirement) {
@@ -292,7 +296,7 @@ async function promotionProgress(interaction, force = false) {
             }
         }
 
-        if (promotionRequirements.includes(PromotionValue.WARS)) {
+        if (promotionRequirements[PromotionValue.WARS]) {
             requirements.push(new PromotionRequirement(PromotionValue.WARS, wars, warsRequirement));
 
             if (wars >= warsRequirement) {
@@ -300,7 +304,7 @@ async function promotionProgress(interaction, force = false) {
             }
         }
 
-        if (promotionRequirements.includes(PromotionValue.BUILD)) {
+        if (promotionRequirements[PromotionValue.BUILD]) {
             requirements.push(new PromotionRequirement(PromotionValue.BUILD, hasBuildRole ? 1 : 0, 1));
 
             if (hasBuildRole) {
@@ -308,7 +312,7 @@ async function promotionProgress(interaction, force = false) {
             }
         }
 
-        if (promotionRequirements.includes(PromotionValue.PLAYTIME)) {
+        if (promotionRequirements[PromotionValue.PLAYTIME]) {
             requirements.push(new PromotionRequirement(PromotionValue.PLAYTIME, memberPlaytime, weeklyPlaytimeRequirement));
 
             if (memberPlaytime >= weeklyPlaytimeRequirement) {
@@ -316,7 +320,7 @@ async function promotionProgress(interaction, force = false) {
             }
         }
 
-        if (promotionRequirements.includes(PromotionValue.ECO)) {
+        if (promotionRequirements[PromotionValue.ECO]) {
             requirements.push(new PromotionRequirement(PromotionValue.ECO, hasEcoRole ? 1 : 0, 1));
 
             if (hasEcoRole) {
