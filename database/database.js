@@ -759,6 +759,13 @@ async function getAllPlayerInfo() {
     return await allAsync(query);
 }
 
+// Returns player info that is relevant to promotions
+async function getPromotionInfo(guild) {
+    const query = 'SELECT uuid, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime FROM players WHERE guildUuid = ?';
+
+    return await allAsync(query, [guild]);
+}
+
 // Create a backup of the database
 async function createDatabaseBackup(backupFilename) {
     const sourceFile = 'database/database.db';
@@ -914,5 +921,6 @@ module.exports = {
     getAveragePlaytime,
     getGuildActivities,
     getAllPlayerInfo,
+    getPromotionInfo,
     setup,
 };

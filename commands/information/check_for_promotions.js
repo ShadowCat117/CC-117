@@ -2,12 +2,18 @@ const {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
+    EmbedBuilder,
     SlashCommandBuilder,
 } = require('discord.js');
+const axios = require('axios');
 const createConfig = require('../../functions/create_config');
 const fs = require('fs');
 const path = require('path');
-const checkForPromotions = require('../../functions/check_for_promotions');
+const database = require('../../database/database');
+const messages = require('../../functions/messages');
+const utilities = require('../../functions/utilities');
+const GuildMemberPromotion = require('../../message_objects/GuildMemberPromotion');
+const PagedMessage = require('../../message_objects/PagedMessage');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -15,12 +21,19 @@ module.exports = {
         .setDescription('Check your guild members to see who should be a higher rank.'),
     ephemeral: false,
     async execute(interaction) {
+        const loadingEmbed = new EmbedBuilder()
+            .setDescription('Checking players that are eligible for promotions')
+            .setColor(0x00ff00);
+
+        const message = await interaction.editReply({ embeds: [loadingEmbed] });
+
         const guildId = interaction.guild.id;
         const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
+        let config = {};
+
+        const responseEmbed = new EmbedBuilder();
 
         try {
-            let config = {};
-
             if (fs.existsSync(filePath)) {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
@@ -31,63 +44,248 @@ module.exports = {
                 config = JSON.parse(fileData);
             }
 
-            const addMemberOfRole = config.memberOf;
-            const memberOfRole = config.memberOfRole;
+            const adminRoleId = config.adminRole;
             const memberRoles = interaction.member.roles.cache;
+            const memberOfRole = config.memberOfRole;
 
-            const guildName = config.guildName;
-
-            // The command can only be ran if the server has a guild set
-            if (!guildName) {
-                await interaction.editReply('The server you are in does not have a guild set.');
+            // If the member of role is used, it is required
+            if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
+                responseEmbed
+                    .setDescription('You do not have the required permissions to run this command.')
+                    .setColor(0xff0000);
+                await interaction.editReply({ embeds: [responseEmbed] });
                 return;
             }
 
-            // If the member of role is used, then check if the user who ran the command has it
-            if (addMemberOfRole) {
-                if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
-                    await interaction.editReply(`You must be a member of ${guildName} to use this command.`);
-                    return;
-                }
+            // Can only be ran by the owner or an admin
+            if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
+                responseEmbed
+                    .setDescription('You do not have the required permissions to run this command.')
+                    .setColor(0xff0000);
+                await interaction.editReply({ embeds: [responseEmbed] });
+                return;
             }
-        } catch (err) {
-            console.log(err);
-            await interaction.editReply('Error checking for demotions.');
+
+            if (!config.guild) {
+                responseEmbed
+                    .setDescription('The server you are in does not have a guild set.')
+                    .setColor(0xff0000);
+                await interaction.editReply({ embeds: [responseEmbed] });
+                return;
+            }
+        } catch (error) {
+            console.error(error);
+            responseEmbed
+                .setDescription('Error checking for promotions')
+                .setColor(0xff0000);
+            await interaction.editReply({ embeds: [responseEmbed] });
             return;
         }
 
-        // Call checkForPromotions
-        const response = await checkForPromotions(interaction);
+        const chiefPromotionRequirement = config.chiefPromotionRequirement;
+        const chiefTimeRequirement = config.chiefTimeRequirement;
+        const chiefRequirementsCount = config.chiefRequirementsCount;
+        const strategistPromotionRequirement = config.strategistPromotionRequirement;
+        const strategistTimeRequirement = config.strategistTimeRequirement;
+        const strategistRequirementsCount = config.strategistRequirementsCount;
+        const captainPromotionRequirement = config.captainPromotionRequirement;
+        const captainTimeRequirement = config.captainTimeRequirement;
+        const captainRequirementsCount = config.captainRequirementsCount;
+        const recruiterPromotionRequirement = config.recruiterPromotionRequirement;
+        const recruiterTimeRequirement = config.recruiterTimeRequirement;
+        const recruiterRequirementsCount = config.recruiterRequirementsCount;
+        const tankRole = interaction.guild.roles.cache.get(config['tankRole']);
+        const healerRole = interaction.guild.roles.cache.get(config['healerRole']);
+        const damageRole = interaction.guild.roles.cache.get(config['damageRole']);
+        const soloRole = interaction.guild.roles.cache.get(config['soloRole']);
+        const ecoRole = interaction.guild.roles.cache.get(config['ecoRole']);
 
-        if (response.pages.length > 1) {
-            // Show buttons for navigating between multiple pages
+        const promotionRequirements = [chiefPromotionRequirement, strategistPromotionRequirement, captainPromotionRequirement, recruiterPromotionRequirement];
+        const timeRequirements = [chiefTimeRequirement, strategistTimeRequirement, captainTimeRequirement, recruiterTimeRequirement];
+        const requirementsCount = [chiefRequirementsCount, strategistRequirementsCount, captainRequirementsCount, recruiterRequirementsCount];
+        const warBuildRoles = [tankRole, healerRole, damageRole, soloRole];
+
+        const promotionExceptions = config['promotionExceptions'];
+
+        const exemptUuids = Object.keys(promotionExceptions);
+
+        let ignoreStrategists = false;
+        let ignoreCaptains = false;
+        let ignoreRecruiters = false;
+        let ignoreRecruits = false;
+
+        if (Object.keys(chiefPromotionRequirement).length === 0) {
+            console.log('ignore strats');
+            ignoreStrategists = true;
+        }
+
+        if (Object.keys(strategistPromotionRequirement).length === 0) {
+            ignoreCaptains = true;
+        }
+
+        if (Object.keys(captainPromotionRequirement).length === 0) {
+            ignoreRecruiters = true;
+        }
+
+        if (Object.keys(recruiterPromotionRequirement).length === 0) {
+            ignoreRecruits = true;
+        }
+
+        const memberInfo = await database.getPromotionInfo(config.guild);
+
+        let eligibleMembers = [];
+
+        const guildJson = (await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${config.guild}`)).data;
+
+        // FIXME: Handle errors better
+        if (!guildJson || !guildJson.name) {
+            return ({ members: [] });
+        }
+
+        for (const rank in guildJson.members) {
+            if (rank === 'total' || rank === 'owner' || rank === 'chief') continue;
+            if (rank === 'strategist' && ignoreStrategists) continue;
+            if (rank === 'captain' && ignoreCaptains) continue;
+            if (rank === 'recruiter' && ignoreRecruiters) continue;
+            if (rank === 'recruit' && ignoreRecruits) continue;
+            
+            const rankMembers = guildJson.members[rank];
+
+            for (const member in rankMembers) {
+                const guildMember = rankMembers[member];
+
+                if (!exemptUuids.includes(guildMember.uuid)) {
+                    const serverMember = await utilities.findDiscordUser(interaction.guild.members.cache.values(), member);
+
+                    let hasBuildRole = false;
+                    let hasEcoRole = false;
+
+                    if (serverMember) {
+                        const memberRoles = serverMember.roles.cache;
+
+                        for (const role of memberRoles.values()) {
+                            if (role === ecoRole) {
+                                hasEcoRole = true;
+                            } else if (warBuildRoles.includes(role)) {
+                                hasBuildRole = true;
+                            }
+
+                            if (hasBuildRole && hasEcoRole) {
+                                break;
+                            }
+                        }
+                    }
+
+                    let wars = 0;
+                    let highestCharacterLevel = 1;
+                    let averagePlaytime = 0;
+
+                    for (const info of memberInfo) {
+                        if (info.uuid === guildMember.uuid) {
+                            wars = info.wars;
+                            highestCharacterLevel = info.highestCharacterLevel;
+
+                            if (info.averagePlaytime === -1) {
+                                averagePlaytime = info.weeklyPlaytime;
+
+                                // If in an active session, add current sessions playtime
+                                if (info.sessionStart) {
+                                    const now = new Date();
+                                    const sessionStart = new Date(info.sessionStart);
+                                    const sessionDurationHours = (now - sessionStart) / (1000 * 60 * 60);
+
+                                    averagePlaytime += sessionDurationHours;
+                                }
+                            } else {
+                                averagePlaytime = info.averagePlaytime;
+                            }
+
+                            break;
+                        }
+                    }
+
+                    const daysInGuild = utilities.daysSince(guildMember.joined);
+
+                    eligibleMembers.push(new GuildMemberPromotion(member, rank, guildMember.contributed, highestCharacterLevel, guildMember.contributionRank, daysInGuild, wars, hasBuildRole, averagePlaytime, hasEcoRole, promotionRequirements, timeRequirements, requirementsCount));
+                }
+            }
+        }
+
+        eligibleMembers = eligibleMembers.filter(player => player.promote);
+
+        if (eligibleMembers.length > 10) {
+            const embeds = [];
+            const row = new ActionRowBuilder();
+
+            const pages = [];
+            for (let i = 0; i < eligibleMembers.length; i += 10) {
+                pages.push(eligibleMembers.slice(i, i + 10));
+            }
+
+            for (const page of pages) {
+                const pageEmbed = new EmbedBuilder();
+
+                pageEmbed
+                    .setTitle(`${eligibleMembers.length} Players eligible for promotion`)
+                    .setColor(0x00ffff);
+
+                for (const player in page) {
+                    const playerPromotion = page[player];
+
+                    let reasons = '';
+
+                    for (const reason of playerPromotion.reasons) {
+                        reasons += `${reason}\n`;
+                    }
+
+                    responseEmbed.addFields({ name: `${playerPromotion.username} to ${playerPromotion.rankToPromote}`, value: `${reasons}` });
+                }
+
+                embeds.push(pageEmbed);
+            }
+
+            messages.addMessage(message.id, new PagedMessage(message, embeds));
+
             const previousPage = new ButtonBuilder()
-                .setCustomId('previousPage')
+                .setCustomId('previous')
                 .setStyle(ButtonStyle.Primary)
                 .setEmoji('⬅️');
 
             const nextPage = new ButtonBuilder()
-                .setCustomId('nextPage')
+                .setCustomId('next')
                 .setStyle(ButtonStyle.Primary)
                 .setEmoji('➡️');
 
-            const row = new ActionRowBuilder().addComponents(previousPage, nextPage);
+            row.addComponents(previousPage, nextPage);
 
-            const editedReply = await interaction.editReply({
-                content: response.pages[0],
+            await interaction.editReply({ 
+                embeds: [embeds[0]],
                 components: [row],
             });
+        } else if (eligibleMembers.length > 0) {
+            responseEmbed
+                .setTitle(`${eligibleMembers.length} Players eligible for promotion`)
+                .setColor(0x00ffff);
 
-            response.setMessage(editedReply);
-        } else if (response.pages[0] === '```\n```') {
-            // No players need promoting
-            interaction.editReply({
-                content: 'No players found in your guild that need promoting.',
-                components: [],
-            });
+            for (const player in eligibleMembers) {
+                const playerPromotion = eligibleMembers[player];
+
+                let reasons = '';
+
+                for (const reason of playerPromotion.reasons) {
+                    reasons += `${reason}\n`;
+                }
+
+                responseEmbed.addFields({ name: `${playerPromotion.username} to ${playerPromotion.rankToPromote}`, value: `${reasons}` });
+            }
+
+            await interaction.editReply({ embeds: [responseEmbed] });
         } else {
-            // Only one page of promotions
-            await interaction.editReply(response.pages[0]);
+            responseEmbed
+                .setTitle('No players in your guild are eligible for promotion.')
+                .setColor(0x00ffff);
+
+            await interaction.editReply({ embeds: [responseEmbed] });
         }
     },
 };
