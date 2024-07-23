@@ -65,14 +65,14 @@ async function verify(interaction, force = false) {
     const veteran = playerJson.veteran ? playerJson.veteran : false;
     const serverRank = playerJson.rank;
 
-    let highestCharcterLevel = 0;
+    let highestCharacterLevel = 0;
 
     for (const character in playerJson.characters) {
         const characterJson = playerJson.characters[character];
 
         // If character level is higher than current tracked highest, set as new highest
-        if (characterJson.level > highestCharcterLevel) {
-            highestCharcterLevel = characterJson.level;
+        if (characterJson.level > highestCharacterLevel) {
+            highestCharacterLevel = characterJson.level;
         }
     }
 
@@ -83,7 +83,7 @@ async function verify(interaction, force = false) {
         username = 'Amber_Rocks_3';
     }
 
-    const playerInfo = new PlayerInfo(username, guildUuid, guildPrefix, guildRank, supportRank, veteran, serverRank, highestCharcterLevel);
+    const playerInfo = new PlayerInfo(username, guildUuid, guildPrefix, guildRank, supportRank, veteran, serverRank, highestCharacterLevel);
 
     const response = await applyRoles(interaction.guild, interaction.member, playerInfo);
 
@@ -98,7 +98,7 @@ async function verify(interaction, force = false) {
         veteran: veteran,
         serverRank: serverRank,
         wars: playerJson.globalData.wars,
-        highestCharcterLevel: highestCharcterLevel,
+        highestCharcterLevel: highestCharacterLevel,
     });
 
     return ({

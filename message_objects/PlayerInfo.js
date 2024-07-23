@@ -22,7 +22,7 @@ class PlayerInfo {
         this.supportRank = supportRank;
         this.veteran = veteran;
         this.serverRank = serverRank;
-        this.level = highestCharacterLevel;
+        this.highestCharacterLevel = highestCharacterLevel;
     }
 }
 
