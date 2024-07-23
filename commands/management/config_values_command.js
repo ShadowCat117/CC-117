@@ -8,7 +8,7 @@ const createConfig = require('../../functions/create_config');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('config_inactivityvalues')
+        .setName('config_values')
         .setDescription('Update value configuration options')
         .addStringOption((option) =>
             option.setName('option')

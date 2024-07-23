@@ -8,7 +8,7 @@ const createConfig = require('../../functions/create_config');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('config_values')
+        .setName('config_messages')
         .setDescription('Update message configuration options')
         .addStringOption((option) =>
             option.setName('option')
