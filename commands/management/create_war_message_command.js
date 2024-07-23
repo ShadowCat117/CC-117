@@ -8,7 +8,7 @@ const {
 const fs = require('fs');
 const path = require('path');
 const createConfig = require('../../functions/create_config');
-const warRoles = ['war', 'tank', 'healer', 'damage', 'solo', 'eco'];
+const warRoles = ['war', 'tank', 'healer', 'damage', 'solo', 'warrer', 'eco'];
 
 module.exports = {
     data: new SlashCommandBuilder()

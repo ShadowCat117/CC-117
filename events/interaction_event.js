@@ -1389,6 +1389,739 @@ module.exports = {
                             
                             break;
                         }
+                        default: {
+                            // Here we expect functionToRun to be one of the interactions with the war, class, giveaway or events buttons
+                            if (interaction.customId === 'war') {
+                                // Get the member of guild role and level requirement for getting war roles
+                                const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
+                                const levelRequirement = config['warLevelRequirement'];
+            
+                                const memberRoles = await interaction.member.roles.cache;
+                        
+                                const validLevelRoles = [];
+
+                                for (const level of Object.keys(config['levelRoles'])) {
+                                    if (level >= levelRequirement) {
+                                        validLevelRoles.push(interaction.guild.roles.cache.get(config['levelRoles'][level]));
+                                    }
+                                }
+            
+                                let validLevel = false;
+            
+                                // Check all roles above minimum requirement and if the member has them
+                                // they are the valid level for getting war roles.
+                                for (const levelRole of validLevelRoles) {
+                                    if (memberRoles.has(levelRole.id)) {
+                                        validLevel = true;
+                                        break;
+                                    }
+                                }
+            
+                                // If the member has both the memer of guild role and is a valid level
+                                // allow them to get war roles.
+                                if (memberOfRole && memberRoles.has(memberOfRole.id) && validLevel) {
+                                    // Get the warrer role
+                                    const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
+            
+                                    // Add warrer role if they don't already have it
+                                    if (!memberRoles.has(warrerRole.id)) {
+                                        await interaction.member.roles.add(warrerRole)
+                                            .then(() => {
+                                                console.log(`Added warrer role to ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to add warrer role to ${interaction.member.username}`);
+                                            });
+                                    }
+            
+                                    // Create the buttons to be displayed on response button
+                                    const tankButton = new ButtonBuilder()
+                                        .setCustomId('tank')
+                                        .setStyle(ButtonStyle.Secondary)
+                                        .setLabel('Tank');
+                        
+                                    const healerButton = new ButtonBuilder()
+                                        .setCustomId('healer')
+                                        .setStyle(ButtonStyle.Success)
+                                        .setLabel('Healer');
+                        
+                                    const damageButton = new ButtonBuilder()
+                                        .setCustomId('damage')
+                                        .setStyle(ButtonStyle.Danger)
+                                        .setLabel('Damage');
+                        
+                                    const soloButton = new ButtonBuilder()
+                                        .setCustomId('solo')
+                                        .setStyle(ButtonStyle.Primary)
+                                        .setLabel('Solo');
+            
+                                    const ecoButton = new ButtonBuilder()
+                                        .setCustomId('eco')
+                                        .setStyle(ButtonStyle.Success)
+                                        .setLabel('Eco');
+            
+                                    const warPingButton = new ButtonBuilder()
+                                        .setCustomId('warping')
+                                        .setStyle(ButtonStyle.Danger)
+                                        .setLabel('War Ping');
+                    
+                                    const removeButton = new ButtonBuilder()
+                                        .setCustomId('removewar')
+                                        .setStyle(ButtonStyle.Danger)
+                                        .setLabel('Remove');
+                    
+                                    // Add the buttons to rows
+                                    const rolesRow = new ActionRowBuilder().addComponents(tankButton, healerButton, damageButton, soloButton, ecoButton);
+                                    const removeRow = new ActionRowBuilder().addComponents(warPingButton, removeButton);
+                    
+                                    // Get the war message
+                                    const warMessage = config['warClassMessage'].replace(/\\n/g, '\n');
+                    
+                                    // Send a followup with the war message and buttons
+                                    await interaction.followUp({
+                                        content: warMessage,
+                                        ephemeral: true,
+                                        components: [rolesRow, removeRow],
+                                    });
+                                } else {
+                                    const guildName = (await database.findGuild(config['guild'], true)).name;
+                                    // Tell the user they need to be a guild member and meet a level requirement to gain war roles
+                                    await interaction.followUp({
+                                        content: `Sorry, you need to be a member of ${guildName} to use this and be at least level ${levelRequirement}.`,
+                                        ephemeral: true,
+                                    });
+                                }
+                            } else if (interaction.customId === 'tank') {
+                                // Get tank role
+                                const tankRole = interaction.guild.roles.cache.get(config['tankRole']);
+            
+                                // Get member roles
+                                const memberRoles = interaction.member.roles.cache;
+            
+                                // Get warrer role
+                                const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
+            
+                                // Add warrer role if they don't already have
+                                if (!memberRoles.has(warrerRole.id)) {
+                                    await interaction.member.roles.add(warrerRole)
+                                        .then(() => {
+                                            console.log(`Added war role to ${interaction.member.user.username}`);
+                                        })
+                                        .catch(() => {
+                                            console.log(`Failed to add warrer role to ${interaction.member.username}`);
+                                        });
+                                }
+            
+                                let replyMessage;
+            
+                                // If they have the tank role, remove it, otherwise add it
+                                if (memberRoles.has(tankRole.id)) {
+                                    await interaction.member.roles.remove(tankRole)
+                                        .then(() => {
+                                            console.log(`Removed tank role from ${interaction.member.user.username}`);
+                                        })
+                                        .catch(() => {
+                                            console.log(`Failed to remove tank role from ${interaction.member.username}`);
+                                        });
+            
+                                    replyMessage = `You no longer have the ${tankRole} role`;
+                                } else {
+                                    await interaction.member.roles.add(tankRole)
+                                        .then(() => {
+                                            console.log(`Added tank role to ${interaction.member.user.username}`);
+                                        })
+                                        .catch(() => {
+                                            console.log(`Failed to add tank role to ${interaction.member.username}`);
+                                        });
+            
+                                    replyMessage = `You now have the ${tankRole} role`;
+                                }
+            
+                                await interaction.followUp({
+                                    content: replyMessage,
+                                    ephemeral: true,
+                                });
+                            } else if (interaction.customId === 'healer') {
+                                // Get healer role
+                                const healerRole = interaction.guild.roles.cache.get(config['healerRole']);
+            
+                                // Get member roles
+                                const memberRoles = interaction.member.roles.cache;
+            
+                                // Get warrer role
+                                const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
+            
+                                // Add warrer role if they don't already have it
+                                if (!memberRoles.has(warrerRole.id)) {
+                                    await interaction.member.roles.add(warrerRole)
+                                        .then(() => {
+                                            console.log(`Added war role to ${interaction.member.user.username}`);
+                                        })
+                                        .catch(() => {
+                                            console.log(`Failed to add warrer role to ${interaction.member.username}`);
+                                        });
+                                }
+            
+                                let replyMessage;
+            
+                                // Add healer role or remove if they already have it
+                                if (memberRoles.has(healerRole.id)) {
+                                    await interaction.member.roles.remove(healerRole)
+                                        .then(() => {
+                                            console.log(`Removed healer role from ${interaction.member.user.username}`);
+                                        })
+                                        .catch(() => {
+                                            console.log(`Failed to remove healer role from ${interaction.member.username}`);
+                                        });
+            
+                                    replyMessage = `You no longer have the ${healerRole} role`;
+                                } else {
+                                    await interaction.member.roles.add(healerRole)
+                                        .then(() => {
+                                            console.log(`Added healer role to ${interaction.member.user.username}`);
+                                        })
+                                        .catch(() => {
+                                            console.log(`Failed to add healer role to ${interaction.member.username}`);
+                                        });
+            
+                                    replyMessage = `You now have the ${healerRole} role`;
+                                }
+            
+                                await interaction.followUp({
+                                    content: replyMessage,
+                                    ephemeral: true,
+                                });
+                            } else if (interaction.customId === 'damage') {
+                                // Get damage role
+                                const damageRole = interaction.guild.roles.cache.get(config['damageRole']);
+            
+                                // Get member roles
+                                const memberRoles = interaction.member.roles.cache;
+            
+                                // Get warrer role
+                                const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
+            
+                                // Add warrer role if they don't already have it
+                                if (!memberRoles.has(warrerRole.id)) {
+                                    await interaction.member.roles.add(warrerRole)
+                                        .then(() => {
+                                            console.log(`Added war role to ${interaction.member.user.username}`);
+                                        })
+                                        .catch(() => {
+                                            console.log(`Failed to add warrer role to ${interaction.member.username}`);
+                                        });
+                                }
+            
+                                let replyMessage;
+            
+                                // Remove damage role if they have it, otherwise add it
+                                if (memberRoles.has(damageRole.id)) {
+                                    await interaction.member.roles.remove(damageRole)
+                                        .then(() => {
+                                            console.log(`Removed damage role from ${interaction.member.user.username}`);
+                                        })
+                                        .catch(() => {
+                                            console.log(`Failed to remove damage role from ${interaction.member.username}`);
+                                        });
+            
+                                    replyMessage = `You no longer have the ${damageRole} role`;
+                                } else {
+                                    await interaction.member.roles.add(damageRole)
+                                        .then(() => {
+                                            console.log(`Added damage role to ${interaction.member.user.username}`);
+                                        })
+                                        .catch(() => {
+                                            console.log(`Failed to add damage role to ${interaction.member.username}`);
+                                        });
+            
+                                    replyMessage = `You now have the ${damageRole} role`;
+                                }
+            
+                                await interaction.followUp({
+                                    content: replyMessage,
+                                    ephemeral: true,
+                                });
+                            } else if (interaction.customId === 'solo') {
+                                // Get solo role
+                                const soloRole = interaction.guild.roles.cache.get(config['soloRole']);
+            
+                                // Get member roles
+                                const memberRoles = interaction.member.roles.cache;
+            
+                                // Get warrer role
+                                const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
+            
+                                // Add warrer role if they don't already have it
+                                if (!memberRoles.has(warrerRole.id)) {
+                                    await interaction.member.roles.add(warrerRole)
+                                        .then(() => {
+                                            console.log(`Added war role to ${interaction.member.user.username}`);
+                                        })
+                                        .catch(() => {
+                                            console.log(`Failed to add warrer role to ${interaction.member.username}`);
+                                        });
+                                }
+            
+                                let replyMessage;
+            
+                                // Add solo role if they don't have it, otherwise remove it
+                                if (memberRoles.has(soloRole.id)) {
+                                    await interaction.member.roles.remove(soloRole)
+                                        .then(() => {
+                                            console.log(`Removed solo role from ${interaction.member.user.username}`);
+                                        })
+                                        .catch(() => {
+                                            console.log(`Failed to remove solo role from ${interaction.member.username}`);
+                                        });
+            
+                                    replyMessage = `You no longer have the ${soloRole} role`;
+                                } else {
+                                    await interaction.member.roles.add(soloRole)
+                                        .then(() => {
+                                            console.log(`Added solo role to ${interaction.member.user.username}`);
+                                        })
+                                        .catch(() => {
+                                            console.log(`Failed to add solo role to ${interaction.member.username}`);
+                                        });
+            
+                                    replyMessage = `You now have the ${soloRole} role`;
+                                }
+            
+                                await interaction.followUp({
+                                    content: replyMessage,
+                                    ephemeral: true,
+                                });
+                            } else if (interaction.customId === 'eco') {
+                                // Get eco role
+                                const ecoRole = interaction.guild.roles.cache.get(config['ecoRole']);
+            
+                                // Get member roles
+                                const memberRoles = interaction.member.roles.cache;
+            
+                                let replyMessage;
+            
+                                // Remove eco role if they have it, otherwise add it
+                                if (memberRoles.has(ecoRole.id)) {
+                                    await interaction.member.roles.remove(ecoRole)
+                                        .then(() => {
+                                            console.log(`Removed eco role from ${interaction.member.user.username}`);
+                                        })
+                                        .catch(() => {
+                                            console.log(`Failed to remove eco role from ${interaction.member.username}`);
+                                        });
+            
+                                    replyMessage = `You no longer have the ${ecoRole} role`;
+                                } else {
+                                    await interaction.member.roles.add(ecoRole)
+                                        .then(() => {
+                                            console.log(`Added eco role to ${interaction.member.user.username}`);
+                                        })
+                                        .catch(() => {
+                                            console.log(`Failed to add eco role to ${interaction.member.username}`);
+                                        });
+            
+                                    replyMessage = `You now have the ${ecoRole} role`;
+                                }
+            
+                                await interaction.followUp({
+                                    content: replyMessage,
+                                    ephemeral: true,
+                                });
+                            } else if (interaction.customId === 'warping') {
+                                // Get member roles
+                                const memberRoles = await interaction.member.roles.cache;
+                                // Get war role
+                                const warRole = interaction.guild.roles.cache.get(config['warRole']);
+                                // Get warrer role
+                                const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
+            
+                                // Add warrer role if they didn't have it
+                                if (!memberRoles.has(warrerRole.id)) {
+                                    await interaction.member.roles.add(warrerRole)
+                                        .then(() => {
+                                            console.log(`Added warrer role to ${interaction.member.user.username}`);
+                                        })
+                                        .catch(() => {
+                                            console.log(`Failed to add warrer role to ${interaction.member.username}`);
+                                        });
+                                }
+            
+                                // Add war role if they didn't have, otherwise remove the role
+                                if (!memberRoles.has(warRole.id)) {
+                                    await interaction.member.roles.add(warRole)
+                                        .then(() => {
+                                            console.log(`Added war role to ${interaction.member.user.username}`);
+                                        })
+                                        .catch(() => {
+                                            console.log(`Failed to add war role to ${interaction.member.username}`);
+                                        });
+            
+                                        await interaction.followUp({
+                                            content: `You now have the ${warRole} role.`,
+                                            ephemeral: true,
+                                        });
+                                } else {
+                                    await interaction.member.roles.remove(warRole)
+                                        .then(() => {
+                                            console.log(`Removed war role from ${interaction.member.user.username}`);
+                                        })
+                                        .catch(() => {
+                                            console.log(`Failed to remove war role from ${interaction.member.username}`);
+                                        });
+            
+                                    await interaction.followUp({
+                                        content:`You no longer have the ${warRole} role.`,
+                                        ephemeral: true,
+                                    });
+                                }
+                            } else if (interaction.customId === 'removewar') {
+                                // Get member roles
+                                const memberRoles = await interaction.member.roles.cache;
+            
+                                // Get warrer role
+                                const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
+            
+                                // If they have the warrer role then remove all war related roles
+                                if (memberRoles.has(warrerRole.id)) {
+                                    const warRole = interaction.guild.roles.cache.get(config['warRole']);
+                                    const tankRole = interaction.guild.roles.cache.get(config['tankRole']);
+                                    const healerRole = interaction.guild.roles.cache.get(config['healerRole']);
+                                    const damageRole = interaction.guild.roles.cache.get(config['damageRole']);
+                                    const soloRole = interaction.guild.roles.cache.get(config['soloRole']);
+                                    const ecoRole = interaction.guild.roles.cache.get(config['ecoRole']);
+            
+                                    const warRoles = [warRole, tankRole, healerRole, damageRole, soloRole, ecoRole, warrerRole];
+            
+                                    // Remove each role
+                                    for (const role of memberRoles.values()) {
+                                        if (warRoles.includes(role)) {
+                                            await interaction.member.roles.remove(role)
+                                                .then(() => {
+                                                    console.log(`Removed war role ${role.name} from ${interaction.member.user.username}`);
+                                                })
+                                                .catch(() => {
+                                                    console.log(`Failed to remove war role ${role.name} from ${interaction.member.username}`);
+                                                });
+                                        }
+                                    }
+            
+                                    await interaction.followUp({
+                                        content: `You no longer have the ${warrerRole} role and any war class roles.`,
+                                        ephemeral: true,
+                                    });
+                                } else {
+                                    // They should have no war roles if they do not have the warrer role
+                                    // unless it was manually added
+                                    await interaction.followUp({
+                                        content: 'You do not have any war roles',
+                                        ephemeral: true,
+                                    });
+                                }
+                            } else if (interaction.customId === 'warrior') {
+                                // Create buttons for warrior archetypes
+                                const fallenButton = new ButtonBuilder()
+                                    .setCustomId('fallen')
+                                    .setStyle(ButtonStyle.Danger)
+                                    .setLabel('FALLEN');
+                    
+                                const battleMonkButton = new ButtonBuilder()
+                                    .setCustomId('battleMonk')
+                                    .setStyle(ButtonStyle.Success)
+                                    .setLabel('BATTLE MONK');
+                    
+                                const paladinButton = new ButtonBuilder()
+                                    .setCustomId('paladin')
+                                    .setStyle(ButtonStyle.Primary)
+                                    .setLabel('PALADIN');
+            
+                                // Add buttons to row
+                                const row = new ActionRowBuilder().addComponents(fallenButton, battleMonkButton, paladinButton);
+            
+                                const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
+            
+                                await interaction.followUp({
+                                    content: archetypeMessage,
+                                    ephemeral: true,
+                                    components: [row],
+                                });
+                            } else if (interaction.customId === 'mage') {
+                                // Create buttons for mage archetypes
+                                const riftwalkerButton = new ButtonBuilder()
+                                    .setCustomId('riftwalker')
+                                    .setStyle(ButtonStyle.Primary)
+                                    .setLabel('RIFTWALKER');
+                    
+                                const lightBenderButton = new ButtonBuilder()
+                                    .setCustomId('lightBender')
+                                    .setStyle(ButtonStyle.Success)
+                                    .setLabel('LIGHT BENDER');
+                    
+                                const arcanistButton = new ButtonBuilder()
+                                    .setCustomId('arcanist')
+                                    .setStyle(ButtonStyle.Danger)
+                                    .setLabel('ARCANIST');
+            
+                                // Add buttons to row
+                                const row = new ActionRowBuilder().addComponents(riftwalkerButton, lightBenderButton, arcanistButton);
+            
+                                const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
+            
+                                await interaction.followUp({
+                                    content: archetypeMessage,
+                                    ephemeral: true,
+                                    components: [row],
+                                });
+                            } else if (interaction.customId === 'archer') {
+                                // Create buttons for archer archetypes
+                                const sharpshooterButton = new ButtonBuilder()
+                                    .setCustomId('sharpshooter')
+                                    .setStyle(ButtonStyle.Primary)
+                                    .setLabel('SHARPSHOOTER');
+                    
+                                const trapperButton = new ButtonBuilder()
+                                    .setCustomId('trapper')
+                                    .setStyle(ButtonStyle.Danger)
+                                    .setLabel('TRAPPER');
+                    
+                                const boltslingerButton = new ButtonBuilder()
+                                    .setCustomId('boltslinger')
+                                    .setStyle(ButtonStyle.Success)
+                                    .setLabel('BOLTSLINGER');
+            
+                                // Add buttons to row
+                                const row = new ActionRowBuilder().addComponents(sharpshooterButton, trapperButton, boltslingerButton);
+            
+                                const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
+            
+                                await interaction.followUp({
+                                    content: archetypeMessage,
+                                    ephemeral: true,
+                                    components: [row],
+                                });
+                            } else if (interaction.customId === 'shaman') {
+                                // Create buttons for shaman archetypes
+                                const ritualistButton = new ButtonBuilder()
+                                    .setCustomId('ritualist')
+                                    .setStyle(ButtonStyle.Primary)
+                                    .setLabel('RITUALIST');
+                    
+                                const summonerButton = new ButtonBuilder()
+                                    .setCustomId('summoner')
+                                    .setStyle(ButtonStyle.Success)
+                                    .setLabel('SUMMONER');
+                    
+                                const acolyteButton = new ButtonBuilder()
+                                    .setCustomId('acolyte')
+                                    .setStyle(ButtonStyle.Danger)
+                                    .setLabel('ACOLYTE');
+            
+                                // Add buttons to row
+                                const row = new ActionRowBuilder().addComponents(ritualistButton, summonerButton, acolyteButton);
+            
+                                const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
+            
+                                await interaction.followUp({
+                                    content: archetypeMessage,
+                                    ephemeral: true,
+                                    components: [row],
+                                });
+                            } else if (interaction.customId === 'assassin') {
+                                // Create buttons for assassin archetypes
+                                const acrobatButton = new ButtonBuilder()
+                                    .setCustomId('acrobat')
+                                    .setStyle(ButtonStyle.Danger)
+                                    .setLabel('ACROBAT');
+                    
+                                const shadestepperButton = new ButtonBuilder()
+                                    .setCustomId('shadestepper')
+                                    .setStyle(ButtonStyle.Primary)
+                                    .setLabel('SHADERSTEPPER');
+                    
+                                const tricksterButton = new ButtonBuilder()
+                                    .setCustomId('trickster')
+                                    .setStyle(ButtonStyle.Success)
+                                    .setLabel('TRICKSTER');
+            
+                                // Add buttons to row
+                                const row = new ActionRowBuilder().addComponents(acrobatButton, shadestepperButton, tricksterButton);
+            
+                                const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
+            
+                                await interaction.followUp({
+                                    content: archetypeMessage,
+                                    ephemeral: true,
+                                    components: [row],
+                                });
+                            } else if (archetypes.includes(interaction.customId)) {
+                                // Get member roles
+                                const memberRoles = await interaction.member.roles.cache;
+            
+                                // Get class roles
+                                const warriorRole = interaction.guild.roles.cache.get(config['warriorRole']);
+                                const mageRole = interaction.guild.roles.cache.get(config['mageRole']);
+                                const archerRole = interaction.guild.roles.cache.get(config['archerRole']);
+                                const shamanRole = interaction.guild.roles.cache.get(config['shamanRole']);
+                                const assassinRole = interaction.guild.roles.cache.get(config['assassinRole']);
+            
+                                const classRoles = [warriorRole, mageRole, archerRole, shamanRole, assassinRole];
+            
+                                for (const archetype of archetypes) {
+                                    classRoles.push(interaction.guild.roles.cache.get(config[`${archetype}Role`]));
+                                }
+            
+                                let classRole;
+            
+                                // Determine which class was selected
+                                if (warriorArchetypes.includes(interaction.customId)) {
+                                    classRole = warriorRole;
+                                } else if (mageArchetypes.includes(interaction.customId)) {
+                                    classRole = mageRole;
+                                } else if (archerArchetypes.includes(interaction.customId)) {
+                                    classRole = archerRole;
+                                } else if (shamanArchetypes.includes(interaction.customId)) {
+                                    classRole = shamanRole;
+                                } else if (assassinArchetypes.includes(interaction.customId)) {
+                                    classRole = assassinRole;
+                                }
+            
+                                // Get the role for the archetype
+                                const archetypeRole = interaction.guild.roles.cache.get(config[`${interaction.customId}Role`]);
+            
+                                // Remove any previous class roles that aren't the same as the new selected
+                                for (const role of memberRoles.values()) {
+                                    if (classRoles.includes(role) && role !== classRole && role !== archetypeRole) {
+                                        await interaction.member.roles.remove(role)
+                                            .then(() => {
+                                                console.log(`Removed class role ${role.name} from ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to remove class role from ${interaction.member.username}`);
+                                            });
+                                    }
+                                }
+            
+                                // Add class role
+                                await interaction.member.roles.add(classRole)
+                                        .then(() => {
+                                            console.log(`Added class role to ${interaction.member.user.username}`);
+                                        })
+                                        .catch(() => {
+                                            console.log(`Failed to add class role to ${interaction.member.username}`);
+                                        });
+            
+                                // Add archetype role
+                                await interaction.member.roles.add(archetypeRole)
+                                        .then(() => {
+                                            console.log(`Added archetype role to ${interaction.member.user.username}`);
+                                        })
+                                        .catch(() => {
+                                            console.log(`Failed to add archetype role to ${interaction.member.username}`);
+                                        });
+            
+                                const replyMessage = `You now have the ${classRole} class role with archetype ${archetypeRole}!`;
+            
+                                await interaction.followUp({
+                                    content: replyMessage,
+                                    ephemeral: true,
+                                });
+                            } else if (interaction.customId === 'giveaway') {
+                                // Get giveaway role
+                                const giveawayRole = interaction.guild.roles.cache.get(config['giveawayRole']);
+                                // Get member of guild role
+                                const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
+            
+                                // Get member roles
+                                const memberRoles = await interaction.member.roles.cache;
+            
+                                let replyMessage;
+            
+                                // If they have the guild member role
+                                if (memberRoles.has(memberOfRole.id)) {
+                                    // Remove giveaway role if they have it already, otherwise add it
+                                    if (memberRoles.has(giveawayRole.id)) {
+                                        await interaction.member.roles.remove(giveawayRole)
+                                            .then(() => {
+                                                console.log(`Removed giveaway role from ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to remove giveaway role from ${interaction.member.username}`);
+                                            });
+            
+                                        replyMessage = `You no longer have the ${giveawayRole} role`;
+                                    } else {
+                                        await interaction.member.roles.add(giveawayRole)
+                                            .then(() => {
+                                                console.log(`Added giveaway role to ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to add giveaway role to ${interaction.member.username}`);
+                                            });
+            
+                                        replyMessage = `You now have the ${giveawayRole} role`;
+                                    }
+            
+                                    await interaction.followUp({
+                                        content: replyMessage,
+                                        ephemeral: true,
+                                    });
+                                } else {
+                                    const guildName = (await database.findGuild(config['guild'], true)).name;
+                                    // Tell user they must be a guild member to get the giveaway role
+                                    await interaction.followUp({
+                                        content: `Sorry, you need to be a member of ${guildName} to use this.`,
+                                        ephemeral: true,
+                                    });
+                                }
+                            } else if (interaction.customId === 'events') {
+                                // Get events role
+                                const eventsRole = interaction.guild.roles.cache.get(config['eventsRole']);
+                                // Get member of guild role
+                                const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
+            
+                                // Get member roles
+                                const memberRoles = await interaction.member.roles.cache;
+            
+                                let replyMessage;
+            
+                                // If they have the guild member role
+                                if (memberRoles.has(memberOfRole.id)) {
+                                    // Remove events role if they have it already, otherwise add it
+                                    if (memberRoles.has(eventsRole.id)) {
+                                        await interaction.member.roles.remove(eventsRole)
+                                            .then(() => {
+                                                console.log(`Removed events role from ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to remove events role from ${interaction.member.username}`);
+                                            });
+            
+                                        replyMessage = `You no longer have the ${eventsRole} role`;
+                                    } else {
+                                        await interaction.member.roles.add(eventsRole)
+                                            .then(() => {
+                                                console.log(`Added events role to ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to add events role to ${interaction.member.username}`);
+                                            });
+            
+                                        replyMessage = `You now have the ${eventsRole} role`;
+                                    }
+            
+                                    await interaction.followUp({
+                                        content: replyMessage,
+                                        ephemeral: true,
+                                    });
+                                } else {
+                                    const guildName = (await database.findGuild(config['guild'], true)).name;
+                                    // Tell user they must be a guild member to get the events role
+                                    await interaction.followUp({
+                                        content: `Sorry, you need to be a member of ${guildName} to use this.`,
+                                        ephemeral: true,
+                                    });
+                                }
+                            }
+                        }
                     }
                 } else if (interaction.isStringSelectMenu()) {
                     const parts = interaction.values[0].split(':');
