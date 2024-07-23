@@ -93,7 +93,7 @@ module.exports = {
         const recruitUpperThreshold = config.recruitUpperThreshold;
         const recruitLowerThreshold = config.recruitLowerThreshold;
         const levelRequirement = config.levelRequirement;
-        const extraTimeMultiplier = config.extraTimeMultiplier;
+        const extraTimeIncrease = config.extraTimeIncrease;
         const averageRequirement = config.averageRequirement;
         const newPlayerMinimumTime = config.newPlayerMinimumTime;
         const newPlayerThreshold = config.newPlayerThreshold;
@@ -176,7 +176,7 @@ module.exports = {
                             }
 
                             if (lastLoginInfo.highestClassLevel >= levelRequirement) {
-                                inactivityThreshold *= (1 + (extraTimeMultiplier / 100));
+                                inactivityThreshold *= (1 + (extraTimeIncrease / 100));
                             }
                         }
 
@@ -210,7 +210,7 @@ module.exports = {
 
                 pageEmbed
                     .setTitle(`${inactiveMembers.length} Inactive Players`)
-                    .setDescription(`Chiefs are inactive after ${chiefThreshold} day${chiefThreshold > 1 ? 's' : ''}\nStrategists are inactive after ${strategistThreshold} day${strategistThreshold > 1 ? 's' : ''}\nCaptains are inactive after ${captainThreshold} day${captainThreshold > 1 ? 's' : ''}\nRecruiters are inactive after ${recruiterThreshold} day${recruiterThreshold > 1 ? 's' : ''}\nRecruits are inactive after ${recruitThreshold} day${recruitThreshold > 1 ? 's' : ''}\n\nThese values change based on if the average guild activity is above or below ${averageRequirement} player${averageRequirement > 1 ? 's' : ''} or if less than ${memberThreshold}% of the member slots are used.\nIndividual players can have their threshold adjusted by having a character over level ${levelRequirement} for a ${extraTimeMultiplier}% increase.\n\nPlayers in the guild for less than ${newPlayerMinimumTime} day${newPlayerMinimumTime > 1 ? 's' : ''} get a threshold of ${newPlayerThreshold} day${newPlayerThreshold > 1 ? 's' : ''}.`)
+                    .setDescription(`Chiefs are inactive after ${chiefThreshold} day${chiefThreshold > 1 ? 's' : ''}\nStrategists are inactive after ${strategistThreshold} day${strategistThreshold > 1 ? 's' : ''}\nCaptains are inactive after ${captainThreshold} day${captainThreshold > 1 ? 's' : ''}\nRecruiters are inactive after ${recruiterThreshold} day${recruiterThreshold > 1 ? 's' : ''}\nRecruits are inactive after ${recruitThreshold} day${recruitThreshold > 1 ? 's' : ''}\n\nThese values change based on if the average guild activity is above or below ${averageRequirement} player${averageRequirement > 1 ? 's' : ''} or if less than ${memberThreshold}% of the member slots are used.\nIndividual players can have their threshold adjusted by having a character over level ${levelRequirement} for a ${extraTimeIncrease}% increase.\n\nPlayers in the guild for less than ${newPlayerMinimumTime} day${newPlayerMinimumTime > 1 ? 's' : ''} get a threshold of ${newPlayerThreshold} day${newPlayerThreshold > 1 ? 's' : ''}.`)
                     .setColor(0x00ffff);
 
                 for (const player in page) {
@@ -249,7 +249,7 @@ module.exports = {
         } else if (inactiveMembers.length > 0) {
             responseEmbed
                 .setTitle(`${inactiveMembers.length} Inactive players`)
-                .setDescription(`Chiefs are inactive after ${chiefThreshold} day${chiefThreshold > 1 ? 's' : ''}\nStrategists are inactive after ${strategistThreshold} day${strategistThreshold > 1 ? 's' : ''}\nCaptains are inactive after ${captainThreshold} day${captainThreshold > 1 ? 's' : ''}\nRecruiters are inactive after ${recruiterThreshold} day${recruiterThreshold > 1 ? 's' : ''}\nRecruits are inactive after ${recruitThreshold} day${recruitThreshold > 1 ? 's' : ''}\n\nThese values change based on if the average guild activity is above or below ${averageRequirement} player${averageRequirement > 1 ? 's' : ''} or if less than ${memberThreshold}% of the member slots are used.\nIndividual players can have their threshold adjusted by having a character over level ${levelRequirement} for a ${extraTimeMultiplier}% increase.\n\nPlayers in the guild for less than ${newPlayerMinimumTime} day${newPlayerMinimumTime > 1 ? 's' : ''} get a threshold of ${newPlayerThreshold} day${newPlayerThreshold > 1 ? 's' : ''}.`)
+                .setDescription(`Chiefs are inactive after ${chiefThreshold} day${chiefThreshold > 1 ? 's' : ''}\nStrategists are inactive after ${strategistThreshold} day${strategistThreshold > 1 ? 's' : ''}\nCaptains are inactive after ${captainThreshold} day${captainThreshold > 1 ? 's' : ''}\nRecruiters are inactive after ${recruiterThreshold} day${recruiterThreshold > 1 ? 's' : ''}\nRecruits are inactive after ${recruitThreshold} day${recruitThreshold > 1 ? 's' : ''}\n\nThese values change based on if the average guild activity is above or below ${averageRequirement} player${averageRequirement > 1 ? 's' : ''} or if less than ${memberThreshold}% of the member slots are used.\nIndividual players can have their threshold adjusted by having a character over level ${levelRequirement} for a ${extraTimeIncrease}% increase.\n\nPlayers in the guild for less than ${newPlayerMinimumTime} day${newPlayerMinimumTime > 1 ? 's' : ''} get a threshold of ${newPlayerThreshold} day${newPlayerThreshold > 1 ? 's' : ''}.`)
                 .setColor(0x00ffff);
 
             for (const player in inactiveMembers) {

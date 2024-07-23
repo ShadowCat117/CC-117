@@ -48,8 +48,8 @@ module.exports = {
                     name: 'Inactivity Full Level Requirement',
                     value: 'levelRequirement',
                 }, {
-                    name: 'Extra Time Multiplier',
-                    value: 'extraTimeMultiplier',
+                    name: 'Extra Time % Increase',
+                    value: 'extraTimeIncrease',
                 }, {
                     name: 'Average Online Requirement',
                     value: 'averageRequirement',
@@ -137,7 +137,7 @@ module.exports = {
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
             }
-        } else if (option === 'extraTimeMultiplier') {
+        } else if (option === 'extraTimeIncrease') {
             if (value < 0) {
                 responseEmbed
                     .setDescription('Extra time multiplier must be above 0')
@@ -161,7 +161,7 @@ module.exports = {
                 case 'recruitUpperThreshold':
                 case 'recruitLowerThreshold':
                 case 'levelRequirement':
-                case 'extraTimeMultiplier':
+                case 'extraTimeIncrease':
                 case 'averageRequirement':
                 case 'newPlayerMinimumTime':
                 case 'newPlayerThreshold':

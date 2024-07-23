@@ -372,7 +372,7 @@ module.exports = {
                     Average Online Requirement: ${config['averageRequirement']}
                     Member Slots % Filled Threshold: ${config['memberThreshold']}
                     Extra Time Level Requirement: ${config['levelRequirement']}
-                    Extra Time Multiplier: ${config['extraTimeMultiplier']}
+                    Extra Time % Increase: ${config['extraTimeIncrease']}
                     New Player Qualification: ${config['newPlayerMinimumTime']}
                     New Player Threshold: ${config['newPlayerThreshold']}
                     `,
