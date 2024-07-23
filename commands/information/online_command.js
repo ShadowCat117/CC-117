@@ -6,6 +6,8 @@ const {
     SlashCommandBuilder,
 } = require('discord.js');
 const online = require('../../functions/online');
+const messages = require('../../functions/messages');
+const PagedMessage = require('../../message_objects/PagedMessage');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -21,12 +23,15 @@ module.exports = {
             .setDescription(`Checking online players for ${interaction.options.getString('guild_name')}`)
             .setColor(0x00ff00);
 
-        await interaction.editReply({ embeds: [loadingEmbed] });
+        const message = await interaction.editReply({ embeds: [loadingEmbed] });
 
         // Call online
         const response = await online(interaction);
 
         const responseEmbed = new EmbedBuilder();
+
+        const embeds = [];
+        const row = new ActionRowBuilder();
 
         if (response.guildUuids !== undefined) {
             // Multiselector
@@ -34,8 +39,6 @@ module.exports = {
                 .setTitle('Multiple guilds found')
                 .setDescription(`More than 1 guild has the identifier ${interaction.options.getString('guild_name')}. Pick the intended guild from the following`)
                 .setColor(0x999999);
-
-            const row = new ActionRowBuilder();
 
             for (let i = 0; i < response.guildUuids.length; i++) {
                 const guildPrefix = response.guildPrefixes[i];
@@ -67,22 +70,107 @@ module.exports = {
                     .setColor(0xff0000);
             } else {
                 // Valid guild
-                responseEmbed
-                    .setTitle(`[${response.guildPrefix}] ${response.guildName} Online Members`)
-                    .setURL(`https://wynncraft.com/stats/guild/${response.guildName.replaceAll(' ', '%20')}`)
-                    .setDescription(`There are currently ${response.onlineCount}/${response.memberCount} players online`)
-                    .setColor(0x00ffff);
+                if (response.onlinePlayers.length > 20) {
+                    const pages = [];
+                    for (let i = 0; i < response.onlinePlayers.length; i += 20) {
+                        pages.push(response.onlinePlayers.slice(i, i + 20));
+                    }
 
-                // Display a message about players in /stream if the guild online count does not match
-                // the number of online players found
-                const playersInStream = response.onlineCount - response.onlinePlayers.length;
+                    for (const page of pages) {
+                        const pageEmbed = new EmbedBuilder()
+                            .setTitle(`[${response.guildPrefix}] ${response.guildName} Online Members`)
+                            .setURL(`https://wynncraft.com/stats/guild/${response.guildName.replaceAll(' ', '%20')}`)
+                            .setDescription(`There are currently ${response.onlineCount}/${response.memberCount} players online`)
+                            .setColor(0x00ffff);
 
-                if (playersInStream > 0) {
+                        // Count the number of players on each server
+                        const serverCounts = response.onlinePlayers.reduce((counts, player) => {
+                            counts[player.server] = (counts[player.server] || 0) + 1;
+                            return counts;
+                        }, {});
+                        
+                        // Find the amount on most active servers
+                        const maxCount = Math.max(...Object.values(serverCounts));
+                        
+                        // If the most active server has more than 1 member
+                        if (maxCount > 1) {
+                            // Filter the most active servers
+                            const activeServers = Object.keys(serverCounts).filter(server => serverCounts[server] === maxCount);
+    
+                            // Sort activeServers by their WC
+                            activeServers.sort((a, b) => {
+                                const numA = parseInt(a.replace(/^\D+/g, ''));
+                                const numB = parseInt(b.replace(/^\D+/g, ''));
+    
+                                return numA - numB;
+                            });
+    
+                            // If only one server display that, otherwise join them together with /
+                            const activeServerValue = activeServers.length === 1
+                                ? `${maxCount} players on ${activeServers[0]}`
+                                : `${maxCount} players on ${activeServers.join('/')}`;
+                        
+                            pageEmbed.addFields({ name: 'Active Server', value: activeServerValue, inline: false });
+                        }
+
+                        // Display a message about players in /stream if the guild online count does not match
+                        // the number of online players found
+                        const playersInStream = response.onlineCount - response.onlinePlayers.length;
+
+                        if (playersInStream > 0) {
+                            pageEmbed
+                                .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream`, inline: false });
+                        }
+
+                        let usernameValue = '';
+                        let rankValue = '';
+                        let serverValue = '';
+    
+                        for (const onlinePlayer of page) {
+                            usernameValue += onlinePlayer.username + '\n';
+                            rankValue += onlinePlayer.guildRank + '\n';
+                            serverValue += onlinePlayer.server + '\n';
+                        }
+    
+                        pageEmbed
+                            .addFields(
+                                { name: 'Username', value: usernameValue, inline: true },
+                                { name: 'Guild Rank', value: rankValue, inline: true },
+                                { name: 'Server', value: serverValue, inline: true },
+                            );
+                    
+                        embeds.push(pageEmbed);
+                    }
+
+                    messages.addMessage(message.id, new PagedMessage(message, embeds));
+
+                    const previousPage = new ButtonBuilder()
+                        .setCustomId('previous')
+                        .setStyle(ButtonStyle.Primary)
+                        .setEmoji('⬅️');
+
+                    const nextPage = new ButtonBuilder()
+                        .setCustomId('next')
+                        .setStyle(ButtonStyle.Primary)
+                        .setEmoji('➡️');
+
+                    row.addComponents(previousPage, nextPage);
+                } else if (response.onlinePlayers.length > 0) {
                     responseEmbed
-                        .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream`, inline: false });
-                }
+                        .setTitle(`[${response.guildPrefix}] ${response.guildName} Online Members`)
+                        .setURL(`https://wynncraft.com/stats/guild/${response.guildName.replaceAll(' ', '%20')}`)
+                        .setDescription(`There are currently ${response.onlineCount}/${response.memberCount} players online`)
+                        .setColor(0x00ffff);
 
-                if (response.onlinePlayers.length > 0) {
+                    // Display a message about players in /stream if the guild online count does not match
+                    // the number of online players found
+                    const playersInStream = response.onlineCount - response.onlinePlayers.length;
+
+                    if (playersInStream > 0) {
+                        responseEmbed
+                            .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream`, inline: false });
+                    }
+
                     let usernameValue = '';
                     let rankValue = '';
                     let serverValue = '';
@@ -129,10 +217,36 @@ module.exports = {
                             { name: 'Guild Rank', value: rankValue, inline: true },
                             { name: 'Server', value: serverValue, inline: true },
                         );
+
+                    embeds.push(responseEmbed);
+                } else {
+                    responseEmbed
+                        .setTitle(`[${response.guildPrefix}] ${response.guildName} Online Members`)
+                        .setURL(`https://wynncraft.com/stats/guild/${response.guildName.replaceAll(' ', '%20')}`)
+                        .setDescription(`There are currently ${response.onlineCount}/${response.memberCount} players online`)
+                        .setColor(0x00ffff);
+
+                    // Display a message about players in /stream if the guild online count does not match
+                    // the number of online players found
+                    const playersInStream = response.onlineCount - response.onlinePlayers.length;
+
+                    if (playersInStream > 0) {
+                        responseEmbed
+                            .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream`, inline: false });
+                    }
+
+                    embeds.push(responseEmbed);
                 }
             }
-        }
 
-        await interaction.editReply({ embeds: [responseEmbed] });
+            if (row.components.length > 0) {
+                await interaction.editReply({ 
+                    embeds: [embeds[0]],
+                    components: [row],
+                });
+            } else {
+                await interaction.editReply({ embeds: [embeds[0]] });
+            }
+        }
     },
 };
