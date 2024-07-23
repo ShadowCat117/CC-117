@@ -1,3 +1,5 @@
+const GuildMemberSlots = require('../values/GuildMemberSlots');
+
 function getTimeSince(timestamp) {
     const now = new Date();
     const lastLoginTime = new Date(timestamp);
@@ -93,10 +95,26 @@ async function checkValidUsername(memberToCheck, guild, nameToCheck) {
     return true;
 }
 
+function calculateMemberSlots(guildLevel) {
+    // New guilds start with 4 slots
+    let slots = 4;
+
+    for (const key in GuildMemberSlots) {
+        if (key > guildLevel) {
+            break;
+        }
+        
+        slots = GuildMemberSlots[key];
+    }
+
+    return slots;
+}
+
 module.exports = {
     getTimeSince,
     getFormattedXPPerDay,
     daysSince,
     findDiscordUser,
     checkValidUsername,
+    calculateMemberSlots,
 };

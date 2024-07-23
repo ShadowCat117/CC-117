@@ -1,6 +1,6 @@
 const axios = require('axios');
 const database = require('../database/database');
-const UpdatGuildMember = require('../message_objects/UpdateGuildMember');
+const UpdateGuildMember = require('../message_objects/UpdateGuildMember');
 
 async function updateGuild(interaction, force = false) {
     let nameToSearch;
@@ -45,7 +45,7 @@ async function updateGuild(interaction, force = false) {
         for (const member in rankMembers) {
             const guildMember = rankMembers[member];
             
-            guildMembers.push(new UpdatGuildMember(guildMember.uuid, member, rank, guildMember.contributed, guildMember.joined));
+            guildMembers.push(new UpdateGuildMember(guildMember.uuid, member, rank, guildMember.contributed, guildMember.joined));
         }
     }
 

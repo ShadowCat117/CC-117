@@ -129,6 +129,24 @@ module.exports = {
             return;
         }
 
+        if (option === 'memberThreshold') {
+            if (value < 1 || value > 100) {
+                responseEmbed
+                    .setDescription('Member threshold must be between 1-100')
+                    .setColor(0xff0000);
+                await interaction.editReply({ embeds: [responseEmbed] });
+                return;
+            }
+        } else if (option === 'extraTimeMultiplier') {
+            if (value < 0) {
+                responseEmbed
+                    .setDescription('Extra time multiplier must be above 0')
+                    .setColor(0xff0000);
+                await interaction.editReply({ embeds: [responseEmbed] });
+                return;
+            }
+        }
+
         try {
             // Save the option to the config
             switch (option) {

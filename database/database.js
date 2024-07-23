@@ -527,6 +527,7 @@ async function updateGuildMembers(uuid, guildMembers) {
 
 // Get the information for last login timestamps for each member of a guild.
 // First call the API to update the list of guild members to ensure the database is up to date and then 
+// return the information
 async function getLastLogins(guild) {
     await waitForRateLimit();
 
@@ -580,17 +581,19 @@ async function getLastLogins(guild) {
         }
     }
 
-    const rows = await allAsync('SELECT username, guildRank, online, lastLogin FROM players WHERE guildUuid = ?', [guild]);
+    const rows = await allAsync('SELECT uuid, username, guildRank, online, lastLogin, highestCharacterLevel FROM players WHERE guildUuid = ?', [guild]);
 
     const playerLastLogins = rows.map(row => {
         const {
+            uuid,
             username,
             guildRank,
             online,
             lastLogin,
+            highestCharacterLevel,
         } = row;
 
-        return new PlayerLastLogin(username, guildRank, online, lastLogin);
+        return new PlayerLastLogin(uuid, username, guildRank, online, lastLogin, highestCharacterLevel);
     });
     
     playerLastLogins.sort((a, b) => a.compareTo(b));
@@ -741,6 +744,51 @@ async function getGuildActivities(guilds) {
     trackedGuilds.sort((a, b) => a.compareTo(b));
 
     return trackedGuilds;
+}
+
+// Returns the average online players for a single guild
+async function getGuildActivity(guild) {
+    let averageQuery = 'SELECT ';
+
+    for (let i = 0; i < 24; i++) {
+        const currentHour = i.toString().padStart(2, '0');
+        const averageKey = 'average' + currentHour;
+        const captainsKey = 'captains' + currentHour;
+
+        averageQuery += averageKey + ', ' + captainsKey;
+
+        if (i !== 23) {
+            averageQuery += ', ';
+        }
+    }
+
+    averageQuery += ' FROM guilds WHERE uuid = ?';
+
+    const averageResult = await getAsync(averageQuery, [guild]);
+
+    let totalAverageOnline = 0;
+    let divideBy = 0;
+
+    for (let i = 0; i < 24; i++) {
+        const currentHour = i.toString().padStart(2, '0');
+        const averageKey = 'average' + currentHour;
+
+        const hourAverageOnline = averageResult[averageKey];
+
+        if (hourAverageOnline !== -1) {
+            totalAverageOnline += hourAverageOnline;
+
+            divideBy++;
+        }
+    }
+
+    let averageOnline = 0;
+
+    if (divideBy !== 0) {
+        averageOnline = totalAverageOnline / divideBy;
+    }
+
+    return averageOnline;
 }
 
 async function getOnlineGuildMembers(guild) {
@@ -917,6 +965,7 @@ module.exports = {
     getWars,
     getAveragePlaytime,
     getGuildActivities,
+    getGuildActivity,
     getAllPlayerInfo,
     getPromotionInfo,
     setup,

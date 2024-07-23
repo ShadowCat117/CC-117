@@ -1,10 +1,14 @@
 class PlayerLastLogin {
     // Creates a PlayerLastLogin object
-    // username: name of the player
+    // uuid: UUID of the player
+    // username: Username of the player
     // guildRank: Guild rank of the player
     // online: If the player is currently online
     // lastLogin: Timestamp for when the player last logged in
-    constructor(username, guildRank, online, lastLogin) {
+    // highestCharacterLevel: Highest combat level on all the players characters
+    constructor(uuid, username, guildRank, online, lastLogin, highestCharacterLevel) {
+        this.uuid = uuid;
+
         // Temporary, remove if Wynn ever fixes the name changing guild bug
         if (username === 'Owen_Rocks_3') {
             this.username = 'Amber\\_Rocks\\_3';
@@ -16,6 +20,7 @@ class PlayerLastLogin {
         this.guildRank = guildRank.charAt(0).toUpperCase() + guildRank.slice(1);
         this.online = online;
         this.lastLogin = lastLogin;
+        this.highestCharacterLevel = highestCharacterLevel;
     }
 
     // Sort players by days since last login first, then by if they are currently online
