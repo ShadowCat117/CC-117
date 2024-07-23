@@ -37,7 +37,7 @@ async function applyRoles(guild, member, playerInfo) {
         const allyOwnerRole = guild.roles.cache.get(config['allyOwnerRole']);
         const allyRole = guild.roles.cache.get(config['allyRole']);
         const memberOfRole = guild.roles.cache.get(config['memberOfRole']);
-        const veteranRole = guild.roles.cache.get(config['vetRole']);
+        const veteranRole = guild.roles.cache.get(config['veteranRole']);
         const administratorRole = guild.roles.cache.get(config['administratorRole']);
         const moderatorRole = guild.roles.cache.get(config['moderatorRole']);
         const contentTeamRole = guild.roles.cache.get(config['contentTeamRole']);

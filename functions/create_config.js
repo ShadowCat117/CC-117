@@ -25,7 +25,7 @@ async function createConfig(client, guildId) {
                 heroRole: null,
                 vipPlusRole: null,
                 vipRole: null,
-                vetRole: null,
+                veteranRole: null,
                 verifiedRole: null,
                 unverifiedRole: null,
                 memberOfRole: null,

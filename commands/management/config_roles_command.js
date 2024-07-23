@@ -55,7 +55,7 @@ module.exports = {
                     value: 'vipRole',
                 }, {
                     name: 'Veteran Role',
-                    value: 'vetRole',
+                    value: 'veteranRole',
                 }, {
                     name: 'Verified Role',
                     value: 'verifiedRole',
@@ -177,7 +177,7 @@ module.exports = {
                 case 'heroRole':
                 case 'vipPlusRole':
                 case 'vipRole':
-                case 'vetRole':
+                case 'veteranRole':
                 case 'verifiedRole':
                 case 'unverifiedRole':
                 case 'memberOfRole':
