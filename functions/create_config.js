@@ -93,7 +93,7 @@ async function createConfig(client, guildId) {
                 averageRequirement: 5,
                 newPlayerMinimumTime: 14,
                 newPlayerThreshold: 5,
-                memberThreshold: 1.0,
+                memberThreshold: 100,
                 promotionExceptions: {},
                 demotionExceptions: {},
                 inactivityExceptions: {},

@@ -60,7 +60,7 @@ module.exports = {
                     name: 'New Player Threshold',
                     value: 'newPlayerThreshold',
                 }, {
-                    name: 'Total Member Threshold',
+                    name: 'Member Slots % Threshold',
                     value: 'memberThreshold',
                 }, {
                     name: 'War Level Requirement',
