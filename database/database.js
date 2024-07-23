@@ -751,10 +751,7 @@ async function getOnlineGuildMembers(guild) {
 
 // Returns all the player info that is used in updating roles
 async function getAllPlayerInfo() {
-    const query = 
-        `SELECT p.username, g.name AS guildName, p.guildRank, p.supportRank, p.veteran, p.serverRank, p.highestCharacterLevel
-        FROM players p
-        LEFT JOIN guilds g ON p.guildUuid = g.uuid;`;
+    const query = 'SELECT username, guildUuid, guildRank, supportRank, veteran, serverRank, highestCharacterLevel FROM players';
     
     return await allAsync(query);
 }
