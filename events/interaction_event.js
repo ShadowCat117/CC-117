@@ -1421,11 +1421,11 @@ module.exports = {
                                 // allow them to get war roles.
                                 if (memberOfRole && memberRoles.has(memberOfRole.id) && validLevel) {
                                     // Get the warrer role
-                                    const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
+                                    const warPingRole = interaction.guild.roles.cache.get(config['warPingRole']);
             
                                     // Add warrer role if they don't already have it
-                                    if (!memberRoles.has(warrerRole.id)) {
-                                        await interaction.member.roles.add(warrerRole)
+                                    if (!memberRoles.has(warPingRole.id)) {
+                                        await interaction.member.roles.add(warPingRole)
                                             .then(() => {
                                                 console.log(`Added warrer role to ${interaction.member.user.username}`);
                                             })
@@ -1499,11 +1499,11 @@ module.exports = {
                                 const memberRoles = interaction.member.roles.cache;
             
                                 // Get warrer role
-                                const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
+                                const warPingRole = interaction.guild.roles.cache.get(config['warPingRole']);
             
                                 // Add warrer role if they don't already have
-                                if (!memberRoles.has(warrerRole.id)) {
-                                    await interaction.member.roles.add(warrerRole)
+                                if (!memberRoles.has(warPingRole.id)) {
+                                    await interaction.member.roles.add(warPingRole)
                                         .then(() => {
                                             console.log(`Added war role to ${interaction.member.user.username}`);
                                         })
@@ -1549,11 +1549,11 @@ module.exports = {
                                 const memberRoles = interaction.member.roles.cache;
             
                                 // Get warrer role
-                                const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
+                                const warPingRole = interaction.guild.roles.cache.get(config['warPingRole']);
             
                                 // Add warrer role if they don't already have it
-                                if (!memberRoles.has(warrerRole.id)) {
-                                    await interaction.member.roles.add(warrerRole)
+                                if (!memberRoles.has(warPingRole.id)) {
+                                    await interaction.member.roles.add(warPingRole)
                                         .then(() => {
                                             console.log(`Added war role to ${interaction.member.user.username}`);
                                         })
@@ -1599,11 +1599,11 @@ module.exports = {
                                 const memberRoles = interaction.member.roles.cache;
             
                                 // Get warrer role
-                                const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
+                                const warPingRole = interaction.guild.roles.cache.get(config['warPingRole']);
             
                                 // Add warrer role if they don't already have it
-                                if (!memberRoles.has(warrerRole.id)) {
-                                    await interaction.member.roles.add(warrerRole)
+                                if (!memberRoles.has(warPingRole.id)) {
+                                    await interaction.member.roles.add(warPingRole)
                                         .then(() => {
                                             console.log(`Added war role to ${interaction.member.user.username}`);
                                         })
@@ -1649,11 +1649,11 @@ module.exports = {
                                 const memberRoles = interaction.member.roles.cache;
             
                                 // Get warrer role
-                                const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
+                                const warPingRole = interaction.guild.roles.cache.get(config['warPingRole']);
             
                                 // Add warrer role if they don't already have it
-                                if (!memberRoles.has(warrerRole.id)) {
-                                    await interaction.member.roles.add(warrerRole)
+                                if (!memberRoles.has(warPingRole.id)) {
+                                    await interaction.member.roles.add(warPingRole)
                                         .then(() => {
                                             console.log(`Added war role to ${interaction.member.user.username}`);
                                         })
@@ -1733,11 +1733,11 @@ module.exports = {
                                 // Get war role
                                 const warRole = interaction.guild.roles.cache.get(config['warRole']);
                                 // Get warrer role
-                                const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
+                                const warPingRole = interaction.guild.roles.cache.get(config['warPingRole']);
             
                                 // Add warrer role if they didn't have it
-                                if (!memberRoles.has(warrerRole.id)) {
-                                    await interaction.member.roles.add(warrerRole)
+                                if (!memberRoles.has(warPingRole.id)) {
+                                    await interaction.member.roles.add(warPingRole)
                                         .then(() => {
                                             console.log(`Added warrer role to ${interaction.member.user.username}`);
                                         })
@@ -1779,10 +1779,10 @@ module.exports = {
                                 const memberRoles = await interaction.member.roles.cache;
             
                                 // Get warrer role
-                                const warrerRole = interaction.guild.roles.cache.get(config['warrerRole']);
+                                const warPingRole = interaction.guild.roles.cache.get(config['warPingRole']);
             
                                 // If they have the warrer role then remove all war related roles
-                                if (memberRoles.has(warrerRole.id)) {
+                                if (memberRoles.has(warPingRole.id)) {
                                     const warRole = interaction.guild.roles.cache.get(config['warRole']);
                                     const tankRole = interaction.guild.roles.cache.get(config['tankRole']);
                                     const healerRole = interaction.guild.roles.cache.get(config['healerRole']);
@@ -1790,7 +1790,7 @@ module.exports = {
                                     const soloRole = interaction.guild.roles.cache.get(config['soloRole']);
                                     const ecoRole = interaction.guild.roles.cache.get(config['ecoRole']);
             
-                                    const warRoles = [warRole, tankRole, healerRole, damageRole, soloRole, ecoRole, warrerRole];
+                                    const warRoles = [warRole, tankRole, healerRole, damageRole, soloRole, ecoRole, warPingRole];
             
                                     // Remove each role
                                     for (const role of memberRoles.values()) {
@@ -1806,7 +1806,7 @@ module.exports = {
                                     }
             
                                     await interaction.followUp({
-                                        content: `You no longer have the ${warrerRole} role and any war class roles.`,
+                                        content: `You no longer have the ${warPingRole} role and any war class roles.`,
                                         ephemeral: true,
                                     });
                                 } else {

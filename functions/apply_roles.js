@@ -47,7 +47,7 @@ async function applyRoles(guild, member, playerInfo) {
         const damageRole = guild.roles.cache.get(config['damageRole']);
         const soloRole = guild.roles.cache.get(config['soloRole']);
         const ecoRole = guild.roles.cache.get(config['ecoRole']);
-        const warrerRole = guild.roles.cache.get(config['warrerRole']);
+        const warPingRole = guild.roles.cache.get(config['warPingRole']);
         const giveawayRole = guild.roles.cache.get(config['giveawayRole']);
         const eventsRole = guild.roles.cache.get(config['eventsRole']);
         const levelRoles = [];
@@ -62,7 +62,7 @@ async function applyRoles(guild, member, playerInfo) {
         const supportRankRoles = [championRole, heroRole, vipPlusRole, vipRole];
         const allyRoles = [allyOwnerRole, allyRole];
         const serverRankRoles = [administratorRole, moderatorRole, contentTeamRole];
-        const warRoles = [warRole, tankRole, healerRole, damageRole, soloRole, ecoRole, warrerRole];
+        const warRoles = [warRole, tankRole, healerRole, damageRole, soloRole, ecoRole, warPingRole];
 
         const memberRoles = member.roles.cache;
 

@@ -33,8 +33,8 @@ module.exports = {
                     name: 'Eco Role',
                     value: 'ecoRole',
                 }, {
-                    name: 'Warrer Role',
-                    value: 'warrerRole',
+                    name: 'War Ping Role',
+                    value: 'warPingRole',
                 }))
         .addRoleOption((option) =>
             option.setName('role')
@@ -124,7 +124,7 @@ module.exports = {
                 case 'damageRole':
                 case 'soloRole':
                 case 'ecoRole':
-                case 'warrerRole':
+                case 'warPingRole':
                     config[option] = role.id;
                     break;
             }

@@ -35,7 +35,7 @@ async function createConfig(client, guildId) {
                 damageRole: null,
                 soloRole: null,
                 ecoRole: null,
-                warrerRole: null,
+                warPingRole: null,
                 levelRoles: {},
                 administratorRole: null,
                 moderatorRole: null,
