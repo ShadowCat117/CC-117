@@ -3,20 +3,18 @@ class GuildMemberDemotion {
     // username: Username of the guild member
     // guildRank: Their current guild rank
     // contributedGuildXP: How much XP have they contributed to the guild
-    // highestClassLevel: Highest combat level of any of their classes
+    // highestCharacterLevel: Highest combat level of any of their characters
     // contributionPos: What position in the guild are they for contributed XP
     // daysInGuild: How many days they've been in the guild for
     // wars: How many wars has the player participated in
     // hasBuildRole: Does the player have one of the war build roles in the Discord server
     // playtime: How many hours per week does the player play on average
     // hasEcoRole: Does the player have the eco role in the Discord server
-    // demotionRequirements: The demotion requirements for each rank. Eg. NONE, TOP or XP
-    // chiefRequirements: The values for each Chief promotion requirement
-    // strategistRequirements: The values for each Strategist promotion requirement
-    // captainRequirements: The values for each Captain promotion requirement
-    // recruiterRequirements: The values for each Recruiter promotion requirement
-    constructor(username, guildRank, contributedGuildXP, highestClassLevel, contributionPos, daysInGuild, wars, hasBuildRole, playtime, hasEcoRole, demotionRequirements, requirementsCount, chiefRequirements, strategistRequirements, captainRequirements, recruiterRequirements) {
-        this.username = username;
+    // promotionRequirements: The promotion requirements for each rank.
+    // timeRequirements: How long you have to be in the guild to be eligible for this rank.
+    // requirementsCount: How many requirements must be met to get this promotion
+    constructor(username, guildRank, contributedGuildXP, highestClassLevel, contributionPos, daysInGuild, wars, hasBuildRole, playtime, hasEcoRole, promotionRequirements, timeRequirements, requirementsCount) {
+        this.username = username.replaceAll('_', '\\_');
         this.guildRank = guildRank;
         this.contributedGuildXP = contributedGuildXP;
         this.highestClassLevel = highestClassLevel;
@@ -26,30 +24,26 @@ class GuildMemberDemotion {
         this.hasBuildRole = hasBuildRole;
         this.playtime = playtime;
         this.hasEcoRole = hasEcoRole;
-        this.demotionStatus = '';
 
-        this.checkForDemotion(demotionRequirements, requirementsCount, chiefRequirements, strategistRequirements, captainRequirements, recruiterRequirements);
+        this.checkForDemotion(promotionRequirements, timeRequirements, requirementsCount);
     }
 
-    // Check for a demotion to each rank
-    // demotionRequirements: The demotion requirements for each rank. Eg. NONE, TOP or XP
-    // requirementsCount: How many requirements must be met to keep this rank
-    // chiefRequirements: The values for each Chief demotion requirement
-    // strategistRequirements: The values for each Strategist demotion requirement
-    // captainRequirements: The values for each Captain demotion requirement
-    // recruiterRequirements: The values for each Recruiter demotion requirement
-    checkForDemotion(demotionRequirements, requirementsCount, chiefRequirements, strategistRequirements, captainRequirements, recruiterRequirements) {
+    // Check each rank to see if the member still qualifies for this rank
+    // promotionRequirements: The promotion requirements for each rank. Eg. NONE, TOP or XP
+    // timeRequirements: How long you have to be in the guild to be eligible for this rank.
+    // requirementsCount: How many requirements must be met to get this promotion
+    checkForDemotion(promotionRequirements, timeRequirements, requirementsCount) {
         // Loop through all requirements for a rank to see if they qualify
-        for (let i = 0; i < demotionRequirements.length; i++) {
+        for (let i = 0; i < promotionRequirements.length; i++) {
             // If the current rank being checked has no requirement and they are that rank, then don't bother checking for demotion
-            if (demotionRequirements[i].includes('NONE')) {
-                if (i === 0 && this.guildRank === 'CHIEF') {
+            if (Object.keys(promotionRequirements[i]).length === 0) {
+                if (i === 0 && this.guildRank === 'chief') {
                     break;
-                } else if (i === 1 && this.guildRank === 'STRATEGIST') {
+                } else if (i === 1 && this.guildRank === 'strategist') {
                     break;
-                } else if (i === 2 && this.guildRank === 'CAPTAIN') {
+                } else if (i === 2 && this.guildRank === 'captain') {
                     break;
-                } else if (i === 3 && this.guildRank === 'RECRUITER') {
+                } else if (i === 3 && this.guildRank === 'recruiter') {
                     break;
                 } else {
                     continue;
@@ -60,56 +54,26 @@ class GuildMemberDemotion {
             switch (i) {
                 case 0:
                     // If they are a chief, check if they should be a strategist
-                    if (this.guildRank === 'CHIEF') {
-                        this.demotionStatus = this.shouldBeDemoted('STRATEGIST', requirementsCount[i], demotionRequirements[i], chiefRequirements);
+                    if (this.guildRank === 'chief') {
+                        this.shouldBeDemoted('strategist', promotionRequirements[i], timeRequirements[i], requirementsCount[i]);
                     }
                     break;
                 case 1:
-                    // If they are a strategist and haven't already been demoted from chief, check if they should be a captain
-                    if (this.guildRank === 'STRATEGIST' && this.demotionStatus === '') {
-                        this.demotionStatus = this.shouldBeDemoted('CAPTAIN', requirementsCount[i], demotionRequirements[i], strategistRequirements);
-                    } else if (this.demotionStatus !== '') {
-                        // Has been demoted from chief, check if they should be a captain
-                        const demoteAgain = this.shouldBeDemoted('CAPTAIN', requirementsCount[i], demotionRequirements[i], strategistRequirements);
-
-                        // If they should be demoted again, update their current rank or set new demotion message
-                        if (demoteAgain === '') {
-                            this.guildRank = 'STRATEGIST';
-                        } else {
-                            this.demotionStatus = demoteAgain;
-                        }
+                    // If they are a strategist or have been demoted from chief, check if they should be a captain
+                    if (this.guildRank === 'strategist' || this.rankToDemote === 'Strategist') {
+                        this.shouldBeDemoted('captain', promotionRequirements[i], timeRequirements[i], requirementsCount[i]);
                     }
                     break;
                 case 2:
-                    // If they are a captain and haven't already been demoted from strategist, check if they should be a recruiter
-                    if (this.guildRank === 'CAPTAIN' && this.demotionStatus === '') {
-                        this.demotionStatus = this.shouldBeDemoted('RECRUITER', requirementsCount[i], demotionRequirements[i], captainRequirements);
-                    } else if (this.demotionStatus !== '') {
-                        // Has been demoted from strategist, check if they should be a recruiter
-                        const demoteAgain = this.shouldBeDemoted('RECRUITER', requirementsCount[i], demotionRequirements[i], captainRequirements);
-
-                        // If they should be demoted again, update their current rank or set new demotion message
-                        if (demoteAgain === '') {
-                            this.guildRank = 'CAPTAIN';
-                        } else {
-                            this.demotionStatus = demoteAgain;
-                        }
+                    // If they are a captain or have been demoted from strategist, check if they should be a recruiter
+                    if (this.guildRank === 'captain' || this.rankToDemote === 'Captain') {
+                        this.shouldBeDemoted('recruiter', promotionRequirements[i], timeRequirements[i], requirementsCount[i]);
                     }
                     break;
                 case 3:
-                    // If they are a recruiter and haven't already been demoted from captain, check if they should be a recruit
-                    if (this.guildRank === 'RECRUITER' && this.demotionStatus === '') {
-                        this.demotionStatus = this.shouldBeDemoted('RECRUIT', requirementsCount[i], demotionRequirements[i], recruiterRequirements);
-                    } else if (this.demotionStatus !== '') {
-                        // Has been demoted from captain, check if they should be a recruit
-                        const demoteAgain = this.shouldBeDemoted('RECRUIT', requirementsCount[i], demotionRequirements[i], recruiterRequirements);
-
-                        // If they should be demoted again, update their current rank or set new demotion message
-                        if (demoteAgain === '') {
-                            this.guildRank = 'RECRUITER';
-                        } else {
-                            this.demotionStatus = demoteAgain;
-                        }
+                    // If they are a recruiter or have been demoted from captain, check if they should be a recruit
+                    if (this.guildRank === 'recruiter' || this.rankToDemote === 'Recruiter') {
+                        this.shouldBeDemoted('recruit', promotionRequirements[i], timeRequirements[i], requirementsCount[i]);
                     }
                     break;
                 default:
@@ -123,93 +87,106 @@ class GuildMemberDemotion {
     // requirementsCount: How many requirements they must meet to be demoted
     // demotionRequirements: The requirements to be that rank
     // rankRequirements: The values for each requirement
-    shouldBeDemoted(rankToDemote, requirementsCount, demotionRequirements, rankRequirements) {
+    shouldBeDemoted(rankToDemote, promotionRequirements, timeRequirement, requirementsCount) {
         let demote = false;
-        let reason = '';
+        const reasons = [];
         let metRequirements = 0;
 
-        if (this.daysInGuild < rankRequirements[0]) {
-            this.guildRank = rankToDemote;
-            return `${this.username} should be demoted to ${rankToDemote} for: Has not been in the guild for ${rankRequirements[0]} day(s)\n`;
+        if (this.daysInGuild < timeRequirement) {
+            reasons.push(`Has not been in guild for ${timeRequirement} days.`);
+            this.demote = true;
+            this.reasons = reasons;
+            this.rankToDemote = rankToDemote.charAt(0).toUpperCase() + rankToDemote.slice(1);
+            return;
         }
 
         // If xp is a requirement
-        if (demotionRequirements.includes('XP')) {
+        if (promotionRequirements['XP']) {
             // If they've contributed more or equal to the amount required
-            if (this.contributedGuildXP >= rankRequirements[1]) {
+            if (this.contributedGuildXP >= promotionRequirements['XP']) {
                 metRequirements++;
-                reason = `Contributed more than ${rankRequirements[1]} XP`;
+            } else {
+                reasons.push(`Has not contributed ${promotionRequirements['XP'].toLocaleString()} XP`);
             }
         }
 
         // If highest combat level is a requirement
-        if (demotionRequirements.includes('LEVEL')) {
+        if (promotionRequirements['LEVEL']) {
             // If their highest combat level is more or equal to the required level
-            if (this.highestClassLevel >= rankRequirements[2]) {
+            if (this.highestClassLevel >= promotionRequirements['LEVEL']) {
                 metRequirements++;
+            } else {
+                reasons.push(`Does not have a character at or above level ${promotionRequirements['LEVEL']}.`);
             }
         }
 
         // If top contributor is a requirement
-        if (demotionRequirements.includes('TOP')) {
+        if (promotionRequirements['TOP']) {
             // If their contribution position is higher or equal to the required position
-            if (this.contributionPos <= rankRequirements[3]) {
+            if (this.contributionPos <= promotionRequirements['TOP']) {
                 metRequirements++;
+            } else {
+                reasons.push(`Is not in the top ${promotionRequirements['TOP']} contributors.`);
             }
         }
 
         // If time in guild is a requirement
-        if (demotionRequirements.includes('TIME')) {
-            if (this.daysInGuild >= rankRequirements[4]) {
+        if (promotionRequirements['TIME']) {
+            if (this.daysInGuild >= promotionRequirements['TIME']) {
                 metRequirements++;
+            } else {
+                reasons.push(`Has not been in the guild for ${promotionRequirements['TIME']} day${promotionRequirements['TIME'] != 1 ? 's' : ''}.`);
             }
         }
 
         // If wars is a requirement
-        if (demotionRequirements.includes('WARS')) {
-            if (this.wars >= rankRequirements[5]) {
+        if (promotionRequirements['WARS']) {
+            if (this.wars >= promotionRequirements['WARS']) {
                 metRequirements++;
+            } else {
+                reasons.push(`Has not participated in ${promotionRequirements['WARS']} wars.`);
             }
         }
 
         // If war build is a requirement
-        if (demotionRequirements.includes('BUILD')) {
+        if (promotionRequirements['BUILD']) {
             if (this.hasBuildRole) {
                 metRequirements++;
+            } else {
+                reasons.push('Does not have a war build');
             }
         }
 
         // If playtime is a requirement
-        if (demotionRequirements.includes('PLAYTIME')) {
-            if (this.playtime >= rankRequirements[7]) {
+        if (promotionRequirements['PLAYTIME']) {
+            if (this.playtime >= promotionRequirements['PLAYTIME']) {
                 metRequirements++;
+            } else {
+                reasons.push(`Does not have an average weekly playtime of ${promotionRequirements['PLAYTIME']} hour${promotionRequirements['PLAYTIME'] != 1 ? 's' : ''}.`);
             }
         }
 
         // If eco is a requirement
-        if (demotionRequirements.includes('ECO')) {
+        if (promotionRequirements['ECO']) {
             if (this.hasEcoRole) {
                 metRequirements++;
+            } else {
+                reasons.push('Does not know eco.');
             }
         }
 
         if (metRequirements < requirementsCount) {
             demote = true;
-            reason = `Does not meet enough requirements for ${this.guildRank} (${metRequirements}/${requirementsCount})`;
         }
 
-        // If they should be demoted, update their rank and set demotion message
+        // If they should be demoted, update their rank and set demotion reasons
         if (demote) {
-            this.guildRank = rankToDemote;
-            return `${this.username} should be demoted to ${rankToDemote} for: ${reason}\n`;
-        } else {
-            return '';
+            this.demote = demote;
+            this.reasons = reasons;
+            this.metRequirements = metRequirements;
+            this.requirementsCount = requirementsCount;
+            this.rankToDemote = rankToDemote.charAt(0).toUpperCase() + rankToDemote.slice(1);
         }
-    }
-
-    // Returns a string of the demotion status for the player
-    toString() {
-        return this.demotionStatus;
     }
 }
 

@@ -12,17 +12,17 @@ const path = require('path');
 const database = require('../../database/database');
 const messages = require('../../functions/messages');
 const utilities = require('../../functions/utilities');
-const GuildMemberPromotion = require('../../message_objects/GuildMemberPromotion');
+const GuildMemberDemotion = require('../../message_objects/GuildMemberDemotion');
 const PagedMessage = require('../../message_objects/PagedMessage');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('checkforpromotions')
-        .setDescription('Check your guild members to see who should be a higher rank.'),
+        .setName('checkfordemotions')
+        .setDescription('Check your guild members to see who should be a lower rank.'),
     ephemeral: false,
     async execute(interaction) {
         const loadingEmbed = new EmbedBuilder()
-            .setDescription('Checking players that are eligible for promotions')
+            .setDescription('Checking players that are eligible for demotion')
             .setColor(0x00ff00);
 
         const message = await interaction.editReply({ embeds: [loadingEmbed] });
@@ -105,30 +105,29 @@ module.exports = {
         const requirementsCount = [chiefRequirementsCount, strategistRequirementsCount, captainRequirementsCount, recruiterRequirementsCount];
         const warBuildRoles = [tankRole, healerRole, damageRole, soloRole];
 
-        const promotionExceptions = config['promotionExceptions'];
+        const demotionExceptions = config['demotionExceptions'];
 
-        const exemptUuids = Object.keys(promotionExceptions);
+        const exemptUuids = Object.keys(demotionExceptions);
 
+        let ignoreChiefs = false;
         let ignoreStrategists = false;
         let ignoreCaptains = false;
         let ignoreRecruiters = false;
-        let ignoreRecruits = false;
 
         if (Object.keys(chiefPromotionRequirement).length === 0) {
-            console.log('ignore strats');
-            ignoreStrategists = true;
+            ignoreChiefs = true;
         }
 
         if (Object.keys(strategistPromotionRequirement).length === 0) {
-            ignoreCaptains = true;
+            ignoreStrategists = true;
         }
 
         if (Object.keys(captainPromotionRequirement).length === 0) {
-            ignoreRecruiters = true;
+            ignoreCaptains = true;
         }
 
         if (Object.keys(recruiterPromotionRequirement).length === 0) {
-            ignoreRecruits = true;
+            ignoreRecruiters = true;
         }
 
         const memberInfo = await database.getPromotionInfo(config.guild);
@@ -143,11 +142,11 @@ module.exports = {
         }
 
         for (const rank in guildJson.members) {
-            if (rank === 'total' || rank === 'owner' || rank === 'chief') continue;
+            if (rank === 'total' || rank === 'owner' || rank === 'recruit') continue;
+            if (rank === 'chief' && ignoreChiefs) continue;
             if (rank === 'strategist' && ignoreStrategists) continue;
             if (rank === 'captain' && ignoreCaptains) continue;
             if (rank === 'recruiter' && ignoreRecruiters) continue;
-            if (rank === 'recruit' && ignoreRecruits) continue;
             
             const rankMembers = guildJson.members[rank];
 
@@ -206,12 +205,12 @@ module.exports = {
 
                     const daysInGuild = utilities.daysSince(guildMember.joined);
 
-                    eligibleMembers.push(new GuildMemberPromotion(member, rank, guildMember.contributed, highestCharacterLevel, guildMember.contributionRank, daysInGuild, wars, hasBuildRole, averagePlaytime, hasEcoRole, promotionRequirements, timeRequirements, requirementsCount));
+                    eligibleMembers.push(new GuildMemberDemotion(member, rank, guildMember.contributed, highestCharacterLevel, guildMember.contributionRank, daysInGuild, wars, hasBuildRole, averagePlaytime, hasEcoRole, promotionRequirements, timeRequirements, requirementsCount));
                 }
             }
         }
 
-        eligibleMembers = eligibleMembers.filter(player => player.promote);
+        eligibleMembers = eligibleMembers.filter(player => player.demote);
 
         if (eligibleMembers.length > 10) {
             const embeds = [];
@@ -226,19 +225,26 @@ module.exports = {
                 const pageEmbed = new EmbedBuilder();
 
                 pageEmbed
-                    .setTitle(`${eligibleMembers.length} Players eligible for promotion`)
+                    .setTitle(`${eligibleMembers.length} Players eligible for demotion`)
+                    .setDescription('Met/required requirements shown after rank to be demoted to unless not met hard time requirement. Missing requirements listed below.')
                     .setColor(0x00ffff);
 
                 for (const player in page) {
-                    const playerPromotion = page[player];
+                    const playerDemotion = page[player];
 
                     let reasons = '';
 
-                    for (const reason of playerPromotion.reasons) {
+                    for (const reason of playerDemotion.reasons) {
                         reasons += `${reason}\n`;
                     }
 
-                    responseEmbed.addFields({ name: `${playerPromotion.username} to ${playerPromotion.rankToPromote}`, value: `${reasons}` });
+                    let progress = '';
+
+                    if (playerDemotion.metRequirements) {
+                        progress = ` (${playerDemotion.metRequirements}/${playerDemotion.requirementsCount})`;
+                    }
+
+                    pageEmbed.addFields({ name: `${playerDemotion.username} to ${playerDemotion.rankToDemote}${progress}`, value: `${reasons}` });
                 }
 
                 embeds.push(pageEmbed);
@@ -264,25 +270,32 @@ module.exports = {
             });
         } else if (eligibleMembers.length > 0) {
             responseEmbed
-                .setTitle(`${eligibleMembers.length} Players eligible for promotion`)
+                .setTitle(`${eligibleMembers.length} Players eligible for demotion`)
+                .setDescription('Met/required requirements shown after rank to be demoted to unless not met hard time requirement. Missing requirements listed below.')
                 .setColor(0x00ffff);
 
             for (const player in eligibleMembers) {
-                const playerPromotion = eligibleMembers[player];
+                const playerDemotion = eligibleMembers[player];
 
                 let reasons = '';
 
-                for (const reason of playerPromotion.reasons) {
+                for (const reason of playerDemotion.reasons) {
                     reasons += `${reason}\n`;
                 }
 
-                responseEmbed.addFields({ name: `${playerPromotion.username} to ${playerPromotion.rankToPromote}`, value: `${reasons}` });
+                let progress = '';
+
+                if (playerDemotion.metRequirements) {
+                    progress = ` (${playerDemotion.metRequirements}/${playerDemotion.requirementsCount})`;
+                }
+
+                responseEmbed.addFields({ name: `${playerDemotion.username} to ${playerDemotion.rankToDemote}${progress}`, value: `${reasons}` });
             }
 
             await interaction.editReply({ embeds: [responseEmbed] });
         } else {
             responseEmbed
-                .setTitle('No players in your guild are eligible for promotion.')
+                .setTitle('No players in your guild are eligible for demotion.')
                 .setColor(0x00ffff);
 
             await interaction.editReply({ embeds: [responseEmbed] });
