@@ -107,7 +107,7 @@ module.exports = {
                     // Unknown player
                     responseEmbed
                         .setTitle('Invalid username')
-                        .setDescription(`Unable to find a player using the name '${interaction.options.getString('username')}', try again using the exact player name.`)
+                        .setDescription(`Unable to find a player using the name '${username}', try again using the exact player name.`)
                         .setColor(0xff0000);
                 } else {
                     // Valid player
@@ -134,26 +134,26 @@ module.exports = {
                             case 'guild':
                                 // Not in guild
                                 responseEmbed
-                                    .setDescription(`${response.username} is not a member of ${guildName}.`);
+                                    .setDescription(`${response.username.replaceAll('_', '\\_')} is not a member of ${guildName}.`);
                                 break;
                             case 'owner':
                                 // Is owner
                                 responseEmbed
-                                    .setDescription(`${response.username} is the Owner of ${guildName}. They are unable to be promoted.`);
+                                    .setDescription(`${response.username.replaceAll('_', '\\_')} is the Owner of ${guildName}. They are unable to be promoted.`);
                                 break;
                             case 'chief':
                                 // Is chief
                                 responseEmbed
-                                    .setDescription(`${response.username} is a Chief of ${guildName}. Only the Owner can decide if they should be promoted.`);
+                                    .setDescription(`${response.username.replaceAll('_', '\\_')} is a Chief of ${guildName}. Only the Owner can decide if they should be promoted.`);
                                 break;
                             default:
                                 // Exempt
                                 if (response.unableToPromote === -1) {
                                     responseEmbed
-                                        .setDescription(`${response.username} is exempt from promotions forever.`);
+                                        .setDescription(`${response.username.replaceAll('_', '\\_')} is exempt from promotions forever.`);
                                 } else if (response.unableToPromote >= 0) {
                                     responseEmbed
-                                        .setDescription(`${response.username} is exempt from promotion for ${response.unableToPromote} day${response.unableToPromote > 1 ? 's' : ''}.`);
+                                        .setDescription(`${response.username.replaceAll('_', '\\_')} is exempt from promotion for ${response.unableToPromote} day${response.unableToPromote > 1 ? 's' : ''}.`);
                                 } else {
                                     responseEmbed
                                         .setDescription('Secret response that totally isn\'t an unexpected issue haha...');
@@ -162,11 +162,11 @@ module.exports = {
                         }
 
                         responseEmbed
-                            .setTitle(response.username)
+                            .setTitle(response.username.replaceAll('_', '\\_'))
                             .setColor(0xff0000);
                     } else {
                         responseEmbed
-                            .setTitle(`${response.guildRank} ${response.username} has ${response.metRequirements}/${response.requirementsCount} requirements for ${response.nextGuildRank}`)
+                            .setTitle(`${response.guildRank} ${response.username.replaceAll('_', '\\_')} has ${response.metRequirements}/${response.requirementsCount} requirements for ${response.nextGuildRank}`)
                             .setDescription('First Days in Guild is required, anything else is optional as long as you meet the requirement.')
                             .setColor(0x00ffff);
 

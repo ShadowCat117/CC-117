@@ -135,7 +135,7 @@ module.exports = {
                     // Unknown player
                     responseEmbed
                         .setTitle('Invalid username')
-                        .setDescription(`Unable to find a player using the name '${interaction.options.getString('username')}', try again using the exact player name.`)
+                        .setDescription(`Unable to find a player using the name '${username}', try again using the exact player name.`)
                         .setColor(0xff0000);
                 } else {
                     const guildName = (await database.findGuild(guildUuid, true)).name;
