@@ -51,6 +51,7 @@ module.exports = {
             // If the member of role is used, it is required
             if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                 responseEmbed
+                    .setTitle('Error')
                     .setDescription('You do not have the required permissions to run this command.')
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
@@ -60,6 +61,7 @@ module.exports = {
             // Can only be ran by the owner or an admin
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 responseEmbed
+                    .setTitle('Error')
                     .setDescription('You do not have the required permissions to run this command.')
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
@@ -68,6 +70,7 @@ module.exports = {
 
             if (!config.guild) {
                 responseEmbed
+                    .setTitle('Error')
                     .setDescription('The server you are in does not have a guild set.')
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
@@ -76,7 +79,8 @@ module.exports = {
         } catch (error) {
             console.error(error);
             responseEmbed
-                .setDescription('Error checking for inactivity')
+                .setTitle('Error')
+                .setDescription('Failed to check for inactivity.')
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
@@ -110,10 +114,10 @@ module.exports = {
         utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
         const guildJson = response.data;
 
-        // FIXME: Handle errors better
         if (!guildJson || !guildJson.name) {
             responseEmbed
-                .setDescription('Error checking for inactivity')
+                .setTitle('Error')
+                .setDescription('Failed to fetch guild information from the API, it may be down.')
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
@@ -214,7 +218,7 @@ module.exports = {
 
                 pageEmbed
                     .setTitle(`${inactiveMembers.length} Inactive Players`)
-                    .setDescription(`Chiefs are inactive after ${chiefThreshold} day${chiefThreshold > 1 ? 's' : ''}\nStrategists are inactive after ${strategistThreshold} day${strategistThreshold > 1 ? 's' : ''}\nCaptains are inactive after ${captainThreshold} day${captainThreshold > 1 ? 's' : ''}\nRecruiters are inactive after ${recruiterThreshold} day${recruiterThreshold > 1 ? 's' : ''}\nRecruits are inactive after ${recruitThreshold} day${recruitThreshold > 1 ? 's' : ''}\n\nThese values change based on if the average guild activity is above or below ${averageRequirement} player${averageRequirement > 1 ? 's' : ''} or if less than ${memberThreshold}% of the member slots are used.\nIndividual players can have their threshold adjusted by having a character over level ${levelRequirement} for a ${extraTimeIncrease}% increase.\n\nPlayers in the guild for less than ${newPlayerMinimumTime} day${newPlayerMinimumTime > 1 ? 's' : ''} get a threshold of ${newPlayerThreshold} day${newPlayerThreshold > 1 ? 's' : ''}.`)
+                    .setDescription(`Chiefs are inactive after ${chiefThreshold} day${chiefThreshold > 1 ? 's' : ''}.\nStrategists are inactive after ${strategistThreshold} day${strategistThreshold > 1 ? 's' : ''}.\nCaptains are inactive after ${captainThreshold} day${captainThreshold > 1 ? 's' : ''}.\nRecruiters are inactive after ${recruiterThreshold} day${recruiterThreshold > 1 ? 's' : ''}.\nRecruits are inactive after ${recruitThreshold} day${recruitThreshold > 1 ? 's' : ''}.\n\nThese values change based on if the average guild activity is above or below ${averageRequirement} player${averageRequirement > 1 ? 's' : ''} or if less than ${memberThreshold}% of the member slots are used.\nIndividual players can have their threshold adjusted by having a character over level ${levelRequirement} for a ${extraTimeIncrease}% increase.\n\nPlayers in the guild for less than ${newPlayerMinimumTime} day${newPlayerMinimumTime > 1 ? 's' : ''} get a threshold of ${newPlayerThreshold} day${newPlayerThreshold > 1 ? 's' : ''}.`)
                     .setColor(0x00ffff);
 
                 for (const player in page) {
@@ -253,7 +257,7 @@ module.exports = {
         } else if (inactiveMembers.length > 0) {
             responseEmbed
                 .setTitle(`${inactiveMembers.length} Inactive players`)
-                .setDescription(`Chiefs are inactive after ${chiefThreshold} day${chiefThreshold > 1 ? 's' : ''}\nStrategists are inactive after ${strategistThreshold} day${strategistThreshold > 1 ? 's' : ''}\nCaptains are inactive after ${captainThreshold} day${captainThreshold > 1 ? 's' : ''}\nRecruiters are inactive after ${recruiterThreshold} day${recruiterThreshold > 1 ? 's' : ''}\nRecruits are inactive after ${recruitThreshold} day${recruitThreshold > 1 ? 's' : ''}\n\nThese values change based on if the average guild activity is above or below ${averageRequirement} player${averageRequirement > 1 ? 's' : ''} or if less than ${memberThreshold}% of the member slots are used.\nIndividual players can have their threshold adjusted by having a character over level ${levelRequirement} for a ${extraTimeIncrease}% increase.\n\nPlayers in the guild for less than ${newPlayerMinimumTime} day${newPlayerMinimumTime > 1 ? 's' : ''} get a threshold of ${newPlayerThreshold} day${newPlayerThreshold > 1 ? 's' : ''}.`)
+                .setDescription(`Chiefs are inactive after ${chiefThreshold} day${chiefThreshold > 1 ? 's' : ''}.\nStrategists are inactive after ${strategistThreshold} day${strategistThreshold > 1 ? 's' : ''}.\nCaptains are inactive after ${captainThreshold} day${captainThreshold > 1 ? 's' : ''}.\nRecruiters are inactive after ${recruiterThreshold} day${recruiterThreshold > 1 ? 's' : ''}.\nRecruits are inactive after ${recruitThreshold} day${recruitThreshold > 1 ? 's' : ''}.\n\nThese values change based on if the average guild activity is above or below ${averageRequirement} player${averageRequirement > 1 ? 's' : ''} or if less than ${memberThreshold}% of the member slots are used.\nIndividual players can have their threshold adjusted by having a character over level ${levelRequirement} for a ${extraTimeIncrease}% increase.\n\nPlayers in the guild for less than ${newPlayerMinimumTime} day${newPlayerMinimumTime > 1 ? 's' : ''} get a threshold of ${newPlayerThreshold} day${newPlayerThreshold > 1 ? 's' : ''}.`)
                 .setColor(0x00ffff);
 
             for (const player in inactiveMembers) {
@@ -272,7 +276,7 @@ module.exports = {
         } else {
             responseEmbed
                 .setTitle('No players in your guild have been inactive for too long.')
-                .setColor(0x00ffff);
+                .setColor(0x999999);
 
             await interaction.editReply({ embeds: [responseEmbed] });
         }

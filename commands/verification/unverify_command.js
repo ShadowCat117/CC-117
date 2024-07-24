@@ -10,6 +10,11 @@ module.exports = {
         .setDescription('Removes all roles associated with your verified username and resets your nickname.'),
     ephemeral: true,
     async execute(interaction) {
+        const loadingEmbed = new EmbedBuilder()
+            .setDescription('Removing roles and resetting nickname.')
+            .setColor(0x00ff00);
+
+        await interaction.editReply({ embeds: [loadingEmbed] });
         // Call applyRoles with null to remove all roles and have nickname reset
         const response = await applyRoles(interaction.guild, interaction.member, null);
 

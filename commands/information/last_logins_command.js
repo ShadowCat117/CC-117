@@ -21,7 +21,7 @@ module.exports = {
     ephemeral: false,
     async execute(interaction) {
         const loadingEmbed = new EmbedBuilder()
-            .setDescription(`Loading last logins for ${interaction.options.getString('guild_name')}`)
+            .setDescription(`Loading last logins for ${interaction.options.getString('guild_name')}.`)
             .setColor(0x00ff00);
 
         const message = await interaction.editReply({ embeds: [loadingEmbed] });
@@ -38,7 +38,7 @@ module.exports = {
             // Multiselector
             responseEmbed
                 .setTitle('Multiple guilds found')
-                .setDescription(`More than 1 guild has the identifier ${interaction.options.getString('guild_name')}. Pick the intended guild from the following`)
+                .setDescription(`More than 1 guild has the identifier ${interaction.options.getString('guild_name')}. Pick the intended guild from the following.`)
                 .setColor(0x999999);
 
             for (let i = 0; i < response.guildUuids.length; i++) {

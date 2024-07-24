@@ -48,7 +48,7 @@ module.exports = {
                 responseEmbed
                     .setTitle('Error')
                     .setDescription('No guilds are currently being tracked')
-                    .setColor(0xff0000);
+                    .setColor(0x999999);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
             }
@@ -112,10 +112,10 @@ module.exports = {
                 await interaction.editReply({ embeds: [responseEmbed] });
             }
         } catch (error) {
-            console.log(error);
+            console.error(error);
             responseEmbed
                     .setTitle('Error')
-                    .setDescription('Error viewing tracked guilds.')
+                    .setDescription('Unable to view tracked guilds.')
                     .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;

@@ -20,7 +20,7 @@ module.exports = {
     ephemeral: false,
     async execute(interaction) {
         const loadingEmbed = new EmbedBuilder()
-            .setDescription(`Checking online players for ${interaction.options.getString('guild_name')}`)
+            .setDescription(`Checking online players for ${interaction.options.getString('guild_name')}.`)
             .setColor(0x00ff00);
 
         const message = await interaction.editReply({ embeds: [loadingEmbed] });
@@ -37,7 +37,7 @@ module.exports = {
             // Multiselector
             responseEmbed
                 .setTitle('Multiple guilds found')
-                .setDescription(`More than 1 guild has the identifier ${interaction.options.getString('guild_name')}. Pick the intended guild from the following`)
+                .setDescription(`More than 1 guild has the identifier ${interaction.options.getString('guild_name')}. Pick the intended guild from the following.`)
                 .setColor(0x999999);
 
             for (let i = 0; i < response.guildUuids.length; i++) {
@@ -80,7 +80,7 @@ module.exports = {
                         const pageEmbed = new EmbedBuilder()
                             .setTitle(`[${response.guildPrefix}] ${response.guildName} Online Members`)
                             .setURL(`https://wynncraft.com/stats/guild/${response.guildName.replaceAll(' ', '%20')}`)
-                            .setDescription(`There are currently ${response.onlineCount}/${response.memberCount} players online`)
+                            .setDescription(`There are currently ${response.onlineCount}/${response.memberCount} players online.`)
                             .setColor(0x00ffff);
 
                         // Count the number of players on each server
@@ -107,8 +107,8 @@ module.exports = {
     
                             // If only one server display that, otherwise join them together with /
                             const activeServerValue = activeServers.length === 1
-                                ? `${maxCount} players on ${activeServers[0]}`
-                                : `${maxCount} players on ${activeServers.join('/')}`;
+                                ? `${maxCount} players on ${activeServers[0]}.`
+                                : `${maxCount} players on ${activeServers.join('/')}.`;
                         
                             pageEmbed.addFields({ name: 'Active Server', value: activeServerValue, inline: false });
                         }
@@ -119,7 +119,7 @@ module.exports = {
 
                         if (playersInStream > 0) {
                             pageEmbed
-                                .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream`, inline: false });
+                                .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream.`, inline: false });
                         }
 
                         let usernameValue = '';
@@ -159,7 +159,7 @@ module.exports = {
                     responseEmbed
                         .setTitle(`[${response.guildPrefix}] ${response.guildName} Online Members`)
                         .setURL(`https://wynncraft.com/stats/guild/${response.guildName.replaceAll(' ', '%20')}`)
-                        .setDescription(`There are currently ${response.onlineCount}/${response.memberCount} players online`)
+                        .setDescription(`There are currently ${response.onlineCount}/${response.memberCount} players online.`)
                         .setColor(0x00ffff);
 
                     // Display a message about players in /stream if the guild online count does not match
@@ -168,7 +168,7 @@ module.exports = {
 
                     if (playersInStream > 0) {
                         responseEmbed
-                            .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream`, inline: false });
+                            .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream.`, inline: false });
                     }
 
                     let usernameValue = '';
@@ -205,8 +205,8 @@ module.exports = {
 
                         // If only one server display that, otherwise join them together with /
                         const activeServerValue = activeServers.length === 1
-                            ? `${maxCount} players on ${activeServers[0]}`
-                            : `${maxCount} players on ${activeServers.join('/')}`;
+                            ? `${maxCount} players on ${activeServers[0]}.`
+                            : `${maxCount} players on ${activeServers.join('/')}.`;
                     
                         responseEmbed.addFields({ name: 'Active Server', value: activeServerValue, inline: false });
                     }
@@ -223,7 +223,7 @@ module.exports = {
                     responseEmbed
                         .setTitle(`[${response.guildPrefix}] ${response.guildName} Online Members`)
                         .setURL(`https://wynncraft.com/stats/guild/${response.guildName.replaceAll(' ', '%20')}`)
-                        .setDescription(`There are currently ${response.onlineCount}/${response.memberCount} players online`)
+                        .setDescription(`There are currently ${response.onlineCount}/${response.memberCount} players online.`)
                         .setColor(0x00ffff);
 
                     // Display a message about players in /stream if the guild online count does not match
@@ -232,7 +232,7 @@ module.exports = {
 
                     if (playersInStream > 0) {
                         responseEmbed
-                            .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream`, inline: false });
+                            .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream.`, inline: false });
                     }
 
                     embeds.push(responseEmbed);

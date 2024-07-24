@@ -28,7 +28,7 @@ module.exports = {
         const username = interaction.options.getString('username').replaceAll('_', '\\_');
 
         const loadingEmbed = new EmbedBuilder()
-            .setDescription(`Finding promotion progress for ${username}`)
+            .setDescription(`Finding promotion progress for ${username}.`)
             .setColor(0x00ff00);
 
         await interaction.editReply({ embeds: [loadingEmbed] });
@@ -67,7 +67,7 @@ module.exports = {
                 // Multiselector
                 responseEmbed
                     .setTitle('Multiple players found')
-                    .setDescription(`More than 1 player has the identifier ${username}. Pick the intended player from the following`)
+                    .setDescription(`More than 1 player has the identifier ${username}. Pick the intended player from the following.`)
                     .setColor(0x999999);
 
                 const row = new ActionRowBuilder();
@@ -160,9 +160,6 @@ module.exports = {
                                 } else if (response.unableToPromote >= 0) {
                                     responseEmbed
                                         .setDescription(`${response.username.replaceAll('_', '\\_')} is exempt from promotion for ${response.unableToPromote} day${response.unableToPromote > 1 ? 's' : ''}.`);
-                                } else {
-                                    responseEmbed
-                                        .setDescription('Secret response that totally isn\'t an unexpected issue haha...');
                                 }
                                 break;
                         }
@@ -226,7 +223,8 @@ module.exports = {
             console.error(error);
 
             const errorEmbed = new EmbedBuilder()
-                .setDescription('Error looking up promotion progress')
+                .setTitle('Error')
+                .setDescription('Unable to view promotion progress')
                 .setColor(0xff0000);
 
             await interaction.editReply({ embeds: [errorEmbed] });

@@ -21,7 +21,7 @@ module.exports = {
     ephemeral: false,
     async execute(interaction) {
         const loadingEmbed = new EmbedBuilder()
-            .setDescription(`Loading active hours for ${interaction.options.getString('guild_name')}`)
+            .setDescription(`Loading active hours for ${interaction.options.getString('guild_name')}.`)
             .setColor(0x00ff00);
 
         await interaction.editReply({ embeds: [loadingEmbed] });
@@ -45,7 +45,8 @@ module.exports = {
         } catch (error) {
             console.error(error);
             const errorEmbed = new EmbedBuilder()
-                .setDescription('Error getting active hours')
+                .setTitle('Error')
+                .setDescription('Failed to get active hours.')
                 .setColor(0xff0000);
 
             await interaction.editReply({ embeds: [errorEmbed] });
@@ -61,7 +62,7 @@ module.exports = {
 
             responseEmbed
                 .setTitle('Multiple guilds found')
-                .setDescription(`More than 1 guild has the identifier ${interaction.options.getString('guild_name')}. Pick the intended guild from the following`)
+                .setDescription(`More than 1 guild has the identifier ${interaction.options.getString('guild_name')}. Pick the intended guild from the following.`)
                 .setColor(0x999999);
 
             const row = new ActionRowBuilder();
@@ -108,7 +109,7 @@ module.exports = {
                     responseEmbed
                         .setTitle('No Data')
                         .setDescription(`There is no activity data for ${response.guildName}, try again later.`)
-                        .setColor(0xff0000);
+                        .setColor(0x999999);
 
                     await interaction.editReply({ embeds: [responseEmbed] });
 

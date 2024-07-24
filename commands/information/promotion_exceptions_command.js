@@ -154,10 +154,10 @@ module.exports = {
                 await interaction.editReply({ embeds: [responseEmbed] });
             }
         } catch (error) {
-            console.log(error);
+            console.error(error);
             responseEmbed
                     .setTitle('Error')
-                    .setDescription('Error viewing promotion exceptions.')
+                    .setDescription('Unable to view promotion exceptions.')
                     .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;

@@ -58,7 +58,7 @@ module.exports = {
 
                 if (interaction.member.id !== interaction.member.guild.ownerId && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                     const responseEmbed = new EmbedBuilder()
-                            .setTitle('Missing Permissions')
+                            .setTitle('Error')
                             .setDescription('You do not have the permissions to run this command.')
                             .setColor(0xff0000);
 
@@ -67,7 +67,7 @@ module.exports = {
                 } else if (interaction.member.id !== interaction.member.guild.ownerId && (memberOfRole && !memberRoles.has(memberOfRole))) {
                     const guildName = (await database.findGuild(guildUuid, true)).name;
                     const responseEmbed = new EmbedBuilder()
-                            .setTitle('Missing Permissions')
+                            .setTitle('Error')
                             .setDescription(`You must be a member of ${guildName} to use this command.`)
                             .setColor(0xff0000);
 
@@ -78,7 +78,7 @@ module.exports = {
                 await createConfig(interaction.client, guildId);
 
                 const responseEmbed = new EmbedBuilder()
-                    .setTitle('Unable to find config')
+                    .setTitle('Error')
                     .setDescription('The config file for this server was not found, either an error has occured or verification has not been setup.')
                     .setColor(0xff0000);
 
@@ -88,7 +88,7 @@ module.exports = {
         } catch (error) {
             console.error(error);
             const responseEmbed = new EmbedBuilder()
-                    .setTitle('Unable to update roles')
+                    .setTitle('Error')
                     .setDescription('An error occured whilst trying to update roles, please try again later.')
                     .setColor(0xff0000);
 
@@ -116,7 +116,7 @@ module.exports = {
                 const responseEmbed = new EmbedBuilder();
 
                 responseEmbed
-                    .setTitle(`Updated roles for ${response.length} members`)
+                    .setTitle(`Updated roles for ${response.length} member${response.length > 1 ? 's' : ''}`)
                     .setColor(0x00ffff);
             
                 for (const player of page) {
@@ -161,7 +161,7 @@ module.exports = {
             const responseEmbed = new EmbedBuilder();
 
             responseEmbed
-                .setTitle(`Updated roles for ${response.length} members`)
+                .setTitle(`Updated roles for ${response.length} member${response.length > 1 ? 's' : ''}`)
                 .setColor(0x00ffff);
 
             for (const player of response) {

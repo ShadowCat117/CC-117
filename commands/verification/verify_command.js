@@ -27,7 +27,7 @@ module.exports = {
         const username = interaction.options.getString('username').replaceAll('_', '\\_');
 
         const loadingEmbed = new EmbedBuilder()
-            .setDescription(`Verifying as ${username}`)
+            .setDescription(`Verifying as ${username}.`)
             .setColor(0x00ff00);
 
         await interaction.editReply({ embeds: [loadingEmbed] });
@@ -82,7 +82,7 @@ module.exports = {
         if (!alreadyVerified) {
             responseEmbed
                     .setTitle('Invalid username')
-                    .setDescription(`Someone is already verified as ${username}`)
+                    .setDescription(`Someone is already verified as ${username}.`)
                     .setColor(0xff0000);
 
             await interaction.editReply({ embeds: [responseEmbed] });
@@ -96,7 +96,7 @@ module.exports = {
             // Multiselector
             responseEmbed
                 .setTitle('Multiple players found')
-                .setDescription(`More than 1 player has the identifier ${username}. Pick the intended player from the following`)
+                .setDescription(`More than 1 player has the identifier ${username}. Pick the intended player from the following.`)
                 .setColor(0x999999);
 
             const row = new ActionRowBuilder();
@@ -164,7 +164,7 @@ module.exports = {
             } else {
                 responseEmbed
                     .setTitle(`Verified as ${response.username}`)
-                    .setDescription('No changes')
+                    .setDescription('No changes.')
                     .setColor(0x999999);
             }
         }
@@ -184,7 +184,7 @@ module.exports = {
                 try {
                     await channel.send({ embeds: [responseEmbed] });
                 } catch (error) {
-                    console.log(`Failed to send verification message to channel ${config.logChannel} in guild ${interaction.guild.id}`);
+                    console.error(`Failed to send verification message to channel ${config.logChannel} in guild ${interaction.guild.id}`);
                 }
             } else {
                 console.log(`${config.logChannel} not found for guild ${interaction.guild.id}`);

@@ -22,7 +22,7 @@ module.exports = {
     ephemeral: false,
     async execute(interaction) {
         const loadingEmbed = new EmbedBuilder()
-            .setDescription('Checking players that are eligible for promotions')
+            .setDescription('Checking players that are eligible for promotions.')
             .setColor(0x00ff00);
 
         const message = await interaction.editReply({ embeds: [loadingEmbed] });
@@ -51,6 +51,7 @@ module.exports = {
             // If the member of role is used, it is required
             if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                 responseEmbed
+                    .setTitle('Error')
                     .setDescription('You do not have the required permissions to run this command.')
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
@@ -60,6 +61,7 @@ module.exports = {
             // Can only be ran by the owner or an admin
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 responseEmbed
+                    .setTitle('Error')
                     .setDescription('You do not have the required permissions to run this command.')
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
@@ -68,6 +70,7 @@ module.exports = {
 
             if (!config.guild) {
                 responseEmbed
+                    .setTitle('Error')
                     .setDescription('The server you are in does not have a guild set.')
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
@@ -76,7 +79,8 @@ module.exports = {
         } catch (error) {
             console.error(error);
             responseEmbed
-                .setDescription('Error checking for promotions')
+                .setTitle('Error')
+                .setDescription('Failed to check for promotions')
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
@@ -140,9 +144,13 @@ module.exports = {
         utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
         const guildJson = response.data;
 
-        // FIXME: Handle errors better
         if (!guildJson || !guildJson.name) {
-            return ({ members: [] });
+            responseEmbed
+                .setTitle('Error')
+                .setDescription('Failed to fetch guild information from the API, it may be down.')
+                .setColor(0xff0000);
+            await interaction.editReply({ embeds: [responseEmbed] });
+            return;
         }
 
         for (const rank in guildJson.members) {
@@ -286,7 +294,7 @@ module.exports = {
         } else {
             responseEmbed
                 .setTitle('No players in your guild are eligible for promotion.')
-                .setColor(0x00ffff);
+                .setColor(0x999999);
 
             await interaction.editReply({ embeds: [responseEmbed] });
         }

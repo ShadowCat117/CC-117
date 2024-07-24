@@ -74,9 +74,8 @@ module.exports = {
             // No players have custom inactivity durations
             if (!config['inactivityExceptions'] || Object.keys(config['inactivityExceptions']).length === 0) {
                 responseEmbed
-                    .setTitle('Error')
                     .setDescription('No players currently have custom inactivity thresholds.')
-                    .setColor(0xff0000);
+                    .setColor(0x999999);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
             }
@@ -154,10 +153,10 @@ module.exports = {
                 await interaction.editReply({ embeds: [responseEmbed] });
             }
         } catch (error) {
-            console.log(error);
+            console.error(error);
             responseEmbed
                     .setTitle('Error')
-                    .setDescription('Error viewing inactivity exceptions.')
+                    .setDescription('Unable to view inactivity exceptions.')
                     .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;

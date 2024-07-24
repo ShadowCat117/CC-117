@@ -59,7 +59,7 @@ async function hourlyTasks() {
                                 const responseEmbed = new EmbedBuilder();
                 
                                 responseEmbed
-                                    .setTitle(`Updated roles for ${response.length} members`)
+                                    .setTitle(`Updated roles for ${response.length} member${response.length > 1 ? 's' : ''}`)
                                     .setColor(0x00ffff);
                             
                                 for (const player of page) {
@@ -102,7 +102,7 @@ async function hourlyTasks() {
                             const responseEmbed = new EmbedBuilder();
                 
                             responseEmbed
-                                .setTitle(`Updated roles for ${response.length} members`)
+                                .setTitle(`Updated roles for ${response.length} member${response.length > 1 ? 's' : ''}`)
                                 .setColor(0x00ffff);
                 
                             for (const player of response) {

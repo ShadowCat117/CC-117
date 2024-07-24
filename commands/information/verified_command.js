@@ -9,7 +9,6 @@ const fs = require('fs');
 const path = require('path');
 const verified = require('../../functions/verified');
 const messages = require('../../functions/messages');
-const database = require('../../database/database');
 const createConfig = require('../../functions/create_config');
 const PagedMessage = require('../../message_objects/PagedMessage');
 
@@ -20,7 +19,7 @@ module.exports = {
     ephemeral: false,
     async execute(interaction) {
         const loadingEmbed = new EmbedBuilder()
-            .setDescription('Finding verified members')
+            .setDescription('Finding verified members.')
             .setColor(0x00ff00);
 
         const message = await interaction.editReply({ embeds: [loadingEmbed] });
@@ -46,7 +45,7 @@ module.exports = {
             if (!guildUuid) {
                 const responseEmbed = new EmbedBuilder()
                     .setTitle('Error')
-                    .setDescription('You do not have a guild set. Use /setguild to set one')
+                    .setDescription('You do not have a guild set. Use /setguild to set one.')
                     .setColor(0xff0000);
 
                 await interaction.editReply({ embeds: [responseEmbed] });
@@ -62,12 +61,10 @@ module.exports = {
             if (response.guildName === '') {
                 const responseEmbed = new EmbedBuilder();
 
-                const guildName = (await database.findGuild(guildUuid, true)).name;
-
                 // Unknown guild
                 responseEmbed
-                    .setTitle('Guild does not exist')
-                    .setDescription(`Unable to find ${guildName}, it may have been deleted or the API is down.`)
+                    .setTitle('Error')
+                    .setDescription('Failed to fetch guild information from the API, it may be down.')
                     .setColor(0xff0000);
 
                 embeds.push(responseEmbed);
@@ -161,10 +158,13 @@ module.exports = {
                 await interaction.editReply({ embeds: [embeds[0]] });
             }
         } catch (error) {
-            await interaction.editReply({ 
-                content: 'Failed to lookup verified members.',
-                embeds: [], 
-            });
+            console.error(error);
+            const errorEmbed = new EmbedBuilder()
+                    .setTitle('Error')
+                    .setDescription('Unable to view verified members.')
+                    .setColor(0xff0000);
+            await interaction.editReply({ embeds: [errorEmbed] });
+            return;
         }
     },
 };

@@ -74,9 +74,8 @@ module.exports = {
             // No players are exempt from demotion
             if (!config['demotionExceptions'] || Object.keys(config['demotionExceptions']).length === 0) {
                 responseEmbed
-                    .setTitle('Error')
                     .setDescription('No players are currently exempt from being demoted.')
-                    .setColor(0xff0000);
+                    .setColor(0x999999);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
             }
@@ -154,10 +153,10 @@ module.exports = {
                 await interaction.editReply({ embeds: [responseEmbed] });
             }
         } catch (error) {
-            console.log(error);
+            console.error(error);
             responseEmbed
                     .setTitle('Error')
-                    .setDescription('Error viewing demotion exceptions.')
+                    .setDescription('Failed to view demotion exceptions.')
                     .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;

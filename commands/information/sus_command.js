@@ -23,7 +23,7 @@ module.exports = {
         const username = interaction.options.getString('username').replaceAll('_', '\\_');
 
         const loadingEmbed = new EmbedBuilder()
-            .setDescription(`Calculating sus level for ${username}`)
+            .setDescription(`Calculating sus level for ${username}.`)
             .setColor(0x00ff00);
 
         await interaction.editReply({ embeds: [loadingEmbed] });
@@ -37,7 +37,7 @@ module.exports = {
             // Multiselector
             responseEmbed
                 .setTitle('Multiple players found')
-                .setDescription(`More than 1 player has the identifier ${username}. Pick the intended player from the following`)
+                .setDescription(`More than 1 player has the identifier ${username}. Pick the intended player from the following.`)
                 .setColor(0x999999);
 
             const row = new ActionRowBuilder();
@@ -109,7 +109,7 @@ module.exports = {
                 // Valid player
                 responseEmbed
                     .setTitle(`Suspiciousness of ${response.username}: ${response.overallSusValue}%`)
-                    .setDescription('This is calculated from the following stats')
+                    .setDescription('This is calculated from the following stats.')
                     .setThumbnail(`https://vzge.me/bust/512/${response.uuid}.png`)
                     .setColor(0x00ffff)
                     .addFields(

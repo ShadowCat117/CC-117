@@ -20,7 +20,7 @@ module.exports = {
         const username = interaction.options.getString('username').replaceAll('_', '\\_');
 
         const loadingEmbed = new EmbedBuilder()
-            .setDescription(`Updating known info about ${username}`)
+            .setDescription(`Updating known info about ${username}.`)
             .setColor(0x00ff00);
 
         await interaction.editReply({ embeds: [loadingEmbed] });
@@ -34,7 +34,7 @@ module.exports = {
             // Multiselector
             responseEmbed
                 .setTitle('Multiple players found')
-                .setDescription(`More than 1 player has the identifier ${username}. Pick the intended player from the following`)
+                .setDescription(`More than 1 player has the identifier ${username}. Pick the intended player from the following.`)
                 .setColor(0x999999);
 
             const row = new ActionRowBuilder();
