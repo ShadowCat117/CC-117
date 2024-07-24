@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { Events } = require('discord.js');
+const createConfig = require('../functions/create_config');
 
 module.exports = {
     name: Events.GuildMemberRemove,
@@ -15,51 +16,27 @@ module.exports = {
             return;
         }
 
-        if (fs.existsSync(filePath)) {
-            try {
-                fs.readFile(filePath, 'utf-8', (error, fileData) => {
-                    if (error) {
-                        console.log(`Error reading the JSON file for guild ${guildId}: ${error}`);
-                        return;
-                    }
+        try {
+            let config = {};
 
-                    try {
-                        // Get the config file for the server
-                        const config = JSON.parse(fileData);
-                        // Get the channel to send leave messages in
-                        const joinLeaveChannelId = config.joinLeaveChannel;
-                        // See whether a message should be sent when a member leaves
-                        const sendJoinLeaveMessages = config.sendJoinLeaveMessages;
-
-                        // If no message sent, do nothing
-                        if (!sendJoinLeaveMessages) {
-                            return;
-                        }
-
-                        // Get the message to send when a member leaves
-                        const leaveMessage = config.leaveMessage;
-
-                        if (joinLeaveChannelId) {
-                            guild.fetch().then(() => {
-                                // Replace $user$ with the username of the member who left if present.
-                                // Then send the message
-                                if (leaveMessage.includes('$user$')) {
-                                    const userLeaveMessage = leaveMessage.replace('$user$', member.user.username.replace(/_/g, '\\_'));
-                                } else {
-                                }
-                            });
-                        } else {
-                            console.log(`Join/Leave channel not specified for guild ${guildId}`);
-                        }
-                    } catch (parseError) {
-                        console.log(`Error parsing the JSON file for guild ${guildId}: ${parseError}`);
-                    }
-                });
-            } catch (error) {
-                console.log(`Error reading the JSON file for guild ${guildId}: ${error}`);
+            if (fs.existsSync(filePath)) {
+                const fileData = fs.readFileSync(filePath, 'utf-8');
+                config = JSON.parse(fileData);
+            } else {
+                await createConfig(member.client, guildId);
+                return;
             }
-        } else {
-            console.log(`Config file not found for guild ${guildId}`);
+
+            const sendJoinLeaveMessages = config['sendJoinLeaveMessages'];
+
+            if (sendJoinLeaveMessages) {
+                const channel = guild.channels.cache.get(config['joinLeaveChannel']);
+
+                // member.user seems to work, if it ends up not working change to member.user.username
+                await channel.send(`${config['leaveMessage'].replace(/\\n/g, '\n').replace('$user$', member.user)}`);
+            }
+        } catch (error) {
+            console.error(`Failed to read config file for guild ${guildId}: `, error);
         }
     },
 };

@@ -181,7 +181,7 @@ async function applyRoles(guild, member, playerInfo) {
                         updates.push(`Added ${unverifiedRole}.`);
                     })
                     .catch(() => {
-                        console.error(`Failed to add unverified role ${unverifiedRole.name} from ${member.user.username}`);
+                        console.error(`Failed to add unverified role ${unverifiedRole.name} to ${member.user.username}`);
                         errors.push(`Failed to add ${unverifiedRole}.`);
                     });
             }
