@@ -110,7 +110,7 @@ module.exports = {
                 responseEmbed
                     .setTitle(`Suspiciousness of ${response.username}: ${response.overallSusValue}%`)
                     .setDescription('This is calculated from the following stats')
-                    .setThumbnail(`https://visage.surgeplay.com/bust/512/${response.uuid}.png`)
+                    .setThumbnail(`https://vzge.me/bust/512/${response.uuid}.png`)
                     .setColor(0x00ffff)
                     .addFields(
                         { name: 'Join Date', value: response.joinSusData, inline: true },

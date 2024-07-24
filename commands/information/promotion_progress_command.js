@@ -119,7 +119,7 @@ module.exports = {
                     // Valid player
                     if (response.uuid) {
                         responseEmbed
-                            .setThumbnail(`https://visage.surgeplay.com/bust/512/${response.uuid}.png`);
+                            .setThumbnail(`https://vzge.me/bust/512/${response.uuid}.png`);
                     }
 
                     if (response.unableToPromote) {
