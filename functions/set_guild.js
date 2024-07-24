@@ -40,6 +40,8 @@ async function setGuild(interaction, force = false) {
 
             config.guild = guild.uuid;
 
+            config.allies = config.allies.filter(item => item !== guild.uuid);
+
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
             return ({ guildName: guild.name });
