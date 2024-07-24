@@ -6,6 +6,8 @@ const fs = require('fs');
 const path = require('path');
 const createConfig = require('../../functions/create_config');
 
+const warRoles = ['warRole', 'tankRole', 'healerRole', 'damageRole', 'soloRole', 'ecoRole', 'warPingRole'];
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('config_warroles')
@@ -100,6 +102,19 @@ module.exports = {
         }
 
         try {
+            for (const roleName of warRoles) {
+                const roleToCheck = interaction.guild.roles.cache.get(config[`${roleName}`]);
+
+                if (roleToCheck === role && roleName !== option) {
+                    responseEmbed
+                        .setTitle(`Invalid role for ${option}`)
+                        .setDescription(`${roleName} has already been set to ${role}`)
+                        .setColor(0xff0000);
+                    await interaction.editReply({ embeds: [responseEmbed] });
+                    return;
+                }
+            }
+
             const guild = interaction.guild;
             const botRole = guild.roles.cache.find(roleSearch => roleSearch.managed && roleSearch.members.has(interaction.client.user.id));
 
