@@ -9,6 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const promotionProgress = require('../../functions/promotion_progress');
 const database = require('../../database/database');
+const createConfig = require('../../functions/create_config');
 const PromotionValue = require('../../values/PromotionValue');
 
 module.exports = {
@@ -36,6 +37,11 @@ module.exports = {
             let config = {};
 
             if (fs.existsSync(filePath)) {
+                const fileData = fs.readFileSync(filePath, 'utf-8');
+                config = JSON.parse(fileData);
+            } else {
+                await createConfig(interaction.client, guildId);
+
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
             }

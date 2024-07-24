@@ -8,6 +8,7 @@ const {
 const sus = require('../../functions/sus');
 const fs = require('fs');
 const path = require('path');
+const createConfig = require('../../functions/create_config');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -98,6 +99,8 @@ module.exports = {
                         config = JSON.parse(fileData);
 
                         banReason = config.bannedPlayers[response.username];
+                    } else {
+                        await createConfig(interaction.client, guildId);
                     }
                 } catch (err) {
                     console.error('Error reading config file', err);

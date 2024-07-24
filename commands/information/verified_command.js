@@ -10,6 +10,7 @@ const path = require('path');
 const verified = require('../../functions/verified');
 const messages = require('../../functions/messages');
 const database = require('../../database/database');
+const createConfig = require('../../functions/create_config');
 const PagedMessage = require('../../message_objects/PagedMessage');
 
 module.exports = {
@@ -34,13 +35,10 @@ module.exports = {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
             } else {
-                const responseEmbed = new EmbedBuilder()
-                    .setTitle('Error')
-                    .setDescription('You do not have a guild set. Use /setguild to set one')
-                    .setColor(0xff0000);
+                await createConfig(interaction.client, guildId);
 
-                await interaction.editReply({ embeds: [responseEmbed] });
-                return;
+                const fileData = fs.readFileSync(filePath, 'utf-8');
+                config = JSON.parse(fileData);
             }
 
             const guildUuid = config.guild;
