@@ -1,6 +1,7 @@
 const axios = require('axios');
 const applyRoles = require('./apply_roles');
 const database = require('../database/database');
+const utilities = require('./utilities');
 const PlayerInfo = require('../message_objects/PlayerInfo');
 
 async function verify(interaction, force = false) {
@@ -24,14 +25,20 @@ async function verify(interaction, force = false) {
         };
     }
 
+    await utilities.waitForRateLimit();
+
     let playerJson;
 
     // If a player was found, look for UUID to get guaranteed results, otherwise look for the name input
     if (player) {
-        playerJson = (await axios.get(`https://api.wynncraft.com/v3/player/${player.uuid}?fullResult=True`)).data;
+        const response = await axios.get(`https://api.wynncraft.com/v3/player/${player.uuid}?fullResult=True`);
+        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+        playerJson = response.data;
     } else {
         try {
-            playerJson = (await axios.get(`https://api.wynncraft.com/v3/player/${nameToSearch}?fullResult=True`)).data;
+            const response = await axios.get(`https://api.wynncraft.com/v3/player/${nameToSearch}?fullResult=True`);
+            utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+            playerJson = response.data;
         } catch (err) {
             // 300 indicates a multi selector
             if (err.response.status === 300) {

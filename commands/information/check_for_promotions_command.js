@@ -134,7 +134,11 @@ module.exports = {
 
         let eligibleMembers = [];
 
-        const guildJson = (await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${config.guild}`)).data;
+        await utilities.waitForRateLimit();
+        const response = await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${config.guild}`);
+
+        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+        const guildJson = response.data;
 
         // FIXME: Handle errors better
         if (!guildJson || !guildJson.name) {

@@ -1,5 +1,6 @@
 const axios = require('axios');
 const database = require('../database/database');
+const utilities = require('./utilities');
 const UpdateGuildMember = require('../message_objects/UpdateGuildMember');
 
 async function updateGuild(interaction, force = false) {
@@ -23,11 +24,17 @@ async function updateGuild(interaction, force = false) {
 
     let guildJson;
 
+    await utilities.waitForRateLimit();
+
     // If a guild was found, look for UUID to get guaranteed results, otherwise look for the name input
     if (guild) {
-        guildJson = (await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${guild.uuid}`)).data;
+        const response = await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${guild.uuid}`);
+        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+        guildJson = response.data;
     } else {
-        guildJson = (await axios.get(`https://api.wynncraft.com/v3/guild/${nameToSearch}`)).data;
+        const response = await axios.get(`https://api.wynncraft.com/v3/guild/${nameToSearch}`);
+        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+        guildJson = response.data;
     }
 
     // FIXME: Handle errors better

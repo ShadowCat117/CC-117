@@ -1,8 +1,13 @@
 const axios = require('axios');
+const utilities = require('./utilities');
 const VerifiedMember = require('../message_objects/VerifiedMember');
 
 async function verified(guildUuid, interaction) {
-    const guildJson = (await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${guildUuid}`)).data;
+    await utilities.waitForRateLimit();
+    const response = await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${guildUuid}`);
+
+    utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+    const guildJson = response.data;
     
     // FIXME: Handle errors better
     if (!guildJson || !guildJson.name) {

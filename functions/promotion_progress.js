@@ -40,14 +40,20 @@ async function promotionProgress(interaction, force = false) {
             };
         }
 
+        await utilities.waitForRateLimit();
+
         let playerJson;
 
         // If a player was found, look for UUID to get guaranteed results, otherwise look for the name input
         if (player) {
-            playerJson = (await axios.get(`https://api.wynncraft.com/v3/player/${player.uuid}?fullResult=True`)).data;
+            const response = await axios.get(`https://api.wynncraft.com/v3/player/${player.uuid}?fullResult=True`);
+            utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+            playerJson = response.data;
         } else {
             try {
-                playerJson = (await axios.get(`https://api.wynncraft.com/v3/player/${nameToSearch}?fullResult=True`)).data;
+                const response = await axios.get(`https://api.wynncraft.com/v3/player/${nameToSearch}?fullResult=True`);
+                utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+                playerJson = response.data;
             } catch (err) {
                 // 300 indicates a multi selector
                 if (err.response.status === 300) {
@@ -91,7 +97,11 @@ async function promotionProgress(interaction, force = false) {
             return ({ username: playerJson.username, unableToPromote: promotionExceptions[playerJson.uuid] });
         }
 
-        const guildJson = (await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${playerJson.guild.uuid}?identifier=uuid`)).data;
+        await utilities.waitForRateLimit();
+        const response = await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${playerJson.guild.uuid}?identifier=uuid`);
+
+        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+        const guildJson = response.data;
 
         // FIXME: Handle errors better
         if (!guildJson || !guildJson.name) {

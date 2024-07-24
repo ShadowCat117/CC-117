@@ -3,16 +3,14 @@ const fs = require('fs').promises;
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const database = new sqlite3.Database('database/database.db');
+const utilities = require('../functions/utilities');
 const PlayerLastLogin = require('../message_objects/PlayerLastLogin');
 const GuildActiveHours = require('../message_objects/GuildActiveHours');
 const TrackedGuild = require('../message_objects/TrackedGuild');
-const RATE_LIMIT = 180;
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const priorityGuilds = [];
 const priorityPlayers = [];
 
-let remainingRateLimit = RATE_LIMIT;
-let rateLimitReset;
 let pausePlayerUpdates = false;
 
 // Call run queries on the database with promises
@@ -391,12 +389,12 @@ async function updatePriorityGuilds() {
     for (const guild of priorityGuilds) {
         if (updated === 5) break;
 
-        await waitForRateLimit();
+        await utilities.waitForRateLimit();
 
         const response = await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${guild}`);
 
-        remainingRateLimit = response.headers['ratelimit-remaining'];
-        rateLimitReset = response.headers['ratelimit-reset'];
+        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+
         const guildJson = response.data;
 
         if (guildJson && guildJson.name) {
@@ -440,12 +438,11 @@ async function updatePriorityPlayers() {
     for (const player of priorityPlayers) {
         if (updated === 5) break;
 
-        await waitForRateLimit();
+        await utilities.waitForRateLimit();
 
         const response = await axios.get(`https://api.wynncraft.com/v3/player/${player}?fullResult=True`);
 
-        remainingRateLimit = response.headers['ratelimit-remaining'];
-        rateLimitReset = response.headers['ratelimit-reset'];
+        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
         const playerJson = response.data;
 
         if (playerJson && playerJson.username) {
@@ -529,12 +526,11 @@ async function updateGuildMembers(uuid, guildMembers) {
 // First call the API to update the list of guild members to ensure the database is up to date and then 
 // return the information
 async function getLastLogins(guild) {
-    await waitForRateLimit();
+    await utilities.waitForRateLimit();
 
     const response = await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${guild}`);
 
-    remainingRateLimit = response.headers['ratelimit-remaining'];
-    rateLimitReset = response.headers['ratelimit-reset'];
+    utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
     const guildJson = response.data;
 
     // If we got a valid response, then update the members of the guild
@@ -552,12 +548,11 @@ async function getLastLogins(guild) {
                 if (existingPlayer) {
                     await runAsync('UPDATE players SET username = ?, guildUuid = ?, guildRank = ? WHERE uuid = ?', [member, guild, rank, guildMember.uuid]);
                 } else {
-                    await waitForRateLimit();
+                    await utilities.waitForRateLimit();
 
                     const playerResponse = await axios.get(`https://api.wynncraft.com/v3/player/${guildMember.uuid}?fullResult=True`);
 
-                    remainingRateLimit = playerResponse.headers['ratelimit-remaining'];
-                    rateLimitReset = playerResponse.headers['ratelimit-reset'];
+                    utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
                     const playerJson = playerResponse.data;
 
                     if (playerJson && playerJson.username) {
@@ -825,7 +820,7 @@ async function createDatabaseBackup(backupFilename) {
 }
 
 async function runFreeFunctions() {
-    await waitForRateLimit();
+    await utilities.waitForRateLimit();
 
     // If the player weekly activity is being updated, don't update the online players list
     if (!pausePlayerUpdates) {
@@ -834,8 +829,7 @@ async function runFreeFunctions() {
         // Get all of the online players by UUID
         const response = await axios.get('https://api.wynncraft.com/v3/player?identifier=uuid');
 
-        remainingRateLimit = response.headers['ratelimit-remaining'];
-        rateLimitReset = response.headers['ratelimit-reset'];
+        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
         const onlinePlayers = response.data;
 
         if (onlinePlayers) {
@@ -870,14 +864,13 @@ async function runScheduledFunctions() {
 
     // Update hourly
     if (now.getUTCMinutes() === 0) {
-        await waitForRateLimit();
+        await utilities.waitForRateLimit();
         console.log('Updating list of all guilds');
 
         // Get all guilds
         const response = await axios.get('https://api.wynncraft.com/v3/guild/list/guild?identifier=uuid');
     
-        remainingRateLimit = response.headers['ratelimit-remaining'];
-        rateLimitReset = response.headers['ratelimit-reset'];
+        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
         const guildList = response.data;
 
         if (guildList) {
@@ -916,14 +909,6 @@ async function runScheduledFunctions() {
 
     // Run this function again at the next minute
     setTimeout(runScheduledFunctions, secondsToNextMinute * 1000);
-}
-
-async function waitForRateLimit() {
-    if (remainingRateLimit === 0) {
-        const timeToWait = (rateLimitReset - Date.now()) * 1000;
-
-        await new Promise((resolve) => setTimeout(resolve, timeToWait));
-    }
 }
 
 // Setup the two tables

@@ -1,5 +1,9 @@
 const GuildMemberSlots = require('../values/GuildMemberSlots');
 
+const RATE_LIMIT = 180;
+let remainingRateLimit = RATE_LIMIT;
+let rateLimitReset;
+
 function getTimeSince(timestamp) {
     const now = new Date();
     const lastLoginTime = new Date(timestamp);
@@ -110,6 +114,21 @@ function calculateMemberSlots(guildLevel) {
     return slots;
 }
 
+async function waitForRateLimit() {
+    if (remainingRateLimit === 0) {
+        const timeToWait = (rateLimitReset - Date.now()) * 1000;
+
+        await new Promise((resolve) => setTimeout(resolve, timeToWait));
+    }
+}
+
+function updateRateLimit(remaining, reset) {
+    if (!remaining || !reset) return;
+    
+    remainingRateLimit = remaining;
+    rateLimitReset = reset;
+}
+
 module.exports = {
     getTimeSince,
     getFormattedXPPerDay,
@@ -117,4 +136,6 @@ module.exports = {
     findDiscordUser,
     checkValidUsername,
     calculateMemberSlots,
+    waitForRateLimit,
+    updateRateLimit,
 };
