@@ -522,6 +522,16 @@ async function updateGuildMembers(uuid, guildMembers) {
     }
 }
 
+async function checkForPlayers(players, guild) {
+    const placeholders = players.map(() => '?').join(', ');
+
+    const query = `SELECT username FROM players WHERE guildUuid = '${guild}' AND uuid IN (${placeholders})`;
+
+    const bannedPlayersInGuild = await allAsync(query, players);
+
+    return bannedPlayersInGuild.map(player => player.username);
+}
+
 // Get the information for last login timestamps for each member of a guild.
 // First call the API to update the list of guild members to ensure the database is up to date and then 
 // return the information
@@ -944,6 +954,7 @@ module.exports = {
     findPlayer,
     updatePlayer,
     updateGuildMembers,
+    checkForPlayers,
     getLastLogins,
     getActiveHours,
     getLastLogin,

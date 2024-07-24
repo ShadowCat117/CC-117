@@ -4,6 +4,7 @@ const database = require('../database/database');
 const messages = require('../functions/messages');
 const fs = require('fs');
 const path = require('path');
+const createConfig = require('../functions/create_config');
 const PagedMessage = require('../message_objects/PagedMessage');
 let client;
 
@@ -33,6 +34,9 @@ async function hourlyTasks() {
                 if (fs.existsSync(filePath)) {
                     const fileData = fs.readFileSync(filePath, 'utf-8');
                     config = JSON.parse(fileData);
+                } else {
+                    await createConfig(client, guild.id);
+                    continue;
                 }
 
                 // If the server has the hourly rank updates enabled, then update the roles
@@ -154,6 +158,52 @@ async function hourlyTasks() {
                 }
             } catch (err) {
                 console.log(`Error checking config for guild ${guild.id}`);
+            }
+        }
+    }
+
+    if (now.getUTCHours() == 0) {
+        // For each server the bot is in
+        for (const guild of client.guilds.cache.values()) {
+            try {
+                // Get the config file for that server
+                let config = {};
+
+                const directoryPath = path.join(__dirname, '..', 'configs');
+                const filePath = path.join(directoryPath, `${guild.id}.json`);
+
+                if (fs.existsSync(filePath)) {
+                    const fileData = fs.readFileSync(filePath, 'utf-8');
+                    config = JSON.parse(fileData);
+                } else {
+                    await createConfig(client, guild.id);
+                    continue;
+                }
+
+                if (config.checkBannedPlayers && config.guild && Object.keys(config.bannedPlayers).length > 0) {
+                    const bannedPlayersInGuild = await database.checkForPlayers(Object.keys(config.bannedPlayers), config.guild);
+
+                    if (bannedPlayersInGuild.length > 0) {
+                        const responseEmbed = new EmbedBuilder()
+                            .setTitle('The following players are banned from your guild but are currently in your guild')
+                            .setDescription(`${bannedPlayersInGuild.join('\n')}`)
+                            .setColor(0x00ffff);
+
+                        const channel = guild.channels.cache.get(config.logChannel);
+
+                        if (channel) {
+                            try {
+                                await channel.send({ embeds: [responseEmbed] });
+                            } catch (error) {
+                                console.error(`Failed to send banned players in guild message to channel ${config.logChannel} in guild ${guild.id}: `, error);
+                            }
+                        } else {
+                            console.log(`${config.logChannel} not found for guild ${guild.id}`);
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error(`Error checking config for guild ${guild.id}: `, err);
             }
         }
     }

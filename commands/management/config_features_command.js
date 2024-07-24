@@ -26,6 +26,9 @@ module.exports = {
                 }, {
                     name: 'Send Join/Leave Messages',
                     value: 'sendJoinLeaveMessages',
+                }, {
+                    name: 'Check for Banned Players in Guild',
+                    value: 'checkBannedPlayers',
                 }))
         .addBooleanOption((option) =>
             option.setName('enabled')
@@ -97,6 +100,7 @@ module.exports = {
                 case 'addGuildPrefixes':
                 case 'logMessages':
                 case 'sendJoinLeaveMessages':
+                case 'checkBannedPlayers':
                     config[option] = enabled;
                     break;
             }

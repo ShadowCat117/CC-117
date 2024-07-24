@@ -92,6 +92,7 @@ module.exports = {
                     Log messages: ${config['logMessages']}
                     Send join/leave messages: ${config['sendJoinLeaveMessages']}
                     Add guild prefixes: ${config['addGuildPrefixes']}
+                    Check for banned players in guild: ${config['checkBannedPlayers']}
                     Log Channel: ${logChannel}
                     Join/Leave Channel: ${joinLeaveChannel}
                     `,

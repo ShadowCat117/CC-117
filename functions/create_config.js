@@ -71,6 +71,7 @@ async function createConfig(client, guildId) {
                 logMessages: false,
                 sendJoinLeaveMessages: false,
                 addGuildPrefixes: true,
+                checkBannedPlayers: true,
                 joinMessage: 'Welcome to the server $user$!',
                 leaveMessage: '$user$ has left the server.',
                 warMessage: '',
