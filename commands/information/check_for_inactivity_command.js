@@ -222,7 +222,7 @@ module.exports = {
                         username += ` (${inactivePlayer.threshold} day${inactivePlayer.threshold > 1 ? 's' : ''})`;
                     }
 
-                    responseEmbed.addFields({ name: `${username}`, value: `${inactivePlayer.guildRank}\nInactive for ${inactivePlayer.daysSinceLastLogin} day${inactivePlayer.daysSinceLastLogin > 1 ? 's' : ''}` });
+                    pageEmbed.addFields({ name: `${username}`, value: `${inactivePlayer.guildRank}\nInactive for ${inactivePlayer.daysSinceLastLogin} day${inactivePlayer.daysSinceLastLogin > 1 ? 's' : ''}` });
                 }
 
                 embeds.push(pageEmbed);
