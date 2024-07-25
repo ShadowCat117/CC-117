@@ -56,7 +56,20 @@ module.exports = {
                 await interaction.editReply({ embeds: [errorEmbed] });
             }
 
+            const memberRoles = interaction.member.roles.cache;
+            const memberOfRole = config.memberOfRole;
+
             const guildName = (await database.findGuild(guildUuid, true)).name;
+
+            // If the member of role is used, check the user has it to let them run the command
+            if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
+                const errorEmbed = new EmbedBuilder()
+                    .setTitle('Error')
+                    .setDescription(`You must be a member of ${guildName} to run this command.`)
+                    .setColor(0xff0000);
+                await interaction.editReply({ embeds: [errorEmbed] });
+                return;
+            }
 
             // Call promotionProgress
             const response = await promotionProgress(interaction);
