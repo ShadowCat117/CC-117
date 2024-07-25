@@ -385,6 +385,16 @@ async function setPriorityGuilds() {
     console.log(priorityGuilds);
 }
 
+async function setPriorityPlayers() {
+    const players = await allAsync('SELECT uuid FROM players WHERE username IS NULL');
+
+    for (const player of players) {
+        if (!priorityPlayers.includes(player.uuid)) {
+            priorityPlayers.push(player.uuid);
+        }
+    }
+}
+
 async function updatePriorityGuilds() {
     if (priorityGuilds.length === 0) return;
     console.log('Updating 5 priority guilds');
@@ -426,9 +436,15 @@ async function updatePriorityGuilds() {
                     }
                 }
             }
-        }
 
-        updated++;    
+            updated++;
+        } else {
+            break;
+        } 
+    }
+
+    for (let i = 0; i < updated; i++) {
+        priorityGuilds.shift();
     }
 
     console.log(`Updated ${updated} priority guilds.`);
@@ -482,9 +498,15 @@ async function updatePriorityPlayers() {
                     priorityGuilds.push(guildUuid);
                 }
             }
-        }
 
-        updated++;    
+            updated++;    
+        } else {
+            break;
+        }
+    }
+
+    for (let i = 0; i < updated; i++) {
+        priorityPlayers.shift();
     }
 
     console.log(`Updated ${updated} priority players.`);
@@ -858,6 +880,11 @@ async function runFreeFunctions() {
 
 async function runScheduledFunctions() {
     let now = new Date();
+
+    // Update every 5 minutes
+    if (now.getUTCMinutes() % 5 === 0) {
+        await setPriorityPlayers();
+    }
 
     // Update every 10 minutes
     if (now.getUTCMinutes() % 10 === 0) {
