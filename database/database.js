@@ -1049,8 +1049,8 @@ async function setup() {
 
     console.log('Database setup complete');
 
-    // runFreeFunctions();
-    // runScheduledFunctions();
+    runFreeFunctions();
+    runScheduledFunctions();
 }
 
 module.exports = {
