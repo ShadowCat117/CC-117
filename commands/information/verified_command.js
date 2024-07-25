@@ -96,11 +96,11 @@ module.exports = {
 
                 embeds.push(responseEmbed);
             } else {
-                // Found guild, if more than 45 players we need to make pages for the embed, otherwise 1 page will work
-                if (response.verifiedMembers.length > 45) {
+                // Found guild, if more than 25 players we need to make pages for the embed, otherwise 1 page will work
+                if (response.verifiedMembers.length > 25) {
                     const pages = [];
-                    for (let i = 0; i < response.verifiedMembers.length; i += 45) {
-                        pages.push(response.verifiedMembers.slice(i, i + 45));
+                    for (let i = 0; i < response.verifiedMembers.length; i += 25) {
+                        pages.push(response.verifiedMembers.slice(i, i + 25));
                     }
 
                     for (const page of pages) {
@@ -108,25 +108,17 @@ module.exports = {
                         responseEmbed
                             .setTitle(`[${response.guildPrefix}] ${response.guildName} Verified Members`)
                             .setColor(0x00ffff);
-                    
-                        let usernameValue = '';
-                        let verifiedValue = '';
-                    
+                                        
                         for (const player of page) {
-                            usernameValue += player.username + '\n';
-                    
+                            let verifiedValue;
+
                             if (player.verifiedMember) {
-                                verifiedValue += `<@${player.verifiedMember}>\n`;
+                                verifiedValue = `<@${player.verifiedMember}>`;
                             } else {
-                                verifiedValue += 'Not verified\n';
+                                verifiedValue = 'Not verified';
                             }
+                            responseEmbed.addFields({ name: `${player.username}`, value: `${verifiedValue}` });
                         }
-                    
-                        responseEmbed
-                            .addFields(
-                                { name: 'Username', value: usernameValue, inline: true },
-                                { name: 'Discord User', value: verifiedValue, inline: true },
-                            );
                     
                         embeds.push(responseEmbed);
                     }
@@ -152,24 +144,16 @@ module.exports = {
                         .setColor(0x00ffff);
 
                     if (response.verifiedMembers.length > 0) {
-                        let usernameValue = '';
-                        let verifiedValue = '';
-
                         for (const player of response.verifiedMembers) {
-                            usernameValue += player.username + '\n';
-                    
-                            if (player.verifiedMember) {
-                                verifiedValue += `${player.verifiedMember}\n`;
-                            } else {
-                                verifiedValue += 'Not verified\n';
-                            }
-                        }
+                            let verifiedValue;
 
-                        responseEmbed
-                            .addFields(
-                                { name: 'Username', value: usernameValue, inline: true },
-                                { name: 'Discord User', value: verifiedValue, inline: true },
-                            );
+                            if (player.verifiedMember) {
+                                verifiedValue = `<@${player.verifiedMember}>`;
+                            } else {
+                                verifiedValue = 'Not verified';
+                            }
+                            responseEmbed.addFields({ name: `${player.username}`, value: `${verifiedValue}` });
+                        }
                     }
 
                     embeds.push(responseEmbed);
