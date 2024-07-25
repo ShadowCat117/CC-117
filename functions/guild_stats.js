@@ -100,7 +100,7 @@ async function guildStats(interaction, force = false) {
 
     members.sort((a, b) => a.compareTo(b));
 
-    return ({ guildName: name, guildPrefix: prefix, level: level, xpPercent: xpPercent, territories: territories, wars: wars, previousRating: previousRating, currentRating: currentRating, averageXpPerDay: averageXpPerDay, totalPlaytime: totalPlaytime, members: members });
+    return ({ guildName: name, guildPrefix: prefix, level: level, xpPercent: xpPercent, territories: territories, wars: wars, previousRating: previousRating, currentRating: currentRating, averageXpPerDay: averageXpPerDay, totalPlaytime: totalPlaytime.toFixed(2), members: members });
 }
 
 module.exports = guildStats;
