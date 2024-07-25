@@ -958,6 +958,8 @@ async function runOnlinePlayerFunction() {
 
 async function runUpdateFunctions() {
     let now = new Date();
+    await updatePriorityGuilds();
+    await updatePriorityPlayers();
 
     // Update every 5 minutes
     if (now.getUTCMinutes() % 5 === 0) {
@@ -971,9 +973,6 @@ async function runUpdateFunctions() {
         await updateGuildActivity(now.getUTCHours().toString().padStart(2, '0'), now.getUTCMinutes().toString().padStart(2, '0'));
 
         console.log(`Updated guild activity for ${now.getUTCHours()}:${now.getUTCMinutes().toString().padStart(2, '0')}`);
-
-        await updatePriorityGuilds();
-        await updatePriorityPlayers();
     }
 
     // Update twice an hour
