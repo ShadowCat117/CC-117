@@ -17,7 +17,7 @@ module.exports = {
     ephemeral: true,
     async execute(interaction) {
         const loadingEmbed = new EmbedBuilder()
-            .setDescription('Creating class message')
+            .setDescription('Creating class message.')
             .setColor(0x00ff00);
 
         await interaction.editReply({ embeds: [loadingEmbed] });
@@ -37,7 +37,8 @@ module.exports = {
                 await createConfig(interaction.client, guildId);
 
                 responseEmbed
-                    .setDescription('Failed to read config or you have not setup the class message configs. Do so with /config_values and /config_classroles')
+                    .setTitle('Error')
+                    .setDescription('Failed to read config or you have not setup the class message configs. Do so with /config_messages and /config_classroles.')
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -45,6 +46,7 @@ module.exports = {
         } catch (error) {
             console.error(error);
             responseEmbed
+                .setTitle('Error')
                 .setDescription('Failed to read config.')
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
@@ -68,14 +70,14 @@ module.exports = {
         if (!classMessage) {
             // If no class message, tell the user to set one
             responseEmbed
-                .setDescription('You have not set a class message with /config_values classMessage.')
+                .setDescription('You have not set a class message with /config_messages classMessage.')
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
         } else if (!config['classArchetypeMessage']) {
             // If no archetype message, tell the user to set one
             responseEmbed
-                .setDescription('You have not set a class archetype message with /config_values classArchetypeMessage.')
+                .setDescription('You have not set a class archetype message with /config_messages classArchetypeMessage.')
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
@@ -133,13 +135,14 @@ module.exports = {
                     .setDescription('Class message created successfully.')
                     .setColor(0x00ffff);
             } catch (error) {
-                console.log(`Failed to send class message to channel ${interaction.channelId} in guild ${interaction.guild.id}`);
+                console.error(`Failed to send class message to channel ${interaction.channelId} in guild ${interaction.guild.id}`);
                 responseEmbed
                     .setDescription('Failed to send message in current channel.')
                     .setColor(0xff0000);
             }
         } else {
             responseEmbed
+                .setTitle('Error')
                 .setDescription('Unable to find current channel.')
                 .setColor(0xff0000);
         }

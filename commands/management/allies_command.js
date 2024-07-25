@@ -64,7 +64,7 @@ module.exports = {
                 errorEmbed
                         .setTitle('Error')
                         .setDescription('No allies have been set.')
-                        .setColor(0x00ffff);
+                        .setColor(0x999999);
 
                 embeds.push(errorEmbed);
             } else if (memberOfRole) {
@@ -150,7 +150,8 @@ module.exports = {
             console.error(error);
 
             const errorEmbed = new EmbedBuilder()
-                .setDescription('Error checking allies.')
+                .setTitle('Error')
+                .setDescription('Failed to check allies.')
                 .setColor(0xff0000);
 
             await interaction.editReply({ embeds: [errorEmbed] });

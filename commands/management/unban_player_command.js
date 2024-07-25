@@ -81,7 +81,7 @@ module.exports = {
                 // Multiselector
                 responseEmbed
                     .setTitle('Multiple players found')
-                    .setDescription(`More than 1 player has the identifier ${username}. Pick the intended player from the following`)
+                    .setDescription(`More than 1 player has the identifier ${username}. Pick the intended player from the following.`)
                     .setColor(0x999999);
 
                     const row = new ActionRowBuilder();
@@ -148,10 +148,10 @@ module.exports = {
 
             await interaction.editReply({ embeds: [responseEmbed] });
         } catch (error) {
-            console.log(error);
+            console.error(error);
             errorEmbed
                     .setTitle('Error')
-                    .setDescription('Error unbanning player.')
+                    .setDescription('Unable to unban player.')
                     .setColor(0xff0000);
             await interaction.editReply({ embeds: [errorEmbed] });
             return;

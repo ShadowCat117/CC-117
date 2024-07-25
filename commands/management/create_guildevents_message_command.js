@@ -16,7 +16,7 @@ module.exports = {
     ephemeral: true,
     async execute(interaction) {
         const loadingEmbed = new EmbedBuilder()
-            .setDescription('Creating guild events message')
+            .setDescription('Creating guild events message.')
             .setColor(0x00ff00);
 
         await interaction.editReply({ embeds: [loadingEmbed] });
@@ -36,7 +36,8 @@ module.exports = {
                 await createConfig(interaction.client, guildId);
 
                 responseEmbed
-                    .setDescription('Failed to read config or you have not setup the guild events message configs. Do so with /config_values and /config_roles')
+                    .setTitle('Error')
+                    .setDescription('Failed to read config or you have not setup the guild events message configs. Do so with /config_messages and /config_roles.')
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -44,6 +45,7 @@ module.exports = {
         } catch (error) {
             console.error(error);
             responseEmbed
+                .setTitle('Error')
                 .setDescription('Failed to read config.')
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
@@ -56,6 +58,7 @@ module.exports = {
         // Only owners and admins can run command
         if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
             responseEmbed
+                .setTitle('Error')
                 .setDescription('You do not have the required permissions to run this command.')
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
@@ -67,7 +70,8 @@ module.exports = {
         // If no events message, tell the user to set one
         if (!message) {
             responseEmbed
-                .setDescription('You have not set a guild events message with /config_values guildEventsMessage.')
+                .setTitle('Error')
+                .setDescription('You have not set a guild events message with /config_messages guildEventsMessage.')
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
@@ -76,6 +80,7 @@ module.exports = {
         // Check if the giveaway role exists and if not tell the user to set it
         if (!config['giveawayRole']) {
             responseEmbed
+                .setTitle('Error')
                 .setDescription('You have not set a giveaway role.')
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
@@ -85,6 +90,7 @@ module.exports = {
         // Same for the events role
         if (!config['eventsRole']) {
             responseEmbed
+                .setTitle('Error')
                 .setDescription('You have not set an events role.')
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
@@ -117,13 +123,14 @@ module.exports = {
                     .setDescription('Guild events message created successfully.')
                     .setColor(0x00ffff);
             } catch (error) {
-                console.log(`Failed to send guild events message to channel ${interaction.channelId} in guild ${interaction.guild.id}`);
+                console.error(`Failed to send guild events message to channel ${interaction.channelId} in guild ${interaction.guild.id}`);
                 responseEmbed
                     .setDescription('Failed to send message in current channel.')
                     .setColor(0xff0000);
             }
         } else {
             responseEmbed
+                .setTitle('Error')
                 .setDescription('Unable to find current channel.')
                 .setColor(0xff0000);
         }

@@ -123,7 +123,8 @@ module.exports = {
         } catch (error) {
             console.error(error);
             responseEmbed
-                .setDescription('Error changing config.')
+                .setTitle('Error')
+                .setDescription('Failed to change config.')
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
@@ -132,7 +133,7 @@ module.exports = {
         if (option === 'memberThreshold') {
             if (value < 1 || value > 100) {
                 responseEmbed
-                    .setDescription('Member threshold must be between 1-100')
+                    .setDescription('Member threshold must be between 1-100.')
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -140,7 +141,7 @@ module.exports = {
         } else if (option === 'extraTimeIncrease') {
             if (value < 0) {
                 responseEmbed
-                    .setDescription('Extra time multiplier must be above 0')
+                    .setDescription('Extra time multiplier must be above 0.')
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -179,7 +180,8 @@ module.exports = {
         } catch (error) {
             console.error(`Error updating configuration option: ${error}`);
             responseEmbed
-                .setDescription('An error occured whilst updating config file.')
+                .setTitle('Error')
+                .setDescription('Failed to update config file.')
                 .setColor(0xff0000);
         }
 

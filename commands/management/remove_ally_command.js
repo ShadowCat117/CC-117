@@ -21,7 +21,7 @@ module.exports = {
     ephemeral: true,
     async execute(interaction) {
         const loadingEmbed = new EmbedBuilder()
-            .setDescription(`Removing ally ${interaction.options.getString('guild_name')}`)
+            .setDescription(`Removing ally ${interaction.options.getString('guild_name')}.`)
             .setColor(0x00ff00);
 
         await interaction.editReply({ embeds: [loadingEmbed] });
@@ -48,14 +48,19 @@ module.exports = {
             // Command can only be ran by owners or admins
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 const errorEmbed = new EmbedBuilder()
+                    .setTitle('Error')
                     .setDescription('You do not have the required permissions to run this command.')
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [errorEmbed] });
                 return;
             }
         } catch (error) {
-            console.log(error);
-            await interaction.editReply('Error removing ally.');
+            console.error(error);
+            const errorEmbed = new EmbedBuilder()
+                    .setTitle('Error')
+                    .setDescription('Failed to remove ally.')
+                    .setColor(0xff0000);
+            await interaction.editReply({ embeds: [errorEmbed] });
             return;
         }
 
@@ -70,7 +75,7 @@ module.exports = {
             // Multiselector
             responseEmbed
                 .setTitle('Multiple guilds found')
-                .setDescription(`More than 1 guild has the identifier ${interaction.options.getString('guild_name')}. Pick the intended guild from the following`)
+                .setDescription(`More than 1 guild has the identifier ${interaction.options.getString('guild_name')}. Pick the intended guild from the following.`)
                 .setColor(0x999999);
 
             for (let i = 0; i < response.guildUuids.length; i++) {

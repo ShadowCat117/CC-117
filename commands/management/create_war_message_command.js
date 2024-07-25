@@ -17,7 +17,7 @@ module.exports = {
     ephemeral: true,
     async execute(interaction) {
         const loadingEmbed = new EmbedBuilder()
-            .setDescription('Creating war message')
+            .setDescription('Creating war message.')
             .setColor(0x00ff00);
 
         await interaction.editReply({ embeds: [loadingEmbed] });
@@ -37,7 +37,8 @@ module.exports = {
                 await createConfig(interaction.client, guildId);
 
                 responseEmbed
-                    .setDescription('Failed to read config or you have not setup the war message configs. Do so with /config_values and /config_warroles')
+                    .setTitle('Error')
+                    .setDescription('Failed to read config or you have not setup the war message configs. Do so with /config_messages and /config_warroles.')
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -45,6 +46,7 @@ module.exports = {
         } catch (error) {
             console.error(error);
             responseEmbed
+                .setTitle('Error')
                 .setDescription('Failed to read config.')
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
@@ -57,6 +59,7 @@ module.exports = {
         // Only owners and admins can run command
         if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
             responseEmbed
+                .setTitle('Error')
                 .setDescription('You do not have the required permissions to run this command.')
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
@@ -68,20 +71,23 @@ module.exports = {
         if (!warMessage) {
             // If no war message, tell the user to set one
             responseEmbed
-                .setDescription('You have not set a war message with /config_values warMessage.')
+                .setTitle('Error')
+                .setDescription('You have not set a war message with /config_messages warMessage.')
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
         } else if (!config['warClassMessage']) {
             // If no war class message, tell the user to set one
             responseEmbed
-                .setDescription('You have not set a war class message with /config_values warClassMessage.')
+                .setTitle('Error')
+                .setDescription('You have not set a war class message with /config_messages warClassMessage.')
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
         } else if (!config['warLevelRequirement']) {
             // If no war level requirement, tell the user to set one
             responseEmbed
+                .setTitle('Error')
                 .setDescription('You have not set a war level requirement with /config_values warLevelRequirement.')
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
@@ -92,6 +98,7 @@ module.exports = {
         for (const warRole of warRoles) {
             if (!config[`${warRole}Role`]) {
                 responseEmbed
+                    .setTitle('Error')
                     .setDescription(`You have not set a role for ${warRole} using /config_warroles.`)
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
@@ -120,13 +127,15 @@ module.exports = {
                     .setDescription('War message created successfully.')
                     .setColor(0x00ffff);
             } catch (error) {
-                console.log(`Failed to send war message to channel ${interaction.channelId} in guild ${interaction.guild.id}`);
+                console.error(`Failed to send war message to channel ${interaction.channelId} in guild ${interaction.guild.id}.`);
                 responseEmbed
+                    .setTitle('Error')
                     .setDescription('Failed to send message in current channel.')
                     .setColor(0xff0000);
             }
         } else {
             responseEmbed
+                .setTitle('Error')
                 .setDescription('Unable to find current channel.')
                 .setColor(0xff0000);
         }

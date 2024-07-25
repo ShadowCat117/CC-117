@@ -92,7 +92,7 @@ module.exports = {
         const option = interaction.options.getString('option');
 
         const loadingEmbed = new EmbedBuilder()
-            .setDescription(`Updating ${option}`)
+            .setDescription(`Updating ${option}.`)
             .setColor(0x00ff00);
 
         await interaction.editReply({ embeds: [loadingEmbed] });
@@ -138,7 +138,8 @@ module.exports = {
         } catch (error) {
             console.error(error);
             responseEmbed
-                .setDescription('Error changing config.')
+                .setTitle('Error')
+                .setDescription('Failed to change config.')
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
@@ -218,7 +219,8 @@ module.exports = {
         } catch (error) {
             console.error(`Error updating configuration option: ${error}`);
             responseEmbed
-                .setDescription('An error occured whilst updating config file.')
+                .setTitle('Error')
+                .setDescription('Failed to update config file.')
                 .setColor(0xff0000);
         }
 

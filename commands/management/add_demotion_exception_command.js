@@ -83,7 +83,7 @@ module.exports = {
                 // Multiselector
                 responseEmbed
                     .setTitle('Multiple players found')
-                    .setDescription(`More than 1 player has the identifier ${username}. Pick the intended player from the following`)
+                    .setDescription(`More than 1 player has the identifier ${username}. Pick the intended player from the following.`)
                     .setFooter({ text: `${response.duration}` })
                     .setColor(0x999999);
 
@@ -128,7 +128,7 @@ module.exports = {
             } else if (response.error) {
                 errorEmbed
                     .setTitle('Error')
-                    .setDescription(`Unable to add demotion exception: ${response.error}`)
+                    .setDescription(`Unable to add demotion exception: ${response.error}.`)
                     .setColor(0xff0000);
 
                 await interaction.editReply({ embeds: [errorEmbed] });
@@ -159,10 +159,10 @@ module.exports = {
 
             await interaction.editReply({ embeds: [responseEmbed] });
         } catch (error) {
-            console.log(error);
+            console.error(error);
             errorEmbed
                     .setTitle('Error')
-                    .setDescription('Error adding demotion exception.')
+                    .setDescription('Failed to add demotion exception.')
                     .setColor(0xff0000);
             await interaction.editReply({ embeds: [errorEmbed] });
             return;
