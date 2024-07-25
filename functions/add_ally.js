@@ -18,11 +18,41 @@ async function addAlly(interaction, force = false) {
     const filePath = path.join(directoryPath, `${guildId}.json`);
 
     if (guild && guild.message === 'Multiple possibilities found') {
-        return {
-            guildUuids: guild.guildUuids,
-            guildNames: guild.guildNames,
-            guildPrefixes: guild.guildPrefixes,
-        };
+        try {
+            let config = {};
+
+            if (fs.existsSync(filePath)) {
+                const fileData = fs.readFileSync(filePath, 'utf-8');
+                config = JSON.parse(fileData);
+
+                const filteredGuilds = guild.guildUuids
+                    .map((uuid, index) => ({
+                        guildUuid: uuid,
+                        guildName: guild.guildNames[index],
+                        guildPrefix: guild.guildPrefixes[index],
+                    }))
+                    .filter(({ guildUuid }) => !config.allies.includes(guildUuid));
+
+
+                if (filteredGuilds.length === 1) {
+                    guild.uuid = filteredGuilds[0].guildUuid;
+                    guild.name = filteredGuilds[0].guildName;
+                    guild.prefix = filteredGuilds[0].guildPrefix;
+                } else if (filteredGuilds.length === 0) {
+                    return ({ guildName: '' });
+                }
+            }
+        } catch (error) {
+            console.error(error);
+        }
+
+        if (!guild.uuid) {
+            return {
+                guildUuids: guild.guildUuids,
+                guildNames: guild.guildNames,
+                guildPrefixes: guild.guildPrefixes,
+            };
+        }
     }
 
     if (guild) {
