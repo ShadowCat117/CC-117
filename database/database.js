@@ -927,7 +927,7 @@ async function createDatabaseBackup(backupFilename) {
     }
 }
 
-async function runFreeFunctions() {
+async function runOnlinePlayerFunction() {
     await utilities.waitForRateLimit();
 
     // If the player weekly activity is being updated, don't update the online players list
@@ -947,7 +947,11 @@ async function runFreeFunctions() {
         console.log('Updated online players');
     }
 
-    runFreeFunctions();
+    // Run the function every 10 seconds
+    const now = new Date();
+    const remainingSeconds = 10 - (now.getUTCSeconds() % 10);
+
+    setTimeout(runOnlinePlayerFunction, remainingSeconds * 1000);
 }
 
 async function runScheduledFunctions() {
@@ -1049,7 +1053,7 @@ async function setup() {
 
     console.log('Database setup complete');
 
-    runFreeFunctions();
+    runOnlinePlayerFunction();
     runScheduledFunctions();
 }
 
