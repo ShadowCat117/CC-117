@@ -198,7 +198,7 @@ async function handleOnlinePlayers(onlinePlayers) {
 
             if (existingPlayer) {
                 // If the player is already online, we don't need to change anything
-                if (existingPlayer.online === false) {
+                if (existingPlayer.online === 0) {
                     // Update existing player, set online to true and lastLogin to current date
                     await runAsync('UPDATE players SET online = true, lastLogin = ?, sessionStart = ? WHERE uuid = ?', [now.toISOString(), now.toISOString(), uuid]);
                 }
@@ -227,7 +227,7 @@ async function handleOfflinePlayers(onlinePlayers) {
         const placeholders = onlinePlayers.map(() => '?').join(', ');
 
         // Get all offline players
-        const offlinePlayers = await allAsync(`SELECT uuid, weeklyPlaytime, sessionStart FROM players WHERE uuid NOT IN (${placeholders}) AND online = true`, onlinePlayers);
+        const offlinePlayers = await allAsync(`SELECT uuid, weeklyPlaytime, sessionStart FROM players WHERE uuid NOT IN (${placeholders}) AND online = 1`, onlinePlayers);
 
         // Calculate the session duration for each offline player and set them as offline
         for (const player of offlinePlayers) {
@@ -289,13 +289,13 @@ async function updateGuildActivity(currentHour, currentMinute) {
             const currentCaptains = guild['captains' + currentHour];
 
             // Get the players from guild
-            const playerQuery = 'SELECT COUNT(*) as count FROM players WHERE guildUuid = ? AND online = true';
+            const playerQuery = 'SELECT COUNT(*) as count FROM players WHERE guildUuid = ? AND online = 1';
             const playerResult = await getAsync(playerQuery, [guildUuid]);
             const currentOnline = playerResult.count;
 
             // Get the players from guild at or above the rank of captain
             const captainRanks = ['captain', 'strategist', 'chief', 'owner'];
-            const captainQuery = 'SELECT COUNT(*) as count FROM players WHERE guildUuid = ? AND online = true AND guildRank IN (' + captainRanks.map(() => '?').join(',') + ')';
+            const captainQuery = 'SELECT COUNT(*) as count FROM players WHERE guildUuid = ? AND online = 1 AND guildRank IN (' + captainRanks.map(() => '?').join(',') + ')';
             const captainResult = await getAsync(captainQuery, [guildUuid]);
             const captainsOnline = captainResult.count;
 
@@ -916,7 +916,7 @@ async function getGuildActivity(guild) {
 }
 
 async function getOnlineGuildMembers(guild) {
-    const query = 'SELECT guildRank FROM players WHERE online = true AND guildUuid = ?';
+    const query = 'SELECT guildRank FROM players WHERE online = 1 AND guildUuid = ?';
 
     return await allAsync(query, guild);
 }
