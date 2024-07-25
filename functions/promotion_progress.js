@@ -28,7 +28,7 @@ async function promotionProgress(interaction, force = false) {
             nameToSearch = interaction.customId.split(':')[1];
         }
 
-        const player = await database.findPlayer(nameToSearch, force);
+        const player = await database.findPlayer(nameToSearch, force, guildUuid);
 
         if (player != null && player.message === 'Multiple possibilities found') {
             return {

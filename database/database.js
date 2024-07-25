@@ -55,7 +55,7 @@ async function allAsync(query, params) {
 // Used for finding a guild from an input
 // input: The given input to look for
 // force: If the input is expected to be correct then this will be set to true
-async function findGuild(input, force = false) {
+async function findGuild(input, force) {
     if (force) {
         const query = 'SELECT uuid, name, prefix FROM guilds WHERE uuid = ?';
         const guilds = await allAsync(query, [input]);
@@ -122,10 +122,18 @@ async function findGuild(input, force = false) {
 // Used for finding a player from an input
 // input: The given input to look for
 // force: If the input is expected to be correct then this will be set to true
-async function findPlayer(input, force = false) {
+// guildUuid: The guild to expect the player to be in
+async function findPlayer(input, force, guildUuid) {
     if (force) {
-        const query = 'SELECT uuid, username FROM players WHERE uuid = ?';
-        const players = await allAsync(query, [input]);
+        let players;
+
+        if (guildUuid) {
+            const query = 'SELECT uuid, username FROM players WHERE uuid = ? AND guildUuid = ?';
+            players = await allAsync(query, [input, guildUuid]);
+        } else {
+            const query = 'SELECT uuid, username FROM players WHERE uuid = ?';
+            players = await allAsync(query, [input]);
+        }
 
         if (players.length === 0 || players.length > 1) {
             console.log(`${input} does not exist in the table, force was incorrect`);
@@ -137,8 +145,15 @@ async function findPlayer(input, force = false) {
             };
         }
     } else {
-        const query = 'SELECT uuid, username, guildUuid, guildRank, supportRank FROM players WHERE UPPER(username) = UPPER(?)';
-        const players = await allAsync(query, [input]);
+        let players;
+
+        if (guildUuid) {
+            const query = 'SELECT uuid, username, guildUuid, guildRank, supportRank FROM players WHERE UPPER(username) = UPPER(?) AND guildUuid = ?';
+            players = await allAsync(query, [input, guildUuid]);
+        } else {
+            const query = 'SELECT uuid, username, guildUuid, guildRank, supportRank FROM players WHERE UPPER(username) = UPPER(?)';
+            players = await allAsync(query, [input]);
+        }
 
         if (players.length === 0) {
             return null;

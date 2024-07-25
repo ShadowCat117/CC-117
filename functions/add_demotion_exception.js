@@ -27,7 +27,7 @@ async function addDemotionException(interaction, force = false, duration = -1) {
             nameToSearch = interaction.customId.split(':')[1];
         }
     
-        const player = await database.findPlayer(nameToSearch, force);
+        const player = await database.findPlayer(nameToSearch, force, config.guild);
 
         if (player && player.message === 'Multiple possibilities found') {
             const filteredPlayers = player.playerUuids
