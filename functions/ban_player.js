@@ -26,14 +26,30 @@ async function banPlayer(interaction, force = false, reason = 'Unknown reason') 
         const player = await database.findPlayer(nameToSearch, force);
 
         if (player && player.message === 'Multiple possibilities found') {
-            return {
-                playerUuids: player.playerUuids,
-                playerUsernames: player.playerUsernames,
-                playerRanks: player.playerRanks,
-                playerGuildRanks: player.playerGuildRanks,
-                playerGuildNames: player.playerGuildNames,
-                reason: reason,
-            };
+            const filteredPlayers = player.playerUuids
+                .map((uuid, index) => ({
+                    playerUuid: uuid,
+                    username: player.playerUsernames[index],
+                }))
+                .filter(({ playerUuid }) => !Object.keys(config.bannedPlayers).includes(playerUuid));
+
+            if (filteredPlayers.length === 1) {
+                player.uuid = filteredPlayers[0].playerUuid;
+                player.username = filteredPlayers[0].username;
+            } else if (filteredPlayers.length === 0) {
+                return ({ error: `Unknown player ${nameToSearch.replaceAll('_', '\\_')}` });
+            }
+    
+            if (!player.uuid) {
+                return {
+                    playerUuids: player.playerUuids,
+                    playerUsernames: player.playerUsernames,
+                    playerRanks: player.playerRanks,
+                    playerGuildRanks: player.playerGuildRanks,
+                    playerGuildNames: player.playerGuildNames,
+                    reason: reason,
+                };
+            }
         }
 
         if (!player) {
