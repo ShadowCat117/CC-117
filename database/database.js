@@ -230,13 +230,31 @@ async function handleOfflinePlayers(onlinePlayers) {
 }
 
 async function updateGuildList(guildList) {
-    const insertQuery = 'INSERT OR IGNORE INTO guilds (uuid, name, prefix, average00, captains00, averageCount00, average01, captains01, averageCount01, average02, captains02, averageCount02, average03, captains03, averageCount03, average04, captains04, averageCount04, average05, captains05, averageCount05, average06, captains06, averageCount06, average07, captains07, averageCount07, average08, captains08, averageCount08, average09, captains09, averageCount09, average10, captains10, averageCount10, average11, captains11, averageCount11, average12, captains12, averageCount12, average13, captains13, averageCount13, average14, captains14, averageCount14, average15, captains15, averageCount15, average16, captains16, averageCount16, average17, captains17, averageCount17, average18, captains18, averageCount18, average19, captains19, averageCount19, average20, captains20, averageCount20, average21, captains21, averageCount21, average22, captains22, averageCount22, average23, captains23, averageCount23) VALUES (?, ?, ?, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);';
-    
+    const currentGuildsQuery = 'SELECT uuid FROM guilds';
+    const currentGuilds = await allAsync(currentGuildsQuery);
+    const guildsInTable = currentGuilds.map(guild => guild.uuid);
+
     for (const uuid in guildList) {
         const { name, prefix } = guildList[uuid];
 
-        await runAsync(insertQuery, [uuid, name, prefix]);
+        if (guildsInTable.includes(uuid)) {
+            const index = guildsInTable.indexOf(uuid);
+            guildsInTable.splice(index, 1);
+        }
+
+        const existingQuery = 'SELECT uuid, name, prefix FROM guilds WHERE uuid = ?';
+        const existing = await getAsync(existingQuery, [uuid]);
+
+        if (existing && (existing.name !== name || existing.prefix !== prefix)) {
+            const updateQuery = 'UPDATE guilds SET name = ?, prefix = ? WHERE uuid = ?';
+            await runAsync(updateQuery, [name, prefix, uuid]);
+        } else if (!existing) {
+            const insertQuery = 'INSERT INTO guilds (uuid, name, prefix, average00, captains00, averageCount00, average01, captains01, averageCount01, average02, captains02, averageCount02, average03, captains03, averageCount03, average04, captains04, averageCount04, average05, captains05, averageCount05, average06, captains06, averageCount06, average07, captains07, averageCount07, average08, captains08, averageCount08, average09, captains09, averageCount09, average10, captains10, averageCount10, average11, captains11, averageCount11, average12, captains12, averageCount12, average13, captains13, averageCount13, average14, captains14, averageCount14, average15, captains15, averageCount15, average16, captains16, averageCount16, average17, captains17, averageCount17, average18, captains18, averageCount18, average19, captains19, averageCount19, average20, captains20, averageCount20, average21, captains21, averageCount21, average22, captains22, averageCount22, average23, captains23, averageCount23) VALUES (?, ?, ?, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);';
+            await runAsync(insertQuery, [uuid, name, prefix]);
+        }
     }
+
+    await deleteGuilds(guildsInTable);
 }
 
 // Update the average activity of each guild at the different intervals
@@ -510,6 +528,60 @@ async function updatePriorityPlayers() {
     }
 
     console.log(`Updated ${updated} priority players.`);
+}
+
+async function deleteGuilds(guilds) {
+    const deleteQuery = 'DELETE FROM guilds WHERE uuid = ?';
+    const configsPath = path.join(__dirname, '..', 'configs');
+
+    for (const guild of guilds) {
+        console.log(`Deleting ${guild}`);
+
+        const playerQuery = 'SELECT uuid FROM players WHERE guildUuid = ?';
+        const guildMembers = await allAsync(playerQuery, [guild]);
+        const memberUuids = guildMembers.map(player => player.uuid);
+
+        for (const member of memberUuids) {
+            const memberQuery = 'UPDATE players SET guildUuid = ?, guildRank = ? WHERE uuid = ?';
+            await runAsync(memberQuery, [null, null, member]);
+
+            if (!priorityPlayers.includes(member)) {
+                priorityPlayers.push(member);
+            }
+        }
+
+        await runAsync(deleteQuery, [guild]);
+        console.log(`Deleted ${guild}`);
+
+        // Loop through config files, remove all references to deleted guilds.
+        // If set guild, set to null. Remove from allies and trackedGuilds
+        try {
+            const files = await fs.readdir(configsPath);
+    
+            for (const file of files) {
+                const filePath = path.join(configsPath, file);
+    
+                const data = await fs.readFile(filePath, 'utf8');
+                const config = JSON.parse(data);
+    
+                if (config['guild'] === guild) {
+                    config['guild'] = null;
+                }
+    
+                if (config['allies'].includes(guild)) {
+                    config['allies'] = config['allies'].filter(allyGuild => allyGuild !== guild);
+                }
+    
+                if (config['trackedGuilds'].includes(guild)) {
+                    config['trackedGuilds'] = config['trackedGuilds'].filter(trackedGuild => trackedGuild !== guild);
+                }
+    
+                fs.writeFile(filePath, JSON.stringify(config, null, 2), 'utf-8');
+            }
+        } catch (error) {
+            console.error('Error removing guild from config files: ', error);
+        }
+    }
 }
 
 // When the bot calls the api for player info, we can update the database
@@ -914,7 +986,8 @@ async function runScheduledFunctions() {
         utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
         const guildList = response.data;
 
-        if (guildList) {
+        // Make sure there are guilds, once the API returned no guilds so don't want it to delete all guilds
+        if (guildList && Object.keys(guildList).length !== 0) {
             await updateGuildList(guildList);
         }
 

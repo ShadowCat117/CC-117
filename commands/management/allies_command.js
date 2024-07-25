@@ -49,8 +49,6 @@ module.exports = {
             const embeds = [];
             const errorEmbed = new EmbedBuilder();
 
-            const guildName = (await database.findGuild(guildUuid, true)).name;
-
             if (!guildUuid) {
                 // Need a set guild to run this command               
                 errorEmbed
@@ -58,8 +56,13 @@ module.exports = {
                     .setDescription('You do not have a guild set.')
                     .setColor(0xff0000);
 
-                embeds.push(errorEmbed);
-            } else if (config.allies.length === 0) {
+                await interaction.editReply({ embeds: [errorEmbed] });
+                return;
+            }
+
+            const guildName = (await database.findGuild(guildUuid, true)).name;
+            
+            if (config.allies.length === 0) {
                 // If no allies
                 errorEmbed
                         .setTitle('Error')
