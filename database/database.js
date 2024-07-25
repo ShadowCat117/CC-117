@@ -954,7 +954,7 @@ async function runOnlinePlayerFunction() {
     setTimeout(runOnlinePlayerFunction, remainingSeconds * 1000);
 }
 
-async function runScheduledFunctions() {
+async function runUpdateFunctions() {
     let now = new Date();
 
     // Update every 5 minutes
@@ -1026,7 +1026,7 @@ async function runScheduledFunctions() {
     const secondsToNextMinute = 60 - now.getSeconds();
 
     // Run this function again at the next minute
-    setTimeout(runScheduledFunctions, secondsToNextMinute * 1000);
+    setTimeout(runUpdateFunctions, secondsToNextMinute * 1000);
 }
 
 // Setup the two tables
@@ -1054,7 +1054,7 @@ async function setup() {
     console.log('Database setup complete');
 
     runOnlinePlayerFunction();
-    runScheduledFunctions();
+    runUpdateFunctions();
 }
 
 module.exports = {
