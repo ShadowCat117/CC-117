@@ -428,11 +428,11 @@ async function setPriorityPlayers() {
 
 async function updatePriorityGuilds() {
     if (priorityGuilds.length === 0) return;
-    console.log('Updating 5 priority guilds');
+    console.log('Updating 20 priority guilds');
     let updated = 0;
 
     for (const guild of priorityGuilds) {
-        if (updated === 5) break;
+        if (updated === 20) break;
 
         await utilities.waitForRateLimit();
 
@@ -483,11 +483,11 @@ async function updatePriorityGuilds() {
 
 async function updatePriorityPlayers() {
     if (priorityPlayers.length === 0) return;
-    console.log('Updating 5 priority players');
+    console.log('Updating 20 priority players');
     let updated = 0;
 
     for (const player of priorityPlayers) {
-        if (updated === 5) break;
+        if (updated === 20) break;
 
         await utilities.waitForRateLimit();
 
