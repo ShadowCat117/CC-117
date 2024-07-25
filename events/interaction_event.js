@@ -667,10 +667,10 @@ module.exports = {
                             const embeds = [];
                             const row = new ActionRowBuilder();
 
-                            if (response.playerLastLogins.length > 25) {
+                            if (response.playerLastLogins.length > 30) {
                                 const pages = [];
-                                for (let i = 0; i < response.playerLastLogins.length; i += 25) {
-                                    pages.push(response.playerLastLogins.slice(i, i + 25));
+                                for (let i = 0; i < response.playerLastLogins.length; i += 30) {
+                                    pages.push(response.playerLastLogins.slice(i, i + 30));
                                 }
             
                                 for (const page of pages) {
@@ -679,17 +679,27 @@ module.exports = {
                                         .setTitle(`[${response.guildPrefix}] ${response.guildName} Last Logins`)
                                         .setColor(0x00ffff);
                                 
-                                    for (const player of page) {  
-                                        let lastLoginValue = '';
-            
+                                    let usernameValue = '';
+                                    let rankValue = '';
+                                    let lastLoginValue = '';
+                                
+                                    for (const player of page) {
+                                        usernameValue += player.username + '\n';
+                                        rankValue += player.guildRank + '\n';
+                                
                                         if (player.online) {
-                                            lastLoginValue += 'is online now!';
+                                            lastLoginValue += 'Online now!\n';
                                         } else {
-                                            lastLoginValue += `was last seen ${utilities.getTimeSince(player.lastLogin)} ago`;
+                                            lastLoginValue += utilities.getTimeSince(player.lastLogin) + ' ago\n';
                                         }
-            
-                                        responseEmbed.addFields({ name: `${player.username} ${lastLoginValue}`, value: `Guild Rank: ${player.guildRank}` });
                                     }
+                                
+                                    responseEmbed
+                                        .addFields(
+                                            { name: 'Username', value: usernameValue, inline: true },
+                                            { name: 'Guild Rank', value: rankValue, inline: true },
+                                            { name: 'Last Login', value: lastLoginValue, inline: true },
+                                        );
                                 
                                     embeds.push(responseEmbed);
                                 }
@@ -715,17 +725,27 @@ module.exports = {
                                     .setColor(0x00ffff);
             
                                 if (response.playerLastLogins.length > 0) {
+                                    let usernameValue = '';
+                                    let rankValue = '';
+                                    let lastLoginValue = '';
+            
                                     for (const player of response.playerLastLogins) {
-                                        let lastLoginValue = '';
+                                        usernameValue += player.username + '\n';
+                                        rankValue += player.guildRank + '\n';
             
                                         if (player.online) {
-                                            lastLoginValue += 'is online now!';
+                                            lastLoginValue += 'Online now!\n';
                                         } else {
-                                            lastLoginValue += `was last seen ${utilities.getTimeSince(player.lastLogin)} ago`;
+                                            lastLoginValue += utilities.getTimeSince(player.lastLogin) + ' ago\n';
                                         }
-            
-                                        responseEmbed.addFields({ name: `${player.username} ${lastLoginValue}`, value: `Guild Rank: ${player.guildRank}` });
                                     }
+            
+                                    responseEmbed
+                                        .addFields(
+                                            { name: 'Username', value: usernameValue, inline: true },
+                                            { name: 'Guild Rank', value: rankValue, inline: true },
+                                            { name: 'Last Login', value: lastLoginValue, inline: true },
+                                        );
                                 }
             
                                 embeds.push(responseEmbed);
@@ -747,7 +767,7 @@ module.exports = {
                                 .setDescription('Checking online players for selected guild')
                                 .setColor(0x00ff00);
 
-                            await interaction.editReply({
+                            const message = await interaction.editReply({
                                 components: [],
                                 embeds: [loadingEmbed],
                             });
@@ -818,7 +838,7 @@ module.exports = {
                                     embeds.push(pageEmbed);
                                 }
             
-                                messages.addMessage(interaction.message.id, new PagedMessage(interaction.message, embeds));
+                                messages.addMessage(message.id, new PagedMessage(message, embeds));
             
                                 const previousPage = new ButtonBuilder()
                                     .setCustomId('previous')
