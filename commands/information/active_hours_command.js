@@ -38,9 +38,11 @@ module.exports = {
                 const fileData = fs.readFileSync(preferencesFile, 'utf-8');
                 preferences = JSON.parse(fileData);
 
-                // Get their timezone
-                timezoneOffset = preferences[interaction.member.id].timezoneOffset;
-                sortByActivity = preferences[interaction.member.id].sortByActivity;
+                // Get their timezone and sort preference
+                if (preferences[interaction.member.id]) {
+                    timezoneOffset = preferences[interaction.member.id].timezoneOffset;
+                    sortByActivity = preferences[interaction.member.id].sortByActivity;
+                }
             }
         } catch (error) {
             console.error(error);
