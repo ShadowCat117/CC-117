@@ -43,6 +43,7 @@ module.exports = {
                 config = JSON.parse(fileData);
             }
 
+            const adminRoleId = config.adminRole;
             const memberRoles = interaction.member.roles.cache;
             const memberOfRole = config.memberOfRole;
 
@@ -66,6 +67,16 @@ module.exports = {
                 responseEmbed
                     .setTitle('Error')
                     .setDescription(`You must be a member of ${guildName} to run this command.`)
+                    .setColor(0xff0000);
+                await interaction.editReply({ embeds: [responseEmbed] });
+                return;
+            }
+
+            // Can only be ran by the owner or an admin
+            if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
+                responseEmbed
+                    .setTitle('Error')
+                    .setDescription('You do not have the required permissions to run this command.')
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
