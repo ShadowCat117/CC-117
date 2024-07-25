@@ -511,10 +511,6 @@ async function updatePriorityPlayers() {
                 await runAsync('UPDATE players SET username = ?, guildUuid = ?, guildRank = ?, online = ?, lastLogin = ?, supportRank = ?, veteran = ?, serverRank = ?, wars = ?, highestCharacterLevel = ? WHERE uuid = ?', [playerJson.username, guildUuid, guildRank, online, lastLogin, playerJson.supportRank, veteran, playerJson.rank, playerJson.globalData.wars, highestCharcterLevel, playerJson.uuid]);
             } else {                  
                 await runAsync('INSERT INTO players (uuid, username, guildUuid, guildRank, online, lastLogin, supportRank, veteran, serverRank, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, null, 0, -1, 0)', [playerJson.uuid, playerJson.username, guildUuid, guildRank, playerJson.lastJoin, playerJson.supportRank, veteran, playerJson.rank, playerJson.globalData.wars, highestCharcterLevel]);
-
-                if (guildUuid && !priorityGuilds.includes(guildUuid)) {
-                    priorityGuilds.push(guildUuid);
-                }
             }
 
             updated++;    
