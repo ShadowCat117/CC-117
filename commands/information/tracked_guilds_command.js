@@ -74,7 +74,7 @@ module.exports = {
 
                     for (const guild in page) {
                         const trackedGuild = page[guild];
-                        responseEmbed.addFields({ name: `[${trackedGuild.prefix}] ${trackedGuild.name}`, value: `Avg. Online: ${trackedGuild.averageOnline} (${trackedGuild.currentOnline})\nAvg. Captains+: ${trackedGuild.averageCaptains} (${trackedGuild.currentCaptains})` });
+                        pageEmbed.addFields({ name: `[${trackedGuild.prefix}] ${trackedGuild.name}`, value: `Avg. Online: ${trackedGuild.averageOnline} (${trackedGuild.currentOnline})\nAvg. Captains+: ${trackedGuild.averageCaptains} (${trackedGuild.currentCaptains})` });
                     }
 
                     embeds.push(pageEmbed);
