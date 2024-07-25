@@ -115,10 +115,10 @@ function calculateMemberSlots(guildLevel) {
 }
 
 async function waitForRateLimit() {
-    if (remainingRateLimit === 0) {
-        const timeToWait = (rateLimitReset - Date.now()) * 1000;
+    if (remainingRateLimit == 0) {
+        const timeToWait = rateLimitReset * 1000;
 
-        await new Promise((resolve) => setTimeout(resolve, timeToWait));
+        await new Promise(resolve => setTimeout(resolve, timeToWait));
     }
 }
 
