@@ -257,12 +257,12 @@ async function promotionProgress(interaction, force = false) {
             nextGuildRank = 'Recruiter';
         }
 
-        // Add one extra for the forced time requirement
-        requirementsCount += 1;
-
         if (Object.keys(promotionRequirements).length < requirementsCount) {
             return ({ username: playerJson.username, unableToPromote: 'missing' });
         }
+
+        // Add one extra for the forced time requirement
+        requirementsCount += 1;
 
         let metRequirements = 0;
 
