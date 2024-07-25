@@ -9,7 +9,6 @@ async function verified(guildUuid, interaction) {
     utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
     const guildJson = response.data;
     
-    // FIXME: Handle errors better
     if (!guildJson || !guildJson.name) {
         return ({ guildName: '', guildPrefix: '', verifiedMembers: [] });
     }

@@ -51,7 +51,6 @@ async function updatePlayer(interaction, force = false) {
         }
     }
 
-    // FIXME: Handle errors better
     if (!playerJson || !playerJson.username) {
         return ({ username: '' });
     }
@@ -78,7 +77,6 @@ async function updatePlayer(interaction, force = false) {
         utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
         const guildJson = response.data;
 
-        // FIXME: Handle errors better
         if (!guildJson || !guildJson.name) {
             return ({ username: playerJson.username, error: 'Failed to retrieve guild info' });
         }

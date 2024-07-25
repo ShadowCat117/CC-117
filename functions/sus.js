@@ -55,7 +55,6 @@ async function sus(interaction, force = false) {
         }
     }
 
-    // FIXME: Handle errors better
     if (!playerJson || !playerJson.username) {
         return ({
             username: '',

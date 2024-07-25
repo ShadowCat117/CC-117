@@ -37,7 +37,6 @@ async function updateGuild(interaction, force = false) {
         guildJson = response.data;
     }
 
-    // FIXME: Handle errors better
     if (!guildJson || !guildJson.name) {
         return ({ guildName: '', guildPrefix: '' });
     }

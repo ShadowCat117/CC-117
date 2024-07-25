@@ -37,7 +37,6 @@ async function online(interaction, force = false) {
         guildJson = response.data;
     }
 
-    // FIXME: Handle errors better
     if (!guildJson || !guildJson.name) {
         return ({ guildName: '', guildPrefix: '', onlinePlayers: [], onlineCount: -1, totalMembers: -1 });
     }
