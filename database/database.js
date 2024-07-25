@@ -190,6 +190,10 @@ async function handleOnlinePlayers(onlinePlayers) {
             } else {
                 // Insert new player with available details
                 await runAsync('INSERT INTO players (uuid, username, guildUuid, guildRank, online, lastLogin, serverRank, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, null, null, null, true, ?, null, -1, -1, ?, 0, -1, 0)', [uuid, now.toISOString(), now.toISOString()]);
+                
+                if (!priorityPlayers.includes(uuid)) {
+                    priorityPlayers.push(uuid);
+                }
             }
         }
 
