@@ -180,27 +180,51 @@ async function hourlyTasks() {
                     continue;
                 }
 
-                if (config.checkBannedPlayers && config.guild && Object.keys(config.bannedPlayers).length > 0) {
-                    const bannedPlayersInGuild = await database.checkForPlayers(Object.keys(config.bannedPlayers), config.guild);
-
-                    if (bannedPlayersInGuild.length > 0) {
-                        const responseEmbed = new EmbedBuilder()
-                            .setTitle('The following players are banned from your guild but are currently in your guild')
-                            .setDescription(`${bannedPlayersInGuild.join('\n')}`)
-                            .setColor(0x00ffff);
-
-                        const channel = guild.channels.cache.get(config.logChannel);
-
-                        if (channel) {
-                            try {
-                                await channel.send({ embeds: [responseEmbed] });
-                            } catch (error) {
-                                console.error(`Failed to send banned players in guild message to channel ${config.logChannel} in guild ${guild.id}: `, error);
+                if (config.guild) {
+                    if (config.checkBannedPlayers && Object.keys(config.bannedPlayers).length > 0) {
+                        const bannedPlayersInGuild = await database.checkForPlayers(Object.keys(config.bannedPlayers), config.guild);
+    
+                        if (bannedPlayersInGuild.length > 0) {
+                            const responseEmbed = new EmbedBuilder()
+                                .setTitle('The following players are banned from your guild but are currently in your guild')
+                                .setDescription(`${bannedPlayersInGuild.join('\n')}`)
+                                .setColor(0x00ffff);
+    
+                            const channel = guild.channels.cache.get(config.logChannel);
+    
+                            if (channel) {
+                                try {
+                                    await channel.send({ embeds: [responseEmbed] });
+                                } catch (error) {
+                                    console.error(`Failed to send banned players in guild message to channel ${config.logChannel} in guild ${guild.id}: `, error);
+                                }
+                            } else {
+                                console.log(`${config.logChannel} not found for guild ${guild.id}`);
                             }
-                        } else {
-                            console.log(`${config.logChannel} not found for guild ${guild.id}`);
                         }
                     }
+
+                    const guildMembers = await database.getGuildMembers(config.guild);
+
+                    for (const player of Object.keys(config.inactivityExceptions)) {
+                        if (!guildMembers.includes(player)) {
+                            delete config['inactivityExceptions'][player];
+                        }
+                    }
+
+                    for (const player of Object.keys(config.promotionExceptions)) {
+                        if (!guildMembers.includes(player)) {
+                            delete config['promotionExceptions'][player];
+                        }
+                    }
+
+                    for (const player of Object.keys(config.demotionExceptions)) {
+                        if (!guildMembers.includes(player)) {
+                            delete config['demotionExceptions'][player];
+                        }
+                    }
+
+                    fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
                 }
             } catch (err) {
                 console.error(`Error checking config for guild ${guild.id}: `, err);
@@ -236,13 +260,14 @@ module.exports = {
         for (const guild of client.guilds.cache.values()) {
             await guild.members.fetch();
         }
+        hourlyTasks();
 
         // Calculate time to run first hourly task at
-        const now = new Date();
-        const timeUntilNextHour = (60 - now.getMinutes()) * 60 * 1000 - (now.getSeconds() * 1000 + now.getMilliseconds());
+        // const now = new Date();
+        // const timeUntilNextHour = (60 - now.getMinutes()) * 60 * 1000 - (now.getSeconds() * 1000 + now.getMilliseconds());
 
-        setTimeout(() => {
-            hourlyTasks();
-        }, timeUntilNextHour);
+        // setTimeout(() => {
+        //     hourlyTasks();
+        // }, timeUntilNextHour);
     },
 };
