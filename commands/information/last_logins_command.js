@@ -74,11 +74,11 @@ module.exports = {
 
                 embeds.push(responseEmbed);
             } else {
-                // Valid guild, if more than 30 players we need to make pages for the embed, otherwise 1 page will work
-                if (response.playerLastLogins.length > 30) {
+                // Valid guild, if more than 25 players we need to make pages for the embed, otherwise 1 page will work
+                if (response.playerLastLogins.length > 25) {
                     const pages = [];
-                    for (let i = 0; i < response.playerLastLogins.length; i += 30) {
-                        pages.push(response.playerLastLogins.slice(i, i + 30));
+                    for (let i = 0; i < response.playerLastLogins.length; i += 25) {
+                        pages.push(response.playerLastLogins.slice(i, i + 25));
                     }
 
                     for (const page of pages) {
@@ -87,27 +87,17 @@ module.exports = {
                             .setTitle(`[${response.guildPrefix}] ${response.guildName} Last Logins`)
                             .setColor(0x00ffff);
                     
-                        let usernameValue = '';
-                        let rankValue = '';
-                        let lastLoginValue = '';
-                    
-                        for (const player of page) {
-                            usernameValue += player.username + '\n';
-                            rankValue += player.guildRank + '\n';
-                    
+                        for (const player of page) {  
+                            let lastLoginValue = '';
+
                             if (player.online) {
-                                lastLoginValue += 'Online now!\n';
+                                lastLoginValue += 'is online now!';
                             } else {
-                                lastLoginValue += utilities.getTimeSince(player.lastLogin) + ' ago\n';
+                                lastLoginValue += `was last seen ${utilities.getTimeSince(player.lastLogin)} ago`;
                             }
+
+                            responseEmbed.addFields({ name: `${player.username} ${lastLoginValue}`, value: `Guild Rank: ${player.guildRank}` });
                         }
-                    
-                        responseEmbed
-                            .addFields(
-                                { name: 'Username', value: usernameValue, inline: true },
-                                { name: 'Guild Rank', value: rankValue, inline: true },
-                                { name: 'Last Login', value: lastLoginValue, inline: true },
-                            );
                     
                         embeds.push(responseEmbed);
                     }
@@ -133,27 +123,17 @@ module.exports = {
                         .setColor(0x00ffff);
 
                     if (response.playerLastLogins.length > 0) {
-                        let usernameValue = '';
-                        let rankValue = '';
-                        let lastLoginValue = '';
-
                         for (const player of response.playerLastLogins) {
-                            usernameValue += player.username + '\n';
-                            rankValue += player.guildRank + '\n';
+                            let lastLoginValue = '';
 
                             if (player.online) {
-                                lastLoginValue += 'Online now!\n';
+                                lastLoginValue += 'is online now!';
                             } else {
-                                lastLoginValue += utilities.imeSince(player.lastLogin) + ' ago\n';
+                                lastLoginValue += `was last seen ${utilities.getTimeSince(player.lastLogin)} ago`;
                             }
-                        }
 
-                        responseEmbed
-                            .addFields(
-                                { name: 'Username', value: usernameValue, inline: true },
-                                { name: 'Guild Rank', value: rankValue, inline: true },
-                                { name: 'Last Login', value: lastLoginValue, inline: true },
-                            );
+                            responseEmbed.addFields({ name: `${player.username} ${lastLoginValue}`, value: `Guild Rank: ${player.guildRank}` });
+                        }
                     }
 
                     embeds.push(responseEmbed);
@@ -162,7 +142,7 @@ module.exports = {
         }
 
         if (row.components.length > 0) {
-            await interaction.editReply({ 
+            await interaction.editReply({
                 embeds: [embeds[0]],
                 components: [row],
             });
