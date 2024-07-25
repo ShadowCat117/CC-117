@@ -399,8 +399,6 @@ async function setPriorityGuilds() {
     } catch (error) {
         console.error('Error setting priority guilds', error);
     }
-
-    console.log(priorityGuilds);
 }
 
 async function setPriorityPlayers() {
