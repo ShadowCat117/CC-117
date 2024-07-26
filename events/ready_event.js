@@ -289,7 +289,8 @@ async function hourlyTasks() {
                             if (config.promotionExceptions[player] === 1) {
                                 delete config.promotionExceptions[player];
                             } else {
-                                config.promotionExceptions[player] = config.promotionExceptions[player] - 1;
+                                config.promotionExceptions[player] =
+                                    config.promotionExceptions[player] - 1;
                             }
                         }
                     }
@@ -301,7 +302,8 @@ async function hourlyTasks() {
                             if (config.demotionExceptions[player] === 1) {
                                 delete config.demotionExceptions[player];
                             } else {
-                                config.demotionExceptions[player] = config.demotionExceptions[player] - 1;
+                                config.demotionExceptions[player] =
+                                    config.demotionExceptions[player] - 1;
                             }
                         }
                     }
