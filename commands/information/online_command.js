@@ -122,22 +122,16 @@ module.exports = {
                                 .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream.`, inline: false });
                         }
 
-                        let usernameValue = '';
-                        let rankValue = '';
-                        let serverValue = '';
-    
-                        for (const onlinePlayer of page) {
-                            usernameValue += onlinePlayer.username + '\n';
-                            rankValue += onlinePlayer.guildRank + '\n';
-                            serverValue += onlinePlayer.server + '\n';
+                        let onlinePlayers = '```     Username    ┃    Rank    ┃ Server\n━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━\n';
+
+                        for (const player of page) {
+                            onlinePlayers += `${player.username.padEnd(16)} ┃ ${player.guildRank.padEnd(10)} ┃ ${player.server}\n`;
+
                         }
-    
-                        pageEmbed
-                            .addFields(
-                                { name: 'Username', value: usernameValue, inline: true },
-                                { name: 'Guild Rank', value: rankValue, inline: true },
-                                { name: 'Server', value: serverValue, inline: true },
-                            );
+
+                        onlinePlayers += '```';
+
+                        pageEmbed.addFields({ name: 'Online Players', value: `${onlinePlayers}` });
                     
                         embeds.push(pageEmbed);
                     }
@@ -171,16 +165,6 @@ module.exports = {
                             .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream.`, inline: false });
                     }
 
-                    let usernameValue = '';
-                    let rankValue = '';
-                    let serverValue = '';
-
-                    for (const onlinePlayer of response.onlinePlayers) {
-                        usernameValue += onlinePlayer.username + '\n';
-                        rankValue += onlinePlayer.guildRank + '\n';
-                        serverValue += onlinePlayer.server + '\n';
-                    }
-
                     // Count the number of players on each server
                     const serverCounts = response.onlinePlayers.reduce((counts, player) => {
                         counts[player.server] = (counts[player.server] || 0) + 1;
@@ -211,12 +195,16 @@ module.exports = {
                         responseEmbed.addFields({ name: 'Active Server', value: activeServerValue, inline: false });
                     }
 
-                    responseEmbed
-                        .addFields(
-                            { name: 'Username', value: usernameValue, inline: true },
-                            { name: 'Guild Rank', value: rankValue, inline: true },
-                            { name: 'Server', value: serverValue, inline: true },
-                        );
+                    let onlinePlayers = '```     Username    ┃    Rank    ┃ Server\n━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━\n';
+
+                    for (const player of response.onlinePlayers) {
+                        onlinePlayers += `${player.username.padEnd(16)} ┃ ${player.guildRank.padEnd(10)} ┃  ${player.server}\n`;
+
+                    }
+
+                    onlinePlayers += '```';
+
+                    responseEmbed.addFields({ name: 'Online Players', value: `${onlinePlayers}` });
 
                     embeds.push(responseEmbed);
                 } else {
