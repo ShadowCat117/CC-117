@@ -25,6 +25,7 @@ async function removeDemotionException(interaction, force = false) {
         const player = await database.findPlayer(nameToSearch, force, config.guild);
 
         if (player && player.message === 'Multiple possibilities found') {
+            // If demotion exceptions doesn't contain one of the choices it can be removed from choices
             const filteredPlayers = player.playerUuids
                 .map((uuid, index) => ({
                     playerUuid: uuid,
@@ -35,8 +36,6 @@ async function removeDemotionException(interaction, force = false) {
             if (filteredPlayers.length === 1) {
                 player.uuid = filteredPlayers[0].playerUuid;
                 player.username = filteredPlayers[0].username;
-            } else if (filteredPlayers.length === 0) {
-                return ({ error: `Unknown player ${nameToSearch.replaceAll('_', '\\_')}` });
             }
     
             if (!player.uuid) {

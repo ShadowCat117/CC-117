@@ -68,8 +68,7 @@ async function applyRoles(guild, member, playerInfo) {
 
         let nickname = null;
 
-        if (playerInfo === null) {
-            // Unverify player, remove all roles given by the bot and reset nickname
+        if (playerInfo === null) { // Unverify player, remove all roles given by the bot and reset nickname
             for (const role of memberRoles.values()) {
                 if (guildRoles.includes(role)) {
                     await member.roles.remove(role)
@@ -207,8 +206,7 @@ async function applyRoles(guild, member, playerInfo) {
                     errors.push(`Failed to remove ${member}'s nickname.`);
                 }
             }
-        } else {
-            // Verified member, change nickname to match username and remove unverified role.
+        } else { // Verified member, change nickname to match username and remove unverified role
             const username = playerInfo.username;
             const guildUuid = playerInfo.guildUuid;
             const guildPrefix = playerInfo.guildPrefix;
@@ -218,8 +216,7 @@ async function applyRoles(guild, member, playerInfo) {
             const serverRank = playerInfo.serverRank;
             const level = playerInfo.highestCharacterLevel;
 
-            if (guildUuid === config.guild) {
-                // Guild member, apply guild rank role and member of role.
+            if (guildUuid === config.guild) { // Guild member, apply guild rank role and member of role
                 const guildRankRole = guild.roles.cache.get(config[guildRank + 'Role']);
 
                 if (guildRankRole && !memberRoles.has(guildRankRole.id)) {
@@ -263,8 +260,8 @@ async function applyRoles(guild, member, playerInfo) {
                             });
                     }
                 }
-            } else {
-                // Not a guild member, remove guild guild rank, member of role, giveaway role, events role and all war roles.
+            } else { // Not a guild member, remove guild guild rank, member of role, giveaway role, events role and all war roles
+
                 for (const role of memberRoles.values()) {
                     if (guildRoles.includes(role)) {
                         await member.roles.remove(role)
@@ -320,8 +317,7 @@ async function applyRoles(guild, member, playerInfo) {
                 }
             }
 
-            if (allies.includes(guildUuid)) {
-                // Add ally role and ally owner role if owner
+            if (allies.includes(guildUuid)) { // Add ally role and ally owner role if owner
                 if (guildRank === 'owner') {
                     if (allyOwnerRole && !memberRoles.has(allyOwnerRole.id)) {
                         await member.roles.add(allyOwnerRole)
@@ -365,8 +361,7 @@ async function applyRoles(guild, member, playerInfo) {
                 } else if (!allyRole) {
                     errors.push('Ally role is not defined in the config or is invalid.');
                 }
-            } else {
-                // Remove ally/ally owner role
+            } else { // Remove ally/ally owner role
                 if (allyOwnerRole && memberRoles.has(allyOwnerRole.id)) {
                     await member.roles.remove(allyOwnerRole)
                         .then(() => {

@@ -21,6 +21,7 @@ async function removeAlly(interaction, force = false) {
         try {
             let config = {};
 
+            // If allies doesn't contain one of the choices it can be removed from choices
             if (fs.existsSync(filePath)) {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
@@ -38,8 +39,6 @@ async function removeAlly(interaction, force = false) {
                     guild.uuid = filteredGuilds[0].guildUuid;
                     guild.name = filteredGuilds[0].guildName;
                     guild.prefix = filteredGuilds[0].guildPrefix;
-                } else if (filteredGuilds.length === 0) {
-                    return ({ guildName: '' });
                 }
             }
         } catch (error) {

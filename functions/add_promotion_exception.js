@@ -30,6 +30,7 @@ async function addPromotionException(interaction, force = false, duration = -1) 
         const player = await database.findPlayer(nameToSearch, force, config.guild);
 
         if (player && player.message === 'Multiple possibilities found') {
+            // If promotion exceptions contains one of the choices it can be removed from choices
             const filteredPlayers = player.playerUuids
                 .map((uuid, index) => ({
                     playerUuid: uuid,
@@ -40,8 +41,6 @@ async function addPromotionException(interaction, force = false, duration = -1) 
             if (filteredPlayers.length === 1) {
                 player.uuid = filteredPlayers[0].playerUuid;
                 player.username = filteredPlayers[0].username;
-            } else if (filteredPlayers.length === 0) {
-                return ({ error: `Unknown player ${nameToSearch.replaceAll('_', '\\_')}` });
             }
     
             if (!player.uuid) {
