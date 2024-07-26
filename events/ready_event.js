@@ -282,6 +282,30 @@ async function hourlyTasks() {
                         }
                     }
 
+                    for (const player of Object.keys(
+                        config.promotionExceptions,
+                    )) {
+                        if (config.promotionExceptions[player] !== -1) {
+                            if (config.promotionExceptions[player] === 1) {
+                                delete config.promotionExceptions[player];
+                            } else {
+                                config.promotionExceptions[player] = config.promotionExceptions[player] - 1;
+                            }
+                        }
+                    }
+
+                    for (const player of Object.keys(
+                        config.demotionExceptions,
+                    )) {
+                        if (config.demotionExceptions[player] !== -1) {
+                            if (config.demotionExceptions[player] === 1) {
+                                delete config.demotionExceptions[player];
+                            } else {
+                                config.demotionExceptions[player] = config.demotionExceptions[player] - 1;
+                            }
+                        }
+                    }
+
                     fs.writeFileSync(
                         filePath,
                         JSON.stringify(config, null, 2),
