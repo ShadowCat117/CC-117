@@ -288,22 +288,15 @@ module.exports = {
                                     .setURL(`https://wynncraft.com/stats/guild/${response.guildName.replaceAll(' ', '%20')}`)
                                     .setColor(0x00ffff);
 
-                                let timeValue = '';
-                                let averageValue = '';
-                                let captainsValue = '';
+                                let activity = '``` Hour ┃ Players ┃ Captains\n━━━━━━╋━━━━━━━━━╋━━━━━━━━━\n';
 
                                 for (const hour of response.activity) {
-                                    timeValue += hour.hour + '\n';
-                                    averageValue += hour.averageOnline + '\n';
-                                    captainsValue += hour.averageCaptains + '\n';
+                                    activity += `${hour.hour} ┃ ${hour.averageOnline >= 10.0 ? ' ' : '  '}${hour.averageOnline}  ┃ ${hour.averageCaptains >= 10.0 ? ' ' : '  '}${hour.averageCaptains}\n`;
                                 }
-
-                                responseEmbed
-                                    .addFields(
-                                        { name: 'Time', value: timeValue, inline: true },
-                                        { name: 'Average Players', value: averageValue, inline: true },
-                                        { name: 'Average Captain+\'s', value: captainsValue, inline: true },
-                                    );
+            
+                                activity += '```';
+            
+                                responseEmbed.addFields({ name: 'Activity', value: `${activity}` });
 
                                 await interaction.editReply({ 
                                     components: [timezoneRow, sortRow],
@@ -2282,22 +2275,15 @@ module.exports = {
                                     .setURL(`https://wynncraft.com/stats/guild/${response.guildName.replaceAll(' ', '%20')}`)
                                     .setColor(0x00ffff);
 
-                                let timeValue = '';
-                                let averageValue = '';
-                                let captainsValue = '';
+                                let activity = '``` Hour ┃ Players ┃ Captains\n━━━━━━╋━━━━━━━━━╋━━━━━━━━━\n';
 
                                 for (const hour of response.activity) {
-                                    timeValue += hour.hour + '\n';
-                                    averageValue += hour.averageOnline + '\n';
-                                    captainsValue += hour.averageCaptains + '\n';
+                                    activity += `${hour.hour} ┃ ${hour.averageOnline >= 10.0 ? ' ' : '  '}${hour.averageOnline}  ┃ ${hour.averageCaptains >= 10.0 ? ' ' : '  '}${hour.averageCaptains}\n`;
                                 }
-
-                                responseEmbed
-                                    .addFields(
-                                        { name: 'Time', value: timeValue, inline: true },
-                                        { name: 'Average Players', value: averageValue, inline: true },
-                                        { name: 'Average Captain+\'s', value: captainsValue, inline: true },
-                                    );
+            
+                                activity += '```';
+            
+                                responseEmbed.addFields({ name: 'Activity', value: `${activity}` });
 
                                 await interaction.editReply({ 
                                     components: [timezoneRow, sortRow],
