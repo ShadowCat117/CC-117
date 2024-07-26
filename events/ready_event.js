@@ -260,14 +260,13 @@ module.exports = {
         for (const guild of client.guilds.cache.values()) {
             await guild.members.fetch();
         }
-        hourlyTasks();
 
         // Calculate time to run first hourly task at
-        // const now = new Date();
-        // const timeUntilNextHour = (60 - now.getMinutes()) * 60 * 1000 - (now.getSeconds() * 1000 + now.getMilliseconds());
+        const now = new Date();
+        const timeUntilNextHour = (60 - now.getUTCMinutes()) * 60 * 1000 - (now.getUTCSeconds() * 1000 + now.getUTCMilliseconds());
 
-        // setTimeout(() => {
-        //     hourlyTasks();
-        // }, timeUntilNextHour);
+        setTimeout(() => {
+            hourlyTasks();
+        }, timeUntilNextHour);
     },
 };
