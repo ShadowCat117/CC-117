@@ -1,7 +1,4 @@
-const {
-    EmbedBuilder,
-    SlashCommandBuilder,
-} = require('discord.js');
+const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const createConfig = require('../../functions/create_config');
@@ -11,12 +8,17 @@ module.exports = {
         .setName('config_levelroles')
         .setDescription('Update configuration options for level roles')
         .addIntegerOption((option) =>
-            option.setName('level')
+            option
+                .setName('level')
                 .setDescription('The level for this role to represent')
-                .setRequired(true))               
+                .setRequired(true),
+        )
         .addRoleOption((option) =>
-            option.setName('role')
-                .setDescription('The role for the given level to be associated with.')
+            option
+                .setName('role')
+                .setDescription(
+                    'The role for the given level to be associated with.',
+                )
                 .setRequired(true),
         ),
     ephemeral: true,
@@ -31,7 +33,13 @@ module.exports = {
         await interaction.editReply({ embeds: [loadingEmbed] });
 
         const guildId = interaction.guild.id;
-        const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
+        const filePath = path.join(
+            __dirname,
+            '..',
+            '..',
+            'configs',
+            `${guildId}.json`,
+        );
         let config = {};
 
         const responseEmbed = new EmbedBuilder();
@@ -51,17 +59,30 @@ module.exports = {
             const memberRoles = interaction.member.roles.cache;
             const memberOfRole = config.memberOfRole;
 
-            if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
+            if (
+                memberOfRole &&
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(memberOfRole)
+            ) {
                 responseEmbed
-                    .setDescription('You do not have the required permissions to run this command.')
+                    .setDescription(
+                        'You do not have the required permissions to run this command.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
             }
 
-            if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
+            if (
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(adminRoleId) &&
+                interaction.member.roles.highest.position <
+                    interaction.guild.roles.cache.get(adminRoleId).position
+            ) {
                 responseEmbed
-                    .setDescription('You do not have the required permissions to run this command.')
+                    .setDescription(
+                        'You do not have the required permissions to run this command.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -79,9 +100,11 @@ module.exports = {
         // Limit the level to the current level cap
         if (level < 1 || level > 106) {
             responseEmbed
-            .setTitle('Invalid level')
+                .setTitle('Invalid level')
                 .setDescription('Level must be in the range 1-106.')
-                .setFooter({ text: 'If level cap has increased this will be changed soon.' })
+                .setFooter({
+                    text: 'If level cap has increased this will be changed soon.',
+                })
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
@@ -90,7 +113,11 @@ module.exports = {
         try {
             config['levelRoles'][level] = role.id;
 
-            fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
+            fs.writeFileSync(
+                filePath,
+                JSON.stringify(config, null, 2),
+                'utf-8',
+            );
 
             responseEmbed
                 .setDescription(`Level ${level} role set to ${role}.`)

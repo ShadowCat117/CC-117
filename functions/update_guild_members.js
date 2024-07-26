@@ -28,17 +28,27 @@ async function updateGuild(interaction, force = false) {
 
     // If a guild was found, look for UUID to get guaranteed results, otherwise look for the name input
     if (guild) {
-        const response = await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${guild.uuid}`);
-        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+        const response = await axios.get(
+            `https://api.wynncraft.com/v3/guild/uuid/${guild.uuid}`,
+        );
+        utilities.updateRateLimit(
+            response.headers['ratelimit-remaining'],
+            response.headers['ratelimit-reset'],
+        );
         guildJson = response.data;
     } else {
-        const response = await axios.get(`https://api.wynncraft.com/v3/guild/${nameToSearch}`);
-        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+        const response = await axios.get(
+            `https://api.wynncraft.com/v3/guild/${nameToSearch}`,
+        );
+        utilities.updateRateLimit(
+            response.headers['ratelimit-remaining'],
+            response.headers['ratelimit-reset'],
+        );
         guildJson = response.data;
     }
 
     if (!guildJson || !guildJson.name) {
-        return ({ guildName: '', guildPrefix: '' });
+        return { guildName: '', guildPrefix: '' };
     }
 
     const guildMembers = [];
@@ -50,14 +60,22 @@ async function updateGuild(interaction, force = false) {
 
         for (const member in rankMembers) {
             const guildMember = rankMembers[member];
-            
-            guildMembers.push(new UpdateGuildMember(guildMember.uuid, member, rank, guildMember.contributed, guildMember.joined));
+
+            guildMembers.push(
+                new UpdateGuildMember(
+                    guildMember.uuid,
+                    member,
+                    rank,
+                    guildMember.contributed,
+                    guildMember.joined,
+                ),
+            );
         }
     }
 
     database.updateGuildMembers(guildJson.uuid, guildMembers);
 
-    return ({ guildName: guildJson.name, guildPrefix: guildJson.prefix });
+    return { guildName: guildJson.name, guildPrefix: guildJson.prefix };
 }
 
 module.exports = updateGuild;

@@ -1,21 +1,28 @@
 {
   "name": "cc-117",
-  "version": "1.0.0",
-  "description": "The Discord bot for my Wynncraft guild, Chief's of Corkus. It reads from the Wynncraft public API and uses that for many different features such as applying roles, displaying active hours for each guild and seeing when members last logged in. ",
+  "version": "2.0.0",
+  "description": "This is a Discord bot primarily focused around guild management for Wynncraft but also displays helpful information such as active hours for other guilds and basic stats about them and their members.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "format": "prettier --write \"commands/**/*.js\" \"database/**/*.js\" \"events/**/*.js\" \"functions/**/*.js\" \"message_objects/**/*.js\" \"values/**/*.js\""
   },
   "keywords": [],
-  "author": "Jamie Callan",
-  "license": "ISC",
+  "author": "Jamie Callan (ShadowCat117)",
+  "license": "MIT",
   "dependencies": {
     "axios": "^1.6.2",
     "discord.js": "^14.15.3",
+    "husky": "^9.1.2",
+    "pretty-quick": "^4.0.0",
     "sqlite3": "^5.1.6"
   },
   "devDependencies": {
     "eslint": "^8.41.0",
     "prettier": "^3.3.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
   }
 }

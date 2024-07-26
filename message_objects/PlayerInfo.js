@@ -8,7 +8,16 @@ class PlayerInfo {
     // veteran: If the player is a veteran or not
     // serverRank: Server rank of the player
     // highestCharacterLevel: Highest character level of the player
-    constructor(username, guildUuid, guildPrefix, guildRank, supportRank, veteran, serverRank, highestCharacterLevel) {
+    constructor(
+        username,
+        guildUuid,
+        guildPrefix,
+        guildRank,
+        supportRank,
+        veteran,
+        serverRank,
+        highestCharacterLevel,
+    ) {
         // Temporary, remove if Wynn ever fixes the name changing guild bug
         if (username === 'Owen_Rocks_3') {
             this.username = 'Amber\\_Rocks\\_3';

@@ -9,7 +9,12 @@ module.exports = {
     async execute(member) {
         const guild = member.guild;
         const guildId = guild.id;
-        const filePath = path.join(__dirname, '..', 'configs', `${guildId}.json`);
+        const filePath = path.join(
+            __dirname,
+            '..',
+            'configs',
+            `${guildId}.json`,
+        );
 
         // Don't do anything when the bot leaves the server
         if (member.client.user.id === member.id) {
@@ -30,13 +35,20 @@ module.exports = {
             const sendJoinLeaveMessages = config['sendJoinLeaveMessages'];
 
             if (sendJoinLeaveMessages) {
-                const channel = guild.channels.cache.get(config['joinLeaveChannel']);
+                const channel = guild.channels.cache.get(
+                    config['joinLeaveChannel'],
+                );
 
                 // member.user seems to work, if it ends up not working change to member.user.username
-                await channel.send(`${config['leaveMessage'].replace(/\\n/g, '\n').replace('$user$', member.user)}`);
+                await channel.send(
+                    `${config['leaveMessage'].replace(/\\n/g, '\n').replace('$user$', member.user)}`,
+                );
             }
         } catch (error) {
-            console.error(`Failed to read config file for guild ${guildId}: `, error);
+            console.error(
+                `Failed to read config file for guild ${guildId}: `,
+                error,
+            );
         }
     },
 };

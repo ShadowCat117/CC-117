@@ -62,7 +62,11 @@ async function findDiscordUser(serverMembers, username) {
             continue;
         }
 
-        if (username === serverMember.user.username || username === serverMember.user.globalName || username === serverMember.nickname) {
+        if (
+            username === serverMember.user.username ||
+            username === serverMember.user.globalName ||
+            username === serverMember.nickname
+        ) {
             return serverMember;
         }
     }
@@ -72,8 +76,13 @@ async function findDiscordUser(serverMembers, username) {
 
 async function checkValidUsername(memberToCheck, guild, nameToCheck) {
     // Temporary, remove if Wynn ever fixes the name changing guild bug
-    if ((nameToCheck.toLowerCase() === 'owen_rocks_3' || nameToCheck.toLowerCase() === 'amber_rocks_3') && memberToCheck.id !== '753700961364738158') return false;
-    
+    if (
+        (nameToCheck.toLowerCase() === 'owen_rocks_3' ||
+            nameToCheck.toLowerCase() === 'amber_rocks_3') &&
+        memberToCheck.id !== '753700961364738158'
+    )
+        return false;
+
     // Loop through all server members
     for (const member of guild.members.cache) {
         // Ignore if member is the current member trying to verify
@@ -90,7 +99,12 @@ async function checkValidUsername(memberToCheck, guild, nameToCheck) {
         }
 
         // If the nickname matches then return false for invalid username
-        if (nameToCheck && (nameToCheck.toLowerCase() === (nicknameToCheck || '').toLowerCase() || nameToCheck.toLowerCase() === usernameToCheck.toLowerCase())) {
+        if (
+            nameToCheck &&
+            (nameToCheck.toLowerCase() ===
+                (nicknameToCheck || '').toLowerCase() ||
+                nameToCheck.toLowerCase() === usernameToCheck.toLowerCase())
+        ) {
             return false;
         }
     }
@@ -107,7 +121,7 @@ function calculateMemberSlots(guildLevel) {
         if (key > guildLevel) {
             break;
         }
-        
+
         slots = GuildMemberSlots[key];
     }
 
@@ -118,13 +132,13 @@ async function waitForRateLimit() {
     if (remainingRateLimit == 0) {
         const timeToWait = rateLimitReset * 1000;
 
-        await new Promise(resolve => setTimeout(resolve, timeToWait));
+        await new Promise((resolve) => setTimeout(resolve, timeToWait));
     }
 }
 
 function updateRateLimit(remaining, reset) {
     if (!remaining || !reset) return;
-    
+
     remainingRateLimit = remaining;
     rateLimitReset = reset;
 }

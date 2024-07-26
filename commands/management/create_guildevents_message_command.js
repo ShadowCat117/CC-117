@@ -12,7 +12,9 @@ const createConfig = require('../../functions/create_config');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('createguildeventsmessage')
-        .setDescription('Sends a message with buttons to get the giveaways and events roles.'),
+        .setDescription(
+            'Sends a message with buttons to get the giveaways and events roles.',
+        ),
     ephemeral: true,
     async execute(interaction) {
         const loadingEmbed = new EmbedBuilder()
@@ -22,7 +24,13 @@ module.exports = {
         await interaction.editReply({ embeds: [loadingEmbed] });
 
         const guildId = interaction.guild.id;
-        const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
+        const filePath = path.join(
+            __dirname,
+            '..',
+            '..',
+            'configs',
+            `${guildId}.json`,
+        );
 
         let config = {};
 
@@ -37,7 +45,9 @@ module.exports = {
 
                 responseEmbed
                     .setTitle('Error')
-                    .setDescription('Failed to read config or you have not setup the guild events message configs. Do so with /config_messages and /config_roles.')
+                    .setDescription(
+                        'Failed to read config or you have not setup the guild events message configs. Do so with /config_messages and /config_roles.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -55,10 +65,17 @@ module.exports = {
         const adminRoleId = config.adminRole;
         const memberRoles = interaction.member.roles.cache;
 
-        if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
+        if (
+            interaction.member.id !== interaction.member.guild.ownerId &&
+            !memberRoles.has(adminRoleId) &&
+            interaction.member.roles.highest.position <
+                interaction.guild.roles.cache.get(adminRoleId).position
+        ) {
             responseEmbed
                 .setTitle('Error')
-                .setDescription('You do not have the required permissions to run this command.')
+                .setDescription(
+                    'You do not have the required permissions to run this command.',
+                )
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
@@ -69,7 +86,9 @@ module.exports = {
         if (!message) {
             responseEmbed
                 .setTitle('Error')
-                .setDescription('You have not set a guild events message with /config_messages guildEventsMessage.')
+                .setDescription(
+                    'You have not set a guild events message with /config_messages guildEventsMessage.',
+                )
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
@@ -103,8 +122,13 @@ module.exports = {
             .setStyle(ButtonStyle.Success)
             .setLabel('EVENTS');
 
-        const row = new ActionRowBuilder().addComponents(giveawayButton, eventsButton);
-        const channel = interaction.guild.channels.cache.get(interaction.channelId);
+        const row = new ActionRowBuilder().addComponents(
+            giveawayButton,
+            eventsButton,
+        );
+        const channel = interaction.guild.channels.cache.get(
+            interaction.channelId,
+        );
         const formattedMessage = message.replace(/\\n/g, '\n');
 
         if (channel) {
@@ -115,12 +139,18 @@ module.exports = {
                 });
 
                 responseEmbed
-                    .setDescription('Guild events message created successfully.')
+                    .setDescription(
+                        'Guild events message created successfully.',
+                    )
                     .setColor(0x00ffff);
             } catch (error) {
-                console.error(`Failed to send guild events message to channel ${interaction.channelId} in guild ${interaction.guild.id}`);
+                console.error(
+                    `Failed to send guild events message to channel ${interaction.channelId} in guild ${interaction.guild.id}`,
+                );
                 responseEmbed
-                    .setDescription('Failed to send message in current channel.')
+                    .setDescription(
+                        'Failed to send message in current channel.',
+                    )
                     .setColor(0xff0000);
             }
         } else {

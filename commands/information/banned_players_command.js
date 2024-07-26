@@ -60,19 +60,30 @@ module.exports = {
 
             const guildName = (await database.findGuild(guildUuid, true)).name;
 
-            if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
+            if (
+                memberOfRole &&
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(memberOfRole)
+            ) {
                 responseEmbed
                     .setTitle('Error')
-                    .setDescription(`You must be a member of ${guildName} to run this command.`)
+                    .setDescription(
+                        `You must be a member of ${guildName} to run this command.`,
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
             }
 
-            if (!config['bannedPlayers'] || Object.keys(config['bannedPlayers']).length === 0) {
+            if (
+                !config['bannedPlayers'] ||
+                Object.keys(config['bannedPlayers']).length === 0
+            ) {
                 responseEmbed
                     .setTitle('Error')
-                    .setDescription(`No players are currently banned from ${guildName}.`)
+                    .setDescription(
+                        `No players are currently banned from ${guildName}.`,
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -84,8 +95,14 @@ module.exports = {
                 const row = new ActionRowBuilder();
 
                 const pages = [];
-                for (let i = 0; i < Object.keys(config['bannedPlayers']).length; i += 25) {
-                    pages.push(Object.keys(config['bannedPlayers']).slice(i, i + 25));
+                for (
+                    let i = 0;
+                    i < Object.keys(config['bannedPlayers']).length;
+                    i += 25
+                ) {
+                    pages.push(
+                        Object.keys(config['bannedPlayers']).slice(i, i + 25),
+                    );
                 }
 
                 for (const page of pages) {
@@ -93,18 +110,28 @@ module.exports = {
 
                     pageEmbed
                         .setTitle(`Players banned from ${guildName}`)
-                        .setDescription('These players should not be invited to join the guild.')
+                        .setDescription(
+                            'These players should not be invited to join the guild.',
+                        )
                         .setColor(0x00ffff);
 
                     for (const player in page) {
-                        const username = (await database.findPlayer(page[player], true)).username;
-                        pageEmbed.addFields({ name: username.replaceAll('_', '\\_'), value: config['bannedPlayers'][page[player]] });
+                        const username = (
+                            await database.findPlayer(page[player], true)
+                        ).username;
+                        pageEmbed.addFields({
+                            name: username.replaceAll('_', '\\_'),
+                            value: config['bannedPlayers'][page[player]],
+                        });
                     }
 
                     embeds.push(pageEmbed);
                 }
 
-                messages.addMessage(message.id, new PagedMessage(message, embeds));
+                messages.addMessage(
+                    message.id,
+                    new PagedMessage(message, embeds),
+                );
 
                 const previousPage = new ButtonBuilder()
                     .setCustomId('previous')
@@ -118,19 +145,25 @@ module.exports = {
 
                 row.addComponents(previousPage, nextPage);
 
-                await interaction.editReply({ 
+                await interaction.editReply({
                     embeds: [embeds[0]],
                     components: [row],
                 });
             } else {
                 responseEmbed
                     .setTitle(`Players banned from ${guildName}`)
-                    .setDescription('These players should not be invited to join the guild.')
+                    .setDescription(
+                        'These players should not be invited to join the guild.',
+                    )
                     .setColor(0x00ffff);
 
                 for (const player in config['bannedPlayers']) {
-                    const username = (await database.findPlayer(player, true)).username;
-                    responseEmbed.addFields({ name: username.replaceAll('_', '\\_'), value: config['bannedPlayers'][player] });
+                    const username = (await database.findPlayer(player, true))
+                        .username;
+                    responseEmbed.addFields({
+                        name: username.replaceAll('_', '\\_'),
+                        value: config['bannedPlayers'][player],
+                    });
                 }
 
                 await interaction.editReply({ embeds: [responseEmbed] });
@@ -138,9 +171,9 @@ module.exports = {
         } catch (error) {
             console.error(error);
             responseEmbed
-                    .setTitle('Error')
-                    .setDescription('Unable to view banned players.')
-                    .setColor(0xff0000);
+                .setTitle('Error')
+                .setDescription('Unable to view banned players.')
+                .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
         }

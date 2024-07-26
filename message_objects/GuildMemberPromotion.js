@@ -13,7 +13,21 @@ class GuildMemberPromotion {
     // promotionRequirements: The promotion requirements for each rank.
     // timeRequirements: How long you have to be in the guild to be eligible for this rank.
     // requirementsCount: How many requirements must be met to get this promotion
-    constructor(username, guildRank, contributedGuildXP, highestClassLevel, contributionPos, daysInGuild, wars, hasBuildRole, playtime, hasEcoRole, promotionRequirements, timeRequirements, requirementsCount) {
+    constructor(
+        username,
+        guildRank,
+        contributedGuildXP,
+        highestClassLevel,
+        contributionPos,
+        daysInGuild,
+        wars,
+        hasBuildRole,
+        playtime,
+        hasEcoRole,
+        promotionRequirements,
+        timeRequirements,
+        requirementsCount,
+    ) {
         this.username = username.replaceAll('_', '\\_');
         this.guildRank = guildRank;
         this.contributedGuildXP = contributedGuildXP;
@@ -25,14 +39,22 @@ class GuildMemberPromotion {
         this.playtime = playtime;
         this.hasEcoRole = hasEcoRole;
 
-        this.checkForPromotion(promotionRequirements, timeRequirements, requirementsCount);
+        this.checkForPromotion(
+            promotionRequirements,
+            timeRequirements,
+            requirementsCount,
+        );
     }
 
     // Check for a promotion of each rank
     // promotionRequirements: The promotion requirements for each rank. Eg. NONE, TOP or XP
     // timeRequirements: How long you have to be in the guild to be eligible for this rank.
     // requirementsCount: How many requirements must be met to get this promotion
-    checkForPromotion(promotionRequirements, timeRequirements, requirementsCount) {
+    checkForPromotion(
+        promotionRequirements,
+        timeRequirements,
+        requirementsCount,
+    ) {
         // Loop through the requirements of each rank and check if they should be promoted
         // Check highest first as if they qualify for that, no need to check rest
         for (let i = 0; i < promotionRequirements.length; i++) {
@@ -48,24 +70,51 @@ class GuildMemberPromotion {
 
             switch (i) {
                 case 0:
-                    this.shouldBePromoted('chief', promotionRequirements[i], timeRequirements[i], requirementsCount[i]);
+                    this.shouldBePromoted(
+                        'chief',
+                        promotionRequirements[i],
+                        timeRequirements[i],
+                        requirementsCount[i],
+                    );
                     break;
                 case 1:
                     // If not a strategist check if they should be promoted to strategist
                     if (this.guildRank !== 'strategist') {
-                        this.shouldBePromoted('strategist', promotionRequirements[i], timeRequirements[i], requirementsCount[i]);
+                        this.shouldBePromoted(
+                            'strategist',
+                            promotionRequirements[i],
+                            timeRequirements[i],
+                            requirementsCount[i],
+                        );
                     }
                     break;
                 case 2:
                     // If not a strategist or captain check if they should be promoted to captain
-                    if (this.guildRank !== 'strategist' && this.guildRank !== 'captain') {
-                        this.shouldBePromoted('captain', promotionRequirements[i], timeRequirements[i], requirementsCount[i]);
+                    if (
+                        this.guildRank !== 'strategist' &&
+                        this.guildRank !== 'captain'
+                    ) {
+                        this.shouldBePromoted(
+                            'captain',
+                            promotionRequirements[i],
+                            timeRequirements[i],
+                            requirementsCount[i],
+                        );
                     }
                     break;
                 case 3:
                     // If not a strategist, captain or recruiter check if they should be promoted to recruiter
-                    if (this.guildRank !== 'strategist' && this.guildRank !== 'captain' && this.guildRank !== 'recruiter') {
-                        this.shouldBePromoted('recruiter', promotionRequirements[i], timeRequirements[i], requirementsCount[i]);
+                    if (
+                        this.guildRank !== 'strategist' &&
+                        this.guildRank !== 'captain' &&
+                        this.guildRank !== 'recruiter'
+                    ) {
+                        this.shouldBePromoted(
+                            'recruiter',
+                            promotionRequirements[i],
+                            timeRequirements[i],
+                            requirementsCount[i],
+                        );
                     }
                     break;
                 default:
@@ -79,7 +128,12 @@ class GuildMemberPromotion {
     // promotionRequirements: What are the requirements for promotion
     // timeRequirement: How long must they be in the guild to be eligible for this promotion.
     // requirementsCount: How many requirements must be met to be eligible for this promotion
-    shouldBePromoted(rankToPromote, promotionRequirements, timeRequirement, requirementsCount) {
+    shouldBePromoted(
+        rankToPromote,
+        promotionRequirements,
+        timeRequirement,
+        requirementsCount,
+    ) {
         let promote = false;
         const reasons = [];
         let metRequirements = 0;
@@ -95,7 +149,9 @@ class GuildMemberPromotion {
             if (this.contributedGuildXP >= promotionRequirements['XP']) {
                 promote = true;
                 metRequirements++;
-                reasons.push(`Contributed more than ${promotionRequirements['XP'].toLocaleString()} XP`);
+                reasons.push(
+                    `Contributed more than ${promotionRequirements['XP'].toLocaleString()} XP`,
+                );
             }
         }
 
@@ -105,7 +161,9 @@ class GuildMemberPromotion {
             if (this.highestClassLevel >= promotionRequirements['LEVEL']) {
                 promote = true;
                 metRequirements++;
-                reasons.push(`Highest class level is higher than ${promotionRequirements['LEVEL']}`);
+                reasons.push(
+                    `Highest class level is higher than ${promotionRequirements['LEVEL']}`,
+                );
             }
         }
 
@@ -115,7 +173,9 @@ class GuildMemberPromotion {
             if (this.contributionPos <= promotionRequirements['TOP']) {
                 promote = true;
                 metRequirements++;
-                reasons.push(`Contribution position higher than ${promotionRequirements['TOP']}`);
+                reasons.push(
+                    `Contribution position higher than ${promotionRequirements['TOP']}`,
+                );
             }
         }
 
@@ -124,7 +184,9 @@ class GuildMemberPromotion {
             if (this.daysInGuild >= promotionRequirements['TIME']) {
                 promote = true;
                 metRequirements++;
-                reasons.push(`Has been in the guild for ${promotionRequirements['TIME']} days`);
+                reasons.push(
+                    `Has been in the guild for ${promotionRequirements['TIME']} days`,
+                );
             }
         }
 
@@ -133,7 +195,9 @@ class GuildMemberPromotion {
             if (this.wars >= promotionRequirements['WARS']) {
                 promote = true;
                 metRequirements++;
-                reasons.push(`Has participated in ${promotionRequirements['WARS']} wars`);
+                reasons.push(
+                    `Has participated in ${promotionRequirements['WARS']} wars`,
+                );
             }
         }
 
@@ -151,7 +215,9 @@ class GuildMemberPromotion {
             if (this.playtime >= promotionRequirements['PLAYTIME']) {
                 promote = true;
                 metRequirements++;
-                reasons.push(`Has an average weekly playtime over ${promotionRequirements['PLAYTIME']} hrs/week`);
+                reasons.push(
+                    `Has an average weekly playtime over ${promotionRequirements['PLAYTIME']} hrs/week`,
+                );
             }
         }
 
@@ -170,7 +236,8 @@ class GuildMemberPromotion {
 
         this.promote = promote;
         this.reasons = reasons;
-        this.rankToPromote = rankToPromote.charAt(0).toUpperCase() + rankToPromote.slice(1);
+        this.rankToPromote =
+            rankToPromote.charAt(0).toUpperCase() + rankToPromote.slice(1);
     }
 }
 

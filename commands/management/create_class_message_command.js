@@ -8,12 +8,35 @@ const {
 const fs = require('fs');
 const path = require('path');
 const createConfig = require('../../functions/create_config');
-const classRoles = ['warrior', 'mage', 'archer', 'shaman', 'assassin', 'fallen', 'battleMonk', 'paladin', 'riftwalker', 'lightBender', 'arcanist', 'sharpshooter', 'trapper', 'boltslinger', 'ritualist', 'summoner', 'acolyte', 'acrobat', 'shadestepper', 'trickster'];
+const classRoles = [
+    'warrior',
+    'mage',
+    'archer',
+    'shaman',
+    'assassin',
+    'fallen',
+    'battleMonk',
+    'paladin',
+    'riftwalker',
+    'lightBender',
+    'arcanist',
+    'sharpshooter',
+    'trapper',
+    'boltslinger',
+    'ritualist',
+    'summoner',
+    'acolyte',
+    'acrobat',
+    'shadestepper',
+    'trickster',
+];
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('createclassmessage')
-        .setDescription('Sends a class message with buttons to get class-related roles.'),
+        .setDescription(
+            'Sends a class message with buttons to get class-related roles.',
+        ),
     ephemeral: true,
     async execute(interaction) {
         const loadingEmbed = new EmbedBuilder()
@@ -23,7 +46,13 @@ module.exports = {
         await interaction.editReply({ embeds: [loadingEmbed] });
 
         const guildId = interaction.guild.id;
-        const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
+        const filePath = path.join(
+            __dirname,
+            '..',
+            '..',
+            'configs',
+            `${guildId}.json`,
+        );
 
         let config = {};
 
@@ -38,7 +67,9 @@ module.exports = {
 
                 responseEmbed
                     .setTitle('Error')
-                    .setDescription('Failed to read config or you have not setup the class message configs. Do so with /config_messages and /config_classroles.')
+                    .setDescription(
+                        'Failed to read config or you have not setup the class message configs. Do so with /config_messages and /config_classroles.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -56,9 +87,16 @@ module.exports = {
         const adminRoleId = config.adminRole;
         const memberRoles = interaction.member.roles.cache;
 
-        if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
+        if (
+            interaction.member.id !== interaction.member.guild.ownerId &&
+            !memberRoles.has(adminRoleId) &&
+            interaction.member.roles.highest.position <
+                interaction.guild.roles.cache.get(adminRoleId).position
+        ) {
             responseEmbed
-                .setDescription('You do not have the required permissions to run this command.')
+                .setDescription(
+                    'You do not have the required permissions to run this command.',
+                )
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
@@ -68,13 +106,17 @@ module.exports = {
 
         if (!classMessage) {
             responseEmbed
-                .setDescription('You have not set a class message with /config_messages classMessage.')
+                .setDescription(
+                    'You have not set a class message with /config_messages classMessage.',
+                )
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
         } else if (!config['classArchetypeMessage']) {
             responseEmbed
-                .setDescription('You have not set a class archetype message with /config_messages classArchetypeMessage.')
+                .setDescription(
+                    'You have not set a class archetype message with /config_messages classArchetypeMessage.',
+                )
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
@@ -83,7 +125,9 @@ module.exports = {
         for (const classRole of classRoles) {
             if (!config[`${classRole}Role`]) {
                 responseEmbed
-                    .setDescription(`You have not set a role for ${classRole} using /config_classroles.`)
+                    .setDescription(
+                        `You have not set a role for ${classRole} using /config_classroles.`,
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -115,8 +159,16 @@ module.exports = {
             .setStyle(ButtonStyle.Primary)
             .setLabel('ASSASSIN');
 
-        const row = new ActionRowBuilder().addComponents(warriorButton, mageButton, archerButton, shamanButton, assassinButton);
-        const channel = interaction.guild.channels.cache.get(interaction.channelId);
+        const row = new ActionRowBuilder().addComponents(
+            warriorButton,
+            mageButton,
+            archerButton,
+            shamanButton,
+            assassinButton,
+        );
+        const channel = interaction.guild.channels.cache.get(
+            interaction.channelId,
+        );
         const formattedMessage = classMessage.replace(/\\n/g, '\n');
 
         if (channel) {
@@ -130,9 +182,13 @@ module.exports = {
                     .setDescription('Class message created successfully.')
                     .setColor(0x00ffff);
             } catch (error) {
-                console.error(`Failed to send class message to channel ${interaction.channelId} in guild ${interaction.guild.id}`);
+                console.error(
+                    `Failed to send class message to channel ${interaction.channelId} in guild ${interaction.guild.id}`,
+                );
                 responseEmbed
-                    .setDescription('Failed to send message in current channel.')
+                    .setDescription(
+                        'Failed to send message in current channel.',
+                    )
                     .setColor(0xff0000);
             }
         } else {

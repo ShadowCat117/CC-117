@@ -9,7 +9,12 @@ module.exports = {
     async execute(member) {
         const guild = member.guild;
         const guildId = guild.id;
-        const filePath = path.join(__dirname, '..', 'configs', `${guildId}.json`);
+        const filePath = path.join(
+            __dirname,
+            '..',
+            'configs',
+            `${guildId}.json`,
+        );
 
         try {
             let config = {};
@@ -25,27 +30,41 @@ module.exports = {
             const sendJoinLeaveMessages = config['sendJoinLeaveMessages'];
 
             if (sendJoinLeaveMessages) {
-                const channel = guild.channels.cache.get(config['joinLeaveChannel']);
+                const channel = guild.channels.cache.get(
+                    config['joinLeaveChannel'],
+                );
 
-                await channel.send(`${config['joinMessage'].replace(/\\n/g, '\n').replace('$user$', member.user)}`);
+                await channel.send(
+                    `${config['joinMessage'].replace(/\\n/g, '\n').replace('$user$', member.user)}`,
+                );
             }
 
             // Don't add unverified role to bots
             if (member.user.bot) return;
 
-            const unverifiedRole = guild.roles.cache.get(config['unverifiedRole']);
+            const unverifiedRole = guild.roles.cache.get(
+                config['unverifiedRole'],
+            );
 
             if (unverifiedRole) {
-                await member.roles.add(unverifiedRole)
+                await member.roles
+                    .add(unverifiedRole)
                     .then(() => {
-                        console.log(`Added unverified role ${unverifiedRole.name} to ${member.user.username}`);
+                        console.log(
+                            `Added unverified role ${unverifiedRole.name} to ${member.user.username}`,
+                        );
                     })
                     .catch(() => {
-                        console.error(`Failed to add unverified role ${unverifiedRole.name} to ${member.user.username}`);
+                        console.error(
+                            `Failed to add unverified role ${unverifiedRole.name} to ${member.user.username}`,
+                        );
                     });
             }
         } catch (error) {
-            console.error(`Failed to read config file for guild ${guildId}: `, error);
+            console.error(
+                `Failed to read config file for guild ${guildId}: `,
+                error,
+            );
         }
     },
 };

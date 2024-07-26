@@ -9,7 +9,9 @@ async function createConfig(client, guildId) {
         try {
             const guild = client.guilds.cache.get(guildId);
 
-            const highestRole = guild.roles.cache.reduce((prev, role) => (role.position > prev.position ? role : prev));
+            const highestRole = guild.roles.cache.reduce((prev, role) =>
+                role.position > prev.position ? role : prev,
+            );
 
             const defaultData = {
                 adminRole: highestRole.id,
@@ -117,7 +119,9 @@ async function createConfig(client, guildId) {
             await fs.writeFile(filePath, JSON.stringify(defaultData, null, 2));
             console.log(`Created config file for guild ${guildId}`);
         } catch (err) {
-            console.error(`Error creating config file for guild ${guildId}: ${err}`);
+            console.error(
+                `Error creating config file for guild ${guildId}: ${err}`,
+            );
         }
     } else {
         console.error('createConfig called but config exists');

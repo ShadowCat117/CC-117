@@ -28,17 +28,27 @@ async function guildStats(interaction, force = false) {
 
     // If a guild was found, look for UUID to get guaranteed results, otherwise look for the name input
     if (guild) {
-        const response = await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${guild.uuid}`);
-        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+        const response = await axios.get(
+            `https://api.wynncraft.com/v3/guild/uuid/${guild.uuid}`,
+        );
+        utilities.updateRateLimit(
+            response.headers['ratelimit-remaining'],
+            response.headers['ratelimit-reset'],
+        );
         guildJson = response.data;
     } else {
-        const response = await axios.get(`https://api.wynncraft.com/v3/guild/${nameToSearch}`);
-        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+        const response = await axios.get(
+            `https://api.wynncraft.com/v3/guild/${nameToSearch}`,
+        );
+        utilities.updateRateLimit(
+            response.headers['ratelimit-remaining'],
+            response.headers['ratelimit-reset'],
+        );
         guildJson = response.data;
     }
 
     if (!guildJson || !guildJson.name) {
-        return ({ guildName: '', guildPrefix: '', members: [] });
+        return { guildName: '', guildPrefix: '', members: [] };
     }
 
     const members = [];
@@ -56,10 +66,13 @@ async function guildStats(interaction, force = false) {
 
     if (numSeasons > 2) {
         const seasons = Object.keys(seasonRanks);
-        previousRating = seasonRanks[seasons[numSeasons - 2]].rating.toLocaleString();
-        currentRating = seasonRanks[seasons[numSeasons - 1]].rating.toLocaleString();
+        previousRating =
+            seasonRanks[seasons[numSeasons - 2]].rating.toLocaleString();
+        currentRating =
+            seasonRanks[seasons[numSeasons - 1]].rating.toLocaleString();
     } else if (numSeasons === 1) {
-        currentRating = seasonRanks[Object.keys(seasonRanks)[0]].rating.toLocaleString();
+        currentRating =
+            seasonRanks[Object.keys(seasonRanks)[0]].rating.toLocaleString();
     }
 
     let averageXpPerDay = 0;
@@ -80,7 +93,9 @@ async function guildStats(interaction, force = false) {
             }
 
             const playerWars = await database.getWars(guildMember.uuid);
-            let averagePlaytime = await database.getAveragePlaytime(guildMember.uuid);
+            let averagePlaytime = await database.getAveragePlaytime(
+                guildMember.uuid,
+            );
 
             if (averagePlaytime === -1) {
                 averagePlaytime = 0;
@@ -93,14 +108,39 @@ async function guildStats(interaction, force = false) {
             averageXpPerDay += guildMember.contributed / daysInGuild;
 
             totalPlaytime += averagePlaytime;
-            
-            members.push(new GuildMember(member, rank, lastLogin, guildMember.contributed, guildMember.contributionRank, guildMember.online, guildMember.server, guildMember.joined, playerWars, averagePlaytime));
+
+            members.push(
+                new GuildMember(
+                    member,
+                    rank,
+                    lastLogin,
+                    guildMember.contributed,
+                    guildMember.contributionRank,
+                    guildMember.online,
+                    guildMember.server,
+                    guildMember.joined,
+                    playerWars,
+                    averagePlaytime,
+                ),
+            );
         }
     }
 
     members.sort((a, b) => a.compareTo(b));
 
-    return ({ guildName: name, guildPrefix: prefix, level: level, xpPercent: xpPercent, territories: territories, wars: wars, previousRating: previousRating, currentRating: currentRating, averageXpPerDay: averageXpPerDay, totalPlaytime: totalPlaytime.toFixed(2), members: members });
+    return {
+        guildName: name,
+        guildPrefix: prefix,
+        level: level,
+        xpPercent: xpPercent,
+        territories: territories,
+        wars: wars,
+        previousRating: previousRating,
+        currentRating: currentRating,
+        averageXpPerDay: averageXpPerDay,
+        totalPlaytime: totalPlaytime.toFixed(2),
+        members: members,
+    };
 }
 
 module.exports = guildStats;

@@ -60,19 +60,25 @@ module.exports = {
             }
 
             const guildName = (await database.findGuild(guildUuid, true)).name;
-            
+
             if (config.allies.length === 0) {
                 errorEmbed
-                        .setTitle('Error')
-                        .setDescription('No allies have been set.')
-                        .setColor(0x999999);
+                    .setTitle('Error')
+                    .setDescription('No allies have been set.')
+                    .setColor(0x999999);
 
                 embeds.push(errorEmbed);
             } else if (memberOfRole) {
-                if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
+                if (
+                    interaction.member.id !==
+                        interaction.member.guild.ownerId &&
+                    !memberRoles.has(memberOfRole)
+                ) {
                     errorEmbed
                         .setTitle('Error')
-                        .setDescription(`You must be a member of ${guildName} to use this command.`)
+                        .setDescription(
+                            `You must be a member of ${guildName} to use this command.`,
+                        )
                         .setColor(0xff0000);
 
                     embeds.push(errorEmbed);
@@ -102,12 +108,18 @@ module.exports = {
                         alliesValue += `${allyName}\n`;
                     }
 
-                    responseEmbed.addFields({ name: 'Allies', value: alliesValue });
+                    responseEmbed.addFields({
+                        name: 'Allies',
+                        value: alliesValue,
+                    });
 
                     embeds.push(responseEmbed);
                 }
 
-                messages.addMessage(message.id, new PagedMessage(message, embeds));
+                messages.addMessage(
+                    message.id,
+                    new PagedMessage(message, embeds),
+                );
 
                 const previousPage = new ButtonBuilder()
                     .setCustomId('previous')
@@ -130,7 +142,8 @@ module.exports = {
                 let alliesValue = '';
 
                 for (const ally of config.allies) {
-                    const allyName = (await database.findGuild(ally, true)).name;
+                    const allyName = (await database.findGuild(ally, true))
+                        .name;
                     alliesValue += `${allyName}\n`;
                 }
 
@@ -140,7 +153,7 @@ module.exports = {
             }
 
             if (row.components.length > 0) {
-                await interaction.editReply({ 
+                await interaction.editReply({
                     embeds: [embeds[0]],
                     components: [row],
                 });

@@ -32,8 +32,9 @@ async function removeAlly(interaction, force = false) {
                         guildName: guild.guildNames[index],
                         guildPrefix: guild.guildPrefixes[index],
                     }))
-                    .filter(({ guildUuid }) => config.allies.includes(guildUuid));
-
+                    .filter(({ guildUuid }) =>
+                        config.allies.includes(guildUuid),
+                    );
 
                 if (filteredGuilds.length === 1) {
                     guild.uuid = filteredGuilds[0].guildUuid;
@@ -64,20 +65,24 @@ async function removeAlly(interaction, force = false) {
             }
 
             if (!config.allies.includes(guild.uuid)) {
-                return ({ error: `${guild.name} is not an ally.` });
+                return { error: `${guild.name} is not an ally.` };
             }
 
-            config.allies = config.allies.filter(item => item !== guild.uuid);
+            config.allies = config.allies.filter((item) => item !== guild.uuid);
 
-            fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
+            fs.writeFileSync(
+                filePath,
+                JSON.stringify(config, null, 2),
+                'utf-8',
+            );
 
-            return ({ guildName: guild.name });
+            return { guildName: guild.name };
         } catch (error) {
             console.error(error);
-            return ({ error: 'An error occured whilst removing ally.' });
+            return { error: 'An error occured whilst removing ally.' };
         }
     } else {
-        return ({ guildName: '' });
+        return { guildName: '' };
     }
 }
 

@@ -19,10 +19,17 @@ class OnlineGuildMember {
     // Then sort by world number
     // Then sort by username
     compareTo(other) {
-        const rankOrder = ['Owner', 'Chief', 'Strategist', 'Captain', 'Recruiter', 'Recruit'];
+        const rankOrder = [
+            'Owner',
+            'Chief',
+            'Strategist',
+            'Captain',
+            'Recruiter',
+            'Recruit',
+        ];
         const thisRankIndex = rankOrder.indexOf(this.guildRank);
         const otherRankIndex = rankOrder.indexOf(other.guildRank);
-    
+
         if (thisRankIndex < otherRankIndex) {
             return -1;
         } else if (thisRankIndex > otherRankIndex) {
@@ -30,7 +37,7 @@ class OnlineGuildMember {
         } else {
             const worldNumber = parseInt(this.server.split('WC')[1], 10);
             const otherWorldNumber = parseInt(other.server.split('WC')[1], 10);
-    
+
             if (worldNumber < otherWorldNumber) {
                 return -1;
             } else if (worldNumber > otherWorldNumber) {
@@ -40,8 +47,6 @@ class OnlineGuildMember {
             }
         }
     }
-    
-    
 }
 
 module.exports = OnlineGuildMember;

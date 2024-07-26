@@ -6,7 +6,14 @@ class PlayerLastLogin {
     // online: If the player is currently online
     // lastLogin: Timestamp for when the player last logged in
     // highestCharacterLevel: Highest combat level on all the players characters
-    constructor(uuid, username, guildRank, online, lastLogin, highestCharacterLevel) {
+    constructor(
+        uuid,
+        username,
+        guildRank,
+        online,
+        lastLogin,
+        highestCharacterLevel,
+    ) {
         this.uuid = uuid;
 
         // Temporary, remove if Wynn ever fixes the name changing guild bug

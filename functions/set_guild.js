@@ -33,24 +33,30 @@ async function setGuild(interaction, force = false) {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
             }
-            
+
             if (config.guild === guild.uuid) {
-                return ({ error: `You have already set your guild to ${guild.name}` });
+                return {
+                    error: `You have already set your guild to ${guild.name}`,
+                };
             }
 
             config.guild = guild.uuid;
 
-            config.allies = config.allies.filter(item => item !== guild.uuid);
+            config.allies = config.allies.filter((item) => item !== guild.uuid);
 
-            fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
+            fs.writeFileSync(
+                filePath,
+                JSON.stringify(config, null, 2),
+                'utf-8',
+            );
 
-            return ({ guildName: guild.name });
+            return { guildName: guild.name };
         } catch (error) {
             console.error(error);
-            return ({ error: 'An error occured whilst setting guild.' });
+            return { error: 'An error occured whilst setting guild.' };
         }
     } else {
-        return ({ guildName: '' });
+        return { guildName: '' };
     }
 }
 

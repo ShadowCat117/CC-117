@@ -21,8 +21,12 @@ async function removeInactivityException(interaction, force = false) {
         } else if (interaction.customId) {
             nameToSearch = interaction.customId.split(':')[1];
         }
-    
-        const player = await database.findPlayer(nameToSearch, force, config.guild);
+
+        const player = await database.findPlayer(
+            nameToSearch,
+            force,
+            config.guild,
+        );
 
         if (player && player.message === 'Multiple possibilities found') {
             // If inactivity exceptions doesn't contain one of the choices it can be removed from choices
@@ -31,13 +35,17 @@ async function removeInactivityException(interaction, force = false) {
                     playerUuid: uuid,
                     username: player.playerUsernames[index],
                 }))
-                .filter(({ playerUuid }) => Object.keys(config.inactivityExceptions).includes(playerUuid));
+                .filter(({ playerUuid }) =>
+                    Object.keys(config.inactivityExceptions).includes(
+                        playerUuid,
+                    ),
+                );
 
             if (filteredPlayers.length === 1) {
                 player.uuid = filteredPlayers[0].playerUuid;
                 player.username = filteredPlayers[0].username;
             }
-    
+
             if (!player.uuid) {
                 return {
                     playerUuids: player.playerUuids,
@@ -50,21 +58,28 @@ async function removeInactivityException(interaction, force = false) {
         }
 
         if (!player) {
-            return ({ error: `Unknown player ${nameToSearch.replaceAll('_', '\\_')}` });
+            return {
+                error: `Unknown player ${nameToSearch.replaceAll('_', '\\_')}`,
+            };
         }
 
-        if (!config['inactivityExceptions'] || !config['inactivityExceptions'][player.uuid]) {
-            return ({ error: `${player.username.replaceAll('_', '\\_')} is not exempt from inactivity.` });
+        if (
+            !config['inactivityExceptions'] ||
+            !config['inactivityExceptions'][player.uuid]
+        ) {
+            return {
+                error: `${player.username.replaceAll('_', '\\_')} is not exempt from inactivity.`,
+            };
         }
 
         delete config['inactivityExceptions'][player.uuid];
 
         fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
-        return ({ username: player.username.replaceAll('_', '\\_') });
+        return { username: player.username.replaceAll('_', '\\_') };
     } catch (err) {
         console.log(err);
-        return ({ error: 'Error trying to remove inactivity exception.' });
+        return { error: 'Error trying to remove inactivity exception.' };
     }
 }
 

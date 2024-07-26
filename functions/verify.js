@@ -31,20 +31,32 @@ async function verify(interaction, force = false) {
 
     // If a player was found, look for UUID to get guaranteed results, otherwise look for the name input
     if (player) {
-        const response = await axios.get(`https://api.wynncraft.com/v3/player/${player.uuid}?fullResult=True`);
-        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+        const response = await axios.get(
+            `https://api.wynncraft.com/v3/player/${player.uuid}?fullResult=True`,
+        );
+        utilities.updateRateLimit(
+            response.headers['ratelimit-remaining'],
+            response.headers['ratelimit-reset'],
+        );
         playerJson = response.data;
     } else {
         try {
-            const response = await axios.get(`https://api.wynncraft.com/v3/player/${nameToSearch}?fullResult=True`);
-            utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+            const response = await axios.get(
+                `https://api.wynncraft.com/v3/player/${nameToSearch}?fullResult=True`,
+            );
+            utilities.updateRateLimit(
+                response.headers['ratelimit-remaining'],
+                response.headers['ratelimit-reset'],
+            );
             playerJson = response.data;
         } catch (err) {
             // 300 indicates a multi selector
             if (err.response.status === 300) {
                 return {
                     playerUuids: Object.keys(err.response.data),
-                    playerUsernames: Object.values(err.response.data).map((entry) => entry.storedName),
+                    playerUsernames: Object.values(err.response.data).map(
+                        (entry) => entry.storedName,
+                    ),
                     playerRanks: [],
                     playerGuildRanks: [],
                     playerGuildNames: [],
@@ -54,7 +66,7 @@ async function verify(interaction, force = false) {
     }
 
     if (!playerJson || !playerJson.username) {
-        return ({ username: '' });
+        return { username: '' };
     }
 
     let guildUuid = null;
@@ -89,9 +101,22 @@ async function verify(interaction, force = false) {
         username = 'Amber_Rocks_3';
     }
 
-    const playerInfo = new PlayerInfo(username, guildUuid, guildPrefix, guildRank, supportRank, veteran, serverRank, highestCharacterLevel);
+    const playerInfo = new PlayerInfo(
+        username,
+        guildUuid,
+        guildPrefix,
+        guildRank,
+        supportRank,
+        veteran,
+        serverRank,
+        highestCharacterLevel,
+    );
 
-    const response = await applyRoles(interaction.guild, interaction.member, playerInfo);
+    const response = await applyRoles(
+        interaction.guild,
+        interaction.member,
+        playerInfo,
+    );
 
     database.updatePlayer({
         uuid: playerJson.uuid,
@@ -107,11 +132,11 @@ async function verify(interaction, force = false) {
         highestCharcterLevel: highestCharacterLevel,
     });
 
-    return ({
+    return {
         username: playerInfo.username,
         updates: response.updates,
         errors: response.errors,
-    });
+    };
 }
 
 module.exports = verify;

@@ -28,7 +28,13 @@ module.exports = {
         const embeds = [];
 
         const guildId = interaction.guild.id;
-        const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
+        const filePath = path.join(
+            __dirname,
+            '..',
+            '..',
+            'configs',
+            `${guildId}.json`,
+        );
 
         try {
             let config = {};
@@ -51,9 +57,11 @@ module.exports = {
 
             if (!guildUuid) {
                 const errorEmbed = new EmbedBuilder()
-                        .setTitle('No Guild Set')
-                        .setDescription('The server you are in does not have a guild set.')
-                        .setColor(0xff0000);
+                    .setTitle('No Guild Set')
+                    .setDescription(
+                        'The server you are in does not have a guild set.',
+                    )
+                    .setColor(0xff0000);
 
                 await interaction.editReply({ embeds: [errorEmbed] });
                 return;
@@ -65,25 +73,43 @@ module.exports = {
                 guildName = (await database.findGuild(guildUuid, true)).name;
             }
 
-            if (guildName && memberOfRoleId && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRoleId))) {
+            if (
+                guildName &&
+                memberOfRoleId &&
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(memberOfRoleId)
+            ) {
                 const errorEmbed = new EmbedBuilder()
                     .setTitle('Error')
-                    .setDescription(`You must be a member of ${guildName} to run this command.`)
+                    .setDescription(
+                        `You must be a member of ${guildName} to run this command.`,
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [errorEmbed] });
                 return;
             }
 
-            if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
+            if (
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(adminRoleId) &&
+                interaction.member.roles.highest.position <
+                    interaction.guild.roles.cache.get(adminRoleId).position
+            ) {
                 const errorEmbed = new EmbedBuilder()
-                    .setDescription('You do not have the required permissions to run this command.')
+                    .setDescription(
+                        'You do not have the required permissions to run this command.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [errorEmbed] });
                 return;
             }
 
-            const logChannel = interaction.guild.channels.cache.get(config['logChannel']);
-            const joinLeaveChannel = interaction.guild.channels.cache.get(config['joinLeaveChannel']);
+            const logChannel = interaction.guild.channels.cache.get(
+                config['logChannel'],
+            );
+            const joinLeaveChannel = interaction.guild.channels.cache.get(
+                config['joinLeaveChannel'],
+            );
 
             let pageEmbed = new EmbedBuilder()
                 .setTitle(`${title}`)
@@ -104,27 +130,69 @@ module.exports = {
             embeds.push(pageEmbed);
 
             const adminRole = interaction.guild.roles.cache.get(adminRoleId);
-            const ownerRole = interaction.guild.roles.cache.get(config['ownerRole']);
-            const chiefRole = interaction.guild.roles.cache.get(config['chiefRole']);
-            const strategistRole = interaction.guild.roles.cache.get(config['strategistRole']);
-            const captainRole = interaction.guild.roles.cache.get(config['captainRole']);
-            const recruiterRole = interaction.guild.roles.cache.get(config['recruiterRole']);
-            const recruitRole = interaction.guild.roles.cache.get(config['recruitRole']);
-            const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
-            const allyOwnerRole = interaction.guild.roles.cache.get(config['allyOwnerRole']);
-            const allyRole = interaction.guild.roles.cache.get(config['allyRole']);
-            const championRole = interaction.guild.roles.cache.get(config['championRole']);
-            const heroRole = interaction.guild.roles.cache.get(config['heroRole']);
-            const vipPlusRole = interaction.guild.roles.cache.get(config['vipPlusRole']);
-            const vipRole = interaction.guild.roles.cache.get(config['vipRole']);
-            const veteranRole = interaction.guild.roles.cache.get(config['veteranRole']);
-            const administratorRole = interaction.guild.roles.cache.get(config['administratorRole']);
-            const moderatorRole = interaction.guild.roles.cache.get(config['moderatorRole']);
-            const contentTeamRole = interaction.guild.roles.cache.get(config['contentTeamRole']);
-            const verifiedRole = interaction.guild.roles.cache.get(config['verifiedRole']);
-            const unverifiedRole = interaction.guild.roles.cache.get(config['unverifiedRole']);
-            const giveawayRole = interaction.guild.roles.cache.get(config['giveawayRole']);
-            const eventsRole = interaction.guild.roles.cache.get(config['eventsRole']);
+            const ownerRole = interaction.guild.roles.cache.get(
+                config['ownerRole'],
+            );
+            const chiefRole = interaction.guild.roles.cache.get(
+                config['chiefRole'],
+            );
+            const strategistRole = interaction.guild.roles.cache.get(
+                config['strategistRole'],
+            );
+            const captainRole = interaction.guild.roles.cache.get(
+                config['captainRole'],
+            );
+            const recruiterRole = interaction.guild.roles.cache.get(
+                config['recruiterRole'],
+            );
+            const recruitRole = interaction.guild.roles.cache.get(
+                config['recruitRole'],
+            );
+            const memberOfRole = interaction.guild.roles.cache.get(
+                config['memberOfRole'],
+            );
+            const allyOwnerRole = interaction.guild.roles.cache.get(
+                config['allyOwnerRole'],
+            );
+            const allyRole = interaction.guild.roles.cache.get(
+                config['allyRole'],
+            );
+            const championRole = interaction.guild.roles.cache.get(
+                config['championRole'],
+            );
+            const heroRole = interaction.guild.roles.cache.get(
+                config['heroRole'],
+            );
+            const vipPlusRole = interaction.guild.roles.cache.get(
+                config['vipPlusRole'],
+            );
+            const vipRole = interaction.guild.roles.cache.get(
+                config['vipRole'],
+            );
+            const veteranRole = interaction.guild.roles.cache.get(
+                config['veteranRole'],
+            );
+            const administratorRole = interaction.guild.roles.cache.get(
+                config['administratorRole'],
+            );
+            const moderatorRole = interaction.guild.roles.cache.get(
+                config['moderatorRole'],
+            );
+            const contentTeamRole = interaction.guild.roles.cache.get(
+                config['contentTeamRole'],
+            );
+            const verifiedRole = interaction.guild.roles.cache.get(
+                config['verifiedRole'],
+            );
+            const unverifiedRole = interaction.guild.roles.cache.get(
+                config['unverifiedRole'],
+            );
+            const giveawayRole = interaction.guild.roles.cache.get(
+                config['giveawayRole'],
+            );
+            const eventsRole = interaction.guild.roles.cache.get(
+                config['eventsRole'],
+            );
 
             pageEmbed = new EmbedBuilder()
                 .setTitle(`${title}`)
@@ -158,13 +226,27 @@ module.exports = {
 
             embeds.push(pageEmbed);
 
-            const warRole = interaction.guild.roles.cache.get(config['warRole']);
-            const tankRole = interaction.guild.roles.cache.get(config['tankRole']);
-            const healerRole = interaction.guild.roles.cache.get(config['healerRole']);
-            const damageRole = interaction.guild.roles.cache.get(config['damageRole']);
-            const soloRole = interaction.guild.roles.cache.get(config['soloRole']);
-            const ecoRole = interaction.guild.roles.cache.get(config['ecoRole']);
-            const warPingRole = interaction.guild.roles.cache.get(config['warPingRole']);
+            const warRole = interaction.guild.roles.cache.get(
+                config['warRole'],
+            );
+            const tankRole = interaction.guild.roles.cache.get(
+                config['tankRole'],
+            );
+            const healerRole = interaction.guild.roles.cache.get(
+                config['healerRole'],
+            );
+            const damageRole = interaction.guild.roles.cache.get(
+                config['damageRole'],
+            );
+            const soloRole = interaction.guild.roles.cache.get(
+                config['soloRole'],
+            );
+            const ecoRole = interaction.guild.roles.cache.get(
+                config['ecoRole'],
+            );
+            const warPingRole = interaction.guild.roles.cache.get(
+                config['warPingRole'],
+            );
 
             pageEmbed = new EmbedBuilder()
                 .setTitle(`${title}`)
@@ -184,26 +266,66 @@ module.exports = {
 
             embeds.push(pageEmbed);
 
-            const archerRole = interaction.guild.roles.cache.get(config['archerRole']);
-            const boltslingerRole = interaction.guild.roles.cache.get(config['boltslingerRole']);
-            const sharpshooterRole = interaction.guild.roles.cache.get(config['sharpshooterRole']);
-            const trapperRole = interaction.guild.roles.cache.get(config['trapperRole']);
-            const warriorRole = interaction.guild.roles.cache.get(config['warriorRole']);
-            const fallenRole = interaction.guild.roles.cache.get(config['fallenRole']);
-            const battleMonkRole = interaction.guild.roles.cache.get(config['battleMonkRole']);
-            const paladinRole = interaction.guild.roles.cache.get(config['paladinRole']);
-            const assassinRole = interaction.guild.roles.cache.get(config['assassinRole']);
-            const shadestepperRole = interaction.guild.roles.cache.get(config['shadestepperRole']);
-            const tricksterRole = interaction.guild.roles.cache.get(config['tricksterRole']);
-            const acrobatRole = interaction.guild.roles.cache.get(config['acrobatRole']);
-            const mageRole = interaction.guild.roles.cache.get(config['mageRole']);
-            const riftwalkerRole = interaction.guild.roles.cache.get(config['riftwalkerRole']);
-            const lightBenderRole = interaction.guild.roles.cache.get(config['lightBenderRole']);
-            const arcanistRole = interaction.guild.roles.cache.get(config['arcanistRole']);
-            const shamanRole = interaction.guild.roles.cache.get(config['shamanRole']);
-            const summonerRole = interaction.guild.roles.cache.get(config['summonerRole']);
-            const ritualistRole = interaction.guild.roles.cache.get(config['ritualistRole']);
-            const acolyteRole = interaction.guild.roles.cache.get(config['acolyteRole']);
+            const archerRole = interaction.guild.roles.cache.get(
+                config['archerRole'],
+            );
+            const boltslingerRole = interaction.guild.roles.cache.get(
+                config['boltslingerRole'],
+            );
+            const sharpshooterRole = interaction.guild.roles.cache.get(
+                config['sharpshooterRole'],
+            );
+            const trapperRole = interaction.guild.roles.cache.get(
+                config['trapperRole'],
+            );
+            const warriorRole = interaction.guild.roles.cache.get(
+                config['warriorRole'],
+            );
+            const fallenRole = interaction.guild.roles.cache.get(
+                config['fallenRole'],
+            );
+            const battleMonkRole = interaction.guild.roles.cache.get(
+                config['battleMonkRole'],
+            );
+            const paladinRole = interaction.guild.roles.cache.get(
+                config['paladinRole'],
+            );
+            const assassinRole = interaction.guild.roles.cache.get(
+                config['assassinRole'],
+            );
+            const shadestepperRole = interaction.guild.roles.cache.get(
+                config['shadestepperRole'],
+            );
+            const tricksterRole = interaction.guild.roles.cache.get(
+                config['tricksterRole'],
+            );
+            const acrobatRole = interaction.guild.roles.cache.get(
+                config['acrobatRole'],
+            );
+            const mageRole = interaction.guild.roles.cache.get(
+                config['mageRole'],
+            );
+            const riftwalkerRole = interaction.guild.roles.cache.get(
+                config['riftwalkerRole'],
+            );
+            const lightBenderRole = interaction.guild.roles.cache.get(
+                config['lightBenderRole'],
+            );
+            const arcanistRole = interaction.guild.roles.cache.get(
+                config['arcanistRole'],
+            );
+            const shamanRole = interaction.guild.roles.cache.get(
+                config['shamanRole'],
+            );
+            const summonerRole = interaction.guild.roles.cache.get(
+                config['summonerRole'],
+            );
+            const ritualistRole = interaction.guild.roles.cache.get(
+                config['ritualistRole'],
+            );
+            const acolyteRole = interaction.guild.roles.cache.get(
+                config['acolyteRole'],
+            );
 
             pageEmbed = new EmbedBuilder()
                 .setTitle(`${title}`)
@@ -237,8 +359,14 @@ module.exports = {
 
             if (Object.keys(config['levelRoles']).length > 20) {
                 const pages = [];
-                for (let i = 0; i < Object.keys(config['levelRoles']).length; i += 20) {
-                    pages.push(Object.keys(config['levelRoles']).slice(i, i + 20));
+                for (
+                    let i = 0;
+                    i < Object.keys(config['levelRoles']).length;
+                    i += 20
+                ) {
+                    pages.push(
+                        Object.keys(config['levelRoles']).slice(i, i + 20),
+                    );
                 }
 
                 for (const page of pages) {
@@ -249,8 +377,10 @@ module.exports = {
                     let description = '';
 
                     for (const level of page) {
-                        const levelRole = interaction.guild.roles.cache.get(config['levelRoles'][level]);
-                        description += `Level ${level} role: ${levelRole}\n`;   
+                        const levelRole = interaction.guild.roles.cache.get(
+                            config['levelRoles'][level],
+                        );
+                        description += `Level ${level} role: ${levelRole}\n`;
                     }
 
                     pageEmbed.setDescription(`${description}`);
@@ -259,14 +389,16 @@ module.exports = {
                 }
             } else {
                 pageEmbed = new EmbedBuilder()
-                        .setTitle(`${title}`)
-                        .setColor(0x00ffff);
+                    .setTitle(`${title}`)
+                    .setColor(0x00ffff);
 
                 let description = '';
 
                 for (const level of Object.keys(config['levelRoles'])) {
-                    const levelRole = interaction.guild.roles.cache.get(config['levelRoles'][level]);
-                    description += `Level ${level} role: ${levelRole}\n`;   
+                    const levelRole = interaction.guild.roles.cache.get(
+                        config['levelRoles'][level],
+                    );
+                    description += `Level ${level} role: ${levelRole}\n`;
                 }
 
                 pageEmbed.setDescription(`${description}`);
@@ -386,7 +518,9 @@ module.exports = {
 
             let chiefPromotionRequirements = 'Chief Promotion Requirements:';
 
-            for (const requirement of Object.keys(config['chiefPromotionRequirement'])) {
+            for (const requirement of Object.keys(
+                config['chiefPromotionRequirement'],
+            )) {
                 switch (requirement) {
                     case 'XP': {
                         chiefPromotionRequirements += `\nContributed XP: ${config['chiefPromotionRequirement'][requirement]}`;
@@ -436,9 +570,12 @@ module.exports = {
 
             embeds.push(pageEmbed);
 
-            let strategistPromotionRequirements = 'Strategist Promotion Requirements:';
+            let strategistPromotionRequirements =
+                'Strategist Promotion Requirements:';
 
-            for (const requirement of Object.keys(config['strategistPromotionRequirement'])) {
+            for (const requirement of Object.keys(
+                config['strategistPromotionRequirement'],
+            )) {
                 switch (requirement) {
                     case 'XP': {
                         strategistPromotionRequirements += `\nContributed XP: ${config['strategistPromotionRequirement'][requirement]}`;
@@ -488,9 +625,12 @@ module.exports = {
 
             embeds.push(pageEmbed);
 
-            let captainPromotionRequirements = 'Captain Promotion Requirements:';
+            let captainPromotionRequirements =
+                'Captain Promotion Requirements:';
 
-            for (const requirement of Object.keys(config['captainPromotionRequirement'])) {
+            for (const requirement of Object.keys(
+                config['captainPromotionRequirement'],
+            )) {
                 switch (requirement) {
                     case 'XP': {
                         captainPromotionRequirements += `\nContributed XP: ${config['captainPromotionRequirement'][requirement]}`;
@@ -540,9 +680,12 @@ module.exports = {
 
             embeds.push(pageEmbed);
 
-            let recruiterPromotionRequirements = 'Recruiter Promotion Requirements:';
+            let recruiterPromotionRequirements =
+                'Recruiter Promotion Requirements:';
 
-            for (const requirement of Object.keys(config['recruiterPromotionRequirement'])) {
+            for (const requirement of Object.keys(
+                config['recruiterPromotionRequirement'],
+            )) {
                 switch (requirement) {
                     case 'XP': {
                         recruiterPromotionRequirements += `\nContributed XP: ${config['recruiterPromotionRequirement'][requirement]}`;
@@ -605,7 +748,10 @@ module.exports = {
                 .setStyle(ButtonStyle.Primary)
                 .setEmoji('➡️');
 
-            const row = new ActionRowBuilder().addComponents(previousPage, nextPage);
+            const row = new ActionRowBuilder().addComponents(
+                previousPage,
+                nextPage,
+            );
 
             await interaction.editReply({
                 embeds: [embeds[0]],

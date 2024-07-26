@@ -15,7 +15,9 @@ const database = require('../../database/database');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('trackedguilds')
-        .setDescription('View the average number of online players for each tracked guild.'),
+        .setDescription(
+            'View the average number of online players for each tracked guild.',
+        ),
     ephemeral: false,
     async execute(interaction) {
         const loadingEmbed = new EmbedBuilder()
@@ -43,7 +45,10 @@ module.exports = {
                 config = JSON.parse(fileData);
             }
 
-            if (!config['trackedGuilds'] || Object.keys(config['trackedGuilds']).length === 0) {
+            if (
+                !config['trackedGuilds'] ||
+                Object.keys(config['trackedGuilds']).length === 0
+            ) {
                 responseEmbed
                     .setTitle('Error')
                     .setDescription('No guilds are currently being tracked')
@@ -52,7 +57,9 @@ module.exports = {
                 return;
             }
 
-            const trackedGuilds = await database.getGuildActivities(config['trackedGuilds']);
+            const trackedGuilds = await database.getGuildActivities(
+                config['trackedGuilds'],
+            );
 
             // Paginate if more than 10 tracked guilds have data
             if (trackedGuilds.length > 10) {
@@ -68,19 +75,29 @@ module.exports = {
                     const pageEmbed = new EmbedBuilder();
 
                     pageEmbed
-                        .setTitle('Average and current activity for tracked guilds')
-                        .setDescription('Number in brackets represents the current online count.')
+                        .setTitle(
+                            'Average and current activity for tracked guilds',
+                        )
+                        .setDescription(
+                            'Number in brackets represents the current online count.',
+                        )
                         .setColor(0x00ffff);
 
                     for (const guild in page) {
                         const trackedGuild = page[guild];
-                        pageEmbed.addFields({ name: `[${trackedGuild.prefix}] ${trackedGuild.name}`, value: `Avg. Online: ${trackedGuild.averageOnline} (${trackedGuild.currentOnline})\nAvg. Captains+: ${trackedGuild.averageCaptains} (${trackedGuild.currentCaptains})` });
+                        pageEmbed.addFields({
+                            name: `[${trackedGuild.prefix}] ${trackedGuild.name}`,
+                            value: `Avg. Online: ${trackedGuild.averageOnline} (${trackedGuild.currentOnline})\nAvg. Captains+: ${trackedGuild.averageCaptains} (${trackedGuild.currentCaptains})`,
+                        });
                     }
 
                     embeds.push(pageEmbed);
                 }
 
-                messages.addMessage(message.id, new PagedMessage(message, embeds));
+                messages.addMessage(
+                    message.id,
+                    new PagedMessage(message, embeds),
+                );
 
                 const previousPage = new ButtonBuilder()
                     .setCustomId('previous')
@@ -94,19 +111,24 @@ module.exports = {
 
                 row.addComponents(previousPage, nextPage);
 
-                await interaction.editReply({ 
+                await interaction.editReply({
                     embeds: [embeds[0]],
                     components: [row],
                 });
             } else {
                 responseEmbed
                     .setTitle('Average and current activity for tracked guilds')
-                    .setDescription('Number in brackets represents the current online count.')
+                    .setDescription(
+                        'Number in brackets represents the current online count.',
+                    )
                     .setColor(0x00ffff);
 
                 for (const guild in trackedGuilds) {
                     const trackedGuild = trackedGuilds[guild];
-                    responseEmbed.addFields({ name: `[${trackedGuild.prefix}] ${trackedGuild.name}`, value: `Avg. Online: ${trackedGuild.averageOnline} (${trackedGuild.currentOnline})\nAvg. Captains+: ${trackedGuild.averageCaptains} (${trackedGuild.currentCaptains})` });
+                    responseEmbed.addFields({
+                        name: `[${trackedGuild.prefix}] ${trackedGuild.name}`,
+                        value: `Avg. Online: ${trackedGuild.averageOnline} (${trackedGuild.currentOnline})\nAvg. Captains+: ${trackedGuild.averageCaptains} (${trackedGuild.currentCaptains})`,
+                    });
                 }
 
                 await interaction.editReply({ embeds: [responseEmbed] });
@@ -114,9 +136,9 @@ module.exports = {
         } catch (error) {
             console.error(error);
             responseEmbed
-                    .setTitle('Error')
-                    .setDescription('Unable to view tracked guilds.')
-                    .setColor(0xff0000);
+                .setTitle('Error')
+                .setDescription('Unable to view tracked guilds.')
+                .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
         }

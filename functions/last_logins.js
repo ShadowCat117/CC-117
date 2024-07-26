@@ -24,9 +24,13 @@ async function lastLogins(interaction, force = false) {
     if (guild) {
         const playerLastLogins = await database.getLastLogins(guild.uuid);
 
-        return ({ guildName: guild.name, guildPrefix: guild.prefix, playerLastLogins: playerLastLogins });
+        return {
+            guildName: guild.name,
+            guildPrefix: guild.prefix,
+            playerLastLogins: playerLastLogins,
+        };
     } else {
-        return ({ guildName: '', guildPrefix: '', playerLastLogins: [] });
+        return { guildName: '', guildPrefix: '', playerLastLogins: [] };
     }
 }
 

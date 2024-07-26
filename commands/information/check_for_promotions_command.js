@@ -18,17 +18,27 @@ const PagedMessage = require('../../message_objects/PagedMessage');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('checkforpromotions')
-        .setDescription('Check your guild members to see who should be a higher rank.'),
+        .setDescription(
+            'Check your guild members to see who should be a higher rank.',
+        ),
     ephemeral: false,
     async execute(interaction) {
         const loadingEmbed = new EmbedBuilder()
-            .setDescription('Checking players that are eligible for promotions.')
+            .setDescription(
+                'Checking players that are eligible for promotions.',
+            )
             .setColor(0x00ff00);
 
         const message = await interaction.editReply({ embeds: [loadingEmbed] });
 
         const guildId = interaction.guild.id;
-        const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
+        const filePath = path.join(
+            __dirname,
+            '..',
+            '..',
+            'configs',
+            `${guildId}.json`,
+        );
         let config = {};
 
         const responseEmbed = new EmbedBuilder();
@@ -48,19 +58,32 @@ module.exports = {
             const memberRoles = interaction.member.roles.cache;
             const memberOfRole = config.memberOfRole;
 
-            if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
+            if (
+                memberOfRole &&
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(memberOfRole)
+            ) {
                 responseEmbed
                     .setTitle('Error')
-                    .setDescription('You do not have the required permissions to run this command.')
+                    .setDescription(
+                        'You do not have the required permissions to run this command.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
             }
 
-            if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
+            if (
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(adminRoleId) &&
+                interaction.member.roles.highest.position <
+                    interaction.guild.roles.cache.get(adminRoleId).position
+            ) {
                 responseEmbed
                     .setTitle('Error')
-                    .setDescription('You do not have the required permissions to run this command.')
+                    .setDescription(
+                        'You do not have the required permissions to run this command.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -69,7 +92,9 @@ module.exports = {
             if (!config.guild) {
                 responseEmbed
                     .setTitle('Error')
-                    .setDescription('The server you are in does not have a guild set.')
+                    .setDescription(
+                        'The server you are in does not have a guild set.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -87,24 +112,45 @@ module.exports = {
         const chiefPromotionRequirement = config.chiefPromotionRequirement;
         const chiefTimeRequirement = config.chiefTimeRequirement;
         const chiefRequirementsCount = config.chiefRequirementsCount;
-        const strategistPromotionRequirement = config.strategistPromotionRequirement;
+        const strategistPromotionRequirement =
+            config.strategistPromotionRequirement;
         const strategistTimeRequirement = config.strategistTimeRequirement;
         const strategistRequirementsCount = config.strategistRequirementsCount;
         const captainPromotionRequirement = config.captainPromotionRequirement;
         const captainTimeRequirement = config.captainTimeRequirement;
         const captainRequirementsCount = config.captainRequirementsCount;
-        const recruiterPromotionRequirement = config.recruiterPromotionRequirement;
+        const recruiterPromotionRequirement =
+            config.recruiterPromotionRequirement;
         const recruiterTimeRequirement = config.recruiterTimeRequirement;
         const recruiterRequirementsCount = config.recruiterRequirementsCount;
         const tankRole = interaction.guild.roles.cache.get(config['tankRole']);
-        const healerRole = interaction.guild.roles.cache.get(config['healerRole']);
-        const damageRole = interaction.guild.roles.cache.get(config['damageRole']);
+        const healerRole = interaction.guild.roles.cache.get(
+            config['healerRole'],
+        );
+        const damageRole = interaction.guild.roles.cache.get(
+            config['damageRole'],
+        );
         const soloRole = interaction.guild.roles.cache.get(config['soloRole']);
         const ecoRole = interaction.guild.roles.cache.get(config['ecoRole']);
 
-        const promotionRequirements = [chiefPromotionRequirement, strategistPromotionRequirement, captainPromotionRequirement, recruiterPromotionRequirement];
-        const timeRequirements = [chiefTimeRequirement, strategistTimeRequirement, captainTimeRequirement, recruiterTimeRequirement];
-        const requirementsCount = [chiefRequirementsCount, strategistRequirementsCount, captainRequirementsCount, recruiterRequirementsCount];
+        const promotionRequirements = [
+            chiefPromotionRequirement,
+            strategistPromotionRequirement,
+            captainPromotionRequirement,
+            recruiterPromotionRequirement,
+        ];
+        const timeRequirements = [
+            chiefTimeRequirement,
+            strategistTimeRequirement,
+            captainTimeRequirement,
+            recruiterTimeRequirement,
+        ];
+        const requirementsCount = [
+            chiefRequirementsCount,
+            strategistRequirementsCount,
+            captainRequirementsCount,
+            recruiterRequirementsCount,
+        ];
         const warBuildRoles = [tankRole, healerRole, damageRole, soloRole];
 
         const promotionExceptions = config['promotionExceptions'];
@@ -138,15 +184,22 @@ module.exports = {
         let eligibleMembers = [];
 
         await utilities.waitForRateLimit();
-        const response = await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${config.guild}`);
+        const response = await axios.get(
+            `https://api.wynncraft.com/v3/guild/uuid/${config.guild}`,
+        );
 
-        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+        utilities.updateRateLimit(
+            response.headers['ratelimit-remaining'],
+            response.headers['ratelimit-reset'],
+        );
         const guildJson = response.data;
 
         if (!guildJson || !guildJson.name) {
             responseEmbed
                 .setTitle('Error')
-                .setDescription('Failed to fetch guild information from the API, it may be down.')
+                .setDescription(
+                    'Failed to fetch guild information from the API, it may be down.',
+                )
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
@@ -155,19 +208,23 @@ module.exports = {
         // Owner and chiefs can't be demoted.
         // If there were no promotion requirements for a rank then skip that rank too.
         for (const rank in guildJson.members) {
-            if (rank === 'total' || rank === 'owner' || rank === 'chief') continue;
+            if (rank === 'total' || rank === 'owner' || rank === 'chief')
+                continue;
             if (rank === 'strategist' && ignoreStrategists) continue;
             if (rank === 'captain' && ignoreCaptains) continue;
             if (rank === 'recruiter' && ignoreRecruiters) continue;
             if (rank === 'recruit' && ignoreRecruits) continue;
-            
+
             const rankMembers = guildJson.members[rank];
 
             for (const member in rankMembers) {
                 const guildMember = rankMembers[member];
 
                 if (!exemptUuids.includes(guildMember.uuid)) {
-                    const serverMember = await utilities.findDiscordUser(interaction.guild.members.cache.values(), member);
+                    const serverMember = await utilities.findDiscordUser(
+                        interaction.guild.members.cache.values(),
+                        member,
+                    );
 
                     let hasBuildRole = false;
                     let hasEcoRole = false;
@@ -203,8 +260,11 @@ module.exports = {
                                 // If in an active session, add current sessions playtime
                                 if (info.sessionStart) {
                                     const now = new Date();
-                                    const sessionStart = new Date(info.sessionStart);
-                                    const sessionDurationHours = (now - sessionStart) / (1000 * 60 * 60);
+                                    const sessionStart = new Date(
+                                        info.sessionStart,
+                                    );
+                                    const sessionDurationHours =
+                                        (now - sessionStart) / (1000 * 60 * 60);
 
                                     averagePlaytime += sessionDurationHours;
                                 }
@@ -218,12 +278,28 @@ module.exports = {
 
                     const daysInGuild = utilities.daysSince(guildMember.joined);
 
-                    eligibleMembers.push(new GuildMemberPromotion(member, rank, guildMember.contributed, highestCharacterLevel, guildMember.contributionRank, daysInGuild, wars, hasBuildRole, averagePlaytime, hasEcoRole, promotionRequirements, timeRequirements, requirementsCount));
+                    eligibleMembers.push(
+                        new GuildMemberPromotion(
+                            member,
+                            rank,
+                            guildMember.contributed,
+                            highestCharacterLevel,
+                            guildMember.contributionRank,
+                            daysInGuild,
+                            wars,
+                            hasBuildRole,
+                            averagePlaytime,
+                            hasEcoRole,
+                            promotionRequirements,
+                            timeRequirements,
+                            requirementsCount,
+                        ),
+                    );
                 }
             }
         }
 
-        eligibleMembers = eligibleMembers.filter(player => player.promote);
+        eligibleMembers = eligibleMembers.filter((player) => player.promote);
 
         // Paginate if more than 10 players eligible for promotion
         if (eligibleMembers.length > 10) {
@@ -239,7 +315,9 @@ module.exports = {
                 const pageEmbed = new EmbedBuilder();
 
                 pageEmbed
-                    .setTitle(`${eligibleMembers.length} Players eligible for promotion`)
+                    .setTitle(
+                        `${eligibleMembers.length} Players eligible for promotion`,
+                    )
                     .setColor(0x00ffff);
 
                 for (const player in page) {
@@ -251,7 +329,10 @@ module.exports = {
                         reasons += `${reason}\n`;
                     }
 
-                    pageEmbed.addFields({ name: `${playerPromotion.username} to ${playerPromotion.rankToPromote}`, value: `${reasons}` });
+                    pageEmbed.addFields({
+                        name: `${playerPromotion.username} to ${playerPromotion.rankToPromote}`,
+                        value: `${reasons}`,
+                    });
                 }
 
                 embeds.push(pageEmbed);
@@ -271,13 +352,15 @@ module.exports = {
 
             row.addComponents(previousPage, nextPage);
 
-            await interaction.editReply({ 
+            await interaction.editReply({
                 embeds: [embeds[0]],
                 components: [row],
             });
         } else if (eligibleMembers.length > 0) {
             responseEmbed
-                .setTitle(`${eligibleMembers.length} Players eligible for promotion`)
+                .setTitle(
+                    `${eligibleMembers.length} Players eligible for promotion`,
+                )
                 .setColor(0x00ffff);
 
             for (const player in eligibleMembers) {
@@ -289,13 +372,18 @@ module.exports = {
                     reasons += `${reason}\n`;
                 }
 
-                responseEmbed.addFields({ name: `${playerPromotion.username} to ${playerPromotion.rankToPromote}`, value: `${reasons}` });
+                responseEmbed.addFields({
+                    name: `${playerPromotion.username} to ${playerPromotion.rankToPromote}`,
+                    value: `${reasons}`,
+                });
             }
 
             await interaction.editReply({ embeds: [responseEmbed] });
         } else {
             responseEmbed
-                .setTitle('No players in your guild are eligible for promotion.')
+                .setTitle(
+                    'No players in your guild are eligible for promotion.',
+                )
                 .setColor(0x999999);
 
             await interaction.editReply({ embeds: [responseEmbed] });

@@ -33,20 +33,32 @@ async function sus(interaction, force = false) {
 
     // If a player was found, look for UUID to get guaranteed results, otherwise look for the name input
     if (player) {
-        const response = await axios.get(`https://api.wynncraft.com/v3/player/${player.uuid}?fullResult=True`);
-        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+        const response = await axios.get(
+            `https://api.wynncraft.com/v3/player/${player.uuid}?fullResult=True`,
+        );
+        utilities.updateRateLimit(
+            response.headers['ratelimit-remaining'],
+            response.headers['ratelimit-reset'],
+        );
         playerJson = response.data;
     } else {
         try {
-            const response = await axios.get(`https://api.wynncraft.com/v3/player/${nameToSearch}?fullResult=True`);
-            utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+            const response = await axios.get(
+                `https://api.wynncraft.com/v3/player/${nameToSearch}?fullResult=True`,
+            );
+            utilities.updateRateLimit(
+                response.headers['ratelimit-remaining'],
+                response.headers['ratelimit-reset'],
+            );
             playerJson = response.data;
         } catch (err) {
             // 300 indicates a multi selector
             if (err.response.status === 300) {
                 return {
                     playerUuids: Object.keys(err.response.data),
-                    playerUsernames: Object.values(err.response.data).map((entry) => entry.storedName),
+                    playerUsernames: Object.values(err.response.data).map(
+                        (entry) => entry.storedName,
+                    ),
                     playerRanks: [],
                     playerGuildRanks: [],
                     playerGuildNames: [],
@@ -56,7 +68,7 @@ async function sus(interaction, force = false) {
     }
 
     if (!playerJson || !playerJson.username) {
-        return ({
+        return {
             username: '',
             uuid: '',
             overallSusValue: -1,
@@ -67,31 +79,66 @@ async function sus(interaction, force = false) {
             questsSusData: '',
             rankSusData: '',
             publicProfile: false,
-        });
+        };
     }
 
     // Calculations based on Valor bot with some tweaks https://github.com/classAndrew/valor/blob/main/commands/sus.py
-    const joinSusValue = Math.max(0, (Date.now() / 1000 - new Date(playerJson.firstJoin).getTime() / 1000 - 63072000) * -1) * 100 / 63072000;
-    const playtimeSusValue = Math.max(0, (playerJson.playtime - 800) * -1) * 100 / 800;
+    const joinSusValue =
+        (Math.max(
+            0,
+            (Date.now() / 1000 -
+                new Date(playerJson.firstJoin).getTime() / 1000 -
+                63072000) *
+                -1,
+        ) *
+            100) /
+        63072000;
+    const playtimeSusValue =
+        (Math.max(0, (playerJson.playtime - 800) * -1) * 100) / 800;
 
-    const daysSinceJoin = Math.floor((Date.now() - new Date(playerJson.firstJoin).getTime()) / (1000 * 60 * 60 * 24));
+    const daysSinceJoin = Math.floor(
+        (Date.now() - new Date(playerJson.firstJoin).getTime()) /
+            (1000 * 60 * 60 * 24),
+    );
 
     let timeSpentPercentage;
     let timeSpentSusValue;
 
     if (daysSinceJoin > 0) {
-        timeSpentPercentage = ((playerJson.playtime / (daysSinceJoin * 24)) * 100);
+        timeSpentPercentage =
+            (playerJson.playtime / (daysSinceJoin * 24)) * 100;
         timeSpentSusValue = sigmoid(timeSpentPercentage);
     } else {
-        timeSpentPercentage = 100.00;
+        timeSpentPercentage = 100.0;
         timeSpentSusValue = 100;
     }
 
-    const totalLevelSusValue = Math.max(0, (playerJson.globalData.totalLevel - 250) * -1) * 100 / 250;
-    const questSusValue = Math.max(0, (playerJson.globalData.completedQuests - 150) * -1) * 100 / 150;
-    const rankSusValue = playerJson.supportRank === 'vip' ? 25.0 : (playerJson.supportRank === 'vipplus' || playerJson.supportRank === 'hero' || playerJson.supportRank === 'champion' || playerJson.veteran === true) ? 0.0 : 50.0;
+    const totalLevelSusValue =
+        (Math.max(0, (playerJson.globalData.totalLevel - 250) * -1) * 100) /
+        250;
+    const questSusValue =
+        (Math.max(0, (playerJson.globalData.completedQuests - 150) * -1) *
+            100) /
+        150;
+    const rankSusValue =
+        playerJson.supportRank === 'vip'
+            ? 25.0
+            : playerJson.supportRank === 'vipplus' ||
+                playerJson.supportRank === 'hero' ||
+                playerJson.supportRank === 'champion' ||
+                playerJson.veteran === true
+              ? 0.0
+              : 50.0;
 
-    const overallSus = ((joinSusValue + rankSusValue + totalLevelSusValue + playtimeSusValue + questSusValue + timeSpentSusValue) / 6).toFixed(2);
+    const overallSus = (
+        (joinSusValue +
+            rankSusValue +
+            totalLevelSusValue +
+            playtimeSusValue +
+            questSusValue +
+            timeSpentSusValue) /
+        6
+    ).toFixed(2);
 
     const joinSusData = `${playerJson.firstJoin.split('T')[0]}\n${joinSusValue.toFixed(2)}%`;
     const playtimeSusData = `${playerJson.playtime} hours\n${playtimeSusValue.toFixed(2)}%`;
@@ -152,7 +199,7 @@ async function sus(interaction, force = false) {
         highestCharcterLevel: highestCharcterLevel,
     });
 
-    return ({
+    return {
         username: playerJson.username.replaceAll('_', '\\_'),
         uuid: playerJson.uuid,
         overallSusValue: overallSus,
@@ -163,7 +210,7 @@ async function sus(interaction, force = false) {
         questsSusData: questsSusData,
         rankSusData: rankSusData,
         publicProfile: playerJson.publicProfile,
-    });
+    };
 }
 
 module.exports = sus;

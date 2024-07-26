@@ -43,9 +43,11 @@ module.exports = {
 
                 if (!guildUuid) {
                     const responseEmbed = new EmbedBuilder()
-                            .setTitle('No Guild Set')
-                            .setDescription('The server you are in does not have a guild set.')
-                            .setColor(0xff0000);
+                        .setTitle('No Guild Set')
+                        .setDescription(
+                            'The server you are in does not have a guild set.',
+                        )
+                        .setColor(0xff0000);
 
                     await interaction.editReply({ embeds: [responseEmbed] });
                     return;
@@ -55,20 +57,37 @@ module.exports = {
                 const adminRoleId = config.adminRole;
                 const memberOfRole = config.memberOfRole;
 
-                if (interaction.member.id !== interaction.member.guild.ownerId && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
+                if (
+                    interaction.member.id !==
+                        interaction.member.guild.ownerId &&
+                    !memberRoles.has(adminRoleId) &&
+                    interaction.member.roles.highest.position <
+                        interaction.guild.roles.cache.get(adminRoleId).position
+                ) {
                     const responseEmbed = new EmbedBuilder()
-                            .setTitle('Error')
-                            .setDescription('You do not have the permissions to run this command.')
-                            .setColor(0xff0000);
+                        .setTitle('Error')
+                        .setDescription(
+                            'You do not have the permissions to run this command.',
+                        )
+                        .setColor(0xff0000);
 
                     await interaction.editReply({ embeds: [responseEmbed] });
                     return;
-                } else if (interaction.member.id !== interaction.member.guild.ownerId && (memberOfRole && !memberRoles.has(memberOfRole))) {
-                    const guildName = (await database.findGuild(guildUuid, true)).name;
+                } else if (
+                    interaction.member.id !==
+                        interaction.member.guild.ownerId &&
+                    memberOfRole &&
+                    !memberRoles.has(memberOfRole)
+                ) {
+                    const guildName = (
+                        await database.findGuild(guildUuid, true)
+                    ).name;
                     const responseEmbed = new EmbedBuilder()
-                            .setTitle('Error')
-                            .setDescription(`You must be a member of ${guildName} to use this command.`)
-                            .setColor(0xff0000);
+                        .setTitle('Error')
+                        .setDescription(
+                            `You must be a member of ${guildName} to use this command.`,
+                        )
+                        .setColor(0xff0000);
 
                     await interaction.editReply({ embeds: [responseEmbed] });
                     return;
@@ -78,7 +97,9 @@ module.exports = {
 
                 const responseEmbed = new EmbedBuilder()
                     .setTitle('Error')
-                    .setDescription('The config file for this server was not found, either an error has occured or verification has not been setup.')
+                    .setDescription(
+                        'The config file for this server was not found, either an error has occured or verification has not been setup.',
+                    )
                     .setColor(0xff0000);
 
                 await interaction.editReply({ embeds: [responseEmbed] });
@@ -87,9 +108,11 @@ module.exports = {
         } catch (error) {
             console.error(error);
             const responseEmbed = new EmbedBuilder()
-                    .setTitle('Error')
-                    .setDescription('An error occured whilst trying to update roles, please try again later.')
-                    .setColor(0xff0000);
+                .setTitle('Error')
+                .setDescription(
+                    'An error occured whilst trying to update roles, please try again later.',
+                )
+                .setColor(0xff0000);
 
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
@@ -100,11 +123,14 @@ module.exports = {
         if (response.length === 0) {
             const responseEmbed = new EmbedBuilder()
                 .setTitle('No roles updated')
-                .setDescription('Everyone is up to date, if you believe this is wrong you can run /updateguildmembers <guildName> or /updateplayer <playerName> to update known guild member/player info and try again later.')
+                .setDescription(
+                    'Everyone is up to date, if you believe this is wrong you can run /updateguildmembers <guildName> or /updateplayer <playerName> to update known guild member/player info and try again later.',
+                )
                 .setColor(0x999999);
 
             embeds.push(responseEmbed);
-        } else if (response.length > 5) { // Paginate if more than 5 members updated
+        } else if (response.length > 5) {
+            // Paginate if more than 5 members updated
             const pages = [];
             for (let i = 0; i < response.length; i += 5) {
                 pages.push(response.slice(i, i + 5));
@@ -114,9 +140,11 @@ module.exports = {
                 const responseEmbed = new EmbedBuilder();
 
                 responseEmbed
-                    .setTitle(`Updated roles for ${response.length} member${response.length !== 1 ? 's' : ''}`)
+                    .setTitle(
+                        `Updated roles for ${response.length} member${response.length !== 1 ? 's' : ''}`,
+                    )
                     .setColor(0x00ffff);
-            
+
                 for (const player of page) {
                     let appliedChanges = 'Applied changes: \n';
 
@@ -136,9 +164,12 @@ module.exports = {
                         name = `${player.member.user.username} Unverified`;
                     }
 
-                    responseEmbed.addFields({ name: `${name}`, value: `${appliedChanges}` });
+                    responseEmbed.addFields({
+                        name: `${name}`,
+                        value: `${appliedChanges}`,
+                    });
                 }
-            
+
                 embeds.push(responseEmbed);
             }
 
@@ -159,7 +190,9 @@ module.exports = {
             const responseEmbed = new EmbedBuilder();
 
             responseEmbed
-                .setTitle(`Updated roles for ${response.length} member${response.length !== 1 ? 's' : ''}`)
+                .setTitle(
+                    `Updated roles for ${response.length} member${response.length !== 1 ? 's' : ''}`,
+                )
                 .setColor(0x00ffff);
 
             for (const player of response) {
@@ -181,14 +214,17 @@ module.exports = {
                     name = `${player.member.user.username} Unverified`;
                 }
 
-                responseEmbed.addFields({ name: `${name}`, value: `${appliedChanges}` });
+                responseEmbed.addFields({
+                    name: `${name}`,
+                    value: `${appliedChanges}`,
+                });
             }
 
             embeds.push(responseEmbed);
         }
 
         if (row.components.length > 0) {
-            await interaction.editReply({ 
+            await interaction.editReply({
                 embeds: [embeds[0]],
                 components: [row],
             });

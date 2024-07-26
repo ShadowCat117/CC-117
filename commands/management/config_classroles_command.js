@@ -1,7 +1,4 @@
-const {
-    EmbedBuilder,
-    SlashCommandBuilder,
-} = require('discord.js');
+const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const createConfig = require('../../functions/create_config');
@@ -11,73 +8,99 @@ module.exports = {
         .setName('config_classroles')
         .setDescription('Update class role configurations')
         .addStringOption((option) =>
-            option.setName('option')
+            option
+                .setName('option')
                 .setDescription('The configuration option to update')
                 .setRequired(true)
-                .addChoices({
-                    name: 'Warrior Role',
-                    value: 'warriorRole',
-                }, {
-                    name: 'Fallen Role',
-                    value: 'fallenRole',
-                }, {
-                    name: 'Battle Monk Role',
-                    value: 'battleMonkRole',
-                }, {
-                    name: 'Paladin Role',
-                    value: 'paladinRole',
-                }, {
-                    name: 'Mage Role',
-                    value: 'mageRole',
-                }, {
-                    name: 'Riftwalker Role',
-                    value: 'riftwalkerRole',
-                }, {
-                    name: 'Light Bender Role',
-                    value: 'lightBenderRole',
-                }, {
-                    name: 'Arcanist Role',
-                    value: 'arcanistRole',
-                }, {
-                    name: 'Archer Role',
-                    value: 'archerRole',
-                }, {
-                    name: 'Sharpshooter Role',
-                    value: 'sharpshooterRole',
-                }, {
-                    name: 'Trapper Role',
-                    value: 'trapperRole',
-                }, {
-                    name: 'Boltslinger Role',
-                    value: 'boltslingerRole',
-                }, {
-                    name: 'Shaman Role',
-                    value: 'shamanRole',
-                }, {
-                    name: 'Ritualist Role',
-                    value: 'ritualistRole',
-                }, {
-                    name: 'Summoner Role',
-                    value: 'summonerRole',
-                }, {
-                    name: 'Acolyte Role',
-                    value: 'acolyteRole',
-                }, {
-                    name: 'Assassin Role',
-                    value: 'assassinRole',
-                }, {
-                    name: 'Acrobat Role',
-                    value: 'acrobatRole',
-                }, {
-                    name: 'Shadestepper Role',
-                    value: 'shadestepperRole',
-                }, {
-                    name: 'Trickster Role',
-                    value: 'tricksterRole',
-                }))
+                .addChoices(
+                    {
+                        name: 'Warrior Role',
+                        value: 'warriorRole',
+                    },
+                    {
+                        name: 'Fallen Role',
+                        value: 'fallenRole',
+                    },
+                    {
+                        name: 'Battle Monk Role',
+                        value: 'battleMonkRole',
+                    },
+                    {
+                        name: 'Paladin Role',
+                        value: 'paladinRole',
+                    },
+                    {
+                        name: 'Mage Role',
+                        value: 'mageRole',
+                    },
+                    {
+                        name: 'Riftwalker Role',
+                        value: 'riftwalkerRole',
+                    },
+                    {
+                        name: 'Light Bender Role',
+                        value: 'lightBenderRole',
+                    },
+                    {
+                        name: 'Arcanist Role',
+                        value: 'arcanistRole',
+                    },
+                    {
+                        name: 'Archer Role',
+                        value: 'archerRole',
+                    },
+                    {
+                        name: 'Sharpshooter Role',
+                        value: 'sharpshooterRole',
+                    },
+                    {
+                        name: 'Trapper Role',
+                        value: 'trapperRole',
+                    },
+                    {
+                        name: 'Boltslinger Role',
+                        value: 'boltslingerRole',
+                    },
+                    {
+                        name: 'Shaman Role',
+                        value: 'shamanRole',
+                    },
+                    {
+                        name: 'Ritualist Role',
+                        value: 'ritualistRole',
+                    },
+                    {
+                        name: 'Summoner Role',
+                        value: 'summonerRole',
+                    },
+                    {
+                        name: 'Acolyte Role',
+                        value: 'acolyteRole',
+                    },
+                    {
+                        name: 'Assassin Role',
+                        value: 'assassinRole',
+                    },
+                    {
+                        name: 'Acrobat Role',
+                        value: 'acrobatRole',
+                    },
+                    {
+                        name: 'Shadestepper Role',
+                        value: 'shadestepperRole',
+                    },
+                    {
+                        name: 'Trickster Role',
+                        value: 'tricksterRole',
+                    },
+                ),
+        )
         .addRoleOption((option) =>
-            option.setName('role')
-                .setDescription('The role value to set for the configuration option')
+            option
+                .setName('role')
+                .setDescription(
+                    'The role value to set for the configuration option',
+                )
                 .setRequired(true),
         ),
     ephemeral: true,
@@ -92,7 +115,13 @@ module.exports = {
         await interaction.editReply({ embeds: [loadingEmbed] });
 
         const guildId = interaction.guild.id;
-        const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
+        const filePath = path.join(
+            __dirname,
+            '..',
+            '..',
+            'configs',
+            `${guildId}.json`,
+        );
         let config = {};
 
         const responseEmbed = new EmbedBuilder();
@@ -112,17 +141,30 @@ module.exports = {
             const memberRoles = interaction.member.roles.cache;
             const memberOfRole = config.memberOfRole;
 
-            if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
+            if (
+                memberOfRole &&
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(memberOfRole)
+            ) {
                 responseEmbed
-                    .setDescription('You do not have the required permissions to run this command.')
+                    .setDescription(
+                        'You do not have the required permissions to run this command.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
             }
 
-            if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
+            if (
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(adminRoleId) &&
+                interaction.member.roles.highest.position <
+                    interaction.guild.roles.cache.get(adminRoleId).position
+            ) {
                 responseEmbed
-                    .setDescription('You do not have the required permissions to run this command.')
+                    .setDescription(
+                        'You do not have the required permissions to run this command.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -139,7 +181,11 @@ module.exports = {
 
         try {
             const guild = interaction.guild;
-            const botRole = guild.roles.cache.find(roleSearch => roleSearch.managed && roleSearch.members.has(interaction.client.user.id));
+            const botRole = guild.roles.cache.find(
+                (roleSearch) =>
+                    roleSearch.managed &&
+                    roleSearch.members.has(interaction.client.user.id),
+            );
 
             let message;
 
@@ -179,11 +225,13 @@ module.exports = {
                     break;
             }
 
-            fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
+            fs.writeFileSync(
+                filePath,
+                JSON.stringify(config, null, 2),
+                'utf-8',
+            );
 
-            responseEmbed
-                .setDescription(`${message}`)
-                .setColor(0x00ffff);
+            responseEmbed.setDescription(`${message}`).setColor(0x00ffff);
         } catch (error) {
             console.error(`Error updating configuration option: ${error}`);
             responseEmbed

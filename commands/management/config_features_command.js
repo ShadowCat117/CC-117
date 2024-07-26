@@ -1,7 +1,4 @@
-const {
-    EmbedBuilder,
-    SlashCommandBuilder,
-} = require('discord.js');
+const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const createConfig = require('../../functions/create_config');
@@ -11,27 +8,36 @@ module.exports = {
         .setName('config_features')
         .setDescription('Update configuration options')
         .addStringOption((option) =>
-            option.setName('option')
+            option
+                .setName('option')
                 .setDescription('The configuration option to update')
                 .setRequired(true)
-                .addChoices({
-                    name: 'Update Roles',
-                    value: 'updateRoles',
-                }, {
-                    name: 'Add Guild Prefixes',
-                    value: 'addGuildPrefixes',
-                }, {
-                    name: 'Send Log Messages',
-                    value: 'logMessages',
-                }, {
-                    name: 'Send Join/Leave Messages',
-                    value: 'sendJoinLeaveMessages',
-                }, {
-                    name: 'Check for Banned Players in Guild',
-                    value: 'checkBannedPlayers',
-                }))
+                .addChoices(
+                    {
+                        name: 'Update Roles',
+                        value: 'updateRoles',
+                    },
+                    {
+                        name: 'Add Guild Prefixes',
+                        value: 'addGuildPrefixes',
+                    },
+                    {
+                        name: 'Send Log Messages',
+                        value: 'logMessages',
+                    },
+                    {
+                        name: 'Send Join/Leave Messages',
+                        value: 'sendJoinLeaveMessages',
+                    },
+                    {
+                        name: 'Check for Banned Players in Guild',
+                        value: 'checkBannedPlayers',
+                    },
+                ),
+        )
         .addBooleanOption((option) =>
-            option.setName('enabled')
+            option
+                .setName('enabled')
                 .setDescription('Enable or disable this feature.')
                 .setRequired(true),
         ),
@@ -47,7 +53,13 @@ module.exports = {
         await interaction.editReply({ embeds: [loadingEmbed] });
 
         const guildId = interaction.guild.id;
-        const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
+        const filePath = path.join(
+            __dirname,
+            '..',
+            '..',
+            'configs',
+            `${guildId}.json`,
+        );
         let config = {};
 
         const responseEmbed = new EmbedBuilder();
@@ -67,17 +79,30 @@ module.exports = {
             const memberRoles = interaction.member.roles.cache;
             const memberOfRole = config.memberOfRole;
 
-            if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
+            if (
+                memberOfRole &&
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(memberOfRole)
+            ) {
                 responseEmbed
-                    .setDescription('You do not have the required permissions to run this command.')
+                    .setDescription(
+                        'You do not have the required permissions to run this command.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
             }
 
-            if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
+            if (
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(adminRoleId) &&
+                interaction.member.roles.highest.position <
+                    interaction.guild.roles.cache.get(adminRoleId).position
+            ) {
                 responseEmbed
-                    .setDescription('You do not have the required permissions to run this command.')
+                    .setDescription(
+                        'You do not have the required permissions to run this command.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -91,7 +116,7 @@ module.exports = {
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
         }
-        
+
         try {
             switch (option) {
                 case 'updateRoles':
@@ -103,11 +128,17 @@ module.exports = {
                     break;
             }
 
-            fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
+            fs.writeFileSync(
+                filePath,
+                JSON.stringify(config, null, 2),
+                'utf-8',
+            );
 
             responseEmbed
-                    .setDescription(`Configuration option \`${option}\` updated successfully to ${enabled}.`)
-                    .setColor(0x00ffff);
+                .setDescription(
+                    `Configuration option \`${option}\` updated successfully to ${enabled}.`,
+                )
+                .setColor(0x00ffff);
         } catch (error) {
             console.error(`Error updating configuration option: ${error}`);
             responseEmbed

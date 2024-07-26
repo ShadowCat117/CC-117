@@ -12,19 +12,27 @@ module.exports = {
         .setName('config_channels')
         .setDescription('Update configuration options')
         .addStringOption((option) =>
-            option.setName('option')
+            option
+                .setName('option')
                 .setDescription('The configuration option to update')
                 .setRequired(true)
-                .addChoices({
-                    name: 'Log Channel',
-                    value: 'logChannel',
-                }, {
-                    name: 'Join/Leave Channel',
-                    value: 'joinLeaveChannel',
-                }))
+                .addChoices(
+                    {
+                        name: 'Log Channel',
+                        value: 'logChannel',
+                    },
+                    {
+                        name: 'Join/Leave Channel',
+                        value: 'joinLeaveChannel',
+                    },
+                ),
+        )
         .addChannelOption((option) =>
-            option.setName('channel')
-                .setDescription('The channel value to set for the configuration option')
+            option
+                .setName('channel')
+                .setDescription(
+                    'The channel value to set for the configuration option',
+                )
                 .setRequired(true),
         ),
     ephemeral: true,
@@ -39,7 +47,13 @@ module.exports = {
         await interaction.editReply({ embeds: [loadingEmbed] });
 
         const guildId = interaction.guild.id;
-        const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
+        const filePath = path.join(
+            __dirname,
+            '..',
+            '..',
+            'configs',
+            `${guildId}.json`,
+        );
         let config = {};
 
         const responseEmbed = new EmbedBuilder();
@@ -59,17 +73,30 @@ module.exports = {
             const memberRoles = interaction.member.roles.cache;
             const memberOfRole = config.memberOfRole;
 
-            if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
+            if (
+                memberOfRole &&
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(memberOfRole)
+            ) {
                 responseEmbed
-                    .setDescription('You do not have the required permissions to run this command.')
+                    .setDescription(
+                        'You do not have the required permissions to run this command.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
             }
 
-            if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
+            if (
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(adminRoleId) &&
+                interaction.member.roles.highest.position <
+                    interaction.guild.roles.cache.get(adminRoleId).position
+            ) {
                 responseEmbed
-                    .setDescription('You do not have the required permissions to run this command.')
+                    .setDescription(
+                        'You do not have the required permissions to run this command.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -92,18 +119,31 @@ module.exports = {
                     break;
             }
 
-            fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
+            fs.writeFileSync(
+                filePath,
+                JSON.stringify(config, null, 2),
+                'utf-8',
+            );
 
-            const botPermissions = channel.permissionsFor(interaction.client.user);
+            const botPermissions = channel.permissionsFor(
+                interaction.client.user,
+            );
 
             // If the bot does not have permission for the selected channel, tell the user
-            if (!botPermissions.has(PermissionsBitField.Flags.SendMessages) || !botPermissions.has(PermissionsBitField.Flags.ViewChannel)) {
+            if (
+                !botPermissions.has(PermissionsBitField.Flags.SendMessages) ||
+                !botPermissions.has(PermissionsBitField.Flags.ViewChannel)
+            ) {
                 responseEmbed
-                    .setDescription(`Configuration option ${option} updated successfully to ${channel}.\n\nI currently do not have permission to send messages to that channel so please allow me to. I need View Channel & Send Messages.`)
+                    .setDescription(
+                        `Configuration option ${option} updated successfully to ${channel}.\n\nI currently do not have permission to send messages to that channel so please allow me to. I need View Channel & Send Messages.`,
+                    )
                     .setColor(0x00ffff);
             } else {
                 responseEmbed
-                    .setDescription(`Configuration option ${option} updated successfully to ${channel}.`)
+                    .setDescription(
+                        `Configuration option ${option} updated successfully to ${channel}.`,
+                    )
                     .setColor(0x00ffff);
             }
         } catch (error) {

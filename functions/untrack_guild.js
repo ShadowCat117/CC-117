@@ -32,8 +32,9 @@ async function untrackGuild(interaction, force = false) {
                         guildName: guild.guildNames[index],
                         guildPrefix: guild.guildPrefixes[index],
                     }))
-                    .filter(({ guildUuid }) => config.trackedGuilds.includes(guildUuid));
-
+                    .filter(({ guildUuid }) =>
+                        config.trackedGuilds.includes(guildUuid),
+                    );
 
                 if (filteredGuilds.length === 1) {
                     guild.uuid = filteredGuilds[0].guildUuid;
@@ -64,20 +65,26 @@ async function untrackGuild(interaction, force = false) {
             }
 
             if (!config.trackedGuilds.includes(guild.uuid)) {
-                return ({ error: `${guild.name} is not being tracked.` });
+                return { error: `${guild.name} is not being tracked.` };
             }
 
-            config.trackedGuilds = config.trackedGuilds.filter(item => item !== guild.uuid);
+            config.trackedGuilds = config.trackedGuilds.filter(
+                (item) => item !== guild.uuid,
+            );
 
-            fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
+            fs.writeFileSync(
+                filePath,
+                JSON.stringify(config, null, 2),
+                'utf-8',
+            );
 
-            return ({ guildName: guild.name });
+            return { guildName: guild.name };
         } catch (error) {
             console.error(error);
-            return ({ error: 'An error occured whilst untracking guild.' });
+            return { error: 'An error occured whilst untracking guild.' };
         }
     } else {
-        return ({ guildName: '' });
+        return { guildName: '' };
     }
 }
 

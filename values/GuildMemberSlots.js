@@ -23,6 +23,6 @@ const GuildMemberSlots = {
     114: 130,
     117: 140,
     120: 150,
-  };
-  
-  module.exports = GuildMemberSlots;
+};
+
+module.exports = GuildMemberSlots;

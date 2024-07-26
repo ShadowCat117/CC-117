@@ -29,20 +29,32 @@ async function updatePlayer(interaction, force = false) {
 
     // If a player was found, look for UUID to get guaranteed results, otherwise look for the name input
     if (player) {
-        const response = await axios.get(`https://api.wynncraft.com/v3/player/${player.uuid}?fullResult=True`);
-        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+        const response = await axios.get(
+            `https://api.wynncraft.com/v3/player/${player.uuid}?fullResult=True`,
+        );
+        utilities.updateRateLimit(
+            response.headers['ratelimit-remaining'],
+            response.headers['ratelimit-reset'],
+        );
         playerJson = response.data;
     } else {
         try {
-            const response = await axios.get(`https://api.wynncraft.com/v3/player/${nameToSearch}?fullResult=True`);
-            utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+            const response = await axios.get(
+                `https://api.wynncraft.com/v3/player/${nameToSearch}?fullResult=True`,
+            );
+            utilities.updateRateLimit(
+                response.headers['ratelimit-remaining'],
+                response.headers['ratelimit-reset'],
+            );
             playerJson = response.data;
         } catch (err) {
             // 300 indicates a multi selector
             if (err.response.status === 300) {
                 return {
                     playerUuids: Object.keys(err.response.data),
-                    playerUsernames: Object.values(err.response.data).map((entry) => entry.storedName),
+                    playerUsernames: Object.values(err.response.data).map(
+                        (entry) => entry.storedName,
+                    ),
                     playerRanks: [],
                     playerGuildRanks: [],
                     playerGuildNames: [],
@@ -52,7 +64,7 @@ async function updatePlayer(interaction, force = false) {
     }
 
     if (!playerJson || !playerJson.username) {
-        return ({ username: '' });
+        return { username: '' };
     }
 
     const veteran = playerJson.veteran ? playerJson.veteran : false;
@@ -72,23 +84,31 @@ async function updatePlayer(interaction, force = false) {
 
     if (playerJson.guild) {
         await utilities.waitForRateLimit();
-        const response = await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${playerJson.guild.uuid}?identifier=uuid`);
+        const response = await axios.get(
+            `https://api.wynncraft.com/v3/guild/uuid/${playerJson.guild.uuid}?identifier=uuid`,
+        );
 
-        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+        utilities.updateRateLimit(
+            response.headers['ratelimit-remaining'],
+            response.headers['ratelimit-reset'],
+        );
         const guildJson = response.data;
 
         if (!guildJson || !guildJson.name) {
-            return ({ username: playerJson.username, error: 'Failed to retrieve guild info' });
+            return {
+                username: playerJson.username,
+                error: 'Failed to retrieve guild info',
+            };
         }
 
         guildUuid = guildJson.uuid;
 
         for (const rank in guildJson.members) {
             if (rank === 'total') continue;
-    
+
             const rankMembers = guildJson.members[rank];
-    
-            for (const member in rankMembers) {               
+
+            for (const member in rankMembers) {
                 if (member === playerJson.uuid) {
                     guildRank = rank;
                     break;
@@ -115,7 +135,7 @@ async function updatePlayer(interaction, force = false) {
         highestCharcterLevel: highestCharcterLevel,
     });
 
-    return ({ username: playerJson.username });
+    return { username: playerJson.username };
 }
 
 module.exports = updatePlayer;

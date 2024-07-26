@@ -1,7 +1,4 @@
-const {
-    EmbedBuilder,
-    SlashCommandBuilder,
-} = require('discord.js');
+const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const createConfig = require('../../functions/create_config');
@@ -11,63 +8,84 @@ module.exports = {
         .setName('config_values')
         .setDescription('Update value configuration options')
         .addStringOption((option) =>
-            option.setName('option')
+            option
+                .setName('option')
                 .setDescription('The configuration option to update')
                 .setRequired(true)
-                .addChoices({
-                    name: 'Chief Inactive Upper Threshold',
-                    value: 'chiefUpperThreshold',
-                }, {
-                    name: 'Chief Inactive Lower Threshold',
-                    value: 'chiefLowerThreshold',
-                }, {
-                    name: 'Strategist Inactive Upper Threshold',
-                    value: 'strategistUpperThreshold',
-                }, {
-                    name: 'Strategist Inactive Lower Threshold',
-                    value: 'strategistLowerThreshold',
-                }, {
-                    name: 'Captain Inactive Upper Threshold',
-                    value: 'captainUpperThreshold',
-                }, {
-                    name: 'Captain Inactive Lower Threshold',
-                    value: 'captainLowerThreshold',
-                }, {
-                    name: 'Recruiter Inactive Upper Threshold',
-                    value: 'recruiterUpperThreshold',
-                }, {
-                    name: 'Recruiter Inactive Lower Threshold',
-                    value: 'recruiterLowerThreshold',
-                }, {
-                    name: 'Recruit Inactive Upper Threshold',
-                    value: 'recruitUpperThreshold',
-                }, {
-                    name: 'Recruit Inactive Lower Threshold',
-                    value: 'recruitLowerThreshold',
-                }, {
-                    name: 'Inactivity Full Level Requirement',
-                    value: 'levelRequirement',
-                }, {
-                    name: 'Extra Time % Increase',
-                    value: 'extraTimeIncrease',
-                }, {
-                    name: 'Average Online Requirement',
-                    value: 'averageRequirement',
-                }, {
-                    name: 'New Player Minimum Time',
-                    value: 'newPlayerMinimumTime',
-                }, {
-                    name: 'New Player Threshold',
-                    value: 'newPlayerThreshold',
-                }, {
-                    name: 'Member Slots % Threshold',
-                    value: 'memberThreshold',
-                }, {
-                    name: 'War Level Requirement',
-                    value: 'warLevelRequirement',
-                }))
+                .addChoices(
+                    {
+                        name: 'Chief Inactive Upper Threshold',
+                        value: 'chiefUpperThreshold',
+                    },
+                    {
+                        name: 'Chief Inactive Lower Threshold',
+                        value: 'chiefLowerThreshold',
+                    },
+                    {
+                        name: 'Strategist Inactive Upper Threshold',
+                        value: 'strategistUpperThreshold',
+                    },
+                    {
+                        name: 'Strategist Inactive Lower Threshold',
+                        value: 'strategistLowerThreshold',
+                    },
+                    {
+                        name: 'Captain Inactive Upper Threshold',
+                        value: 'captainUpperThreshold',
+                    },
+                    {
+                        name: 'Captain Inactive Lower Threshold',
+                        value: 'captainLowerThreshold',
+                    },
+                    {
+                        name: 'Recruiter Inactive Upper Threshold',
+                        value: 'recruiterUpperThreshold',
+                    },
+                    {
+                        name: 'Recruiter Inactive Lower Threshold',
+                        value: 'recruiterLowerThreshold',
+                    },
+                    {
+                        name: 'Recruit Inactive Upper Threshold',
+                        value: 'recruitUpperThreshold',
+                    },
+                    {
+                        name: 'Recruit Inactive Lower Threshold',
+                        value: 'recruitLowerThreshold',
+                    },
+                    {
+                        name: 'Inactivity Full Level Requirement',
+                        value: 'levelRequirement',
+                    },
+                    {
+                        name: 'Extra Time % Increase',
+                        value: 'extraTimeIncrease',
+                    },
+                    {
+                        name: 'Average Online Requirement',
+                        value: 'averageRequirement',
+                    },
+                    {
+                        name: 'New Player Minimum Time',
+                        value: 'newPlayerMinimumTime',
+                    },
+                    {
+                        name: 'New Player Threshold',
+                        value: 'newPlayerThreshold',
+                    },
+                    {
+                        name: 'Member Slots % Threshold',
+                        value: 'memberThreshold',
+                    },
+                    {
+                        name: 'War Level Requirement',
+                        value: 'warLevelRequirement',
+                    },
+                ),
+        )
         .addIntegerOption((option) =>
-            option.setName('value')
+            option
+                .setName('value')
                 .setDescription('The value to set for the configuration option')
                 .setRequired(true),
         ),
@@ -83,7 +101,13 @@ module.exports = {
         await interaction.editReply({ embeds: [loadingEmbed] });
 
         const guildId = interaction.guild.id;
-        const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
+        const filePath = path.join(
+            __dirname,
+            '..',
+            '..',
+            'configs',
+            `${guildId}.json`,
+        );
         let config = {};
 
         const responseEmbed = new EmbedBuilder();
@@ -104,18 +128,31 @@ module.exports = {
             const memberOfRole = config.memberOfRole;
 
             // If the member of role is used, it is required
-            if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
+            if (
+                memberOfRole &&
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(memberOfRole)
+            ) {
                 responseEmbed
-                    .setDescription('You do not have the required permissions to run this command.')
+                    .setDescription(
+                        'You do not have the required permissions to run this command.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
             }
 
             // Can only be ran by the owner or an admin
-            if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
+            if (
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(adminRoleId) &&
+                interaction.member.roles.highest.position <
+                    interaction.guild.roles.cache.get(adminRoleId).position
+            ) {
                 responseEmbed
-                    .setDescription('You do not have the required permissions to run this command.')
+                    .setDescription(
+                        'You do not have the required permissions to run this command.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -173,7 +210,11 @@ module.exports = {
                     break;
             }
 
-            fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
+            fs.writeFileSync(
+                filePath,
+                JSON.stringify(config, null, 2),
+                'utf-8',
+            );
 
             responseEmbed
                 .setDescription(`Option ${option} set to ${value}.`)

@@ -1,7 +1,4 @@
-const {
-    EmbedBuilder,
-    SlashCommandBuilder,
-} = require('discord.js');
+const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const createConfig = require('../../functions/create_config');
@@ -11,80 +8,109 @@ module.exports = {
         .setName('config_promotions')
         .setDescription('Update promotion options')
         .addStringOption((option) =>
-            option.setName('option')
+            option
+                .setName('option')
                 .setDescription('The promotion option to update')
                 .setRequired(true)
-                .addChoices({
-                    name: 'Set Chief Promotion Requirement',
-                    value: 'chiefPromotionRequirement',
-                }, {
-                    name: 'Chief Time Requirement',
-                    value: 'chiefTimeRequirement',
-                }, {
-                    name: 'Chief Requirements Count',
-                    value: 'chiefRequirementsCount',
-                }, {
-                    name: 'Set Strategist Promotion Requirement',
-                    value: 'strategistPromotionRequirement',
-                }, {
-                    name: 'Strategist Time Requirement',
-                    value: 'strategistTimeRequirement',
-                }, {
-                    name: 'Strategist Requirements Count',
-                    value: 'strategistRequirementsCount',
-                }, {
-                    name: 'Set Captain Promotion Requirement',
-                    value: 'captainPromotionRequirement',
-                }, {
-                    name: 'Captain Time Requirement',
-                    value: 'captainTimeRequirement',
-                }, {
-                    name: 'Captain Requirements Count',
-                    value: 'captainRequirementsCount',
-                }, {
-                    name: 'Set Recruiter Promotion Requirement',
-                    value: 'recruiterPromotionRequirement',
-                }, {
-                    name: 'Recruiter Time Requirement',
-                    value: 'recruiterTimeRequirement',
-                }, {
-                    name: 'Recruiter Requirements Count',
-                    value: 'recruiterRequirementsCount',
-                }))
+                .addChoices(
+                    {
+                        name: 'Set Chief Promotion Requirement',
+                        value: 'chiefPromotionRequirement',
+                    },
+                    {
+                        name: 'Chief Time Requirement',
+                        value: 'chiefTimeRequirement',
+                    },
+                    {
+                        name: 'Chief Requirements Count',
+                        value: 'chiefRequirementsCount',
+                    },
+                    {
+                        name: 'Set Strategist Promotion Requirement',
+                        value: 'strategistPromotionRequirement',
+                    },
+                    {
+                        name: 'Strategist Time Requirement',
+                        value: 'strategistTimeRequirement',
+                    },
+                    {
+                        name: 'Strategist Requirements Count',
+                        value: 'strategistRequirementsCount',
+                    },
+                    {
+                        name: 'Set Captain Promotion Requirement',
+                        value: 'captainPromotionRequirement',
+                    },
+                    {
+                        name: 'Captain Time Requirement',
+                        value: 'captainTimeRequirement',
+                    },
+                    {
+                        name: 'Captain Requirements Count',
+                        value: 'captainRequirementsCount',
+                    },
+                    {
+                        name: 'Set Recruiter Promotion Requirement',
+                        value: 'recruiterPromotionRequirement',
+                    },
+                    {
+                        name: 'Recruiter Time Requirement',
+                        value: 'recruiterTimeRequirement',
+                    },
+                    {
+                        name: 'Recruiter Requirements Count',
+                        value: 'recruiterRequirementsCount',
+                    },
+                ),
+        )
         .addStringOption((option) =>
-            option.setName('requirement')
-                .setDescription('Requirement type to edit for the rank promotion.')
-                .addChoices({
-                    name: 'None',
-                    value: 'NONE',
-                }, {
-                    name: 'Contribution XP Requirement',
-                    value: 'XP',
-                }, {
-                    name: 'Level Requirement',
-                    value: 'LEVEL',
-                }, {
-                    name: 'Top Contributor Requirement',
-                    value: 'TOP',
-                }, {
-                    name: 'Days in Guild Requirement',
-                    value: 'TIME',
-                }, {
-                    name: 'Guild Wars Requirement',
-                    value: 'WARS',
-                }, {
-                    name: 'War Build Requirement',
-                    value: 'BUILD',
-                }, {
-                    name: 'Weekly Playtime Requirement',
-                    value: 'PLAYTIME',
-                }, {
-                    name: 'Eco Requirement',
-                    value: 'ECO',
-                }),
+            option
+                .setName('requirement')
+                .setDescription(
+                    'Requirement type to edit for the rank promotion.',
+                )
+                .addChoices(
+                    {
+                        name: 'None',
+                        value: 'NONE',
+                    },
+                    {
+                        name: 'Contribution XP Requirement',
+                        value: 'XP',
+                    },
+                    {
+                        name: 'Level Requirement',
+                        value: 'LEVEL',
+                    },
+                    {
+                        name: 'Top Contributor Requirement',
+                        value: 'TOP',
+                    },
+                    {
+                        name: 'Days in Guild Requirement',
+                        value: 'TIME',
+                    },
+                    {
+                        name: 'Guild Wars Requirement',
+                        value: 'WARS',
+                    },
+                    {
+                        name: 'War Build Requirement',
+                        value: 'BUILD',
+                    },
+                    {
+                        name: 'Weekly Playtime Requirement',
+                        value: 'PLAYTIME',
+                    },
+                    {
+                        name: 'Eco Requirement',
+                        value: 'ECO',
+                    },
+                ),
         )
         .addIntegerOption((option) =>
-            option.setName('requirement_number')
+            option
+                .setName('requirement_number')
                 .setDescription('Value to set for this option.'),
         ),
     ephemeral: true,
@@ -98,7 +124,13 @@ module.exports = {
         await interaction.editReply({ embeds: [loadingEmbed] });
 
         const guildId = interaction.guild.id;
-        const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
+        const filePath = path.join(
+            __dirname,
+            '..',
+            '..',
+            'configs',
+            `${guildId}.json`,
+        );
         let config = {};
 
         const responseEmbed = new EmbedBuilder();
@@ -118,17 +150,30 @@ module.exports = {
             const memberRoles = interaction.member.roles.cache;
             const memberOfRole = config.memberOfRole;
 
-            if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
+            if (
+                memberOfRole &&
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(memberOfRole)
+            ) {
                 responseEmbed
-                    .setDescription('You do not have the required permissions to run this command.')
+                    .setDescription(
+                        'You do not have the required permissions to run this command.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
             }
 
-            if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
+            if (
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(adminRoleId) &&
+                interaction.member.roles.highest.position <
+                    interaction.guild.roles.cache.get(adminRoleId).position
+            ) {
                 responseEmbed
-                    .setDescription('You do not have the required permissions to run this command.')
+                    .setDescription(
+                        'You do not have the required permissions to run this command.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -144,23 +189,32 @@ module.exports = {
         }
 
         const requirementStr = interaction.options.getString('requirement');
-        const requirementNum = interaction.options.getInteger('requirement_number');
+        const requirementNum =
+            interaction.options.getInteger('requirement_number');
 
         // Time and count requirements need requirementNum so make sure it is present
-        if (option.endsWith('TimeRequirement') || (option.endsWith('RequirementsCount'))) {
+        if (
+            option.endsWith('TimeRequirement') ||
+            option.endsWith('RequirementsCount')
+        ) {
             if (!requirementNum) {
                 responseEmbed
                     .setTitle('Invalid option')
-                    .setDescription(`${option} requires a number input, set one using the 'requirement_number' option.`)
+                    .setDescription(
+                        `${option} requires a number input, set one using the 'requirement_number' option.`,
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
             }
-        } else { // The others use requirementStr so make sure that is present
+        } else {
+            // The others use requirementStr so make sure that is present
             if (!requirementStr) {
                 responseEmbed
                     .setTitle('Invalid option')
-                    .setDescription(`${option} requires a string input, set one using the 'requirement' option.`)
+                    .setDescription(
+                        `${option} requires a string input, set one using the 'requirement' option.`,
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -186,7 +240,10 @@ module.exports = {
                 case 'strategistPromotionRequirement':
                 case 'captainPromotionRequirement':
                 case 'recruiterPromotionRequirement':
-                    if (requirementStr === 'BUILD' || requirementStr === 'ECO') {
+                    if (
+                        requirementStr === 'BUILD' ||
+                        requirementStr === 'ECO'
+                    ) {
                         // As these are technically boolean requirements, just add a 1 and if the key doesn't exist, and if it does then remove it.
                         if (config[option][requirementStr]) {
                             message = `Successfully removed ${requirementStr} requirement for ${option}`;
@@ -209,11 +266,13 @@ module.exports = {
                     break;
             }
 
-            fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
+            fs.writeFileSync(
+                filePath,
+                JSON.stringify(config, null, 2),
+                'utf-8',
+            );
 
-            responseEmbed
-                    .setDescription(`${message}`)
-                    .setColor(0x00ffff);
+            responseEmbed.setDescription(`${message}`).setColor(0x00ffff);
         } catch (error) {
             console.error(`Error updating configuration option: ${error}`);
             responseEmbed

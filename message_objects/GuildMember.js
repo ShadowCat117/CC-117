@@ -12,7 +12,18 @@ class GuildMember {
     // joinDate: When did they join the guild
     // wars: How many wars have they participated in
     // averagePlaytime: How many hours per week does the player play
-    constructor(username, guildRank, lastJoin, contributed, contributionRank, online, server, joinDate, wars, averagePlaytime) {
+    constructor(
+        username,
+        guildRank,
+        lastJoin,
+        contributed,
+        contributionRank,
+        online,
+        server,
+        joinDate,
+        wars,
+        averagePlaytime,
+    ) {
         // Temporary, remove if Wynn ever fixes the name changing guild bug
         if (username === 'Owen_Rocks_3') {
             this.username = 'Amber\\_Rocks\\_3';

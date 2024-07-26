@@ -1,7 +1,4 @@
-const {
-    EmbedBuilder,
-    SlashCommandBuilder,
-} = require('discord.js');
+const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const createConfig = require('../../functions/create_config');
@@ -11,34 +8,47 @@ module.exports = {
         .setName('config_messages')
         .setDescription('Update message configuration options')
         .addStringOption((option) =>
-            option.setName('option')
+            option
+                .setName('option')
                 .setDescription('The configuration option to update')
                 .setRequired(true)
-                .addChoices({
-                    name: 'Join Message',
-                    value: 'joinMessage',
-                }, {
-                    name: 'Leave Message',
-                    value: 'leaveMessage',
-                }, {
-                    name: 'War Message',
-                    value: 'warMessage',
-                }, {
-                    name: 'War Class Message',
-                    value: 'warClassMessage',
-                }, {
-                    name: 'Class Message',
-                    value: 'classMessage',
-                }, {
-                    name: 'Class Archetype Message',
-                    value: 'classArchetypeMessage',
-                }, {
-                    name: 'Guild Events Message',
-                    value: 'guildEventsMessage',
-                }))
+                .addChoices(
+                    {
+                        name: 'Join Message',
+                        value: 'joinMessage',
+                    },
+                    {
+                        name: 'Leave Message',
+                        value: 'leaveMessage',
+                    },
+                    {
+                        name: 'War Message',
+                        value: 'warMessage',
+                    },
+                    {
+                        name: 'War Class Message',
+                        value: 'warClassMessage',
+                    },
+                    {
+                        name: 'Class Message',
+                        value: 'classMessage',
+                    },
+                    {
+                        name: 'Class Archetype Message',
+                        value: 'classArchetypeMessage',
+                    },
+                    {
+                        name: 'Guild Events Message',
+                        value: 'guildEventsMessage',
+                    },
+                ),
+        )
         .addStringOption((option) =>
-            option.setName('message')
-                .setDescription('The message to set for the configuration option')
+            option
+                .setName('message')
+                .setDescription(
+                    'The message to set for the configuration option',
+                )
                 .setRequired(true),
         ),
     ephemeral: true,
@@ -53,7 +63,13 @@ module.exports = {
         await interaction.editReply({ embeds: [loadingEmbed] });
 
         const guildId = interaction.guild.id;
-        const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
+        const filePath = path.join(
+            __dirname,
+            '..',
+            '..',
+            'configs',
+            `${guildId}.json`,
+        );
         let config = {};
 
         const responseEmbed = new EmbedBuilder();
@@ -73,17 +89,30 @@ module.exports = {
             const memberRoles = interaction.member.roles.cache;
             const memberOfRole = config.memberOfRole;
 
-            if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
+            if (
+                memberOfRole &&
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(memberOfRole)
+            ) {
                 responseEmbed
-                    .setDescription('You do not have the required permissions to run this command.')
+                    .setDescription(
+                        'You do not have the required permissions to run this command.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
             }
 
-            if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
+            if (
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(adminRoleId) &&
+                interaction.member.roles.highest.position <
+                    interaction.guild.roles.cache.get(adminRoleId).position
+            ) {
                 responseEmbed
-                    .setDescription('You do not have the required permissions to run this command.')
+                    .setDescription(
+                        'You do not have the required permissions to run this command.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -102,7 +131,9 @@ module.exports = {
         if (message.length > 1000) {
             responseEmbed
                 .setTitle('Message exceeds length')
-                .setDescription(`Messages cannot exceed 1,000 characters, yours is ${message.length}.`)
+                .setDescription(
+                    `Messages cannot exceed 1,000 characters, yours is ${message.length}.`,
+                )
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
@@ -121,10 +152,16 @@ module.exports = {
                     break;
             }
 
-            fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
+            fs.writeFileSync(
+                filePath,
+                JSON.stringify(config, null, 2),
+                'utf-8',
+            );
 
             responseEmbed
-                .setDescription(`Configuration option ${option} updated successfully.`)
+                .setDescription(
+                    `Configuration option ${option} updated successfully.`,
+                )
                 .setColor(0x00ffff);
         } catch (error) {
             console.error(`Error updating configuration option: ${error}`);

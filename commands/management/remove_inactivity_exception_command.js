@@ -14,13 +14,19 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('removeinactivityexception')
         .setDescription('Removes a player from the inactivity exceptions list.')
-        .addStringOption(option =>
-            option.setName('username')
-                .setDescription('The name of the player you want to be exemept from inactivity checks.')
-                .setRequired(true)),
+        .addStringOption((option) =>
+            option
+                .setName('username')
+                .setDescription(
+                    'The name of the player you want to be exemept from inactivity checks.',
+                )
+                .setRequired(true),
+        ),
     ephemeral: true,
     async execute(interaction) {
-        const username = interaction.options.getString('username').replaceAll('_', '\\_');
+        const username = interaction.options
+            .getString('username')
+            .replaceAll('_', '\\_');
 
         const loadingEmbed = new EmbedBuilder()
             .setDescription(`Removing ${username} from inactivity exceptions.`)
@@ -29,7 +35,13 @@ module.exports = {
         await interaction.editReply({ embeds: [loadingEmbed] });
 
         const guildId = interaction.guild.id;
-        const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
+        const filePath = path.join(
+            __dirname,
+            '..',
+            '..',
+            'configs',
+            `${guildId}.json`,
+        );
 
         const errorEmbed = new EmbedBuilder();
 
@@ -50,10 +62,17 @@ module.exports = {
             const memberRoles = interaction.member.roles.cache;
             const guildUuid = config.guild;
 
-            if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
+            if (
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(adminRoleId) &&
+                interaction.member.roles.highest.position <
+                    interaction.guild.roles.cache.get(adminRoleId).position
+            ) {
                 errorEmbed
                     .setTitle('Error')
-                    .setDescription('You do not have the required permissions to run this command.')
+                    .setDescription(
+                        'You do not have the required permissions to run this command.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [errorEmbed] });
                 return;
@@ -68,48 +87,55 @@ module.exports = {
                 await interaction.editReply({ embeds: [errorEmbed] });
                 return;
             }
-        
+
             const response = await removeInactivityException(interaction);
 
             const responseEmbed = new EmbedBuilder();
 
-            if (response.playerUuids !== undefined) { // Multiselector
+            if (response.playerUuids !== undefined) {
+                // Multiselector
                 responseEmbed
                     .setTitle('Multiple players found')
-                    .setDescription(`More than 1 player has the identifier ${username}. Pick the intended player from the following.`)
+                    .setDescription(
+                        `More than 1 player has the identifier ${username}. Pick the intended player from the following.`,
+                    )
                     .setColor(0x999999);
 
-                    const row = new ActionRowBuilder();
+                const row = new ActionRowBuilder();
 
-                    for (let i = 0; i < response.playerUuids.length; i++) {
-                        let responseValue = '';
-        
-                        const uuid = response.playerUuids[i];
-                        const playerUsername = response.playerUsernames[i].replaceAll('_', '\\_');
-                        const rank = response.playerRanks[i];
-                        const guildRank = response.playerGuildRanks[i];
-                        const playerGuildName = response.playerGuildNames[i];
-            
-                        if (!rank && !playerGuildName) {
-                            responseValue += `${i + 1}. ${playerUsername}.`;
-                        } else if (!rank) {
-                            responseValue += `${i + 1}. ${playerUsername}, ${guildRank} of ${playerGuildName}.`;
-                        } else if (!playerGuildName) {
-                            responseValue += `${i + 1}. ${playerUsername}, ${rank}.`;
-                        } else {
-                            responseValue += `${i + 1}. ${playerUsername}, ${rank} and ${guildRank} of ${playerGuildName}.`;
-                        }
-        
-                        responseEmbed
-                            .addFields({ name: `Option ${i + 1}`, value: `${responseValue} [View Profile](https://wynncraft.com/stats/player/${uuid})` });
-        
-                        const button = new ButtonBuilder()
-                            .setCustomId(`remove_inactivity_exception:${uuid}`)
-                            .setStyle(ButtonStyle.Primary)
-                            .setLabel((i + 1).toString());
-        
-                        row.addComponents(button);
+                for (let i = 0; i < response.playerUuids.length; i++) {
+                    let responseValue = '';
+
+                    const uuid = response.playerUuids[i];
+                    const playerUsername = response.playerUsernames[
+                        i
+                    ].replaceAll('_', '\\_');
+                    const rank = response.playerRanks[i];
+                    const guildRank = response.playerGuildRanks[i];
+                    const playerGuildName = response.playerGuildNames[i];
+
+                    if (!rank && !playerGuildName) {
+                        responseValue += `${i + 1}. ${playerUsername}.`;
+                    } else if (!rank) {
+                        responseValue += `${i + 1}. ${playerUsername}, ${guildRank} of ${playerGuildName}.`;
+                    } else if (!playerGuildName) {
+                        responseValue += `${i + 1}. ${playerUsername}, ${rank}.`;
+                    } else {
+                        responseValue += `${i + 1}. ${playerUsername}, ${rank} and ${guildRank} of ${playerGuildName}.`;
                     }
+
+                    responseEmbed.addFields({
+                        name: `Option ${i + 1}`,
+                        value: `${responseValue} [View Profile](https://wynncraft.com/stats/player/${uuid})`,
+                    });
+
+                    const button = new ButtonBuilder()
+                        .setCustomId(`remove_inactivity_exception:${uuid}`)
+                        .setStyle(ButtonStyle.Primary)
+                        .setLabel((i + 1).toString());
+
+                    row.addComponents(button);
+                }
 
                 await interaction.editReply({
                     components: [row],
@@ -117,23 +143,32 @@ module.exports = {
                 });
 
                 return;
-            } else if (response.error) { // Error whilst removing inactivity exception
+            } else if (response.error) {
+                // Error whilst removing inactivity exception
                 errorEmbed
                     .setTitle('Error')
-                    .setDescription(`Unable to remove inactivity exception: ${response.error}`)
+                    .setDescription(
+                        `Unable to remove inactivity exception: ${response.error}`,
+                    )
                     .setColor(0xff0000);
 
                 await interaction.editReply({ embeds: [errorEmbed] });
                 return;
             } else {
-                if (response.username === '') { // Unknown player
+                if (response.username === '') {
+                    // Unknown player
                     responseEmbed
                         .setTitle('Invalid username')
-                        .setDescription(`Unable to find a player using the name '${username}', try again using the exact player name.`)
+                        .setDescription(
+                            `Unable to find a player using the name '${username}', try again using the exact player name.`,
+                        )
                         .setColor(0xff0000);
-                } else { // Valid player
+                } else {
+                    // Valid player
                     responseEmbed
-                        .setTitle(`${response.username} is no longer exempt from inactivity.`)
+                        .setTitle(
+                            `${response.username} is no longer exempt from inactivity.`,
+                        )
                         .setColor(0x00ffff);
                 }
             }
@@ -142,9 +177,9 @@ module.exports = {
         } catch (error) {
             console.error(error);
             errorEmbed
-                    .setTitle('Error')
-                    .setDescription('Unable to remove inactivity exception.')
-                    .setColor(0xff0000);
+                .setTitle('Error')
+                .setDescription('Unable to remove inactivity exception.')
+                .setColor(0xff0000);
             await interaction.editReply({ embeds: [errorEmbed] });
             return;
         }

@@ -6,7 +6,14 @@ class TrackedGuild {
     // averageCaptains: Average number of captains+ online
     // currentOnline: Current number of online players
     // currentCaptains: Current number of captains+ online
-    constructor(name, prefix, averageOnline, averageCaptains, currentOnline, currentCaptains) {
+    constructor(
+        name,
+        prefix,
+        averageOnline,
+        averageCaptains,
+        currentOnline,
+        currentCaptains,
+    ) {
         this.name = name;
         this.prefix = prefix;
         this.averageOnline = averageOnline.toFixed(2);
@@ -20,22 +27,42 @@ class TrackedGuild {
     compareTo(other) {
         if (parseFloat(this.averageOnline) > parseFloat(other.averageOnline)) {
             return -1;
-        } else if (parseFloat(this.averageOnline) < parseFloat(other.averageOnline)) {
+        } else if (
+            parseFloat(this.averageOnline) < parseFloat(other.averageOnline)
+        ) {
             return 1;
         } else {
-            if (parseFloat(this.averageCaptains) > parseFloat(other.averageCaptains)) {
+            if (
+                parseFloat(this.averageCaptains) >
+                parseFloat(other.averageCaptains)
+            ) {
                 return -1;
-            } else if (parseFloat(this.averageCaptains) < parseFloat(other.averageCaptains)) {
+            } else if (
+                parseFloat(this.averageCaptains) <
+                parseFloat(other.averageCaptains)
+            ) {
                 return 1;
             } else {
-                if (parseFloat(this.currentOnline) > parseFloat(other.currentOnline)) {
+                if (
+                    parseFloat(this.currentOnline) >
+                    parseFloat(other.currentOnline)
+                ) {
                     return -1;
-                } else if (parseFloat(this.currentOnline) < parseFloat(other.currentOnline)) {
+                } else if (
+                    parseFloat(this.currentOnline) <
+                    parseFloat(other.currentOnline)
+                ) {
                     return 1;
                 } else {
-                    if (parseFloat(this.currentCaptains) > parseFloat(other.currentCaptains)) {
+                    if (
+                        parseFloat(this.currentCaptains) >
+                        parseFloat(other.currentCaptains)
+                    ) {
                         return -1;
-                    } else if (parseFloat(this.currentCaptains) < parseFloat(other.currentCaptains)) {
+                    } else if (
+                        parseFloat(this.currentCaptains) <
+                        parseFloat(other.currentCaptains)
+                    ) {
                         return 1;
                     } else {
                         return 0;

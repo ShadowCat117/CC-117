@@ -13,7 +13,9 @@ const warRoles = ['war', 'tank', 'healer', 'damage', 'solo', 'warPing', 'eco'];
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('createwarmessage')
-        .setDescription('Sends a war message with buttons to get war-related roles.'),
+        .setDescription(
+            'Sends a war message with buttons to get war-related roles.',
+        ),
     ephemeral: true,
     async execute(interaction) {
         const loadingEmbed = new EmbedBuilder()
@@ -23,7 +25,13 @@ module.exports = {
         await interaction.editReply({ embeds: [loadingEmbed] });
 
         const guildId = interaction.guild.id;
-        const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
+        const filePath = path.join(
+            __dirname,
+            '..',
+            '..',
+            'configs',
+            `${guildId}.json`,
+        );
 
         let config = {};
 
@@ -38,7 +46,9 @@ module.exports = {
 
                 responseEmbed
                     .setTitle('Error')
-                    .setDescription('Failed to read config or you have not setup the war message configs. Do so with /config_messages and /config_warroles.')
+                    .setDescription(
+                        'Failed to read config or you have not setup the war message configs. Do so with /config_messages and /config_warroles.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -56,10 +66,17 @@ module.exports = {
         const adminRoleId = config.adminRole;
         const memberRoles = interaction.member.roles.cache;
 
-        if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
+        if (
+            interaction.member.id !== interaction.member.guild.ownerId &&
+            !memberRoles.has(adminRoleId) &&
+            interaction.member.roles.highest.position <
+                interaction.guild.roles.cache.get(adminRoleId).position
+        ) {
             responseEmbed
                 .setTitle('Error')
-                .setDescription('You do not have the required permissions to run this command.')
+                .setDescription(
+                    'You do not have the required permissions to run this command.',
+                )
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
@@ -70,21 +87,27 @@ module.exports = {
         if (!warMessage) {
             responseEmbed
                 .setTitle('Error')
-                .setDescription('You have not set a war message with /config_messages warMessage.')
+                .setDescription(
+                    'You have not set a war message with /config_messages warMessage.',
+                )
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
         } else if (!config['warClassMessage']) {
             responseEmbed
                 .setTitle('Error')
-                .setDescription('You have not set a war class message with /config_messages warClassMessage.')
+                .setDescription(
+                    'You have not set a war class message with /config_messages warClassMessage.',
+                )
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
         } else if (!config['warLevelRequirement']) {
             responseEmbed
                 .setTitle('Error')
-                .setDescription('You have not set a war level requirement with /config_values warLevelRequirement.')
+                .setDescription(
+                    'You have not set a war level requirement with /config_values warLevelRequirement.',
+                )
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
@@ -94,7 +117,9 @@ module.exports = {
             if (!config[`${warRole}Role`]) {
                 responseEmbed
                     .setTitle('Error')
-                    .setDescription(`You have not set a role for ${warRole} using /config_warroles.`)
+                    .setDescription(
+                        `You have not set a role for ${warRole} using /config_warroles.`,
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -107,7 +132,9 @@ module.exports = {
             .setLabel('WAR');
 
         const row = new ActionRowBuilder().addComponents(warButton);
-        const channel = interaction.guild.channels.cache.get(interaction.channelId);
+        const channel = interaction.guild.channels.cache.get(
+            interaction.channelId,
+        );
         const formattedMessage = warMessage.replace(/\\n/g, '\n');
 
         if (channel) {
@@ -121,10 +148,14 @@ module.exports = {
                     .setDescription('War message created successfully.')
                     .setColor(0x00ffff);
             } catch (error) {
-                console.error(`Failed to send war message to channel ${interaction.channelId} in guild ${interaction.guild.id}.`);
+                console.error(
+                    `Failed to send war message to channel ${interaction.channelId} in guild ${interaction.guild.id}.`,
+                );
                 responseEmbed
                     .setTitle('Error')
-                    .setDescription('Failed to send message in current channel.')
+                    .setDescription(
+                        'Failed to send message in current channel.',
+                    )
                     .setColor(0xff0000);
             }
         } else {

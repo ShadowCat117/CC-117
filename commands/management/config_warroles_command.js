@@ -1,45 +1,61 @@
-const {
-    EmbedBuilder,
-    SlashCommandBuilder,
-} = require('discord.js');
+const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const createConfig = require('../../functions/create_config');
 
-const warRoles = ['warRole', 'tankRole', 'healerRole', 'damageRole', 'soloRole', 'ecoRole', 'warPingRole'];
+const warRoles = [
+    'warRole',
+    'tankRole',
+    'healerRole',
+    'damageRole',
+    'soloRole',
+    'ecoRole',
+    'warPingRole',
+];
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('config_warroles')
         .setDescription('Update war role configurations')
         .addStringOption((option) =>
-            option.setName('option')
+            option
+                .setName('option')
                 .setDescription('The role option to update')
                 .setRequired(true)
-                .addChoices({
-                    name: 'War Role',
-                    value: 'warRole',
-                }, {
-                    name: 'Tank Role',
-                    value: 'tankRole',
-                }, {
-                    name: 'Healer Role',
-                    value: 'healerRole',
-                }, {
-                    name: 'Damage Role',
-                    value: 'damageRole',
-                }, {
-                    name: 'Solo Role',
-                    value: 'soloRole',
-                }, {
-                    name: 'Eco Role',
-                    value: 'ecoRole',
-                }, {
-                    name: 'War Ping Role',
-                    value: 'warPingRole',
-                }))
+                .addChoices(
+                    {
+                        name: 'War Role',
+                        value: 'warRole',
+                    },
+                    {
+                        name: 'Tank Role',
+                        value: 'tankRole',
+                    },
+                    {
+                        name: 'Healer Role',
+                        value: 'healerRole',
+                    },
+                    {
+                        name: 'Damage Role',
+                        value: 'damageRole',
+                    },
+                    {
+                        name: 'Solo Role',
+                        value: 'soloRole',
+                    },
+                    {
+                        name: 'Eco Role',
+                        value: 'ecoRole',
+                    },
+                    {
+                        name: 'War Ping Role',
+                        value: 'warPingRole',
+                    },
+                ),
+        )
         .addRoleOption((option) =>
-            option.setName('role')
+            option
+                .setName('role')
                 .setDescription('The role to set for the configuration option')
                 .setRequired(true),
         ),
@@ -55,7 +71,13 @@ module.exports = {
         await interaction.editReply({ embeds: [loadingEmbed] });
 
         const guildId = interaction.guild.id;
-        const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
+        const filePath = path.join(
+            __dirname,
+            '..',
+            '..',
+            'configs',
+            `${guildId}.json`,
+        );
         let config = {};
 
         const responseEmbed = new EmbedBuilder();
@@ -75,17 +97,30 @@ module.exports = {
             const memberRoles = interaction.member.roles.cache;
             const memberOfRole = config.memberOfRole;
 
-            if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
+            if (
+                memberOfRole &&
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(memberOfRole)
+            ) {
                 responseEmbed
-                    .setDescription('You do not have the required permissions to run this command.')
+                    .setDescription(
+                        'You do not have the required permissions to run this command.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
             }
 
-            if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
+            if (
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(adminRoleId) &&
+                interaction.member.roles.highest.position <
+                    interaction.guild.roles.cache.get(adminRoleId).position
+            ) {
                 responseEmbed
-                    .setDescription('You do not have the required permissions to run this command.')
+                    .setDescription(
+                        'You do not have the required permissions to run this command.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -102,12 +137,16 @@ module.exports = {
 
         try {
             for (const roleName of warRoles) {
-                const roleToCheck = interaction.guild.roles.cache.get(config[`${roleName}`]);
+                const roleToCheck = interaction.guild.roles.cache.get(
+                    config[`${roleName}`],
+                );
 
                 if (roleToCheck === role && roleName !== option) {
                     responseEmbed
                         .setTitle(`Invalid role for ${option}`)
-                        .setDescription(`${roleName} has already been set to ${role}.`)
+                        .setDescription(
+                            `${roleName} has already been set to ${role}.`,
+                        )
                         .setColor(0xff0000);
                     await interaction.editReply({ embeds: [responseEmbed] });
                     return;
@@ -115,7 +154,11 @@ module.exports = {
             }
 
             const guild = interaction.guild;
-            const botRole = guild.roles.cache.find(roleSearch => roleSearch.managed && roleSearch.members.has(interaction.client.user.id));
+            const botRole = guild.roles.cache.find(
+                (roleSearch) =>
+                    roleSearch.managed &&
+                    roleSearch.members.has(interaction.client.user.id),
+            );
 
             let message;
 
@@ -142,11 +185,13 @@ module.exports = {
                     break;
             }
 
-            fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
+            fs.writeFileSync(
+                filePath,
+                JSON.stringify(config, null, 2),
+                'utf-8',
+            );
 
-            responseEmbed
-                .setDescription(`${message}`)
-                .setColor(0x00ffff);
+            responseEmbed.setDescription(`${message}`).setColor(0x00ffff);
         } catch (error) {
             console.error(`Error updating configuration option: ${error}`);
             responseEmbed

@@ -1,7 +1,4 @@
-const {
-    EmbedBuilder,
-    SlashCommandBuilder,
-} = require('discord.js');
+const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -17,7 +14,9 @@ module.exports = {
 
         const responseEmbed = new EmbedBuilder()
             .setTitle('CC-117 Help')
-            .setDescription('Manual has not been updated for the new version, just message <@237296939245240330> if you need help until it\'s done.')
+            .setDescription(
+                "Manual has not been updated for the new version, just message <@237296939245240330> if you need help until it's done.",
+            )
             .setColor(0x00ffff);
 
         await interaction.editReply({ embeds: [responseEmbed] });

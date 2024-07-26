@@ -1,13 +1,12 @@
-const {
-    SlashCommandBuilder,
-    EmbedBuilder,
-} = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const applyRoles = require('../../functions/apply_roles');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('unverify')
-        .setDescription('Removes all roles associated with your verified username and resets your nickname.'),
+        .setDescription(
+            'Removes all roles associated with your verified username and resets your nickname.',
+        ),
     ephemeral: true,
     async execute(interaction) {
         const loadingEmbed = new EmbedBuilder()
@@ -15,15 +14,17 @@ module.exports = {
             .setColor(0x00ff00);
 
         await interaction.editReply({ embeds: [loadingEmbed] });
-        
+
         // Call applyRoles with null to remove all roles and have nickname reset
-        const response = await applyRoles(interaction.guild, interaction.member, null);
+        const response = await applyRoles(
+            interaction.guild,
+            interaction.member,
+            null,
+        );
 
         const responseEmbed = new EmbedBuilder();
 
-        responseEmbed
-            .setTitle('You have been unverified')
-            .setColor(0x00ffff);
+        responseEmbed.setTitle('You have been unverified').setColor(0x00ffff);
 
         let appliedChanges = 'Applied changes: \n';
 
@@ -42,4 +43,3 @@ module.exports = {
         await interaction.editReply({ embeds: [responseEmbed] });
     },
 };
-

@@ -1,6 +1,4 @@
-const {
-    Events,
-} = require('discord.js');
+const { Events } = require('discord.js');
 const utilities = require('../functions/utilities');
 
 module.exports = {
@@ -11,10 +9,18 @@ module.exports = {
         if (oldMember.nickname === newMember.nickname) return;
         if (oldMember.id === oldMember.guild.ownerId) return;
 
-        const validChange = await utilities.checkValidUsername(newMember, newMember.guild, newMember.nickname);
+        const validChange = await utilities.checkValidUsername(
+            newMember,
+            newMember.guild,
+            newMember.nickname,
+        );
 
         if (!validChange) {
-            const oldNicknameValid = await utilities.checkValidUsername(newMember, newMember.guild, oldMember.nickname);
+            const oldNicknameValid = await utilities.checkValidUsername(
+                newMember,
+                newMember.guild,
+                oldMember.nickname,
+            );
 
             try {
                 if (oldNicknameValid) {
@@ -23,7 +29,9 @@ module.exports = {
                     newMember.setNickname(null);
                 }
             } catch (ex) {
-                console.error(`Failed to change nickname for ${newMember.user.username}`);
+                console.error(
+                    `Failed to change nickname for ${newMember.user.username}`,
+                );
             }
         }
     },

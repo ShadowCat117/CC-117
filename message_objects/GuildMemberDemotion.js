@@ -13,7 +13,21 @@ class GuildMemberDemotion {
     // promotionRequirements: The promotion requirements for each rank.
     // timeRequirements: How long you have to be in the guild to be eligible for this rank.
     // requirementsCount: How many requirements must be met to get this promotion
-    constructor(username, guildRank, contributedGuildXP, highestClassLevel, contributionPos, daysInGuild, wars, hasBuildRole, playtime, hasEcoRole, promotionRequirements, timeRequirements, requirementsCount) {
+    constructor(
+        username,
+        guildRank,
+        contributedGuildXP,
+        highestClassLevel,
+        contributionPos,
+        daysInGuild,
+        wars,
+        hasBuildRole,
+        playtime,
+        hasEcoRole,
+        promotionRequirements,
+        timeRequirements,
+        requirementsCount,
+    ) {
         this.username = username.replaceAll('_', '\\_');
         this.guildRank = guildRank;
         this.contributedGuildXP = contributedGuildXP;
@@ -25,14 +39,22 @@ class GuildMemberDemotion {
         this.playtime = playtime;
         this.hasEcoRole = hasEcoRole;
 
-        this.checkForDemotion(promotionRequirements, timeRequirements, requirementsCount);
+        this.checkForDemotion(
+            promotionRequirements,
+            timeRequirements,
+            requirementsCount,
+        );
     }
 
     // Check each rank to see if the member still qualifies for this rank
     // promotionRequirements: The promotion requirements for each rank. Eg. NONE, TOP or XP
     // timeRequirements: How long you have to be in the guild to be eligible for this rank.
     // requirementsCount: How many requirements must be met to get this promotion
-    checkForDemotion(promotionRequirements, timeRequirements, requirementsCount) {
+    checkForDemotion(
+        promotionRequirements,
+        timeRequirements,
+        requirementsCount,
+    ) {
         // Loop through all requirements for a rank to see if they qualify
         for (let i = 0; i < promotionRequirements.length; i++) {
             // If the current rank being checked has no requirement and they are that rank, then don't bother checking for demotion
@@ -55,25 +77,54 @@ class GuildMemberDemotion {
                 case 0:
                     // If they are a chief, check if they should be a strategist
                     if (this.guildRank === 'chief') {
-                        this.shouldBeDemoted('strategist', promotionRequirements[i], timeRequirements[i], requirementsCount[i]);
+                        this.shouldBeDemoted(
+                            'strategist',
+                            promotionRequirements[i],
+                            timeRequirements[i],
+                            requirementsCount[i],
+                        );
                     }
                     break;
                 case 1:
                     // If they are a strategist or have been demoted from chief, check if they should be a captain
-                    if (this.guildRank === 'strategist' || this.rankToDemote === 'Strategist') {
-                        this.shouldBeDemoted('captain', promotionRequirements[i], timeRequirements[i], requirementsCount[i]);
+                    if (
+                        this.guildRank === 'strategist' ||
+                        this.rankToDemote === 'Strategist'
+                    ) {
+                        this.shouldBeDemoted(
+                            'captain',
+                            promotionRequirements[i],
+                            timeRequirements[i],
+                            requirementsCount[i],
+                        );
                     }
                     break;
                 case 2:
                     // If they are a captain or have been demoted from strategist, check if they should be a recruiter
-                    if (this.guildRank === 'captain' || this.rankToDemote === 'Captain') {
-                        this.shouldBeDemoted('recruiter', promotionRequirements[i], timeRequirements[i], requirementsCount[i]);
+                    if (
+                        this.guildRank === 'captain' ||
+                        this.rankToDemote === 'Captain'
+                    ) {
+                        this.shouldBeDemoted(
+                            'recruiter',
+                            promotionRequirements[i],
+                            timeRequirements[i],
+                            requirementsCount[i],
+                        );
                     }
                     break;
                 case 3:
                     // If they are a recruiter or have been demoted from captain, check if they should be a recruit
-                    if (this.guildRank === 'recruiter' || this.rankToDemote === 'Recruiter') {
-                        this.shouldBeDemoted('recruit', promotionRequirements[i], timeRequirements[i], requirementsCount[i]);
+                    if (
+                        this.guildRank === 'recruiter' ||
+                        this.rankToDemote === 'Recruiter'
+                    ) {
+                        this.shouldBeDemoted(
+                            'recruit',
+                            promotionRequirements[i],
+                            timeRequirements[i],
+                            requirementsCount[i],
+                        );
                     }
                     break;
                 default:
@@ -87,7 +138,12 @@ class GuildMemberDemotion {
     // requirementsCount: How many requirements they must meet to be demoted
     // demotionRequirements: The requirements to be that rank
     // rankRequirements: The values for each requirement
-    shouldBeDemoted(rankToDemote, promotionRequirements, timeRequirement, requirementsCount) {
+    shouldBeDemoted(
+        rankToDemote,
+        promotionRequirements,
+        timeRequirement,
+        requirementsCount,
+    ) {
         let demote = false;
         const reasons = [];
         let metRequirements = 0;
@@ -96,7 +152,8 @@ class GuildMemberDemotion {
             reasons.push(`Has not been in guild for ${timeRequirement} days.`);
             this.demote = true;
             this.reasons = reasons;
-            this.rankToDemote = rankToDemote.charAt(0).toUpperCase() + rankToDemote.slice(1);
+            this.rankToDemote =
+                rankToDemote.charAt(0).toUpperCase() + rankToDemote.slice(1);
             return;
         }
 
@@ -106,7 +163,9 @@ class GuildMemberDemotion {
             if (this.contributedGuildXP >= promotionRequirements['XP']) {
                 metRequirements++;
             } else {
-                reasons.push(`Has not contributed ${promotionRequirements['XP'].toLocaleString()} XP`);
+                reasons.push(
+                    `Has not contributed ${promotionRequirements['XP'].toLocaleString()} XP`,
+                );
             }
         }
 
@@ -116,7 +175,9 @@ class GuildMemberDemotion {
             if (this.highestClassLevel >= promotionRequirements['LEVEL']) {
                 metRequirements++;
             } else {
-                reasons.push(`Does not have a character at or above level ${promotionRequirements['LEVEL']}.`);
+                reasons.push(
+                    `Does not have a character at or above level ${promotionRequirements['LEVEL']}.`,
+                );
             }
         }
 
@@ -126,7 +187,9 @@ class GuildMemberDemotion {
             if (this.contributionPos <= promotionRequirements['TOP']) {
                 metRequirements++;
             } else {
-                reasons.push(`Is not in the top ${promotionRequirements['TOP']} contributors.`);
+                reasons.push(
+                    `Is not in the top ${promotionRequirements['TOP']} contributors.`,
+                );
             }
         }
 
@@ -135,7 +198,9 @@ class GuildMemberDemotion {
             if (this.daysInGuild >= promotionRequirements['TIME']) {
                 metRequirements++;
             } else {
-                reasons.push(`Has not been in the guild for ${promotionRequirements['TIME']} day${promotionRequirements['TIME'] != 1 ? 's' : ''}.`);
+                reasons.push(
+                    `Has not been in the guild for ${promotionRequirements['TIME']} day${promotionRequirements['TIME'] != 1 ? 's' : ''}.`,
+                );
             }
         }
 
@@ -144,7 +209,9 @@ class GuildMemberDemotion {
             if (this.wars >= promotionRequirements['WARS']) {
                 metRequirements++;
             } else {
-                reasons.push(`Has not participated in ${promotionRequirements['WARS']} wars.`);
+                reasons.push(
+                    `Has not participated in ${promotionRequirements['WARS']} wars.`,
+                );
             }
         }
 
@@ -162,7 +229,9 @@ class GuildMemberDemotion {
             if (this.playtime >= promotionRequirements['PLAYTIME']) {
                 metRequirements++;
             } else {
-                reasons.push(`Does not have an average weekly playtime of ${promotionRequirements['PLAYTIME']} hour${promotionRequirements['PLAYTIME'] != 1 ? 's' : ''}.`);
+                reasons.push(
+                    `Does not have an average weekly playtime of ${promotionRequirements['PLAYTIME']} hour${promotionRequirements['PLAYTIME'] != 1 ? 's' : ''}.`,
+                );
             }
         }
 
@@ -185,7 +254,8 @@ class GuildMemberDemotion {
             this.reasons = reasons;
             this.metRequirements = metRequirements;
             this.requirementsCount = requirementsCount;
-            this.rankToDemote = rankToDemote.charAt(0).toUpperCase() + rankToDemote.slice(1);
+            this.rankToDemote =
+                rankToDemote.charAt(0).toUpperCase() + rankToDemote.slice(1);
         }
     }
 }

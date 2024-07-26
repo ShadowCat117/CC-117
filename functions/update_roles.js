@@ -14,7 +14,7 @@ async function updateRoles(guild) {
         const username = serverMember.user.username;
         const globalName = serverMember.user.username;
         let nickname = undefined;
-    
+
         // If they have a nickname, remove the guild tag suffix
         if (serverMember.nickname) {
             nickname = serverMember.nickname.split(' [')[0];
@@ -32,10 +32,24 @@ async function updateRoles(guild) {
 
                     playerInfo.splice(i, 1);
 
-                    const response = await applyRoles(guild, serverMember, player);
+                    const response = await applyRoles(
+                        guild,
+                        serverMember,
+                        player,
+                    );
 
-                    if (response.updates.length > 0 || response.errors.length > 0) {
-                        updates.push(new UpdatedUser(response.username, serverMember, response.updates, response.errors));
+                    if (
+                        response.updates.length > 0 ||
+                        response.errors.length > 0
+                    ) {
+                        updates.push(
+                            new UpdatedUser(
+                                response.username,
+                                serverMember,
+                                response.updates,
+                                response.errors,
+                            ),
+                        );
                     }
 
                     hasUpdated = true;
@@ -50,11 +64,22 @@ async function updateRoles(guild) {
         for (let i = 0; i < playerInfo.length; i++) {
             const player = playerInfo[i];
 
-            if ((nickname && player.username === nickname) || (globalName && player.username === globalName) || (player.username === username)) {
+            if (
+                (nickname && player.username === nickname) ||
+                (globalName && player.username === globalName) ||
+                player.username === username
+            ) {
                 const response = await applyRoles(guild, serverMember, player);
 
                 if (response.updates.length > 0 || response.errors.length > 0) {
-                    updates.push(new UpdatedUser(response.username, serverMember, response.updates, response.errors));
+                    updates.push(
+                        new UpdatedUser(
+                            response.username,
+                            serverMember,
+                            response.updates,
+                            response.errors,
+                        ),
+                    );
                 }
 
                 hasUpdated = true;
@@ -68,7 +93,14 @@ async function updateRoles(guild) {
             const response = await applyRoles(guild, serverMember, null);
 
             if (response.updates.length > 0 || response.errors.length > 0) {
-                updates.push(new UpdatedUser(response.username, serverMember, response.updates, response.errors));
+                updates.push(
+                    new UpdatedUser(
+                        response.username,
+                        serverMember,
+                        response.updates,
+                        response.errors,
+                    ),
+                );
             }
         }
     }

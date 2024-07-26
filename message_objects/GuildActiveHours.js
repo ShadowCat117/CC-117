@@ -5,14 +5,20 @@ class GuildActiveHours {
     // averageCaptains: Average number of captains online at this hour
     // hourOffset: The offset selected to display in the users timezone
     constructor(hour, averageOnline, averageCaptains, hourOffset) {
-        this.averageOnline = typeof averageOnline === 'number' ? averageOnline.toFixed(2) : averageOnline;
-        this.averageCaptains = typeof averageCaptains === 'number' ? averageCaptains.toFixed(2) : averageCaptains;
+        this.averageOnline =
+            typeof averageOnline === 'number'
+                ? averageOnline.toFixed(2)
+                : averageOnline;
+        this.averageCaptains =
+            typeof averageCaptains === 'number'
+                ? averageCaptains.toFixed(2)
+                : averageCaptains;
 
         // Some timezones are +/- x:30 from UTC
         if (parseFloat(hourOffset) % 1 === 0.5) {
             this.halfTimezone = true;
         }
-        
+
         // Set the hour adjusted for offset
         this.hour = parseInt(hour) + parseInt(hourOffset);
 
@@ -55,12 +61,20 @@ class GuildActiveHours {
     compareToActivity(other) {
         if (parseFloat(this.averageOnline) > parseFloat(other.averageOnline)) {
             return -1;
-        } else if (parseFloat(this.averageOnline) < parseFloat(other.averageOnline)) {
+        } else if (
+            parseFloat(this.averageOnline) < parseFloat(other.averageOnline)
+        ) {
             return 1;
         } else {
-            if (parseFloat(this.averageCaptains) > parseFloat(other.averageCaptains)) {
+            if (
+                parseFloat(this.averageCaptains) >
+                parseFloat(other.averageCaptains)
+            ) {
                 return -1;
-            } else if (parseFloat(this.averageCaptains) < parseFloat(other.averageCaptains)) {
+            } else if (
+                parseFloat(this.averageCaptains) <
+                parseFloat(other.averageCaptains)
+            ) {
                 return 1;
             } else {
                 return 0;

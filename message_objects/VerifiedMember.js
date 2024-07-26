@@ -17,8 +17,11 @@ class VerifiedMember {
     }
 
     async findDiscordUser(username) {
-        const serverMember = await utilities.findDiscordUser(this.members, username);
-        
+        const serverMember = await utilities.findDiscordUser(
+            this.members,
+            username,
+        );
+
         if (serverMember) {
             this.verifiedMember = serverMember.id;
         } else {

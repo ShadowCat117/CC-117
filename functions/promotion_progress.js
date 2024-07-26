@@ -28,9 +28,16 @@ async function promotionProgress(interaction, force = false) {
             nameToSearch = interaction.customId.split(':')[1];
         }
 
-        const player = await database.findPlayer(nameToSearch, force, guildUuid);
+        const player = await database.findPlayer(
+            nameToSearch,
+            force,
+            guildUuid,
+        );
 
-        if (player != null && player.message === 'Multiple possibilities found') {
+        if (
+            player != null &&
+            player.message === 'Multiple possibilities found'
+        ) {
             return {
                 playerUuids: player.playerUuids,
                 playerUsernames: player.playerUsernames,
@@ -46,20 +53,32 @@ async function promotionProgress(interaction, force = false) {
 
         // If a player was found, look for UUID to get guaranteed results, otherwise look for the name input
         if (player) {
-            const response = await axios.get(`https://api.wynncraft.com/v3/player/${player.uuid}?fullResult=True`);
-            utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+            const response = await axios.get(
+                `https://api.wynncraft.com/v3/player/${player.uuid}?fullResult=True`,
+            );
+            utilities.updateRateLimit(
+                response.headers['ratelimit-remaining'],
+                response.headers['ratelimit-reset'],
+            );
             playerJson = response.data;
         } else {
             try {
-                const response = await axios.get(`https://api.wynncraft.com/v3/player/${nameToSearch}?fullResult=True`);
-                utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+                const response = await axios.get(
+                    `https://api.wynncraft.com/v3/player/${nameToSearch}?fullResult=True`,
+                );
+                utilities.updateRateLimit(
+                    response.headers['ratelimit-remaining'],
+                    response.headers['ratelimit-reset'],
+                );
                 playerJson = response.data;
             } catch (err) {
                 // 300 indicates a multi selector
                 if (err.response.status === 300) {
                     return {
                         playerUuids: Object.keys(err.response.data),
-                        playerUsernames: Object.values(err.response.data).map((entry) => entry.storedName),
+                        playerUsernames: Object.values(err.response.data).map(
+                            (entry) => entry.storedName,
+                        ),
                         playerRanks: [],
                         playerGuildRanks: [],
                         playerGuildNames: [],
@@ -69,11 +88,11 @@ async function promotionProgress(interaction, force = false) {
         }
 
         if (!playerJson || !playerJson.username) {
-            return ({ username: playerJson.username, unableToPromote: 'error' });
+            return { username: playerJson.username, unableToPromote: 'error' };
         }
 
         if (!playerJson.guild || playerJson.guild.uuid !== guildUuid) {
-            return ({ username: playerJson.username, unableToPromote: 'guild' });
+            return { username: playerJson.username, unableToPromote: 'guild' };
         }
 
         let highestCharcterLevel = 0;
@@ -88,22 +107,33 @@ async function promotionProgress(interaction, force = false) {
             }
         }
 
-        const promotionExceptions = config['promotionExceptions'] !== undefined ? config['promotionExceptions'] : {};
+        const promotionExceptions =
+            config['promotionExceptions'] !== undefined
+                ? config['promotionExceptions']
+                : {};
 
         const exemptUsernames = Object.keys(promotionExceptions);
 
         if (exemptUsernames.includes(playerJson.uuid)) {
-            return ({ username: playerJson.username, unableToPromote: promotionExceptions[playerJson.uuid] });
+            return {
+                username: playerJson.username,
+                unableToPromote: promotionExceptions[playerJson.uuid],
+            };
         }
 
         await utilities.waitForRateLimit();
-        const response = await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${playerJson.guild.uuid}?identifier=uuid`);
+        const response = await axios.get(
+            `https://api.wynncraft.com/v3/guild/uuid/${playerJson.guild.uuid}?identifier=uuid`,
+        );
 
-        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+        utilities.updateRateLimit(
+            response.headers['ratelimit-remaining'],
+            response.headers['ratelimit-reset'],
+        );
         const guildJson = response.data;
 
         if (!guildJson || !guildJson.name) {
-            return ({ username: playerJson.username, unableToPromote: 'error' });
+            return { username: playerJson.username, unableToPromote: 'error' };
         }
 
         let contributionPos = -1;
@@ -113,12 +143,12 @@ async function promotionProgress(interaction, force = false) {
 
         for (const rank in guildJson.members) {
             if (rank === 'total') continue;
-    
+
             const rankMembers = guildJson.members[rank];
-    
+
             for (const member in rankMembers) {
                 const guildMember = rankMembers[member];
-                
+
                 if (member === playerJson.uuid) {
                     guildRank = rank;
                     contributionPos = guildMember.contributionRank;
@@ -150,13 +180,19 @@ async function promotionProgress(interaction, force = false) {
         });
 
         const tankRole = interaction.guild.roles.cache.get(config['tankRole']);
-        const healerRole = interaction.guild.roles.cache.get(config['healerRole']);
-        const damageRole = interaction.guild.roles.cache.get(config['damageRole']);
+        const healerRole = interaction.guild.roles.cache.get(
+            config['healerRole'],
+        );
+        const damageRole = interaction.guild.roles.cache.get(
+            config['damageRole'],
+        );
         const soloRole = interaction.guild.roles.cache.get(config['soloRole']);
         const ecoRole = interaction.guild.roles.cache.get(config['ecoRole']);
         const warBuildRoles = [tankRole, healerRole, damageRole, soloRole];
 
-        const memberPlaytime = await database.getAveragePlaytime(playerJson.uuid);
+        const memberPlaytime = await database.getAveragePlaytime(
+            playerJson.uuid,
+        );
 
         const now = new Date();
         const timeDifference = now - joinTimestamp;
@@ -165,7 +201,10 @@ async function promotionProgress(interaction, force = false) {
         const hours = Math.floor(minutes / 60);
         const daysInGuild = Math.floor(hours / 24);
 
-        const serverMember = await utilities.findDiscordUser(interaction.guild.members.cache.values(), playerJson.username);
+        const serverMember = await utilities.findDiscordUser(
+            interaction.guild.members.cache.values(),
+            playerJson.username,
+        );
 
         let hasBuildRole = false;
         let hasEcoRole = false;
@@ -195,14 +234,22 @@ async function promotionProgress(interaction, force = false) {
         let contributionRequirement;
         let optionalTimeRequirement;
         let warsRequirement;
-        let weeklyPlaytimeRequirement ;
+        let weeklyPlaytimeRequirement;
 
         let nextGuildRank;
 
         if (guildRank === 'owner') {
-            return ({ uuid: playerJson.uuid, username: playerJson.username, unableToPromote: 'owner' });
+            return {
+                uuid: playerJson.uuid,
+                username: playerJson.username,
+                unableToPromote: 'owner',
+            };
         } else if (guildRank === 'chief') {
-            return ({ uuid: playerJson.uuid, username: playerJson.username, unableToPromote: 'chief' });
+            return {
+                uuid: playerJson.uuid,
+                username: playerJson.username,
+                unableToPromote: 'chief',
+            };
         } else if (guildRank === 'strategist') {
             promotionRequirements = config.chiefPromotionRequirement;
             timeRequirement = config.chiefTimeRequirement;
@@ -211,9 +258,11 @@ async function promotionProgress(interaction, force = false) {
             XPRequirement = promotionRequirements[PromotionValue.XP];
             levelRequirement = promotionRequirements[PromotionValue.LEVEL];
             contributionRequirement = promotionRequirements[PromotionValue.TOP];
-            optionalTimeRequirement = promotionRequirements[PromotionValue.TIME];
+            optionalTimeRequirement =
+                promotionRequirements[PromotionValue.TIME];
             warsRequirement = promotionRequirements[PromotionValue.WARS];
-            weeklyPlaytimeRequirement = promotionRequirements[PromotionValue.PLAYTIME];
+            weeklyPlaytimeRequirement =
+                promotionRequirements[PromotionValue.PLAYTIME];
 
             nextGuildRank = 'Chief';
         } else if (guildRank === 'captain') {
@@ -224,9 +273,11 @@ async function promotionProgress(interaction, force = false) {
             XPRequirement = promotionRequirements[PromotionValue.XP];
             levelRequirement = promotionRequirements[PromotionValue.LEVEL];
             contributionRequirement = promotionRequirements[PromotionValue.TOP];
-            optionalTimeRequirement = promotionRequirements[PromotionValue.TIME];
+            optionalTimeRequirement =
+                promotionRequirements[PromotionValue.TIME];
             warsRequirement = promotionRequirements[PromotionValue.WARS];
-            weeklyPlaytimeRequirement = promotionRequirements[PromotionValue.PLAYTIME];
+            weeklyPlaytimeRequirement =
+                promotionRequirements[PromotionValue.PLAYTIME];
 
             nextGuildRank = 'Strategist';
         } else if (guildRank === 'recruiter') {
@@ -237,9 +288,11 @@ async function promotionProgress(interaction, force = false) {
             XPRequirement = promotionRequirements[PromotionValue.XP];
             levelRequirement = promotionRequirements[PromotionValue.LEVEL];
             contributionRequirement = promotionRequirements[PromotionValue.TOP];
-            optionalTimeRequirement = promotionRequirements[PromotionValue.TIME];
+            optionalTimeRequirement =
+                promotionRequirements[PromotionValue.TIME];
             warsRequirement = promotionRequirements[PromotionValue.WARS];
-            weeklyPlaytimeRequirement = promotionRequirements[PromotionValue.PLAYTIME];
+            weeklyPlaytimeRequirement =
+                promotionRequirements[PromotionValue.PLAYTIME];
 
             nextGuildRank = 'Captain';
         } else if (guildRank === 'recruit') {
@@ -250,15 +303,20 @@ async function promotionProgress(interaction, force = false) {
             XPRequirement = promotionRequirements[PromotionValue.XP];
             levelRequirement = promotionRequirements[PromotionValue.LEVEL];
             contributionRequirement = promotionRequirements[PromotionValue.TOP];
-            optionalTimeRequirement = promotionRequirements[PromotionValue.TIME];
+            optionalTimeRequirement =
+                promotionRequirements[PromotionValue.TIME];
             warsRequirement = promotionRequirements[PromotionValue.WARS];
-            weeklyPlaytimeRequirement = promotionRequirements[PromotionValue.PLAYTIME];
+            weeklyPlaytimeRequirement =
+                promotionRequirements[PromotionValue.PLAYTIME];
 
             nextGuildRank = 'Recruiter';
         }
 
         if (Object.keys(promotionRequirements).length < requirementsCount) {
-            return ({ username: playerJson.username, unableToPromote: 'missing' });
+            return {
+                username: playerJson.username,
+                unableToPromote: 'missing',
+            };
         }
 
         // Add one extra for the forced time requirement
@@ -273,15 +331,27 @@ async function promotionProgress(interaction, force = false) {
         const requirements = [];
 
         if (promotionRequirements[PromotionValue.XP]) {
-            requirements.push(new PromotionRequirement(PromotionValue.XP, contributedGuildXP, XPRequirement));
+            requirements.push(
+                new PromotionRequirement(
+                    PromotionValue.XP,
+                    contributedGuildXP,
+                    XPRequirement,
+                ),
+            );
 
             if (contributedGuildXP >= XPRequirement) {
                 metRequirements++;
             }
         }
 
-        if (promotionRequirements[PromotionValue.LEVEL]) {           
-            requirements.push(new PromotionRequirement(PromotionValue.LEVEL, highestCharcterLevel, levelRequirement));
+        if (promotionRequirements[PromotionValue.LEVEL]) {
+            requirements.push(
+                new PromotionRequirement(
+                    PromotionValue.LEVEL,
+                    highestCharcterLevel,
+                    levelRequirement,
+                ),
+            );
 
             if (highestCharcterLevel >= levelRequirement) {
                 metRequirements++;
@@ -289,15 +359,27 @@ async function promotionProgress(interaction, force = false) {
         }
 
         if (promotionRequirements[PromotionValue.TOP]) {
-            requirements.push(new PromotionRequirement(PromotionValue.TOP, contributionPos, contributionRequirement));
+            requirements.push(
+                new PromotionRequirement(
+                    PromotionValue.TOP,
+                    contributionPos,
+                    contributionRequirement,
+                ),
+            );
 
             if (contributionPos <= contributionRequirement) {
                 metRequirements++;
             }
         }
 
-        if (promotionRequirements[PromotionValue.TIME]) {  
-            requirements.push(new PromotionRequirement(PromotionValue.TIME, daysInGuild, optionalTimeRequirement));
+        if (promotionRequirements[PromotionValue.TIME]) {
+            requirements.push(
+                new PromotionRequirement(
+                    PromotionValue.TIME,
+                    daysInGuild,
+                    optionalTimeRequirement,
+                ),
+            );
 
             if (daysInGuild >= optionalTimeRequirement) {
                 metRequirements++;
@@ -305,7 +387,13 @@ async function promotionProgress(interaction, force = false) {
         }
 
         if (promotionRequirements[PromotionValue.WARS]) {
-            requirements.push(new PromotionRequirement(PromotionValue.WARS, wars, warsRequirement));
+            requirements.push(
+                new PromotionRequirement(
+                    PromotionValue.WARS,
+                    wars,
+                    warsRequirement,
+                ),
+            );
 
             if (wars >= warsRequirement) {
                 metRequirements++;
@@ -313,7 +401,13 @@ async function promotionProgress(interaction, force = false) {
         }
 
         if (promotionRequirements[PromotionValue.BUILD]) {
-            requirements.push(new PromotionRequirement(PromotionValue.BUILD, hasBuildRole ? 1 : 0, 1));
+            requirements.push(
+                new PromotionRequirement(
+                    PromotionValue.BUILD,
+                    hasBuildRole ? 1 : 0,
+                    1,
+                ),
+            );
 
             if (hasBuildRole) {
                 metRequirements++;
@@ -321,7 +415,13 @@ async function promotionProgress(interaction, force = false) {
         }
 
         if (promotionRequirements[PromotionValue.PLAYTIME]) {
-            requirements.push(new PromotionRequirement(PromotionValue.PLAYTIME, memberPlaytime, weeklyPlaytimeRequirement));
+            requirements.push(
+                new PromotionRequirement(
+                    PromotionValue.PLAYTIME,
+                    memberPlaytime,
+                    weeklyPlaytimeRequirement,
+                ),
+            );
 
             if (memberPlaytime >= weeklyPlaytimeRequirement) {
                 metRequirements++;
@@ -329,14 +429,20 @@ async function promotionProgress(interaction, force = false) {
         }
 
         if (promotionRequirements[PromotionValue.ECO]) {
-            requirements.push(new PromotionRequirement(PromotionValue.ECO, hasEcoRole ? 1 : 0, 1));
+            requirements.push(
+                new PromotionRequirement(
+                    PromotionValue.ECO,
+                    hasEcoRole ? 1 : 0,
+                    1,
+                ),
+            );
 
             if (hasEcoRole) {
                 metRequirements++;
             }
         }
 
-        return ({
+        return {
             uuid: playerJson.uuid,
             username: playerJson.username,
             guildRank: guildRank.charAt(0).toUpperCase() + guildRank.slice(1),
@@ -346,7 +452,7 @@ async function promotionProgress(interaction, force = false) {
             daysInGuild: daysInGuild,
             timeRequirement: timeRequirement,
             requirements: requirements,
-        });
+        };
     } catch (error) {
         console.error(error);
 
@@ -358,7 +464,7 @@ async function promotionProgress(interaction, force = false) {
             username = interaction.customId;
         }
 
-        return ({ username: username, unableToPromote: 'error' });
+        return { username: username, unableToPromote: 'error' };
     }
 }
 

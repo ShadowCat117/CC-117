@@ -1,11 +1,16 @@
 const database = require('../database/database');
 const TimezoneValue = require('../values/TimezoneValue');
 
-async function activeHours(interaction, force = false, timezoneOffset = 0, sortByActivity = true) {
+async function activeHours(
+    interaction,
+    force = false,
+    timezoneOffset = 0,
+    sortByActivity = true,
+) {
     let nameToSearch;
 
     if (interaction.options !== undefined) {
-        nameToSearch = interaction.options.getString('guild_name'); 
+        nameToSearch = interaction.options.getString('guild_name');
     } else if (interaction.values) {
         nameToSearch = interaction.values[0].split(':')[1];
     } else {
@@ -33,11 +38,27 @@ async function activeHours(interaction, force = false, timezoneOffset = 0, sortB
     }
 
     if (guild) {
-        const guildActivity = await database.getActiveHours(guild.uuid, timezoneOffset, sortByActivity);
+        const guildActivity = await database.getActiveHours(
+            guild.uuid,
+            timezoneOffset,
+            sortByActivity,
+        );
 
-        return ({ guildUuid: guild.uuid, guildName: guild.name, guildPrefix: guild.prefix, activity: guildActivity, timezone: timezone });
+        return {
+            guildUuid: guild.uuid,
+            guildName: guild.name,
+            guildPrefix: guild.prefix,
+            activity: guildActivity,
+            timezone: timezone,
+        };
     } else {
-        return ({ guildUuid: guild.uuid, guildName: guild.name, guildPrefix: guild.prefix, activity: [], timezone: timezone });
+        return {
+            guildUuid: guild.uuid,
+            guildName: guild.name,
+            guildPrefix: guild.prefix,
+            activity: [],
+            timezone: timezone,
+        };
     }
 }
 

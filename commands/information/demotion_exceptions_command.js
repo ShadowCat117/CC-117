@@ -61,27 +61,45 @@ module.exports = {
 
             const guildName = (await database.findGuild(guildUuid, true)).name;
 
-            if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
+            if (
+                memberOfRole &&
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(memberOfRole)
+            ) {
                 responseEmbed
                     .setTitle('Error')
-                    .setDescription(`You must be a member of ${guildName} to run this command.`)
+                    .setDescription(
+                        `You must be a member of ${guildName} to run this command.`,
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
             }
 
-            if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
+            if (
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(adminRoleId) &&
+                interaction.member.roles.highest.position <
+                    interaction.guild.roles.cache.get(adminRoleId).position
+            ) {
                 responseEmbed
                     .setTitle('Error')
-                    .setDescription('You do not have the required permissions to run this command.')
+                    .setDescription(
+                        'You do not have the required permissions to run this command.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
             }
 
-            if (!config['demotionExceptions'] || Object.keys(config['demotionExceptions']).length === 0) {
+            if (
+                !config['demotionExceptions'] ||
+                Object.keys(config['demotionExceptions']).length === 0
+            ) {
                 responseEmbed
-                    .setDescription('No players are currently exempt from being demoted.')
+                    .setDescription(
+                        'No players are currently exempt from being demoted.',
+                    )
                     .setColor(0x999999);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -93,8 +111,17 @@ module.exports = {
                 const row = new ActionRowBuilder();
 
                 const pages = [];
-                for (let i = 0; i < Object.keys(config['demotionExceptions']).length; i += 25) {
-                    pages.push(Object.keys(config['demotionExceptions']).slice(i, i + 25));
+                for (
+                    let i = 0;
+                    i < Object.keys(config['demotionExceptions']).length;
+                    i += 25
+                ) {
+                    pages.push(
+                        Object.keys(config['demotionExceptions']).slice(
+                            i,
+                            i + 25,
+                        ),
+                    );
                 }
 
                 for (const page of pages) {
@@ -102,7 +129,9 @@ module.exports = {
 
                     pageEmbed
                         .setTitle(`${guildName} Demotion Exceptions`)
-                        .setDescription('These players are exempt from being demoted.')
+                        .setDescription(
+                            'These players are exempt from being demoted.',
+                        )
                         .setColor(0x00ffff);
 
                     for (const player in page) {
@@ -114,14 +143,22 @@ module.exports = {
                             duration = `Exempt from demotions for ${config['demotionExceptions'][page[player]]} day${config['demotionExceptions'][page[player]] !== 1 ? 's' : ''}`;
                         }
 
-                        const username = (await database.findPlayer(page[player], true)).username;
-                        pageEmbed.addFields({ name: username.replaceAll('_', '\\_'), value: duration });
+                        const username = (
+                            await database.findPlayer(page[player], true)
+                        ).username;
+                        pageEmbed.addFields({
+                            name: username.replaceAll('_', '\\_'),
+                            value: duration,
+                        });
                     }
 
                     embeds.push(pageEmbed);
                 }
 
-                messages.addMessage(message.id, new PagedMessage(message, embeds));
+                messages.addMessage(
+                    message.id,
+                    new PagedMessage(message, embeds),
+                );
 
                 const previousPage = new ButtonBuilder()
                     .setCustomId('previous')
@@ -135,14 +172,16 @@ module.exports = {
 
                 row.addComponents(previousPage, nextPage);
 
-                await interaction.editReply({ 
+                await interaction.editReply({
                     embeds: [embeds[0]],
                     components: [row],
                 });
             } else {
                 responseEmbed
                     .setTitle(`${guildName} Demotion Exceptions`)
-                    .setDescription('These players are exempt from being demoted.')
+                    .setDescription(
+                        'These players are exempt from being demoted.',
+                    )
                     .setColor(0x00ffff);
 
                 for (const player in config['demotionExceptions']) {
@@ -153,9 +192,13 @@ module.exports = {
                     } else {
                         duration = `Exempt from demotions for ${config['demotionExceptions'][player]} day${config['demotionExceptions'][player] !== 1 ? 's' : ''}`;
                     }
-                    
-                    const username = (await database.findPlayer(player, true)).username;
-                    responseEmbed.addFields({ name: username.replaceAll('_', '\\_'), value: duration });
+
+                    const username = (await database.findPlayer(player, true))
+                        .username;
+                    responseEmbed.addFields({
+                        name: username.replaceAll('_', '\\_'),
+                        value: duration,
+                    });
                 }
 
                 await interaction.editReply({ embeds: [responseEmbed] });
@@ -163,9 +206,9 @@ module.exports = {
         } catch (error) {
             console.error(error);
             responseEmbed
-                    .setTitle('Error')
-                    .setDescription('Failed to view demotion exceptions.')
-                    .setColor(0xff0000);
+                .setTitle('Error')
+                .setDescription('Failed to view demotion exceptions.')
+                .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
         }

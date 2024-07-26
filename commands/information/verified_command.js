@@ -26,7 +26,13 @@ module.exports = {
         const message = await interaction.editReply({ embeds: [loadingEmbed] });
 
         const guildId = interaction.guild.id;
-        const filePath = path.join(__dirname, '..', '..', 'configs', `${guildId}.json`);
+        const filePath = path.join(
+            __dirname,
+            '..',
+            '..',
+            'configs',
+            `${guildId}.json`,
+        );
 
         try {
             let config = {};
@@ -46,7 +52,9 @@ module.exports = {
             if (!guildUuid) {
                 const responseEmbed = new EmbedBuilder()
                     .setTitle('Error')
-                    .setDescription('You do not have a guild set. Use /setguild to set one.')
+                    .setDescription(
+                        'You do not have a guild set. Use /setguild to set one.',
+                    )
                     .setColor(0xff0000);
 
                 await interaction.editReply({ embeds: [responseEmbed] });
@@ -59,19 +67,32 @@ module.exports = {
 
             const guildName = (await database.findGuild(guildUuid, true)).name;
 
-            if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
+            if (
+                memberOfRole &&
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(memberOfRole)
+            ) {
                 const errorEmbed = new EmbedBuilder()
                     .setTitle('Error')
-                    .setDescription(`You must be a member of ${guildName} to run this command.`)
+                    .setDescription(
+                        `You must be a member of ${guildName} to run this command.`,
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [errorEmbed] });
                 return;
             }
 
-            if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
+            if (
+                interaction.member.id !== interaction.member.guild.ownerId &&
+                !memberRoles.has(adminRoleId) &&
+                interaction.member.roles.highest.position <
+                    interaction.guild.roles.cache.get(adminRoleId).position
+            ) {
                 const errorEmbed = new EmbedBuilder()
                     .setTitle('Error')
-                    .setDescription('You do not have the required permissions to run this command.')
+                    .setDescription(
+                        'You do not have the required permissions to run this command.',
+                    )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [errorEmbed] });
                 return;
@@ -82,27 +103,37 @@ module.exports = {
             const embeds = [];
             const row = new ActionRowBuilder();
 
-            if (response.guildName === '') { // Failed to get guild info from API
+            if (response.guildName === '') {
+                // Failed to get guild info from API
                 const responseEmbed = new EmbedBuilder()
                     .setTitle('Error')
-                    .setDescription('Failed to fetch guild information from the API, it may be down.')
+                    .setDescription(
+                        'Failed to fetch guild information from the API, it may be down.',
+                    )
                     .setColor(0xff0000);
 
                 embeds.push(responseEmbed);
-            } else { // Found guild
+            } else {
+                // Found guild
                 // Paginate if more than 25 members
                 if (response.verifiedMembers.length > 25) {
                     const pages = [];
-                    for (let i = 0; i < response.verifiedMembers.length; i += 25) {
+                    for (
+                        let i = 0;
+                        i < response.verifiedMembers.length;
+                        i += 25
+                    ) {
                         pages.push(response.verifiedMembers.slice(i, i + 25));
                     }
 
                     for (const page of pages) {
                         const responseEmbed = new EmbedBuilder();
                         responseEmbed
-                            .setTitle(`[${response.guildPrefix}] ${response.guildName} Verified Members`)
+                            .setTitle(
+                                `[${response.guildPrefix}] ${response.guildName} Verified Members`,
+                            )
                             .setColor(0x00ffff);
-                                        
+
                         for (const player of page) {
                             let verifiedValue;
 
@@ -111,13 +142,19 @@ module.exports = {
                             } else {
                                 verifiedValue = 'Not verified';
                             }
-                            responseEmbed.addFields({ name: `${player.username}`, value: `${verifiedValue}` });
+                            responseEmbed.addFields({
+                                name: `${player.username}`,
+                                value: `${verifiedValue}`,
+                            });
                         }
-                    
+
                         embeds.push(responseEmbed);
                     }
 
-                    messages.addMessage(message.id, new PagedMessage(message, embeds));
+                    messages.addMessage(
+                        message.id,
+                        new PagedMessage(message, embeds),
+                    );
 
                     const previousPage = new ButtonBuilder()
                         .setCustomId('previous')
@@ -134,7 +171,9 @@ module.exports = {
                     const responseEmbed = new EmbedBuilder();
 
                     responseEmbed
-                        .setTitle(`[${response.guildPrefix}] ${response.guildName} Verified Members`)
+                        .setTitle(
+                            `[${response.guildPrefix}] ${response.guildName} Verified Members`,
+                        )
                         .setColor(0x00ffff);
 
                     if (response.verifiedMembers.length > 0) {
@@ -146,7 +185,10 @@ module.exports = {
                             } else {
                                 verifiedValue = 'Not verified';
                             }
-                            responseEmbed.addFields({ name: `${player.username}`, value: `${verifiedValue}` });
+                            responseEmbed.addFields({
+                                name: `${player.username}`,
+                                value: `${verifiedValue}`,
+                            });
                         }
                     }
 
@@ -155,7 +197,7 @@ module.exports = {
             }
 
             if (row.components.length > 0) {
-                await interaction.editReply({ 
+                await interaction.editReply({
                     embeds: [embeds[0]],
                     components: [row],
                 });
@@ -165,9 +207,9 @@ module.exports = {
         } catch (error) {
             console.error(error);
             const errorEmbed = new EmbedBuilder()
-                    .setTitle('Error')
-                    .setDescription('Unable to view verified members.')
-                    .setColor(0xff0000);
+                .setTitle('Error')
+                .setDescription('Unable to view verified members.')
+                .setColor(0xff0000);
             await interaction.editReply({ embeds: [errorEmbed] });
             return;
         }

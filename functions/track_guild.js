@@ -32,8 +32,10 @@ async function trackGuild(interaction, force = false) {
                         guildName: guild.guildNames[index],
                         guildPrefix: guild.guildPrefixes[index],
                     }))
-                    .filter(({ guildUuid }) => !config.trackedGuilds.includes(guildUuid));
-
+                    .filter(
+                        ({ guildUuid }) =>
+                            !config.trackedGuilds.includes(guildUuid),
+                    );
 
                 if (filteredGuilds.length === 1) {
                     guild.uuid = filteredGuilds[0].guildUuid;
@@ -64,20 +66,24 @@ async function trackGuild(interaction, force = false) {
             }
 
             if (config.trackedGuilds.includes(guild.uuid)) {
-                return ({ error: `${guild.name} is already being tracked.` });
+                return { error: `${guild.name} is already being tracked.` };
             }
 
             config.trackedGuilds.push(guild.uuid);
 
-            fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
+            fs.writeFileSync(
+                filePath,
+                JSON.stringify(config, null, 2),
+                'utf-8',
+            );
 
-            return ({ guildName: guild.name });
+            return { guildName: guild.name };
         } catch (error) {
             console.error(error);
-            return ({ error: 'An error occured whilst tracking guild.' });
+            return { error: 'An error occured whilst tracking guild.' };
         }
     } else {
-        return ({ guildName: '' });
+        return { guildName: '' };
     }
 }
 
