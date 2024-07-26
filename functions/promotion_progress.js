@@ -1,34 +1,10 @@
-const ButtonedMessage = require('../message_type/ButtonedMessage');
 const fs = require('fs');
 const path = require('path');
-const findPlayer = require('./find_player');
-const MessageType = require('../message_type/MessageType');
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('database/database.db');
-
-async function getAsync(query, params) {
-    return new Promise((resolve, reject) => {
-        db.get(query, params, function(err, rows) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(rows);
-            }
-        });
-    });
-}
-
-async function allAsync(query, params) {
-    return new Promise((resolve, reject) => {
-        db.all(query, params, function(err, rows) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(rows);
-            }
-        });
-    });
-}
+const axios = require('axios');
+const database = require('../database/database');
+const utilities = require('./utilities');
+const PromotionValue = require('../values/PromotionValue');
+const PromotionRequirement = require('../message_objects/PromotionRequirement');
 
 async function promotionProgress(interaction, force = false) {
     const guildId = interaction.guild.id;
@@ -42,59 +18,136 @@ async function promotionProgress(interaction, force = false) {
             config = JSON.parse(fileData);
         }
 
-        const guildName = config.guildName;
+        const guildUuid = config.guild;
 
         let nameToSearch;
 
         if (interaction.options !== undefined) {
             nameToSearch = interaction.options.getString('username');
         } else if (interaction.customId) {
-            nameToSearch = interaction.customId;
+            nameToSearch = interaction.customId.split(':')[1];
         }
 
-        const player = await findPlayer(nameToSearch, guildName, force);
+        const player = await database.findPlayer(nameToSearch, force, guildUuid);
 
         if (player != null && player.message === 'Multiple possibilities found') {
-            let textMessage = `Multiple players found with the username: ${nameToSearch}.`;
-    
-            for (let i = 0; i < player.playerUuids.length; i++) {
-                const uuid = player.playerUuids[i];
-                const playerUsername = player.playerUsernames[i];
-                const rank = player.playerRanks[i];
-                const guildRank = player.playerGuildRanks[i];
-                const playerGuildName = player.playerGuildNames[i];
-
-                if (!rank && !playerGuildName) {
-                    textMessage += `\n${i + 1}. ${playerUsername} (UUID: ${uuid})`;
-                } else if (!rank) {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${guildRank} of ${playerGuildName}. (UUID: ${uuid})`;
-                } else if (!playerGuildName) {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${rank}. (UUID: ${uuid})`;
-                } else {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${rank} and ${guildRank} of ${playerGuildName}. (UUID: ${uuid})`;
-                }
-            }
-    
-            textMessage += '\nClick button to choose player.';
-    
-            return new ButtonedMessage(textMessage, player.playerUuids, MessageType.PROMOTION_PROGRESS, []);
+            return {
+                playerUuids: player.playerUuids,
+                playerUsernames: player.playerUsernames,
+                playerRanks: player.playerRanks,
+                playerGuildRanks: player.playerGuildRanks,
+                playerGuildNames: player.playerGuildNames,
+            };
         }
 
-        if (!player) {
-            return new ButtonedMessage('', [], '', [`Unknown player, ${nameToSearch.replace(/_/g, '\\_')}. They may not be a member of ${guildName}`]);
+        await utilities.waitForRateLimit();
+
+        let playerJson;
+
+        // If a player was found, look for UUID to get guaranteed results, otherwise look for the name input
+        if (player) {
+            const response = await axios.get(`https://api.wynncraft.com/v3/player/${player.uuid}?fullResult=True`);
+            utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+            playerJson = response.data;
+        } else {
+            try {
+                const response = await axios.get(`https://api.wynncraft.com/v3/player/${nameToSearch}?fullResult=True`);
+                utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+                playerJson = response.data;
+            } catch (err) {
+                // 300 indicates a multi selector
+                if (err.response.status === 300) {
+                    return {
+                        playerUuids: Object.keys(err.response.data),
+                        playerUsernames: Object.values(err.response.data).map((entry) => entry.storedName),
+                        playerRanks: [],
+                        playerGuildRanks: [],
+                        playerGuildNames: [],
+                    };
+                }
+            }
+        }
+
+        if (!playerJson || !playerJson.username) {
+            return ({ username: playerJson.username, unableToPromote: 'error' });
+        }
+
+        if (!playerJson.guild || playerJson.guild.uuid !== guildUuid) {
+            return ({ username: playerJson.username, unableToPromote: 'guild' });
+        }
+
+        let highestCharcterLevel = 0;
+        const wars = playerJson.globalData.wars;
+
+        for (const character in playerJson.characters) {
+            const characterJson = playerJson.characters[character];
+
+            // If character level is higher than current tracked highest, set as new highest
+            if (characterJson.level > highestCharcterLevel) {
+                highestCharcterLevel = characterJson.level;
+            }
         }
 
         const promotionExceptions = config['promotionExceptions'] !== undefined ? config['promotionExceptions'] : {};
 
         const exemptUsernames = Object.keys(promotionExceptions);
 
-        if (exemptUsernames.includes(player.username)) {
-            if (promotionExceptions[player.username] === -1) {
-                return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is exempt from promotions forever.`]);
-            } else {
-                return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is exempt from promotions for ${promotionExceptions[player.username]} more day(s).`]);
+        if (exemptUsernames.includes(playerJson.uuid)) {
+            return ({ username: playerJson.username, unableToPromote: promotionExceptions[playerJson.uuid] });
+        }
+
+        await utilities.waitForRateLimit();
+        const response = await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${playerJson.guild.uuid}?identifier=uuid`);
+
+        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+        const guildJson = response.data;
+
+        if (!guildJson || !guildJson.name) {
+            return ({ username: playerJson.username, unableToPromote: 'error' });
+        }
+
+        let contributionPos = -1;
+        let joinTimestamp;
+        let guildRank;
+        let contributedGuildXP;
+
+        for (const rank in guildJson.members) {
+            if (rank === 'total') continue;
+    
+            const rankMembers = guildJson.members[rank];
+    
+            for (const member in rankMembers) {
+                const guildMember = rankMembers[member];
+                
+                if (member === playerJson.uuid) {
+                    guildRank = rank;
+                    contributionPos = guildMember.contributionRank;
+                    joinTimestamp = new Date(guildMember.joined);
+                    contributedGuildXP = guildMember.contributed;
+                    break;
+                }
+            }
+
+            if (contributionPos !== -1) {
+                break;
             }
         }
+
+        const veteran = playerJson.veteran ? playerJson.veteran : false;
+
+        database.updatePlayer({
+            uuid: playerJson.uuid,
+            username: playerJson.username,
+            guildUuid: playerJson.guild.uuid,
+            guildRank: guildRank,
+            online: playerJson.online,
+            lastLogin: playerJson.lastJoin,
+            supportRank: playerJson.supportRank,
+            veteran: veteran,
+            serverRank: playerJson.rank,
+            wars: playerJson.globalData.wars,
+            highestCharcterLevel: highestCharcterLevel,
+        });
 
         const tankRole = interaction.guild.roles.cache.get(config['tankRole']);
         const healerRole = interaction.guild.roles.cache.get(config['healerRole']);
@@ -103,26 +156,16 @@ async function promotionProgress(interaction, force = false) {
         const ecoRole = interaction.guild.roles.cache.get(config['ecoRole']);
         const warBuildRoles = [tankRole, healerRole, damageRole, soloRole];
 
-        const guildMembers = await allAsync('SELECT UUID FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
-        const memberToCheck = await getAsync('SELECT UUID, username, guildRank, contributedGuildXP, highestClassLevel, guildJoinDate, wars FROM players WHERE UUID = ? AND guildName = ?', [player.uuid, guildName]);
+        const memberPlaytime = await database.getAveragePlaytime(playerJson.uuid);
 
-        if (!memberToCheck) {
-            return new ButtonedMessage('', [], '', [`${nameToSearch.replace(/_/g, '\\_')} is not a member of ${guildName}`]);
-        }
+        const now = new Date();
+        const timeDifference = now - joinTimestamp;
+        const seconds = Math.floor(timeDifference / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const daysInGuild = Math.floor(hours / 24);
 
-        const tableName = guildName.replaceAll(' ', '_');
-
-        const memberPlaytime = await getAsync(`SELECT averagePlaytime FROM ${tableName} WHERE UUID = ?`, [memberToCheck.UUID]);
-
-        const contributionPos = guildMembers.findIndex(member => member.UUID === memberToCheck.UUID) + 1;
-
-        const today = new Date();
-        const [year, month, day] = memberToCheck.guildJoinDate.split('-');
-        const joinDate = new Date(year, month - 1, day);
-        const differenceInMilliseconds = today - joinDate;
-        const daysInGuild = Math.round(differenceInMilliseconds / (1000 * 60 * 60 * 24));
-
-        const serverMember = await findDiscordUser(interaction.guild.members.cache.values(), player.username);
+        const serverMember = await utilities.findDiscordUser(interaction.guild.members.cache.values(), playerJson.username);
 
         let hasBuildRole = false;
         let hasEcoRole = false;
@@ -156,62 +199,66 @@ async function promotionProgress(interaction, force = false) {
 
         let nextGuildRank;
 
-        if (memberToCheck.guildRank === 'OWNER') {
-            return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is the owner of ${guildName}, they cannot be promoted.`]);
-        } else if (memberToCheck.guildRank === 'CHIEF') {
-            return new ButtonedMessage('', [], '', [`${player.username.replace(/_/g, '\\_')} is a chief of ${guildName}, they cannot be promoted.`]);
-        } else if (memberToCheck.guildRank === 'STRATEGIST') {
+        if (guildRank === 'owner') {
+            return ({ uuid: playerJson.uuid, username: playerJson.username, unableToPromote: 'owner' });
+        } else if (guildRank === 'chief') {
+            return ({ uuid: playerJson.uuid, username: playerJson.username, unableToPromote: 'chief' });
+        } else if (guildRank === 'strategist') {
             promotionRequirements = config.chiefPromotionRequirement;
             timeRequirement = config.chiefTimeRequirement;
             requirementsCount = config.chiefRequirementsCount;
 
-            XPRequirement = config.chiefXPRequirement;
-            levelRequirement = config.chiefLevelRequirement;
-            contributionRequirement = config.chiefContributorRequirement;
-            optionalTimeRequirement = config.chiefOptionalTimeRequirement;
-            warsRequirement = config.chiefWarsRequirement;
-            weeklyPlaytimeRequirement = config.chiefWeeklyPlaytimeRequirement;
+            XPRequirement = promotionRequirements[PromotionValue.XP];
+            levelRequirement = promotionRequirements[PromotionValue.LEVEL];
+            contributionRequirement = promotionRequirements[PromotionValue.TOP];
+            optionalTimeRequirement = promotionRequirements[PromotionValue.TIME];
+            warsRequirement = promotionRequirements[PromotionValue.WARS];
+            weeklyPlaytimeRequirement = promotionRequirements[PromotionValue.PLAYTIME];
 
-            nextGuildRank = 'CHIEF';
-        } else if (memberToCheck.guildRank === 'CAPTAIN') {
+            nextGuildRank = 'Chief';
+        } else if (guildRank === 'captain') {
             promotionRequirements = config.strategistPromotionRequirement;
             timeRequirement = config.strategistTimeRequirement;
             requirementsCount = config.strategistRequirementsCount;
 
-            XPRequirement = config.strategistXPRequirement;
-            levelRequirement = config.strategistLevelRequirement;
-            contributionRequirement = config.strategistContributorRequirement;
-            optionalTimeRequirement = config.strategistOptionalTimeRequirement;
-            warsRequirement = config.strategistWarsRequirement;
-            weeklyPlaytimeRequirement = config.strategistWeeklyPlaytimeRequirement;
+            XPRequirement = promotionRequirements[PromotionValue.XP];
+            levelRequirement = promotionRequirements[PromotionValue.LEVEL];
+            contributionRequirement = promotionRequirements[PromotionValue.TOP];
+            optionalTimeRequirement = promotionRequirements[PromotionValue.TIME];
+            warsRequirement = promotionRequirements[PromotionValue.WARS];
+            weeklyPlaytimeRequirement = promotionRequirements[PromotionValue.PLAYTIME];
 
-            nextGuildRank = 'STRATEGIST';
-        } else if (memberToCheck.guildRank === 'RECRUITER') {
+            nextGuildRank = 'Strategist';
+        } else if (guildRank === 'recruiter') {
             promotionRequirements = config.captainPromotionRequirement;
             timeRequirement = config.captainTimeRequirement;
             requirementsCount = config.captainRequirementsCount;
 
-            XPRequirement = config.captainXPRequirement;
-            levelRequirement = config.captainLevelRequirement;
-            contributionRequirement = config.captainContributorRequirement;
-            optionalTimeRequirement = config.captainOptionalTimeRequirement;
-            warsRequirement = config.captainWarsRequirement;
-            weeklyPlaytimeRequirement = config.captainWeeklyPlaytimeRequirement;
+            XPRequirement = promotionRequirements[PromotionValue.XP];
+            levelRequirement = promotionRequirements[PromotionValue.LEVEL];
+            contributionRequirement = promotionRequirements[PromotionValue.TOP];
+            optionalTimeRequirement = promotionRequirements[PromotionValue.TIME];
+            warsRequirement = promotionRequirements[PromotionValue.WARS];
+            weeklyPlaytimeRequirement = promotionRequirements[PromotionValue.PLAYTIME];
 
-            nextGuildRank = 'CAPTAIN';
-        } else if (memberToCheck.guildRank === 'RECRUIT') {
+            nextGuildRank = 'Captain';
+        } else if (guildRank === 'recruit') {
             promotionRequirements = config.recruiterPromotionRequirement;
             timeRequirement = config.recruiterTimeRequirement;
             requirementsCount = config.recruiterRequirementsCount;
 
-            XPRequirement = config.recruiterXPRequirement;
-            levelRequirement = config.recruiterLevelRequirement;
-            contributionRequirement = config.recruiterContributorRequirement;
-            optionalTimeRequirement = config.recruiterOptionalTimeRequirement;
-            warsRequirement = config.recruiterWarsRequirement;
-            weeklyPlaytimeRequirement = config.recruiterWeeklyPlaytimeRequirement;
+            XPRequirement = promotionRequirements[PromotionValue.XP];
+            levelRequirement = promotionRequirements[PromotionValue.LEVEL];
+            contributionRequirement = promotionRequirements[PromotionValue.TOP];
+            optionalTimeRequirement = promotionRequirements[PromotionValue.TIME];
+            warsRequirement = promotionRequirements[PromotionValue.WARS];
+            weeklyPlaytimeRequirement = promotionRequirements[PromotionValue.PLAYTIME];
 
-            nextGuildRank = 'RECRUITER';
+            nextGuildRank = 'Recruiter';
+        }
+
+        if (Object.keys(promotionRequirements).length < requirementsCount) {
+            return ({ username: playerJson.username, unableToPromote: 'missing' });
         }
 
         // Add one extra for the forced time requirement
@@ -219,114 +266,100 @@ async function promotionProgress(interaction, force = false) {
 
         let metRequirements = 0;
 
-        let timeMessage;
-
-        if (daysInGuild < timeRequirement) {
-            timeMessage = `🔴 Does not meet time requirement (${daysInGuild} days/${timeRequirement} days)\n`;
-        } else {
-            timeMessage = `🟢 Meets time requirement (${daysInGuild} days/${timeRequirement} days)\n`;
+        if (daysInGuild >= timeRequirement) {
             metRequirements++;
         }
 
-        let reqsMessage = '';
+        const requirements = [];
 
-        if (promotionRequirements.includes('XP')) {
-            if (memberToCheck.contributedGuildXP >= XPRequirement) {
-                reqsMessage += `🟢 Has contributed enough XP (${memberToCheck.contributedGuildXP.toLocaleString()}/${XPRequirement.toLocaleString()})\n`;
+        if (promotionRequirements[PromotionValue.XP]) {
+            requirements.push(new PromotionRequirement(PromotionValue.XP, contributedGuildXP, XPRequirement));
+
+            if (contributedGuildXP >= XPRequirement) {
                 metRequirements++;
-            } else {
-                reqsMessage += `🔴 Has not contributed enough XP (${memberToCheck.contributedGuildXP.toLocaleString()}/${XPRequirement.toLocaleString()})\n`;
             }
         }
 
-        if (promotionRequirements.includes('LEVEL')) {
-            if (memberToCheck.highestClassLevel >= levelRequirement) {
-                reqsMessage += `🟢 Has a high enough level class (${memberToCheck.highestClassLevel}/${levelRequirement})\n`;
+        if (promotionRequirements[PromotionValue.LEVEL]) {           
+            requirements.push(new PromotionRequirement(PromotionValue.LEVEL, highestCharcterLevel, levelRequirement));
+
+            if (highestCharcterLevel >= levelRequirement) {
                 metRequirements++;
-            } else {
-                reqsMessage += `🔴 Does not have a high enough level class (${memberToCheck.highestClassLevel}/${levelRequirement})\n`;
             }
         }
 
-        if (promotionRequirements.includes('TOP')) {
+        if (promotionRequirements[PromotionValue.TOP]) {
+            requirements.push(new PromotionRequirement(PromotionValue.TOP, contributionPos, contributionRequirement));
+
             if (contributionPos <= contributionRequirement) {
-                reqsMessage += `🟢 Is a top contributor (${contributionPos}/${contributionRequirement})\n`;
                 metRequirements++;
-            } else {
-                reqsMessage += `🔴 Is not a top contributor (${contributionPos}/${contributionRequirement})\n`;
             }
         }
 
-        if (promotionRequirements.includes('TIME')) {
+        if (promotionRequirements[PromotionValue.TIME]) {  
+            requirements.push(new PromotionRequirement(PromotionValue.TIME, daysInGuild, optionalTimeRequirement));
+
             if (daysInGuild >= optionalTimeRequirement) {
-                reqsMessage += `🟢 Has been in the guild long enough (${daysInGuild}/${optionalTimeRequirement})\n`;
                 metRequirements++;
-            } else {
-                reqsMessage += `🔴 Has not been in the guild long enough (${daysInGuild}/${optionalTimeRequirement})\n`;
             }
         }
 
-        if (promotionRequirements.includes('WARS')) {
-            if (memberToCheck.wars >= warsRequirement) {
-                reqsMessage += `🟢 Has participated in enough wars (${memberToCheck.wars}/${warsRequirement})\n`;
+        if (promotionRequirements[PromotionValue.WARS]) {
+            requirements.push(new PromotionRequirement(PromotionValue.WARS, wars, warsRequirement));
+
+            if (wars >= warsRequirement) {
                 metRequirements++;
-            } else {
-                reqsMessage += `🔴 Has not participated in enough wars (${memberToCheck.wars}/${warsRequirement})\n`;
             }
         }
 
-        if (promotionRequirements.includes('BUILD')) {
+        if (promotionRequirements[PromotionValue.BUILD]) {
+            requirements.push(new PromotionRequirement(PromotionValue.BUILD, hasBuildRole ? 1 : 0, 1));
+
             if (hasBuildRole) {
-                reqsMessage += '🟢 Has a war build\n';
                 metRequirements++;
-            } else {
-                reqsMessage += '🔴 Does not have a war build\n';
             }
         }
 
-        if (promotionRequirements.includes('PLAYTIME')) {
-            if (!memberPlaytime || memberPlaytime.averagePlaytime === -1) {
-                reqsMessage += '🔴 Has not been in guild long enough for weekly playtime to be tracked\n';
-            } else if (memberPlaytime.averagePlaytime >= weeklyPlaytimeRequirement) {
-                reqsMessage += `🟢 Has enough weekly playtime (${parseFloat(memberPlaytime.averagePlaytime.toFixed(2))} hrs/${weeklyPlaytimeRequirement} hrs)\n`;
+        if (promotionRequirements[PromotionValue.PLAYTIME]) {
+            requirements.push(new PromotionRequirement(PromotionValue.PLAYTIME, memberPlaytime, weeklyPlaytimeRequirement));
+
+            if (memberPlaytime >= weeklyPlaytimeRequirement) {
                 metRequirements++;
-            } else {
-                reqsMessage += `🔴 Does not have enough weekly playtime (${parseFloat(memberPlaytime.averagePlaytime.toFixed(2))} hrs/${weeklyPlaytimeRequirement} hrs)\n`;
             }
         }
 
-        if (promotionRequirements.includes('ECO')) {
+        if (promotionRequirements[PromotionValue.ECO]) {
+            requirements.push(new PromotionRequirement(PromotionValue.ECO, hasEcoRole ? 1 : 0, 1));
+
             if (hasEcoRole) {
-                reqsMessage += '🟢 Is willing to learn/knows eco';
                 metRequirements++;
-            } else {
-                reqsMessage += '🔴 Is not willing to learn and does not know eco';
             }
         }
 
-        const headerMessage = `${player.username.replace(/_/g, '\\_')} (${memberToCheck.guildRank}) has the following requirements for ${nextGuildRank} (${metRequirements}/${requirementsCount})\n`;
-
-        const fullMessage = headerMessage + '\n' + timeMessage + '\n' + reqsMessage;
-
-        return new ButtonedMessage('', [], '', [fullMessage]);
+        return ({
+            uuid: playerJson.uuid,
+            username: playerJson.username,
+            guildRank: guildRank.charAt(0).toUpperCase() + guildRank.slice(1),
+            nextGuildRank: nextGuildRank,
+            requirementsCount: requirementsCount,
+            metRequirements: metRequirements,
+            daysInGuild: daysInGuild,
+            timeRequirement: timeRequirement,
+            requirements: requirements,
+        });
     } catch (error) {
-        console.log(error);
-        return new ButtonedMessage('', [], '', ['Unable to display promotion progress.']);
-    }
-}
+        console.error(error);
 
-async function findDiscordUser(serverMembers, username) {
-    for (const serverMember of serverMembers) {
-        if (serverMember.user.bot) {
-            continue;
+        let username;
+
+        if (interaction.options !== undefined) {
+            username = interaction.options.getString('username');
+        } else if (interaction.customId) {
+            username = interaction.customId;
         }
 
-        if (username === serverMember.user.username || username === serverMember.user.globalName || username === serverMember.nickname) {
-            return serverMember;
-        }
+        return ({ username: username, unableToPromote: 'error' });
     }
-
-    return null;
 }
 
 module.exports = promotionProgress;

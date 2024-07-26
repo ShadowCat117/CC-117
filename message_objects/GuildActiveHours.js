@@ -22,6 +22,15 @@ class GuildActiveHours {
         } else if (this.hour < 0) {
             this.hour += 24;
         }
+
+        this.hour = this.hour.toString().padStart(2, '0');
+
+        // If the timezone has a x:30 offset from UTC, display minutes as :30, otherwise :00
+        if (this.halfTimezone) {
+            this.hour += ':30';
+        } else {
+            this.hour += ':00';
+        }
     }
 
     // Format the object to be displayed

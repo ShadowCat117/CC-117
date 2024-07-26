@@ -1,8 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const ButtonedMessage = require('../message_type/ButtonedMessage');
-const MessageType = require('../message_type/MessageType');
-const findPlayer = require('./find_player');
+const database = require('../database/database');
 
 async function unbanPlayer(interaction, force = false) {
     const guildId = interaction.guild.id;
@@ -16,56 +14,58 @@ async function unbanPlayer(interaction, force = false) {
             config = JSON.parse(fileData);
         }
 
-        const guildName = config.guildName;
-
         let nameToSearch;
 
         if (interaction.options !== undefined) {
             nameToSearch = interaction.options.getString('username');
         } else if (interaction.customId) {
-            nameToSearch = interaction.customId;
+            nameToSearch = interaction.customId.split(':')[1];
         }
-
-        const player = await findPlayer(nameToSearch, '', force);
+    
+        const player = await database.findPlayer(nameToSearch, force);
 
         if (player && player.message === 'Multiple possibilities found') {
-            let textMessage = `Multiple players found with the username: ${nameToSearch}.`;
-    
-            for (let i = 0; i < player.playerUuids.length; i++) {
-                const uuid = player.playerUuids[i];
-                const playerUsername = player.playerUsernames[i];
-                const rank = player.playerRanks[i];
-                const guildRank = player.playerGuildRanks[i];
-                const playerGuildName = player.playerGuildNames[i];
+            // If banned players doesn't contain one of the choices it can be removed from choices
+            const filteredPlayers = player.playerUuids
+                .map((uuid, index) => ({
+                    playerUuid: uuid,
+                    username: player.playerUsernames[index],
+                }))
+                .filter(({ playerUuid }) => Object.keys(config.bannedPlayers).includes(playerUuid));
 
-                if (!rank && !playerGuildName) {
-                    textMessage += `\n${i + 1}. ${playerUsername} (UUID: ${uuid})`;
-                } else if (!rank) {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${guildRank} of ${playerGuildName}. (UUID: ${uuid})`;
-                } else if (!playerGuildName) {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${rank}. (UUID: ${uuid})`;
-                } else {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${rank} and ${guildRank} of ${playerGuildName}. (UUID: ${uuid})`;
-                }
+            if (filteredPlayers.length === 1) {
+                player.uuid = filteredPlayers[0].playerUuid;
+                player.username = filteredPlayers[0].username;
             }
     
-            textMessage += '\nClick button to choose player.';
-    
-            return new ButtonedMessage(textMessage, player.playerUuids, MessageType.UNBAN_PLAYER, []);
+            if (!player.uuid) {
+                return {
+                    playerUuids: player.playerUuids,
+                    playerUsernames: player.playerUsernames,
+                    playerRanks: player.playerRanks,
+                    playerGuildRanks: player.playerGuildRanks,
+                    playerGuildNames: player.playerGuildNames,
+                };
+            }
         }
 
-        if (!config['bannedPlayers'] || !config['bannedPlayers'][player.username]) {
-            return new ButtonedMessage('', [], '', [`${player.username} is not banned from ${guildName}`]);
+        if (!player) {
+            return ({ error: `Unknown player ${nameToSearch.replaceAll('_', '\\_')}` });
         }
 
-        delete config['bannedPlayers'][player.username];
+        if (!config['bannedPlayers'] || !config['bannedPlayers'][player.uuid]) {
+            return ({ error: `${player.username.replaceAll('_', '\\_')} is not banned.` });
+        }
+
+
+        delete config['bannedPlayers'][player.uuid];
 
         fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
-        return new ButtonedMessage('', [], '', [`${player.username} is no longer banned from ${guildName}`]);
+        return ({ username: player.username.replaceAll('_', '\\_') });
     } catch (err) {
         console.log(err);
-        return new ButtonedMessage('', [], '', ['Unable to unban player.']);
+        return ({ error: 'Error trying to unban user.' });
     }
 }
 

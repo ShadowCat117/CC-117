@@ -3,10 +3,8 @@ node_modules
 config.json
 testConfig.json
 configs
-database/
-updateGuilds.json
-updatePlayers.json
-timezones.json
+database/database.db
+database/database.db-journal
+preferences.json
 deploy-commands.js
 index.js
-events/message_delete.js

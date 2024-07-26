@@ -1,21 +1,6 @@
-const ButtonedMessage = require('../message_type/ButtonedMessage');
-const MessageType = require('../message_type/MessageType');
-const findPlayer = require('./find_player');
-
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('database/database.db');
-
-async function getAsync(query, params) {
-    return new Promise((resolve, reject) => {
-        db.get(query, params, function(err, rows) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(rows);
-            }
-        });
-    });
-}
+const axios = require('axios');
+const database = require('../database/database');
+const utilities = require('./utilities');
 
 function sigmoid(x) {
     return 100 / (1 + Math.exp(-0.1 * (x - 50)));
@@ -27,126 +12,158 @@ async function sus(interaction, force = false) {
     if (interaction.options !== undefined) {
         nameToSearch = interaction.options.getString('username');
     } else if (interaction.customId) {
-        nameToSearch = interaction.customId;
+        nameToSearch = interaction.customId.split(':')[1];
     }
 
-    const player = await findPlayer(nameToSearch, '', force);
+    const player = await database.findPlayer(nameToSearch, force);
 
     if (player && player.message === 'Multiple possibilities found') {
-        let textMessage = `Multiple players found with the username: ${nameToSearch}.`;
+        return {
+            playerUuids: player.playerUuids,
+            playerUsernames: player.playerUsernames,
+            playerRanks: player.playerRanks,
+            playerGuildRanks: player.playerGuildRanks,
+            playerGuildNames: player.playerGuildNames,
+        };
+    }
 
-        for (let i = 0; i < player.playerUuids.length; i++) {
-            const uuid = player.playerUuids[i];
-            const playerUsername = player.playerUsernames[i];
-            const rank = player.playerRanks[i];
-            const guildRank = player.playerGuildRanks[i];
-            const playerGuildName = player.playerGuildNames[i];
+    await utilities.waitForRateLimit();
 
-            if (!rank && !playerGuildName) {
-                textMessage += `\n${i + 1}. ${playerUsername} (UUID: ${uuid})`;
-            } else if (!rank) {
-                textMessage += `\n${i + 1}. ${playerUsername}, ${guildRank} of ${playerGuildName}. (UUID: ${uuid})`;
-            } else if (!playerGuildName) {
-                textMessage += `\n${i + 1}. ${playerUsername}, ${rank}. (UUID: ${uuid})`;
-            } else {
-                textMessage += `\n${i + 1}. ${playerUsername}, ${rank} and ${guildRank} of ${playerGuildName}. (UUID: ${uuid})`;
+    let playerJson;
+
+    // If a player was found, look for UUID to get guaranteed results, otherwise look for the name input
+    if (player) {
+        const response = await axios.get(`https://api.wynncraft.com/v3/player/${player.uuid}?fullResult=True`);
+        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+        playerJson = response.data;
+    } else {
+        try {
+            const response = await axios.get(`https://api.wynncraft.com/v3/player/${nameToSearch}?fullResult=True`);
+            utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+            playerJson = response.data;
+        } catch (err) {
+            // 300 indicates a multi selector
+            if (err.response.status === 300) {
+                return {
+                    playerUuids: Object.keys(err.response.data),
+                    playerUsernames: Object.values(err.response.data).map((entry) => entry.storedName),
+                    playerRanks: [],
+                    playerGuildRanks: [],
+                    playerGuildNames: [],
+                };
             }
         }
-
-        textMessage += '\nClick button to choose player.';
-
-        return new ButtonedMessage(textMessage, player.playerUuids, MessageType.SUS, []);
     }
 
-    if (!player) {
-        return new ButtonedMessage('', [], '', [`Unknown player, ${nameToSearch.replace(/_/g, '\\_')}`]);
-    }
-
-    const memberToCheck = await getAsync('SELECT username, guildName, guildRank, rank, veteran, firstJoin, completedQuests, totalCombatLevel, playtime FROM players WHERE UUID = ?', [player.uuid]);
-
-    if (!memberToCheck) {
-        return new ButtonedMessage('', [], '', [`${nameToSearch.replace(/_/g, '\\_')} not found`]);
-    }
-
-    if (memberToCheck.firstJoin === null || memberToCheck.playtime === null || (memberToCheck.totalCombatLevel === null || memberToCheck.totalCombatLevel === 0) || memberToCheck.completedQuests === null) {
-        const susResponse = `Missing information for ${memberToCheck.username.replace(/_/g, '\\_')}, please run \`/updateplayer player:${memberToCheck.username.replace(/_/g, '\\_')}\``;
-        return new ButtonedMessage('', [], '', [susResponse]);
+    if (!playerJson || !playerJson.username) {
+        return ({
+            username: '',
+            uuid: '',
+            overallSusValue: -1,
+            joinSusData: '',
+            playtimeSusData: '',
+            timeSpentSusData: '',
+            totalLevelSusData: '',
+            questsSusData: '',
+            rankSusData: '',
+            publicProfile: false,
+        });
     }
 
     // Calculations based on Valor bot with some tweaks https://github.com/classAndrew/valor/blob/main/commands/sus.py
-    const wynnJoinSus = memberToCheck.firstJoin ? Math.max(0, (Date.now() / 1000 - new Date(memberToCheck.firstJoin).getTime() / 1000 - 63072000) * -1) * 100 / 63072000 : 50.0;
-    const rankSus = memberToCheck.rank === 'VIP' ? 25.0 : (memberToCheck.rank === 'VIP+' || memberToCheck.rank === 'HERO' || memberToCheck.rank === 'CHAMPION' || memberToCheck.veteran === 1) ? 0.0 : 50.0;
-    const levelSus = memberToCheck.totalCombatLevel ? Math.max(0, (memberToCheck.totalCombatLevel - 210) * -1) * 100 / 210 : 50.0;
-    const playtimeSus = memberToCheck.playtime ? Math.max(0, (memberToCheck.playtime - 800) * -1) * 100 / 800 : 50.0;
-    const questSus = memberToCheck.completedQuests ? Math.max(0, (memberToCheck.completedQuests - 150) * -1) * 100 / 150 : 50.0;
+    const joinSusValue = Math.max(0, (Date.now() / 1000 - new Date(playerJson.firstJoin).getTime() / 1000 - 63072000) * -1) * 100 / 63072000;
+    const playtimeSusValue = Math.max(0, (playerJson.playtime - 800) * -1) * 100 / 800;
 
-    const daysSinceJoin = Math.floor((Date.now() - new Date(memberToCheck.firstJoin).getTime()) / (1000 * 60 * 60 * 24));
+    const daysSinceJoin = Math.floor((Date.now() - new Date(playerJson.firstJoin).getTime()) / (1000 * 60 * 60 * 24));
 
     let timeSpentPercentage;
-    let timeSpentSus;
+    let timeSpentSusValue;
 
-    if (memberToCheck.playtime && daysSinceJoin > 0) {
-        timeSpentPercentage = ((memberToCheck.playtime / (daysSinceJoin * 24)) * 100);
-        timeSpentSus = sigmoid(timeSpentPercentage);
-    } else if (memberToCheck.playtime && daysSinceJoin === 0) {
+    if (daysSinceJoin > 0) {
+        timeSpentPercentage = ((playerJson.playtime / (daysSinceJoin * 24)) * 100);
+        timeSpentSusValue = sigmoid(timeSpentPercentage);
+    } else {
         timeSpentPercentage = 100.00;
-        timeSpentSus = 100;
-    } else {
-        timeSpentPercentage = 0.00;
-        timeSpentSus = 0;
+        timeSpentSusValue = 100;
     }
 
-    const overallSus = ((wynnJoinSus + rankSus + levelSus + playtimeSus + questSus + timeSpentSus) / 6).toFixed(2);
+    const totalLevelSusValue = Math.max(0, (playerJson.globalData.totalLevel - 250) * -1) * 100 / 250;
+    const questSusValue = Math.max(0, (playerJson.globalData.completedQuests - 150) * -1) * 100 / 150;
+    const rankSusValue = playerJson.supportRank === 'vip' ? 25.0 : (playerJson.supportRank === 'vipplus' || playerJson.supportRank === 'hero' || playerJson.supportRank === 'champion' || playerJson.veteran === true) ? 0.0 : 50.0;
 
-    let joinSusMessage;
-    let playtimeSusMessage;
-    let timeSpentSusMessage;
-    let levelSusMessage;
-    let questsSusMessage;
-    let rankSusMessage;
+    const overallSus = ((joinSusValue + rankSusValue + totalLevelSusValue + playtimeSusValue + questSusValue + timeSpentSusValue) / 6).toFixed(2);
 
-    if (memberToCheck.firstJoin !== null) {
-        joinSusMessage = `**Join Date**: ${memberToCheck.firstJoin} (${daysSinceJoin} days) __(${wynnJoinSus.toFixed(2)}%)__`;
+    const joinSusData = `${playerJson.firstJoin.split('T')[0]}\n${joinSusValue.toFixed(2)}%`;
+    const playtimeSusData = `${playerJson.playtime} hours\n${playtimeSusValue.toFixed(2)}%`;
+    const timeSpentSusData = `${timeSpentPercentage.toFixed(2)}% of playtime\n${timeSpentSusValue.toFixed(2)}%`;
+    const totalLevelSusData = `${playerJson.globalData.totalLevel}\n${totalLevelSusValue.toFixed(2)}%`;
+    const questsSusData = `${playerJson.globalData.completedQuests}\n${questSusValue.toFixed(2)}%`;
+    let rankSusData;
+
+    const rank = playerJson.supportRank;
+
+    if (rank === null) {
+        rankSusData = 'No rank';
+    } else if (rank === 'vipplus') {
+        rankSusData = 'VIP+';
     } else {
-        joinSusMessage = `Unknown join date: __(${wynnJoinSus.toFixed(2)}%)__`;
+        rankSusData = rank.charAt(0).toUpperCase() + rank.slice(1);
     }
 
-    if (memberToCheck.playtime !== null) {
-        playtimeSusMessage = `**Playtime**: ${memberToCheck.playtime} hours __(${playtimeSus.toFixed(2)}%)__`;
-    } else {
-        playtimeSusMessage = `Unknown playtime: __(${playtimeSus.toFixed(2)}%)__`;
+    if (playerJson.veteran === true) {
+        rankSusData += ' (Vet.)';
     }
 
-    if (timeSpentPercentage > 0) {
-        timeSpentSusMessage = `**Time Spent Playing**: ${timeSpentPercentage.toFixed(2)}% of playtime __(${timeSpentSus.toFixed(2)}%)__`;
-    } else {
-        timeSpentSusMessage = `Unknown time spent playing: __(${timeSpentSus.toFixed(2)}%)__`;
+    rankSusData += `\n${rankSusValue.toFixed(2)}%`;
+
+    let guildUuid = null;
+    let guildRank = null;
+
+    if (playerJson.guild) {
+        guildUuid = playerJson.guild.uuid;
+
+        guildRank = playerJson.guild.rank.toLowerCase();
     }
 
-    if (memberToCheck.totalCombatLevel !== null) {
-        levelSusMessage = `**Total Combat Level**: ${memberToCheck.totalCombatLevel} __(${levelSus.toFixed(2)}%)__`;
-    } else {
-        levelSusMessage = `Unknown total combat level: __(${levelSus.toFixed(2)}%)__`;
-    }
+    let highestCharcterLevel = 0;
 
-    if (memberToCheck.completedQuests !== null) {
-        questsSusMessage = `**Total Quests Completed**: ${memberToCheck.completedQuests} __(${questSus.toFixed(2)}%)__`;
-    } else {
-        questsSusMessage = `Unknown total quests completed: __(${questSus.toFixed(2)}%)__`;
-    }
+    for (const character in playerJson.characters) {
+        const characterJson = playerJson.characters[character];
 
-    if (memberToCheck.rank !== null) {
-        if (memberToCheck.veteran === 1) {
-            rankSusMessage = `**Rank**: ${memberToCheck.rank} (Vet) __(${rankSus.toFixed(2)}%)__`;
-        } else {
-            rankSusMessage = `**Rank**: ${memberToCheck.rank} __(${rankSus.toFixed(2)}%)__`;
+        // If character level is higher than current tracked highest, set as new highest
+        if (characterJson.level > highestCharcterLevel) {
+            highestCharcterLevel = characterJson.level;
         }
-    } else {
-        rankSusMessage = `**Rank**: None __(${rankSus.toFixed(2)}%)__`;
     }
 
-    const susResponse = `Suspiciousness of **${memberToCheck.username}** is: **__${overallSus}%__**\n\n${joinSusMessage}\n\n${playtimeSusMessage}\n\n${timeSpentSusMessage}\n\n${levelSusMessage}\n\n${questsSusMessage}\n\n${rankSusMessage}`;
-    return new ButtonedMessage('', [], '', [susResponse]);
+    const veteran = playerJson.veteran ? playerJson.veteran : false;
+
+    database.updatePlayer({
+        uuid: playerJson.uuid,
+        username: playerJson.username,
+        guildUuid: guildUuid,
+        guildRank: guildRank,
+        online: playerJson.online,
+        lastLogin: playerJson.lastJoin,
+        supportRank: playerJson.supportRank,
+        veteran: veteran,
+        serverRank: playerJson.rank,
+        wars: playerJson.globalData.wars,
+        highestCharcterLevel: highestCharcterLevel,
+    });
+
+    return ({
+        username: playerJson.username.replaceAll('_', '\\_'),
+        uuid: playerJson.uuid,
+        overallSusValue: overallSus,
+        joinSusData: joinSusData,
+        playtimeSusData: playtimeSusData,
+        timeSpentSusData: timeSpentSusData,
+        totalLevelSusData: totalLevelSusData,
+        questsSusData: questsSusData,
+        rankSusData: rankSusData,
+        publicProfile: playerJson.publicProfile,
+    });
 }
 
 module.exports = sus;

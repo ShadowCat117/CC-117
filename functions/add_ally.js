@@ -1,8 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const findGuild = require('./find_guild');
-const ButtonedMessage = require('../message_type/ButtonedMessage');
-const MessageType = require('../message_type/MessageType');
+const database = require('../database/database');
 
 async function addAlly(interaction, force = false) {
     let nameToSearch;
@@ -10,51 +8,53 @@ async function addAlly(interaction, force = false) {
     if (interaction.options !== undefined) {
         nameToSearch = interaction.options.getString('guild_name');
     } else {
-        nameToSearch = interaction.customId;
+        nameToSearch = interaction.customId.split(':')[1];
     }
 
-    let guildName = await findGuild(nameToSearch, force);
+    const guild = await database.findGuild(nameToSearch, force);
 
     const guildId = interaction.guild.id;
     const directoryPath = path.join(__dirname, '..', 'configs');
     const filePath = path.join(directoryPath, `${guildId}.json`);
 
-    if (guildName && guildName.message === 'Multiple possibilities found') {
+    if (guild && guild.message === 'Multiple possibilities found') {
         try {
             let config = {};
 
+            // If allies contains one of the choices it can be removed from choices
             if (fs.existsSync(filePath)) {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
-            }
 
-            const filteredGuildNames = guildName.guildNames.filter(name => !config.allies.includes(name));
+                const filteredGuilds = guild.guildUuids
+                    .map((uuid, index) => ({
+                        guildUuid: uuid,
+                        guildName: guild.guildNames[index],
+                        guildPrefix: guild.guildPrefixes[index],
+                    }))
+                    .filter(({ guildUuid }) => !config.allies.includes(guildUuid));
 
-            guildName.guildNames = filteredGuildNames;
 
-            if (guildName.guildNames.length === 0) {
-                return new ButtonedMessage('', [], '', [`Already allied with all guilds matching ${nameToSearch}.`]);
-            } else if (guildName.guildNames.length === 1) {
-                guildName = filteredGuildNames[0];
-            } else {
-                let textMessage = `Multiple guilds found with the name/prefix: ${nameToSearch}.`;
-
-                for (let i = 0; i < guildName.guildNames.length; i++) {
-                    const name = guildName.guildNames[i];
-
-                    textMessage += `\n${i + 1}. ${name}`;
+                if (filteredGuilds.length === 1) {
+                    guild.uuid = filteredGuilds[0].guildUuid;
+                    guild.name = filteredGuilds[0].guildName;
+                    guild.prefix = filteredGuilds[0].guildPrefix;
                 }
-
-                textMessage += '\nClick button to choose guild.';
-
-                return new ButtonedMessage(textMessage, guildName.guildNames, MessageType.ADD_ALLY, []);
             }
         } catch (error) {
-            return new ButtonedMessage('', [], '', ['Unable to add ally.']);
+            console.error(error);
+        }
+
+        if (!guild.uuid) {
+            return {
+                guildUuids: guild.guildUuids,
+                guildNames: guild.guildNames,
+                guildPrefixes: guild.guildPrefixes,
+            };
         }
     }
 
-    if (guildName) {
+    if (guild) {
         try {
             let config = {};
 
@@ -63,26 +63,25 @@ async function addAlly(interaction, force = false) {
                 config = JSON.parse(fileData);
             }
 
-            config.allies = config.allies.filter(item => item !== null);
-
-            if (config.allies.includes(guildName)) {
-                return new ButtonedMessage('', [], '', [`${guildName} is already added as an ally.`]);
+            if (config.allies.includes(guild.uuid)) {
+                return ({ error: `${guild.name} is already an ally.` });
             }
 
-            if (config.guildName === guildName) {
-                return new ButtonedMessage('', [], '', [`Can't add ${guildName} as an ally as that is the guild your server is currently representing.`]);
+            if (config.guild === guild.uuid) {
+                return ({ error: `You are representing ${guild.name}.` });
             }
 
-            config.allies.push(guildName);
+            config.allies.push(guild.uuid);
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
-            return new ButtonedMessage('', [], '', [`Added ${guildName} as an ally.`]);
+            return ({ guildName: guild.name });
         } catch (error) {
-            return new ButtonedMessage('', [], '', ['Unable to add ally.']);
+            console.error(error);
+            return ({ error: 'An error occured whilst adding ally.' });
         }
     } else {
-        return new ButtonedMessage('', [], '', [`${interaction.options.getString('guild_name')} not found, try using the full exact guild name.`]);
+        return ({ guildName: '' });
     }
 }
 

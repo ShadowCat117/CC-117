@@ -1,38 +1,7 @@
-const sqlite3 = require('sqlite3').verbose();
-const findGuild = require('./find_guild');
+const axios = require('axios');
+const database = require('../database/database');
+const utilities = require('./utilities');
 const GuildMember = require('../message_objects/GuildMember');
-const ButtonedMessage = require('../message_type/ButtonedMessage');
-const MessageType = require('../message_type/MessageType');
-const db = new sqlite3.Database('database/database.db');
-
-async function getAsync(query, params) {
-    return new Promise((resolve, reject) => {
-        db.get(query, params, function(err, rows) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(rows);
-            }
-        });
-    });
-}
-
-async function allAsync(query, params) {
-    return new Promise((resolve, reject) => {
-        db.all(query, params, function(err, rows) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(rows);
-            }
-        });
-    });
-}
-
-async function doesTableExist(tableName) {
-    const result = await getAsync('SELECT name FROM sqlite_master WHERE type = \'table\' AND name = ?', [tableName]);
-    return !!result;
-}
 
 async function guildStats(interaction, force = false) {
     let nameToSearch;
@@ -40,145 +9,98 @@ async function guildStats(interaction, force = false) {
     if (interaction.options !== undefined) {
         nameToSearch = interaction.options.getString('guild_name');
     } else {
-        nameToSearch = interaction.customId;
+        nameToSearch = interaction.customId.split(':')[1];
     }
 
-    const guildName = await findGuild(nameToSearch, force);
+    const guild = await database.findGuild(nameToSearch, force);
 
-    if (guildName && guildName.message === 'Multiple possibilities found') {
-        let textMessage = `Multiple guilds found with the name/prefix: ${nameToSearch}.`;
-
-        for (let i = 0; i < guildName.guildNames.length; i++) {
-            const name = guildName.guildNames[i];
-
-            textMessage += `\n${i + 1}. ${name}`;
-        }
-
-        textMessage += '\nClick button to choose guild.';
-
-        return new ButtonedMessage(textMessage, guildName.guildNames, MessageType.GUILD_STATS, []);
+    if (guild && guild.message === 'Multiple possibilities found') {
+        return {
+            guildUuids: guild.guildUuids,
+            guildNames: guild.guildNames,
+            guildPrefixes: guild.guildPrefixes,
+        };
     }
 
-    if (guildName) {
-        const guildRow = await getAsync('SELECT prefix, level, xpPercent, wars, rating FROM guilds WHERE name = ?', [guildName]);
-        const memberRows = await allAsync('SELECT UUID, username, guildRank, lastJoin, isOnline, onlineWorld, contributedGuildXP, guildJoinDate, wars FROM players WHERE guildName = ? ORDER BY contributedGuildXP DESC', [guildName]);
-        const today = new Date();
+    let guildJson;
 
-        if (guildRow == undefined) {
-            return new ButtonedMessage('', [], '', [`${nameToSearch} not found, try using the full exact guild name.`]);
-        }
+    await utilities.waitForRateLimit();
 
-        const tableName = guildName.replaceAll(' ', '_');
-        const tableExists = await doesTableExist(tableName);
-
-        let activityRows;
-
-        if (tableExists) {
-            activityRows = await allAsync(`SELECT UUID, averagePlaytime FROM ${tableName}`);
-        }
-
-        let contributionPosition = 0;
-
-        let averageXpPerDay = 0;
-
-        let totalPlaytime = 0;
-
-        const guildMembers = memberRows.map(row => {
-            contributionPosition++;
-
-            const {
-                username,
-                guildRank,
-                wars,
-            } = row;
-
-            let {
-                contributedGuildXP,
-            } = row;
-
-            let daysInGuild;
-
-            try {
-                const [year, month, day] = row.guildJoinDate.split('-');
-                
-                const joinDate = new Date(year, month - 1, day);
-        
-                const differenceInMilliseconds = today - joinDate;
-                
-                daysInGuild = Math.round(differenceInMilliseconds / (1000 * 60 * 60 * 24));
-            } catch (err) {
-                daysInGuild = 1;
-            }
-
-            if (contributedGuildXP == null) {
-                contributedGuildXP = 0;
-            }
-
-            if (daysInGuild !== 0) {
-                averageXpPerDay += contributedGuildXP / daysInGuild;
-            }
-
-            const [lastJoinYear, lastJoinMonth, lastJoinDay] = row.lastJoin.split('-');
-                
-            const lastJoinDate = new Date(lastJoinYear, lastJoinMonth - 1, lastJoinDay);
-    
-            const lastJoinDifferenceInMilliseconds = today - lastJoinDate;
-            
-            const daysSinceLastJoin = Math.round(lastJoinDifferenceInMilliseconds / (1000 * 60 * 60 * 24));
-
-            if (tableExists) {
-                for (const player of activityRows) {
-                    if (player.UUID === row.UUID && player.averagePlaytime >= 0) {
-                        totalPlaytime += player.averagePlaytime;
-                        return new GuildMember(username, guildRank, daysSinceLastJoin, contributedGuildXP, row.isOnline, row.onlineWorld, row.guildJoinDate, daysInGuild, contributionPosition, wars, player.averagePlaytime);
-                    }
-                }
-            }
-
-            return new GuildMember(username, guildRank, daysSinceLastJoin, contributedGuildXP, row.isOnline, row.onlineWorld, row.guildJoinDate, daysInGuild, contributionPosition, wars, -1);
-        });
-
-        let formattedXPPerDay;
-
-        if (averageXpPerDay >= 1000000000) {
-            formattedXPPerDay = `${(averageXpPerDay / 1000000000).toFixed(1)}B/day`;
-        } else if (averageXpPerDay >= 1000000) {
-            formattedXPPerDay = `${(averageXpPerDay / 1000000).toFixed(1)}M/day`;
-        } else if (averageXpPerDay >= 1000) {
-            formattedXPPerDay = `${(averageXpPerDay / 1000).toFixed(1)}k/day`;
-        } else {
-            formattedXPPerDay = `${averageXpPerDay.toFixed(2)}/day`;
-        }
-
-        const formattedPlaytime = `${totalPlaytime.toFixed(2)} hours`;
-
-        const pages = [];
-        const guildLevel = guildRow.level ? guildRow.level : '?';
-        const weeklyPlaytime = totalPlaytime == 0 ? '' : `\nTotal weekly playtime: ${formattedPlaytime}`;
-        let guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%)\nWars: ${guildRow.wars} Rating: ${guildRow.rating}\nXP per day: ${formattedXPPerDay}${weeklyPlaytime}\n\n`;
-        let counter = 0;
-
-        guildMembers.forEach((player) => {
-            if (counter === 5) {
-                guildStatsPage += '```';
-                pages.push(guildStatsPage);
-                guildStatsPage = `\`\`\`${guildName} [${guildRow.prefix}] Level: ${guildLevel} (${guildRow.xpPercent}%)\nWars: ${guildRow.wars} Rating: ${guildRow.rating}\nXP per day: ${formattedXPPerDay}${weeklyPlaytime}\n\n` + player.toString();
-                counter = 1;
-            } else {
-                guildStatsPage += player.toString();
-                counter++;
-            }
-        });
-
-        if (counter <= 5) {
-            guildStatsPage += '```';
-            pages.push(guildStatsPage);
-        }
-
-        return new ButtonedMessage('', [], '', pages);
+    // If a guild was found, look for UUID to get guaranteed results, otherwise look for the name input
+    if (guild) {
+        const response = await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${guild.uuid}`);
+        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+        guildJson = response.data;
     } else {
-        return new ButtonedMessage('', [], '', [`${nameToSearch} not found, try using the full exact guild name.`]);
+        const response = await axios.get(`https://api.wynncraft.com/v3/guild/${nameToSearch}`);
+        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+        guildJson = response.data;
     }
+
+    if (!guildJson || !guildJson.name) {
+        return ({ guildName: '', guildPrefix: '', members: [] });
+    }
+
+    const members = [];
+    const name = guildJson.name;
+    const prefix = guildJson.prefix;
+    const level = guildJson.level;
+    const xpPercent = guildJson.xpPercent;
+    const territories = guildJson.territories;
+    const wars = guildJson.wars.toLocaleString();
+    let previousRating = -1;
+    let currentRating = -1;
+
+    const seasonRanks = guildJson.seasonRanks;
+    const numSeasons = Object.keys(seasonRanks).length;
+
+    if (numSeasons > 2) {
+        const seasons = Object.keys(seasonRanks);
+        previousRating = seasonRanks[seasons[numSeasons - 2]].rating.toLocaleString();
+        currentRating = seasonRanks[seasons[numSeasons - 1]].rating.toLocaleString();
+    } else if (numSeasons === 1) {
+        currentRating = seasonRanks[Object.keys(seasonRanks)[0]].rating.toLocaleString();
+    }
+
+    let averageXpPerDay = 0;
+    let totalPlaytime = 0;
+
+    for (const rank in guildJson.members) {
+        if (rank === 'total') continue;
+
+        const rankMembers = guildJson.members[rank];
+
+        for (const member in rankMembers) {
+            const guildMember = rankMembers[member];
+
+            let lastLogin = null;
+
+            if (!guildMember.online) {
+                lastLogin = await database.getLastLogin(guildMember.uuid);
+            }
+
+            const playerWars = await database.getWars(guildMember.uuid);
+            let averagePlaytime = await database.getAveragePlaytime(guildMember.uuid);
+
+            if (averagePlaytime === -1) {
+                averagePlaytime = 0;
+            }
+
+            let daysInGuild = utilities.daysSince(guildMember.joined);
+
+            daysInGuild = daysInGuild > 0 ? daysInGuild : 1;
+
+            averageXpPerDay += guildMember.contributed / daysInGuild;
+
+            totalPlaytime += averagePlaytime;
+            
+            members.push(new GuildMember(member, rank, lastLogin, guildMember.contributed, guildMember.contributionRank, guildMember.online, guildMember.server, guildMember.joined, playerWars, averagePlaytime));
+        }
+    }
+
+    members.sort((a, b) => a.compareTo(b));
+
+    return ({ guildName: name, guildPrefix: prefix, level: level, xpPercent: xpPercent, territories: territories, wars: wars, previousRating: previousRating, currentRating: currentRating, averageXpPerDay: averageXpPerDay, totalPlaytime: totalPlaytime.toFixed(2), members: members });
 }
 
 module.exports = guildStats;

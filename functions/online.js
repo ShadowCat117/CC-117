@@ -1,21 +1,7 @@
-const sqlite3 = require('sqlite3').verbose();
-const findGuild = require('./find_guild');
+const axios = require('axios');
+const database = require('../database/database');
+const utilities = require('./utilities');
 const OnlineGuildMember = require('../message_objects/OnlineGuildMember');
-const ButtonedMessage = require('../message_type/ButtonedMessage');
-const MessageType = require('../message_type/MessageType');
-const db = new sqlite3.Database('database/database.db');
-
-async function allAsync(query, params) {
-    return new Promise((resolve, reject) => {
-        db.all(query, params, function(err, rows) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(rows);
-            }
-        });
-    });
-}
 
 async function online(interaction, force = false) {
     let nameToSearch;
@@ -23,65 +9,57 @@ async function online(interaction, force = false) {
     if (interaction.options !== undefined) {
         nameToSearch = interaction.options.getString('guild_name');
     } else {
-        nameToSearch = interaction.customId;
+        nameToSearch = interaction.customId.split(':')[1];
     }
 
-    const guildName = await findGuild(nameToSearch, force);
+    const guild = await database.findGuild(nameToSearch, force);
 
-    if (guildName && guildName.message === 'Multiple possibilities found') {
-        let textMessage = `Multiple guilds found with the name/prefix: ${nameToSearch}.`;
-
-        for (let i = 0; i < guildName.guildNames.length; i++) {
-            const name = guildName.guildNames[i];
-
-            textMessage += `\n${i + 1}. ${name}`;
-        }
-
-        textMessage += '\nClick button to choose guild.';
-
-        return new ButtonedMessage(textMessage, guildName.guildNames, MessageType.ONLINE, []);
+    if (guild && guild.message === 'Multiple possibilities found') {
+        return {
+            guildUuids: guild.guildUuids,
+            guildNames: guild.guildNames,
+            guildPrefixes: guild.guildPrefixes,
+        };
     }
 
-    if (guildName) {
-        const rows = await allAsync('SELECT username, guildRank, onlineWorld FROM players WHERE guildName = ? AND isOnline = 1', [guildName]);
-                
-            const onlinePlayers = rows.map(row => {
-                const {
-                    username,
-                    guildRank,
-                    onlineWorld,
-                } = row;
+    let guildJson;
 
-                return new OnlineGuildMember(username, guildRank, onlineWorld);
-            });
+    await utilities.waitForRateLimit();
 
-            onlinePlayers.sort((a, b) => a.compareTo(b));
-
-            const pages = [];
-            let onlinePage = `\`\`\`Current online players in ${guildName} (${onlinePlayers.length})\n`;
-            let counter = 0;
-
-            onlinePlayers.forEach((player) => {
-                if (counter === 30) {
-                    onlinePage += '```';
-                    pages.push(onlinePage);
-                    onlinePage = `\`\`\`Current online players in ${guildName} (${onlinePlayers.length})\n` + player.toString();
-                    counter = 1;
-                } else {
-                    onlinePage += player.toString();
-                    counter++;
-                }
-            });
-
-            if (counter <= 30) {
-                onlinePage += '```';
-                pages.push(onlinePage);
-            }
-
-            return new ButtonedMessage('', [], '', pages);
+    // If a guild was found, look for UUID to get guaranteed results, otherwise look for the name input
+    if (guild) {
+        const response = await axios.get(`https://api.wynncraft.com/v3/guild/uuid/${guild.uuid}`);
+        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+        guildJson = response.data;
     } else {
-        return new ButtonedMessage('', [], '', [`${nameToSearch} not found, try using the full exact guild name.`]);
+        const response = await axios.get(`https://api.wynncraft.com/v3/guild/${nameToSearch}`);
+        utilities.updateRateLimit(response.headers['ratelimit-remaining'], response.headers['ratelimit-reset']);
+        guildJson = response.data;
     }
+
+    if (!guildJson || !guildJson.name) {
+        return ({ guildName: '', guildPrefix: '', guildUuid: '', onlinePlayers: [], onlineCount: -1, totalMembers: -1 });
+    }
+
+    const onlinePlayers = [];
+
+    for (const rank in guildJson.members) {
+        if (rank === 'total') continue;
+
+        const rankMembers = guildJson.members[rank];
+
+        for (const member in rankMembers) {
+            const guildMember = rankMembers[member];
+            
+            if (guildMember.online) {
+                onlinePlayers.push(new OnlineGuildMember(member, rank, guildMember.server));
+            }
+        }
+    }
+
+    onlinePlayers.sort((a, b) => a.compareTo(b));
+
+    return ({ guildName: guildJson.name, guildPrefix: guildJson.prefix, guildUuid: guildJson.uuid, onlinePlayers: onlinePlayers, onlineCount: guildJson.online, memberCount: guildJson.members.total });
 }
 
 module.exports = online;

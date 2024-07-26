@@ -229,10 +229,6 @@ Commands for the average user
 ```
 
 ```bash
-/worldactivity
-```
-
-```bash
 /trackedguilds
 ```
 

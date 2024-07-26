@@ -1,10 +1,8 @@
 const fs = require('fs');
 const path = require('path');
-const ButtonedMessage = require('../message_type/ButtonedMessage');
-const MessageType = require('../message_type/MessageType');
-const findPlayer = require('./find_player');
+const database = require('../database/database');
 
-async function removeDemotionException(interaction, force = false) {
+async function removePromotionException(interaction, force = false) {
     const guildId = interaction.guild.id;
     const filePath = path.join(__dirname, '..', 'configs', `${guildId}.json`);
 
@@ -16,61 +14,58 @@ async function removeDemotionException(interaction, force = false) {
             config = JSON.parse(fileData);
         }
 
-        const guildName = config.guildName;
-
         let nameToSearch;
 
         if (interaction.options !== undefined) {
             nameToSearch = interaction.options.getString('username');
         } else if (interaction.customId) {
-            nameToSearch = interaction.customId;
+            nameToSearch = interaction.customId.split(':')[1];
         }
-
-        const player = await findPlayer(nameToSearch, guildName, force);
+    
+        const player = await database.findPlayer(nameToSearch, force, config.guild);
 
         if (player && player.message === 'Multiple possibilities found') {
-            let textMessage = `Multiple players found with the username: ${nameToSearch}.`;
-    
-            for (let i = 0; i < player.playerUuids.length; i++) {
-                const uuid = player.playerUuids[i];
-                const playerUsername = player.playerUsernames[i];
-                const rank = player.playerRanks[i];
-                const guildRank = player.playerGuildRanks[i];
-                const playerGuildName = player.playerGuildNames[i];
+            // If promotion exceptions doesn't contain one of the choices it can be removed from choices
+            const filteredPlayers = player.playerUuids
+                .map((uuid, index) => ({
+                    playerUuid: uuid,
+                    username: player.playerUsernames[index],
+                }))
+                .filter(({ playerUuid }) => Object.keys(config.promotionExceptions).includes(playerUuid));
 
-                if (!rank && !playerGuildName) {
-                    textMessage += `\n${i + 1}. ${playerUsername} (UUID: ${uuid})`;
-                } else if (!rank) {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${guildRank} of ${playerGuildName}. (UUID: ${uuid})`;
-                } else if (!playerGuildName) {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${rank}. (UUID: ${uuid})`;
-                } else {
-                    textMessage += `\n${i + 1}. ${playerUsername}, ${rank} and ${guildRank} of ${playerGuildName}. (UUID: ${uuid})`;
-                }
+            if (filteredPlayers.length === 1) {
+                player.uuid = filteredPlayers[0].playerUuid;
+                player.username = filteredPlayers[0].username;
             }
     
-            textMessage += '\nClick button to choose player.';
-    
-            return new ButtonedMessage(textMessage, player.playerUuids, MessageType.REMOVE_PROMOTION_EXCEPTION, []);
+            if (!player.uuid) {
+                return {
+                    playerUuids: player.playerUuids,
+                    playerUsernames: player.playerUsernames,
+                    playerRanks: player.playerRanks,
+                    playerGuildRanks: player.playerGuildRanks,
+                    playerGuildNames: player.playerGuildNames,
+                };
+            }
         }
 
         if (!player) {
-            return new ButtonedMessage('', [], '', [`${nameToSearch.replace(/_/g, '\\_')} is not a member of ${guildName}`]);
+            return ({ error: `Unknown player ${nameToSearch.replaceAll('_', '\\_')}` });
         }
 
-        if (!config['promotionExceptions'] || !config['promotionExceptions'][player.username]) {
-            return new ButtonedMessage('', [], '', [`${player.username} is not exempt from promotions`]);
+        if (!config['promotionExceptions'] || !config['promotionExceptions'][player.uuid]) {
+            return ({ error: `${player.username.replaceAll('_', '\\_')} is not exempt from promotion.` });
         }
 
-        delete config['promotionExceptions'][player.username];
+        delete config['promotionExceptions'][player.uuid];
 
         fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
-        return new ButtonedMessage('', [], '', [`${player.username} is no longer exempt from promotions`]);
+        return ({ username: player.username.replaceAll('_', '\\_') });
     } catch (err) {
         console.log(err);
-        return new ButtonedMessage('', [], '', ['Unable to remove promotion exception.']);
+        return ({ error: 'Error trying to remove promotion exception.' });
     }
 }
 
-module.exports = removeDemotionException;
+module.exports = removePromotionException;

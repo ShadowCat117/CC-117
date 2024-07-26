@@ -1,17 +1,17 @@
 class OnlineGuildMember {
     // Creates a OnlineGuildMember object
-    // playerName: name of the player
+    // username: Member username
     // guildRank: Guild rank of the player
-    // onlineWorld: What world the player is currently on
-    constructor(playerName, guildRank, onlineWorld) {
-        this.playerName = playerName;
-        this.guildRank = guildRank;
-        this.onlineWorld = onlineWorld;
-    }
-
-    // Returns a formatted string for the players online state
-    toString() {
-        return `${this.playerName.padEnd(16)} ${`(${this.guildRank})`.padEnd(12)} is currently online on ${this.onlineWorld}!\n`;
+    // server: What server the player is currently on
+    constructor(username, guildRank, server) {
+        // Temporary, remove if Wynn ever fixes the name changing guild bug
+        if (username === 'Owen_Rocks_3') {
+            this.username = 'Amber_Rocks_3';
+        } else {
+            this.username = username;
+        }
+        this.guildRank = guildRank.charAt(0).toUpperCase() + guildRank.slice(1);
+        this.server = server;
     }
 
     // Compare an online player with another for sorting.
@@ -19,7 +19,7 @@ class OnlineGuildMember {
     // Then sort by world number
     // Then sort by username
     compareTo(other) {
-        const rankOrder = ['OWNER', 'CHIEF', 'STRATEGIST', 'CAPTAIN', 'RECRUITER', 'RECRUIT'];
+        const rankOrder = ['Owner', 'Chief', 'Strategist', 'Captain', 'Recruiter', 'Recruit'];
         const thisRankIndex = rankOrder.indexOf(this.guildRank);
         const otherRankIndex = rankOrder.indexOf(other.guildRank);
     
@@ -28,15 +28,15 @@ class OnlineGuildMember {
         } else if (thisRankIndex > otherRankIndex) {
             return 1;
         } else {
-            const worldNumber = parseInt(this.onlineWorld.split('WC')[1], 10);
-            const otherWorldNumber = parseInt(other.onlineWorld.split('WC')[1], 10);
+            const worldNumber = parseInt(this.server.split('WC')[1], 10);
+            const otherWorldNumber = parseInt(other.server.split('WC')[1], 10);
     
             if (worldNumber < otherWorldNumber) {
                 return -1;
             } else if (worldNumber > otherWorldNumber) {
                 return 1;
             } else {
-                return this.playerName.localeCompare(other.playerName);
+                return this.username.localeCompare(other.username);
             }
         }
     }

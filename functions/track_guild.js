@@ -1,8 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const findGuild = require('./find_guild');
-const ButtonedMessage = require('../message_type/ButtonedMessage');
-const MessageType = require('../message_type/MessageType');
+const database = require('../database/database');
 
 async function trackGuild(interaction, force = false) {
     let nameToSearch;
@@ -10,51 +8,53 @@ async function trackGuild(interaction, force = false) {
     if (interaction.options !== undefined) {
         nameToSearch = interaction.options.getString('guild_name');
     } else {
-        nameToSearch = interaction.customId;
+        nameToSearch = interaction.customId.split(':')[1];
     }
 
-    let guildName = await findGuild(nameToSearch, force);
+    const guild = await database.findGuild(nameToSearch, force);
 
     const guildId = interaction.guild.id;
     const directoryPath = path.join(__dirname, '..', 'configs');
     const filePath = path.join(directoryPath, `${guildId}.json`);
 
-    if (guildName && guildName.message === 'Multiple possibilities found') {
+    if (guild && guild.message === 'Multiple possibilities found') {
         try {
             let config = {};
 
+            // If tracked guilds contains one of the choices it can be removed from choices
             if (fs.existsSync(filePath)) {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
-            }
 
-            const filteredGuildNames = guildName.guildNames.filter(name => !config.trackedGuilds.includes(name));
+                const filteredGuilds = guild.guildUuids
+                    .map((uuid, index) => ({
+                        guildUuid: uuid,
+                        guildName: guild.guildNames[index],
+                        guildPrefix: guild.guildPrefixes[index],
+                    }))
+                    .filter(({ guildUuid }) => !config.trackedGuilds.includes(guildUuid));
 
-            guildName.guildNames = filteredGuildNames;
 
-            if (guildName.guildNames.length === 0) {
-                return new ButtonedMessage('', [], '', [`Already tracking all guilds matching ${nameToSearch}.`]);
-            } else if (guildName.guildNames.length === 1) {
-                guildName = filteredGuildNames[0];
-            } else {
-                let textMessage = `Multiple guilds found with the name/prefix: ${nameToSearch}.`;
-
-                for (let i = 0; i < guildName.guildNames.length; i++) {
-                    const name = guildName.guildNames[i];
-
-                    textMessage += `\n${i + 1}. ${name}`;
+                if (filteredGuilds.length === 1) {
+                    guild.uuid = filteredGuilds[0].guildUuid;
+                    guild.name = filteredGuilds[0].guildName;
+                    guild.prefix = filteredGuilds[0].guildPrefix;
                 }
-
-                textMessage += '\nClick button to choose guild.';
-
-                return new ButtonedMessage(textMessage, guildName.guildNames, MessageType.TRACK_GUILD, []);
             }
         } catch (error) {
-            return new ButtonedMessage('', [], '', ['Unable to track guild.']);
+            console.error(error);
+        }
+
+        if (!guild.uuid) {
+            return {
+                guildUuids: guild.guildUuids,
+                guildNames: guild.guildNames,
+                guildPrefixes: guild.guildPrefixes,
+            };
         }
     }
 
-    if (guildName) {
+    if (guild) {
         try {
             let config = {};
 
@@ -63,22 +63,21 @@ async function trackGuild(interaction, force = false) {
                 config = JSON.parse(fileData);
             }
 
-            config.trackedGuilds = config.trackedGuilds.filter(item => item !== null);
-
-            if (config.trackedGuilds.includes(guildName)) {
-                return new ButtonedMessage('', [], '', [`${guildName} is already being tracked.`]);
+            if (config.trackedGuilds.includes(guild.uuid)) {
+                return ({ error: `${guild.name} is already being tracked.` });
             }
 
-            config.trackedGuilds.push(guildName);
+            config.trackedGuilds.push(guild.uuid);
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
-            return new ButtonedMessage('', [], '', [`${guildName} is now being tracked.`]);
+            return ({ guildName: guild.name });
         } catch (error) {
-            return new ButtonedMessage('', [], '', ['Unable to track guild.']);
+            console.error(error);
+            return ({ error: 'An error occured whilst tracking guild.' });
         }
     } else {
-        return new ButtonedMessage('', [], '', [`${interaction.options.getString('guild_name')} not found, try using the full exact guild name.`]);
+        return ({ guildName: '' });
     }
 }
 

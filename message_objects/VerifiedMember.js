@@ -1,34 +1,28 @@
+const utilities = require('../functions/utilities');
+
 class VerifiedMember {
-    // Creates a verified member object for if a player has a verified member in the discord
-    // playerName: Username of the guild member
+    // Creates a verified member object for if a player has a verified member in the Discord
+    // username: Username of the guild member
     // members: Members of the Discord server
-    constructor(playerName, members) {
-        this.playerName = playerName;
+    constructor(username, members) {
+        // Temporary, remove if Wynn ever fixes the name changing guild bug
+        if (username === 'Owen_Rocks_3') {
+            this.username = 'Amber\\_Rocks\\_3';
+        } else {
+            this.username = username.replaceAll('_', '\\_');
+        }
         this.members = members;
 
-        this.isVerified();
+        this.findDiscordUser(username);
     }
 
-    // Checks if there is a Discord server member with a matching name of the guild member
-    isVerified() {
-        for (const serverMember of this.members) {
-            if (serverMember.user.bot) {
-                continue;
-            }
-
-            if (this.playerName === serverMember.user.username || this.playerName === serverMember.user.globalName || this.playerName === serverMember.nickname) {
-                this.verifiedMember = serverMember.user.username;
-                break;
-            }
-        }
-    }
-
-    // Returns a string for if the member has someone in the Discord server matching this username
-    toString() {
-        if (this.verifiedMember) {
-            return `+ Guild Member ${this.playerName} is verified as @${this.verifiedMember}.\n`;
+    async findDiscordUser(username) {
+        const serverMember = await utilities.findDiscordUser(this.members, username);
+        
+        if (serverMember) {
+            this.verifiedMember = serverMember.id;
         } else {
-            return `- Guild Member ${this.playerName} is not verified.\n`;
+            this.verifiedMember = null;
         }
     }
 }

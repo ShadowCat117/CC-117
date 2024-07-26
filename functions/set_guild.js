@@ -1,8 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const findGuild = require('./find_guild');
-const ButtonedMessage = require('../message_type/ButtonedMessage');
-const MessageType = require('../message_type/MessageType');
+const database = require('../database/database');
 
 async function setGuild(interaction, force = false) {
     let nameToSearch;
@@ -10,49 +8,24 @@ async function setGuild(interaction, force = false) {
     if (interaction.options !== undefined) {
         nameToSearch = interaction.options.getString('guild_name');
     } else {
-        nameToSearch = interaction.customId;
+        nameToSearch = interaction.customId.split(':')[1];
     }
 
-    let guildName = await findGuild(nameToSearch, force);
+    const guild = await database.findGuild(nameToSearch, force);
 
     const guildId = interaction.guild.id;
     const directoryPath = path.join(__dirname, '..', 'configs');
     const filePath = path.join(directoryPath, `${guildId}.json`);
 
-    if (guildName && guildName.message === 'Multiple possibilities found') {
-        try {
-            let config = {};
-
-            if (fs.existsSync(filePath)) {
-                const fileData = fs.readFileSync(filePath, 'utf-8');
-                config = JSON.parse(fileData);
-            }
-
-            const filteredGuildNames = guildName.guildNames.filter(name => name !== config.guildName);
-
-            guildName.guildNames = filteredGuildNames;
-
-            if (guildName.guildNames.length === 1) {
-                guildName = filteredGuildNames[0];
-            } else {
-                let textMessage = `Multiple guilds found with the name/prefix: ${nameToSearch}.`;
-
-                for (let i = 0; i < guildName.guildNames.length; i++) {
-                    const name = guildName.guildNames[i];
-
-                    textMessage += `\n${i + 1}. ${name}`;
-                }
-
-                textMessage += '\nClick button to choose guild.';
-
-                return new ButtonedMessage(textMessage, guildName.guildNames, MessageType.SET_GUILD, []);
-            }
-        } catch (error) {
-            return new ButtonedMessage('', [], '', ['Unable to set guild.']);
-        }
+    if (guild && guild.message === 'Multiple possibilities found') {
+        return {
+            guildUuids: guild.guildUuids,
+            guildNames: guild.guildNames,
+            guildPrefixes: guild.guildPrefixes,
+        };
     }
 
-    if (guildName) {
+    if (guild) {
         try {
             let config = {};
 
@@ -60,21 +33,24 @@ async function setGuild(interaction, force = false) {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
             }
-
-            if (config.guildName === guildName) {
-                return new ButtonedMessage('', [], '', [`You are already representing ${guildName}.`]);
+            
+            if (config.guild === guild.uuid) {
+                return ({ error: `You have already set your guild to ${guild.name}` });
             }
 
-            config.guildName = guildName;
+            config.guild = guild.uuid;
+
+            config.allies = config.allies.filter(item => item !== guild.uuid);
 
             fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 
-            return new ButtonedMessage('', [], '', [`Set ${guildName} as your guild.`]);
+            return ({ guildName: guild.name });
         } catch (error) {
-            return new ButtonedMessage('', [], '', ['Unable to set guild.']);
+            console.error(error);
+            return ({ error: 'An error occured whilst setting guild.' });
         }
     } else {
-        return new ButtonedMessage('', [], '', [`${interaction.options.getString('guild_name')} not found, try using the full exact guild name.`]);
+        return ({ guildName: '' });
     }
 }
 
