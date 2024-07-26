@@ -1997,6 +1997,20 @@ module.exports = {
                                 // If the member has both the memer of guild role and is a valid level
                                 // allow them to get war roles.
                                 if (memberOfRole && memberRoles.has(memberOfRole.id) && validLevel) {
+                                    // Get war role
+                                    const warRole = interaction.guild.roles.cache.get(config['warRole']);
+                
+                                    // Add war role if they don't already have it
+                                    if (!memberRoles.has(warRole.id)) {
+                                        await interaction.member.roles.add(warRole)
+                                            .then(() => {
+                                                console.log(`Added war role to ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to add war role to ${interaction.member.username}`);
+                                            });
+                                    }
+                                    
                                     // Get eco role
                                     const ecoRole = interaction.guild.roles.cache.get(config['ecoRole']);
                 
