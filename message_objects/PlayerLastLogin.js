@@ -11,9 +11,9 @@ class PlayerLastLogin {
 
         // Temporary, remove if Wynn ever fixes the name changing guild bug
         if (username === 'Owen_Rocks_3') {
-            this.username = 'Amber\\_Rocks\\_3';
+            this.username = 'Amber_Rocks_3';
         } else {
-            this.username = username.replaceAll('_', '\\_');
+            this.username = username;
         }
 
         // Capitalise the first letter as the database stores full lower case

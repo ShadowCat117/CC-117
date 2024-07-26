@@ -74,11 +74,11 @@ module.exports = {
 
                 embeds.push(responseEmbed);
             } else {
-                // Valid guild, if more than 30 players we need to make pages for the embed, otherwise 1 page will work
-                if (response.playerLastLogins.length > 30) {
+                // Valid guild, if more than 20 players we need to make pages for the embed, otherwise 1 page will work
+                if (response.playerLastLogins.length > 20) {
                     const pages = [];
-                    for (let i = 0; i < response.playerLastLogins.length; i += 30) {
-                        pages.push(response.playerLastLogins.slice(i, i + 30));
+                    for (let i = 0; i < response.playerLastLogins.length; i += 20) {
+                        pages.push(response.playerLastLogins.slice(i, i + 20));
                     }
 
                     for (const page of pages) {
@@ -86,28 +86,25 @@ module.exports = {
                         responseEmbed
                             .setTitle(`[${response.guildPrefix}] ${response.guildName} Last Logins`)
                             .setColor(0x00ffff);
-                    
-                        let usernameValue = '';
-                        let rankValue = '';
-                        let lastLoginValue = '';
-                    
+
+                        let logins = '```     Username    ┃    Rank    ┃ Last Login\n━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━\n';
+
                         for (const player of page) {
-                            usernameValue += player.username + '\n';
-                            rankValue += player.guildRank + '\n';
+                            let lastLoginValue;
                     
                             if (player.online) {
-                                lastLoginValue += 'Online now!\n';
+                                lastLoginValue = 'Online now';
                             } else {
-                                lastLoginValue += utilities.getTimeSince(player.lastLogin) + ' ago\n';
+                                lastLoginValue = utilities.getTimeSince(player.lastLogin) + ' ago';
                             }
+
+                            logins += `${player.username.padEnd(16)} ┃ ${player.guildRank.padEnd(10)} ┃ ${lastLoginValue}\n`;
+
                         }
-                    
-                        responseEmbed
-                            .addFields(
-                                { name: 'Username', value: usernameValue, inline: true },
-                                { name: 'Guild Rank', value: rankValue, inline: true },
-                                { name: 'Last Login', value: lastLoginValue, inline: true },
-                            );
+
+                        logins += '```';
+
+                        responseEmbed.addFields({ name: 'Last Logins', value: `${logins}` });
                     
                         embeds.push(responseEmbed);
                     }
@@ -133,27 +130,24 @@ module.exports = {
                         .setColor(0x00ffff);
 
                     if (response.playerLastLogins.length > 0) {
-                        let usernameValue = '';
-                        let rankValue = '';
-                        let lastLoginValue = '';
+                        let logins = '```     Username    ┃    Rank    ┃ Last Login\n━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━\n';
 
                         for (const player of response.playerLastLogins) {
-                            usernameValue += player.username + '\n';
-                            rankValue += player.guildRank + '\n';
-
+                            let lastLoginValue;
+                    
                             if (player.online) {
-                                lastLoginValue += 'Online now!\n';
+                                lastLoginValue = 'Online now';
                             } else {
-                                lastLoginValue += utilities.imeSince(player.lastLogin) + ' ago\n';
+                                lastLoginValue = utilities.getTimeSince(player.lastLogin) + ' ago';
                             }
+
+                            logins += `${player.username.padEnd(16)} ┃ ${player.guildRank.padEnd(10)} ┃ ${lastLoginValue}\n`;
+
                         }
 
-                        responseEmbed
-                            .addFields(
-                                { name: 'Username', value: usernameValue, inline: true },
-                                { name: 'Guild Rank', value: rankValue, inline: true },
-                                { name: 'Last Login', value: lastLoginValue, inline: true },
-                            );
+                        logins += '```';
+
+                        responseEmbed.addFields({ name: 'Last Logins', value: `${logins}` });
                     }
 
                     embeds.push(responseEmbed);
