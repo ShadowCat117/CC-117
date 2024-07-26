@@ -69,7 +69,7 @@ async function addInactivityException(interaction, force = false, duration = -1)
             if (duration === -1) {
                 durationStr = `${player.username.replaceAll('_', '\\_')} is already allowed to be inactive forever`;
             } else {
-                durationStr = `${player.username.replaceAll('_', '\\_')} is already allowed to be inactive for ${duration} day${duration > 1 ? 's' : ''}.`;
+                durationStr = `${player.username.replaceAll('_', '\\_')} is already allowed to be inactive for ${duration} day${duration !== 1 ? 's' : ''}.`;
             }
 
             return ({ error: `${durationStr}` });

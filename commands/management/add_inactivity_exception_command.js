@@ -141,7 +141,7 @@ module.exports = {
                     if (response.duration === -1) {
                         duration = 'Exempt from inactivity forever';
                     } else {
-                        duration = `Allowed to be inactive for ${response.duration} day${response.duration > 1 ? 's' : ''}`;
+                        duration = `Allowed to be inactive for ${response.duration} day${response.duration !== 1 ? 's' : ''}`;
                     }
 
                     responseEmbed

@@ -112,7 +112,7 @@ module.exports = {
                         if (config['promotionExceptions'][page[player]] === -1) {
                             duration = 'Exempt from promotions forever';
                         } else {
-                            duration = `Exempt from promotions for ${config['promotionExceptions'][page[player]]} day${config['promotionExceptions'][page[player]] > 1 ? 's' : ''}`;
+                            duration = `Exempt from promotions for ${config['promotionExceptions'][page[player]]} day${config['promotionExceptions'][page[player]] !== 1 ? 's' : ''}`;
                         }
 
                         const username = (await database.findPlayer(page[player], true)).username;
@@ -152,7 +152,7 @@ module.exports = {
                     if (config['promotionExceptions'][player] === -1) {
                         duration = 'Exempt from promotions forever';
                     } else {
-                        duration = `Exempt from promotions for ${config['promotionExceptions'][player]} day${config['promotionExceptions'][player] > 1 ? 's' : ''}`;
+                        duration = `Exempt from promotions for ${config['promotionExceptions'][player]} day${config['promotionExceptions'][player] !== 1 ? 's' : ''}`;
                     }
                     
                     const username = (await database.findPlayer(player, true)).username;

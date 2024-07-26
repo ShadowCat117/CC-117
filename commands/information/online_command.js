@@ -125,7 +125,7 @@ module.exports = {
                             }
 
                             pageEmbed
-                                .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream.${streamers}`, inline: false });
+                                .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream !== 1 ? 's' : ''} in /stream.${streamers}`, inline: false });
                         }
 
                         let onlinePlayers = '```     Username    ┃    Rank    ┃ Server\n━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━\n';
@@ -175,7 +175,7 @@ module.exports = {
                         }
 
                         responseEmbed
-                            .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream.${streamers}`, inline: false });
+                            .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream !== 1 ? 's' : ''} in /stream.${streamers}`, inline: false });
                     }
 
                     // Count the number of players on each server
@@ -240,7 +240,7 @@ module.exports = {
                         }
 
                         responseEmbed
-                            .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream.${streamers}`, inline: false });
+                            .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream !== 1 ? 's' : ''} in /stream.${streamers}`, inline: false });
                     }
 
                     embeds.push(responseEmbed);

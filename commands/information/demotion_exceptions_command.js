@@ -111,7 +111,7 @@ module.exports = {
                         if (config['demotionExceptions'][page[player]] === -1) {
                             duration = 'Exempt from demotions forever';
                         } else {
-                            duration = `Exempt from demotions for ${config['demotionExceptions'][page[player]]} day${config['demotionExceptions'][page[player]] > 1 ? 's' : ''}`;
+                            duration = `Exempt from demotions for ${config['demotionExceptions'][page[player]]} day${config['demotionExceptions'][page[player]] !== 1 ? 's' : ''}`;
                         }
 
                         const username = (await database.findPlayer(page[player], true)).username;
@@ -151,7 +151,7 @@ module.exports = {
                     if (config['demotionExceptions'][player] === -1) {
                         duration = 'Exempt from demotions forever';
                     } else {
-                        duration = `Exempt from demotions for ${config['demotionExceptions'][player]} day${config['demotionExceptions'][player] > 1 ? 's' : ''}`;
+                        duration = `Exempt from demotions for ${config['demotionExceptions'][player]} day${config['demotionExceptions'][player] !== 1 ? 's' : ''}`;
                     }
                     
                     const username = (await database.findPlayer(player, true)).username;

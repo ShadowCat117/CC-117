@@ -69,7 +69,7 @@ async function addPromotionException(interaction, force = false, duration = -1) 
             if (duration === -1) {
                 durationStr = `${player.username.replaceAll('_', '\\_')} is already exempt from promotions forever`;
             } else {
-                durationStr = `${player.username.replaceAll('_', '\\_')} is already exempt from promotions for ${duration} day${duration > 1 ? 's' : ''}.`;
+                durationStr = `${player.username.replaceAll('_', '\\_')} is already exempt from promotions for ${duration} day${duration !== 1 ? 's' : ''}.`;
             }
 
             return ({ error: `${durationStr}` });

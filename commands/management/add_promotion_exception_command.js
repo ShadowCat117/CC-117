@@ -145,7 +145,7 @@ module.exports = {
                     if (response.duration === -1) {
                         duration = 'Exempt from promotions forever';
                     } else {
-                        duration = `Exempt from promotions for ${response.duration} day${response.duration > 1 ? 's' : ''}`;
+                        duration = `Exempt from promotions for ${response.duration} day${response.duration !== 1 ? 's' : ''}`;
                     }
 
                     responseEmbed

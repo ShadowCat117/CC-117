@@ -359,7 +359,7 @@ module.exports = {
                                 if (response.duration === -1) {
                                     duration = 'Exempt from demotions forever';
                                 } else {
-                                    duration = `Exempt from demotions for ${response.duration} day${response.duration > 1 ? 's' : ''}`;
+                                    duration = `Exempt from demotions for ${response.duration} day${response.duration !== 1 ? 's' : ''}`;
                                 }
 
                                 responseEmbed
@@ -397,7 +397,7 @@ module.exports = {
                                 if (response.duration === -1) {
                                     duration = 'Exempt from inactivity forever';
                                 } else {
-                                    duration = `Allowed to be inactive for ${response.duration} day${response.duration > 1 ? 's' : ''}`;
+                                    duration = `Allowed to be inactive for ${response.duration} day${response.duration !== 1 ? 's' : ''}`;
                                 }
 
                                 responseEmbed
@@ -435,7 +435,7 @@ module.exports = {
                                 if (response.duration === -1) {
                                     duration = 'Exempt from promotions forever';
                                 } else {
-                                    duration = `Exempt from promotions for ${response.duration} day${response.duration > 1 ? 's' : ''}`;
+                                    duration = `Exempt from promotions for ${response.duration} day${response.duration !== 1 ? 's' : ''}`;
                                 }
             
                                 responseEmbed
@@ -518,7 +518,7 @@ module.exports = {
             
                                     description += `Wars: ${response.wars}\n`;
                                     description += `XP/day: ${utilities.getFormattedXPPerDay(response.averageXpPerDay)}\n`;
-                                    description += `Total weekly playtime: ${response.totalPlaytime} hour${response.totalPlaytime === 1 ? '' : 's'}`;
+                                    description += `Total weekly playtime: ${response.totalPlaytime} hour${response.totalPlaytime !== 1 ? 's' : ''}`;
             
                                     responseEmbed.setDescription(description);
             
@@ -526,7 +526,7 @@ module.exports = {
                                         let memberDetails = `${member.getOnlineStatus()}\n`;
                                         memberDetails += `Joined ${utilities.getTimeSince(member.joinDate)} ago\n`;
                                         memberDetails += `${member.localeContributed} (${utilities.getFormattedXPPerDay(member.contributed, member.joinDate)})\n`;
-                                        memberDetails += `${member.wars} war${member.wars === 1 ? '' : 's'}\n`;
+                                        memberDetails += `${member.wars} war${member.wars !== 1 ? 's' : ''}\n`;
                                         memberDetails += `${member.averagePlaytime} hours per week`;
             
                                         responseEmbed.addFields({ name: `${member.contributionRank}. ${member.username} (${member.guildRank})`, value: `${memberDetails}` });
@@ -566,7 +566,7 @@ module.exports = {
             
                                 description += `Wars: ${response.wars}\n`;
                                 description += `XP/day: ${utilities.getFormattedXPPerDay(response.averageXpPerDay)}\n`;
-                                description += `Total weekly playtime: ${response.totalPlaytime} hour${response.totalPlaytime === 1 ? '' : 's'}`;
+                                description += `Total weekly playtime: ${response.totalPlaytime} hour${response.totalPlaytime !== 1 ? 's' : ''}`;
             
                                 responseEmbed.setDescription(description);
             
@@ -574,7 +574,7 @@ module.exports = {
                                     let memberDetails = `${member.getOnlineStatus()}\n`;
                                     memberDetails += `Joined ${utilities.getTimeSince(member.joinDate)} ago\n`;
                                     memberDetails += `${member.localeContributed} (${utilities.getFormattedXPPerDay(member.contributed, member.joinDate)})\n`;
-                                    memberDetails += `${member.wars} war${member.wars === 1 ? '' : 's'}\n`;
+                                    memberDetails += `${member.wars} war${member.wars !== 1 ? 's' : ''}\n`;
                                     memberDetails += `${member.averagePlaytime} hours per week`;
             
                                     responseEmbed.addFields({ name: `${member.username} (${member.guildRank})`, value: `${memberDetails}` });
@@ -773,7 +773,7 @@ module.exports = {
                                         }
 
                                         pageEmbed
-                                            .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream.${streamers}`, inline: false });
+                                            .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream !== 1 ? 's' : ''} in /stream.${streamers}`, inline: false });
                                     }
             
                                     let onlinePlayers = '```     Username    ┃    Rank    ┃ Server\n━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━\n';
@@ -823,7 +823,7 @@ module.exports = {
                                     }
 
                                     responseEmbed
-                                        .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream.${streamers}`, inline: false });
+                                        .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream !== 1 ? 's' : ''} in /stream.${streamers}`, inline: false });
                                 }
             
                                 // Count the number of players on each server
@@ -888,7 +888,7 @@ module.exports = {
                                     }
 
                                     responseEmbed
-                                        .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream.${streamers}`, inline: false });
+                                        .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream !== 1 ? 's' : ''} in /stream.${streamers}`, inline: false });
                                 }
             
                                 embeds.push(responseEmbed);
@@ -955,7 +955,7 @@ module.exports = {
                                                 .setDescription(`${response.username} is exempt from promotions forever.`);
                                         } else if (response.unableToPromote >= 0) {
                                             responseEmbed
-                                                .setDescription(`${response.username} is exempt from promotion for ${response.unableToPromote} day${response.unableToPromote > 1 ? 's' : ''}.`);
+                                                .setDescription(`${response.username} is exempt from promotion for ${response.unableToPromote} day${response.unableToPromote !== 1 ? 's' : ''}.`);
                                         } else {
                                             responseEmbed
                                                 .setDescription('Secret response that totally isn\'t an unexpected issue haha...');

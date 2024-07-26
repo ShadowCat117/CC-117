@@ -141,7 +141,7 @@ module.exports = {
                     if (response.duration === -1) {
                         duration = 'Exempt from demotions forever';
                     } else {
-                        duration = `Exempt from demotions for ${response.duration} day${response.duration > 1 ? 's' : ''}`;
+                        duration = `Exempt from demotions for ${response.duration} day${response.duration !== 1 ? 's' : ''}`;
                     }
 
                     responseEmbed

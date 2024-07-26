@@ -114,7 +114,7 @@ module.exports = {
                 const responseEmbed = new EmbedBuilder();
 
                 responseEmbed
-                    .setTitle(`Updated roles for ${response.length} member${response.length > 1 ? 's' : ''}`)
+                    .setTitle(`Updated roles for ${response.length} member${response.length !== 1 ? 's' : ''}`)
                     .setColor(0x00ffff);
             
                 for (const player of page) {
@@ -159,7 +159,7 @@ module.exports = {
             const responseEmbed = new EmbedBuilder();
 
             responseEmbed
-                .setTitle(`Updated roles for ${response.length} member${response.length > 1 ? 's' : ''}`)
+                .setTitle(`Updated roles for ${response.length} member${response.length !== 1 ? 's' : ''}`)
                 .setColor(0x00ffff);
 
             for (const player of response) {

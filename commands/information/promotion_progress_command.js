@@ -160,7 +160,7 @@ module.exports = {
                                         .setDescription(`${response.username.replaceAll('_', '\\_')} is exempt from promotions forever.`);
                                 } else if (response.unableToPromote >= 0) {
                                     responseEmbed
-                                        .setDescription(`${response.username.replaceAll('_', '\\_')} is exempt from promotion for ${response.unableToPromote} day${response.unableToPromote > 1 ? 's' : ''}.`);
+                                        .setDescription(`${response.username.replaceAll('_', '\\_')} is exempt from promotion for ${response.unableToPromote} day${response.unableToPromote !== 1 ? 's' : ''}.`);
                                 }
                                 break;
                         }

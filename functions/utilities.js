@@ -15,13 +15,13 @@ function getTimeSince(timestamp) {
     const days = Math.floor(hours / 24);
 
     if (days > 0) {
-        return `${days.toLocaleString()} day${days > 1 ? 's' : ''}`;
+        return `${days.toLocaleString()} day${days !== 1 ? 's' : ''}`;
     } else if (hours > 0) {
-        return `${hours} hour${hours > 1 ? 's' : ''}`;
+        return `${hours} hour${hours !== 1 ? 's' : ''}`;
     } else if (minutes > 0) {
-        return `${minutes} minute${minutes > 1 ? 's' : ''}`;
+        return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
     } else {
-        return `${seconds} second${seconds > 1 ? 's' : ''}`;
+        return `${seconds} second${seconds !== 1 ? 's' : ''}`;
     }
 }
 

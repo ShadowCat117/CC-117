@@ -218,7 +218,7 @@ module.exports = {
 
                 pageEmbed
                     .setTitle(`${inactiveMembers.length} Inactive Players`)
-                    .setDescription(`Chiefs are inactive after ${chiefThreshold} day${chiefThreshold > 1 ? 's' : ''}.\nStrategists are inactive after ${strategistThreshold} day${strategistThreshold > 1 ? 's' : ''}.\nCaptains are inactive after ${captainThreshold} day${captainThreshold > 1 ? 's' : ''}.\nRecruiters are inactive after ${recruiterThreshold} day${recruiterThreshold > 1 ? 's' : ''}.\nRecruits are inactive after ${recruitThreshold} day${recruitThreshold > 1 ? 's' : ''}.\n\nThese values change based on if the average guild activity is above or below ${averageRequirement} player${averageRequirement > 1 ? 's' : ''} or if less than ${memberThreshold}% of the member slots are used.\nIndividual players can have their threshold adjusted by having a character over level ${levelRequirement} for a ${extraTimeIncrease}% increase.\n\nPlayers in the guild for less than ${newPlayerMinimumTime} day${newPlayerMinimumTime > 1 ? 's' : ''} get a threshold of ${newPlayerThreshold} day${newPlayerThreshold > 1 ? 's' : ''}.`)
+                    .setDescription(`Chiefs are inactive after ${chiefThreshold} day${chiefThreshold !== 1 ? 's' : ''}.\nStrategists are inactive after ${strategistThreshold} day${strategistThreshold !== 1 ? 's' : ''}.\nCaptains are inactive after ${captainThreshold} day${captainThreshold !== 1 ? 's' : ''}.\nRecruiters are inactive after ${recruiterThreshold} day${recruiterThreshold !== 1 ? 's' : ''}.\nRecruits are inactive after ${recruitThreshold} day${recruitThreshold !== 1 ? 's' : ''}.\n\nThese values change based on if the average guild activity is above or below ${averageRequirement} player${averageRequirement !== 1 ? 's' : ''} or if less than ${memberThreshold}% of the member slots are used.\nIndividual players can have their threshold adjusted by having a character over level ${levelRequirement} for a ${extraTimeIncrease}% increase.\n\nPlayers in the guild for less than ${newPlayerMinimumTime} day${newPlayerMinimumTime !== 1 ? 's' : ''} get a threshold of ${newPlayerThreshold} day${newPlayerThreshold !== 1 ? 's' : ''}.`)
                     .setColor(0x00ffff);
 
                 for (const player in page) {
@@ -227,10 +227,10 @@ module.exports = {
                     let username = inactivePlayer.username;
 
                     if (inactivePlayer.threshold !== -1) {
-                        username += ` (${inactivePlayer.threshold} day${inactivePlayer.threshold > 1 ? 's' : ''})`;
+                        username += ` (${inactivePlayer.threshold} day${inactivePlayer.threshold !== 1 ? 's' : ''})`;
                     }
 
-                    pageEmbed.addFields({ name: `${username}`, value: `${inactivePlayer.guildRank}\nInactive for ${inactivePlayer.daysSinceLastLogin} day${inactivePlayer.daysSinceLastLogin > 1 ? 's' : ''}` });
+                    pageEmbed.addFields({ name: `${username}`, value: `${inactivePlayer.guildRank}\nInactive for ${inactivePlayer.daysSinceLastLogin} day${inactivePlayer.daysSinceLastLogin !== 1 ? 's' : ''}` });
                 }
 
                 embeds.push(pageEmbed);
@@ -257,7 +257,7 @@ module.exports = {
         } else if (inactiveMembers.length > 0) {
             responseEmbed
                 .setTitle(`${inactiveMembers.length} Inactive players`)
-                .setDescription(`Chiefs are inactive after ${chiefThreshold} day${chiefThreshold > 1 ? 's' : ''}.\nStrategists are inactive after ${strategistThreshold} day${strategistThreshold > 1 ? 's' : ''}.\nCaptains are inactive after ${captainThreshold} day${captainThreshold > 1 ? 's' : ''}.\nRecruiters are inactive after ${recruiterThreshold} day${recruiterThreshold > 1 ? 's' : ''}.\nRecruits are inactive after ${recruitThreshold} day${recruitThreshold > 1 ? 's' : ''}.\n\nThese values change based on if the average guild activity is above or below ${averageRequirement} player${averageRequirement > 1 ? 's' : ''} or if less than ${memberThreshold}% of the member slots are used.\nIndividual players can have their threshold adjusted by having a character over level ${levelRequirement} for a ${extraTimeIncrease}% increase.\n\nPlayers in the guild for less than ${newPlayerMinimumTime} day${newPlayerMinimumTime > 1 ? 's' : ''} get a threshold of ${newPlayerThreshold} day${newPlayerThreshold > 1 ? 's' : ''}.`)
+                .setDescription(`Chiefs are inactive after ${chiefThreshold} day${chiefThreshold !== 1 ? 's' : ''}.\nStrategists are inactive after ${strategistThreshold} day${strategistThreshold !== 1 ? 's' : ''}.\nCaptains are inactive after ${captainThreshold} day${captainThreshold !== 1 ? 's' : ''}.\nRecruiters are inactive after ${recruiterThreshold} day${recruiterThreshold !== 1 ? 's' : ''}.\nRecruits are inactive after ${recruitThreshold} day${recruitThreshold !== 1 ? 's' : ''}.\n\nThese values change based on if the average guild activity is above or below ${averageRequirement} player${averageRequirement !== 1 ? 's' : ''} or if less than ${memberThreshold}% of the member slots are used.\nIndividual players can have their threshold adjusted by having a character over level ${levelRequirement} for a ${extraTimeIncrease}% increase.\n\nPlayers in the guild for less than ${newPlayerMinimumTime} day${newPlayerMinimumTime !== 1 ? 's' : ''} get a threshold of ${newPlayerThreshold} day${newPlayerThreshold !== 1 ? 's' : ''}.`)
                 .setColor(0x00ffff);
 
             for (const player in inactiveMembers) {
@@ -266,10 +266,10 @@ module.exports = {
                 let username = inactivePlayer.username;
 
                 if (inactivePlayer.threshold !== -1) {
-                    username += ` (${inactivePlayer.threshold} day${inactivePlayer.threshold > 1 ? 's' : ''})`;
+                    username += ` (${inactivePlayer.threshold} day${inactivePlayer.threshold !== 1 ? 's' : ''})`;
                 }
 
-                responseEmbed.addFields({ name: `${username}`, value: `${inactivePlayer.guildRank}\nInactive for ${inactivePlayer.daysSinceLastLogin} day${inactivePlayer.daysSinceLastLogin > 1 ? 's' : ''}` });
+                responseEmbed.addFields({ name: `${username}`, value: `${inactivePlayer.guildRank}\nInactive for ${inactivePlayer.daysSinceLastLogin} day${inactivePlayer.daysSinceLastLogin !== 1 ? 's' : ''}` });
             }
 
             await interaction.editReply({ embeds: [responseEmbed] });

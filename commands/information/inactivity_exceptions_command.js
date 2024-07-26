@@ -111,7 +111,7 @@ module.exports = {
                         if (config['inactivityExceptions'][page[player]] === -1) {
                             duration = 'Exempt from inactivity forever';
                         } else {
-                            duration = `Allowed to be inactive for ${config['inactivityExceptions'][page[player]]} day${config['inactivityExceptions'][page[player]] > 1 ? 's' : ''}`;
+                            duration = `Allowed to be inactive for ${config['inactivityExceptions'][page[player]]} day${config['inactivityExceptions'][page[player]] !== 1 ? 's' : ''}`;
                         }
 
                         const username = (await database.findPlayer(page[player], true)).username;
@@ -151,7 +151,7 @@ module.exports = {
                     if (config['inactivityExceptions'][player] === -1) {
                         duration = 'Exempt from inactivity forever';
                     } else {
-                        duration = `Allowed to be inactive for ${config['inactivityExceptions'][player]} day${config['inactivityExceptions'][player] > 1 ? 's' : ''}`;
+                        duration = `Allowed to be inactive for ${config['inactivityExceptions'][player]} day${config['inactivityExceptions'][player] !== 1 ? 's' : ''}`;
                     }
                     
                     const username = (await database.findPlayer(player, true)).username;

@@ -94,7 +94,7 @@ module.exports = {
 
                         description += `Wars: ${response.wars}\n`;
                         description += `XP/day: ${utilities.getFormattedXPPerDay(response.averageXpPerDay)}\n`;
-                        description += `Total weekly playtime: ${response.totalPlaytime} hour${response.totalPlaytime === 1 ? '' : 's'}`;
+                        description += `Total weekly playtime: ${response.totalPlaytime} hour${response.totalPlaytime !== 1 ? 's' : ''}`;
 
                         responseEmbed.setDescription(description);
 
@@ -102,7 +102,7 @@ module.exports = {
                             let memberDetails = `${member.getOnlineStatus()}\n`;
                             memberDetails += `Joined ${utilities.getTimeSince(member.joinDate)} ago\n`;
                             memberDetails += `${member.localeContributed} (${utilities.getFormattedXPPerDay(member.contributed, member.joinDate)})\n`;
-                            memberDetails += `${member.wars} war${member.wars === 1 ? '' : 's'}\n`;
+                            memberDetails += `${member.wars} war${member.wars !== 1 ? 's' : ''}\n`;
                             memberDetails += `${member.averagePlaytime} hours per week`;
 
                             responseEmbed.addFields({ name: `${member.contributionRank}. ${member.username} (${member.guildRank})`, value: `${memberDetails}` });
@@ -142,7 +142,7 @@ module.exports = {
 
                     description += `Wars: ${response.wars}\n`;
                     description += `XP/day: ${utilities.getFormattedXPPerDay(response.averageXpPerDay)}\n`;
-                    description += `Total weekly playtime: ${response.totalPlaytime} hour${response.totalPlaytime === 1 ? '' : 's'}`;
+                    description += `Total weekly playtime: ${response.totalPlaytime} hour${response.totalPlaytime !== 1 ? 's' : ''}`;
 
                     responseEmbed.setDescription(description);
 
@@ -150,7 +150,7 @@ module.exports = {
                         let memberDetails = `${member.getOnlineStatus()}\n`;
                         memberDetails += `Joined ${utilities.getTimeSince(member.joinDate)} ago\n`;
                         memberDetails += `${member.localeContributed} XP (${utilities.getFormattedXPPerDay(member.contributed, member.joinDate)})\n`;
-                        memberDetails += `${member.wars} war${member.wars === 1 ? '' : 's'}\n`;
+                        memberDetails += `${member.wars} war${member.wars !== 1 ? 's' : ''}\n`;
                         memberDetails += `${member.averagePlaytime} hours per week`;
 
                         responseEmbed.addFields({ name: `${member.username} (${member.guildRank})`, value: `${memberDetails}` });
