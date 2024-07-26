@@ -814,8 +814,15 @@ module.exports = {
                                     const playersInStream = response.onlineCount - response.onlinePlayers.length;
             
                                     if (playersInStream > 0) {
+                                        const likelyStreamers = await database.getRecentPlayers(response.guildUuid, playersInStream);
+                                        let streamers = '';
+
+                                        for (const streamer of likelyStreamers) {
+                                            streamers += `\n${streamer.username} last seen ${utilities.getTimeSince(streamer.lastLogin)}`;
+                                        }
+
                                         pageEmbed
-                                            .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream.`, inline: false });
+                                            .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream.${streamers}`, inline: false });
                                     }
             
                                     let onlinePlayers = '```     Username    ┃    Rank    ┃ Server\n━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━\n';
@@ -857,8 +864,15 @@ module.exports = {
                                 const playersInStream = response.onlineCount - response.onlinePlayers.length;
             
                                 if (playersInStream > 0) {
+                                    const likelyStreamers = await database.getRecentPlayers(response.guildUuid, playersInStream);
+                                    let streamers = '';
+
+                                    for (const streamer of likelyStreamers) {
+                                        streamers += `\n${streamer.username} last seen ${utilities.getTimeSince(streamer.lastLogin)}`;
+                                    }
+
                                     responseEmbed
-                                        .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream.`, inline: false });
+                                        .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream.${streamers}`, inline: false });
                                 }
             
                                 // Count the number of players on each server
@@ -915,8 +929,15 @@ module.exports = {
                                 const playersInStream = response.onlineCount - response.onlinePlayers.length;
             
                                 if (playersInStream > 0) {
+                                    const likelyStreamers = await database.getRecentPlayers(response.guildUuid, playersInStream);
+                                    let streamers = '';
+
+                                    for (const streamer of likelyStreamers) {
+                                        streamers += `\n${streamer.username} last seen ${utilities.getTimeSince(streamer.lastLogin)}`;
+                                    }
+
                                     responseEmbed
-                                        .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream.`, inline: false });
+                                        .addFields({ name: 'Streamers', value: `There ${playersInStream > 1 ? 'are' : 'is'} ${playersInStream} player${playersInStream > 1 ? 's' : ''} in /stream.${streamers}`, inline: false });
                                 }
             
                                 embeds.push(responseEmbed);

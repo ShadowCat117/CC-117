@@ -38,7 +38,7 @@ async function online(interaction, force = false) {
     }
 
     if (!guildJson || !guildJson.name) {
-        return ({ guildName: '', guildPrefix: '', onlinePlayers: [], onlineCount: -1, totalMembers: -1 });
+        return ({ guildName: '', guildPrefix: '', guildUuid: '', onlinePlayers: [], onlineCount: -1, totalMembers: -1 });
     }
 
     const onlinePlayers = [];
@@ -59,7 +59,7 @@ async function online(interaction, force = false) {
 
     onlinePlayers.sort((a, b) => a.compareTo(b));
 
-    return ({ guildName: guildJson.name, guildPrefix: guildJson.prefix, onlinePlayers: onlinePlayers, onlineCount: guildJson.online, memberCount: guildJson.members.total });
+    return ({ guildName: guildJson.name, guildPrefix: guildJson.prefix, guildUuid: guildJson.uuid, onlinePlayers: onlinePlayers, onlineCount: guildJson.online, memberCount: guildJson.members.total });
 }
 
 module.exports = online;
