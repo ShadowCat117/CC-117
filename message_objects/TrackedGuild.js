@@ -1,5 +1,5 @@
 class TrackedGuild {
-    // Create a tracked guild object
+    // Create a TrackedGuild object
     // name: Name of the guild
     // prefix: Prefix of the guild
     // averageOnline: Average number of players online

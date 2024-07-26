@@ -1,5 +1,5 @@
 class UpdatedUser {
-    // Creates an updated user object for storing updates made to users from /updateroles
+    // Creates an UpdatedUser object for storing updates made to users from /updateroles
     // username: Username of the updated player
     // member: Discord member that was updated
     // updates: The completed updates made to the user

@@ -1,7 +1,7 @@
 const utilities = require('../functions/utilities');
 
 class VerifiedMember {
-    // Creates a verified member object for if a player has a verified member in the discord
+    // Creates a verified member object for if a player has a verified member in the Discord
     // username: Username of the guild member
     // members: Members of the Discord server
     constructor(username, members) {
