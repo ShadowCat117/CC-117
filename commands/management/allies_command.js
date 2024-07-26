@@ -50,7 +50,6 @@ module.exports = {
             const errorEmbed = new EmbedBuilder();
 
             if (!guildUuid) {
-                // Need a set guild to run this command               
                 errorEmbed
                     .setTitle('Error')
                     .setDescription('You do not have a guild set.')
@@ -63,7 +62,6 @@ module.exports = {
             const guildName = (await database.findGuild(guildUuid, true)).name;
             
             if (config.allies.length === 0) {
-                // If no allies
                 errorEmbed
                         .setTitle('Error')
                         .setDescription('No allies have been set.')
@@ -71,7 +69,6 @@ module.exports = {
 
                 embeds.push(errorEmbed);
             } else if (memberOfRole) {
-                // If member of role is used make sure they have the role
                 if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                     errorEmbed
                         .setTitle('Error')
@@ -84,6 +81,7 @@ module.exports = {
 
             const row = new ActionRowBuilder();
 
+            // Paginate if more than 50 allies
             if (config.allies.length > 50) {
                 const pages = [];
                 for (let i = 0; i < config.alliess.length; i += 50) {

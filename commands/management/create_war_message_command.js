@@ -56,7 +56,6 @@ module.exports = {
         const adminRoleId = config.adminRole;
         const memberRoles = interaction.member.roles.cache;
 
-        // Only owners and admins can run command
         if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
             responseEmbed
                 .setTitle('Error')
@@ -69,7 +68,6 @@ module.exports = {
         const warMessage = config['warMessage'];
 
         if (!warMessage) {
-            // If no war message, tell the user to set one
             responseEmbed
                 .setTitle('Error')
                 .setDescription('You have not set a war message with /config_messages warMessage.')
@@ -77,7 +75,6 @@ module.exports = {
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
         } else if (!config['warClassMessage']) {
-            // If no war class message, tell the user to set one
             responseEmbed
                 .setTitle('Error')
                 .setDescription('You have not set a war class message with /config_messages warClassMessage.')
@@ -85,7 +82,6 @@ module.exports = {
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
         } else if (!config['warLevelRequirement']) {
-            // If no war level requirement, tell the user to set one
             responseEmbed
                 .setTitle('Error')
                 .setDescription('You have not set a war level requirement with /config_values warLevelRequirement.')
@@ -94,7 +90,6 @@ module.exports = {
             return;
         }
 
-        // Loop through war roles and if one is not present, tell the user they need to set it
         for (const warRole of warRoles) {
             if (!config[`${warRole}Role`]) {
                 responseEmbed
@@ -106,7 +101,6 @@ module.exports = {
             }
         }
 
-        // Add the war button
         const warButton = new ButtonBuilder()
             .setCustomId('war')
             .setStyle(ButtonStyle.Danger)

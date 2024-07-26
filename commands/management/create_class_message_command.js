@@ -56,7 +56,6 @@ module.exports = {
         const adminRoleId = config.adminRole;
         const memberRoles = interaction.member.roles.cache;
 
-        // Only owners and admins can run command
         if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
             responseEmbed
                 .setDescription('You do not have the required permissions to run this command.')
@@ -68,14 +67,12 @@ module.exports = {
         const classMessage = config['classMessage'];
 
         if (!classMessage) {
-            // If no class message, tell the user to set one
             responseEmbed
                 .setDescription('You have not set a class message with /config_messages classMessage.')
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
         } else if (!config['classArchetypeMessage']) {
-            // If no archetype message, tell the user to set one
             responseEmbed
                 .setDescription('You have not set a class archetype message with /config_messages classArchetypeMessage.')
                 .setColor(0xff0000);
@@ -83,7 +80,6 @@ module.exports = {
             return;
         }
 
-        // Loop through class roles and if one is not present, tell the user they need to set it
         for (const classRole of classRoles) {
             if (!config[`${classRole}Role`]) {
                 responseEmbed
@@ -94,7 +90,6 @@ module.exports = {
             }
         }
 
-        // Add class buttons
         const warriorButton = new ButtonBuilder()
             .setCustomId('warrior')
             .setStyle(ButtonStyle.Primary)

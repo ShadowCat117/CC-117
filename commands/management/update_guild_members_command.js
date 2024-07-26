@@ -23,13 +23,11 @@ module.exports = {
 
         await interaction.editReply({ embeds: [loadingEmbed] });
 
-        // Call updateGuildMembers
         const response = await updateGuildMembers(interaction);
 
         const responseEmbed = new EmbedBuilder();
 
-        if (response.guildUuids !== undefined) {
-            // Multiselector
+        if (response.guildUuids !== undefined) { // Multiselector
             responseEmbed
                 .setTitle('Multiple guilds found')
                 .setDescription(`More than 1 guild has the identifier ${interaction.options.getString('guild_name')}. Pick the intended guild from the following.`)
@@ -59,14 +57,12 @@ module.exports = {
 
             return;
         } else {
-            if (response.guildName === '') {
-                // Unknown guild
+            if (response.guildName === '') { // Unknown guild
                 responseEmbed
                     .setTitle('Invalid guild')
                     .setDescription(`Unable to find a guild using the name/prefix '${interaction.options.getString('guild_name')}', try again using the exact guild name.`)
                     .setColor(0xff0000);
-            } else {
-                // Valid guild
+            } else { // Valid guild
                 responseEmbed
                     .setTitle(`[${response.guildPrefix}] ${response.guildName} Members Updated`)
                     .setURL(`https://wynncraft.com/stats/guild/${response.guildName.replaceAll(' ', '%20')}`)

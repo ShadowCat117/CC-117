@@ -25,13 +25,11 @@ module.exports = {
 
         await interaction.editReply({ embeds: [loadingEmbed] });
 
-        // Call updatePlayer
         const response = await updatePlayer(interaction);
 
         const responseEmbed = new EmbedBuilder();
 
-        if (response.playerUuids !== undefined) {
-            // Multiselector
+        if (response.playerUuids !== undefined) { // Multiselector
             responseEmbed
                 .setTitle('Multiple players found')
                 .setDescription(`More than 1 player has the identifier ${username}. Pick the intended player from the following.`)
@@ -76,18 +74,17 @@ module.exports = {
 
             return;
         } else {
-            if (response.username === '') {
-                // Unknown player
+            if (response.username === '') { // Unknown player
                 responseEmbed
                     .setTitle('Invalid username')
                     .setDescription(`Unable to find a player using the name '${username}', try again using the exact player name.`)
                     .setColor(0xff0000);
-            } else if (response.error) {
+            } else if (response.error) { // Error whilst updating player
                 responseEmbed
                     .setTitle(`Error updating ${username}`)
                     .setDescription(`Unable to find a player using the name '${username}', try again using the exact player name.`)
                     .setColor(0xff0000);
-            } else {
+            } else { // Valid player
                 responseEmbed
                     .setTitle(`Updated ${response.username}`)
                     .setDescription('Updated all known information about player, guild wide promotion/demotion check and role applying should now be accurate for this player.')

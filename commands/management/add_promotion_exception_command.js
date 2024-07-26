@@ -125,7 +125,7 @@ module.exports = {
                 });
 
                 return;
-            } else if (response.error) {
+            } else if (response.error) { // Error whilst trying to add promotion exception
                 errorEmbed
                     .setTitle('Error')
                     .setDescription(`Unable to add promotion exception: ${response.error}`)
@@ -134,14 +134,12 @@ module.exports = {
                 await interaction.editReply({ embeds: [errorEmbed] });
                 return;
             } else {
-                if (response.username === '') {
-                    // Unknown player
+                if (response.username === '') { // Unknown player
                     responseEmbed
                         .setTitle('Invalid username')
                         .setDescription(`Unable to find a player using the name '${username}', try again using the exact player name.`)
                         .setColor(0xff0000);
-                } else {
-                    // Valid player
+                } else { // Valid player
                     let duration;
 
                     if (response.duration === -1) {

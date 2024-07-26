@@ -38,7 +38,6 @@ module.exports = {
                 const fileData = fs.readFileSync(preferencesFile, 'utf-8');
                 preferences = JSON.parse(fileData);
 
-                // Get their timezone and sort preference
                 if (preferences[interaction.member.id]) {
                     timezoneOffset = preferences[interaction.member.id].timezoneOffset;
                     sortByActivity = preferences[interaction.member.id].sortByActivity;
@@ -55,11 +54,9 @@ module.exports = {
             return;
         }
 
-        // Call the activeHours function, passing in the timezone
         const response = await activeHours(interaction, false, timezoneOffset, sortByActivity);
 
-        if (response.guildUuids !== undefined) {
-            // Multiselector
+        if (response.guildUuids !== undefined) { // Multiselector
             const responseEmbed = new EmbedBuilder();
 
             responseEmbed
@@ -91,8 +88,7 @@ module.exports = {
 
             return;
         } else {
-            if (response.guildName === '') {
-                // Unknown guild
+            if (response.guildName === '') { // Unknown guild
                 const responseEmbed = new EmbedBuilder();
 
                 responseEmbed
@@ -103,9 +99,8 @@ module.exports = {
                 await interaction.editReply({ embeds: [responseEmbed] });
 
                 return;
-            } else {
-                // Valid guild
-                if (response.activity.length === 0) {
+            } else { // Valid guild
+                if (response.activity.length === 0) { // No activity
                     const responseEmbed = new EmbedBuilder();
 
                     responseEmbed
@@ -116,12 +111,11 @@ module.exports = {
                     await interaction.editReply({ embeds: [responseEmbed] });
 
                     return;
-                } else {
+                } else { // Available activity
                     const responseEmbed = new EmbedBuilder();
                     const timezoneRow = new ActionRowBuilder();
                     const sortRow = new ActionRowBuilder();
 
-                    // Create string select menu with all timezone options
                     const timezoneSelection = new StringSelectMenuBuilder()
                         .setCustomId('timezone')
                         .setPlaceholder('Select timezone!')

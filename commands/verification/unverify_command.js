@@ -15,6 +15,7 @@ module.exports = {
             .setColor(0x00ff00);
 
         await interaction.editReply({ embeds: [loadingEmbed] });
+        
         // Call applyRoles with null to remove all roles and have nickname reset
         const response = await applyRoles(interaction.guild, interaction.member, null);
 

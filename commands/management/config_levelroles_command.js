@@ -51,7 +51,6 @@ module.exports = {
             const memberRoles = interaction.member.roles.cache;
             const memberOfRole = config.memberOfRole;
 
-            // If the member of role is used, it is required
             if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                 responseEmbed
                     .setDescription('You do not have the required permissions to run this command.')
@@ -60,7 +59,6 @@ module.exports = {
                 return;
             }
 
-            // Can only be ran by the owner or an admin
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 responseEmbed
                     .setDescription('You do not have the required permissions to run this command.')
@@ -78,6 +76,7 @@ module.exports = {
             return;
         }
 
+        // Limit the level to the current level cap
         if (level < 1 || level > 106) {
             responseEmbed
             .setTitle('Invalid level')

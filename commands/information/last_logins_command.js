@@ -26,16 +26,14 @@ module.exports = {
 
         const message = await interaction.editReply({ embeds: [loadingEmbed] });
 
-        // Call lastLogins
         const response = await lastLogins(interaction);
 
         const embeds = [];
         const row = new ActionRowBuilder();
 
-        if (response.guildUuids !== undefined) {
+        if (response.guildUuids !== undefined) { // Multiselector
             const responseEmbed = new EmbedBuilder();
 
-            // Multiselector
             responseEmbed
                 .setTitle('Multiple guilds found')
                 .setDescription(`More than 1 guild has the identifier ${interaction.options.getString('guild_name')}. Pick the intended guild from the following.`)
@@ -63,18 +61,15 @@ module.exports = {
 
             return;
         } else {
-            if (response.guildName === '') {
-                const responseEmbed = new EmbedBuilder();
-
-                // Unknown guild
-                responseEmbed
+            if (response.guildName === '') { // Unknown guild
+                const responseEmbed = new EmbedBuilder()
                     .setTitle('Invalid guild')
                     .setDescription(`Unable to find a guild using the name/prefix '${interaction.options.getString('guild_name')}', try again using the exact guild name.`)
                     .setColor(0xff0000);
 
                 embeds.push(responseEmbed);
-            } else {
-                // Valid guild, if more than 20 players we need to make pages for the embed, otherwise 1 page will work
+            } else { // Valid guild
+                // paginate if more than 20 members
                 if (response.playerLastLogins.length > 20) {
                     const pages = [];
                     for (let i = 0; i < response.playerLastLogins.length; i += 20) {

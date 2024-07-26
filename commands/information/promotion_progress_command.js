@@ -61,7 +61,6 @@ module.exports = {
 
             const guildName = (await database.findGuild(guildUuid, true)).name;
 
-            // If the member of role is used, check the user has it to let them run the command
             if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                 const errorEmbed = new EmbedBuilder()
                     .setTitle('Error')
@@ -71,13 +70,11 @@ module.exports = {
                 return;
             }
 
-            // Call promotionProgress
             const response = await promotionProgress(interaction);
 
             const responseEmbed = new EmbedBuilder();
 
-            if (response.playerUuids !== undefined) {
-                // Multiselector
+            if (response.playerUuids !== undefined) { // Multiselector
                 responseEmbed
                     .setTitle('Multiple players found')
                     .setDescription(`More than 1 player has the identifier ${username}. Pick the intended player from the following.`)
@@ -122,14 +119,12 @@ module.exports = {
 
                 return;
             } else {
-                if (response.username === '') {
-                    // Unknown player
+                if (response.username === '') { // Unknown player
                     responseEmbed
                         .setTitle('Invalid username')
                         .setDescription(`Unable to find a player using the name '${username}', try again using the exact player name.`)
                         .setColor(0xff0000);
-                } else {
-                    // Valid player
+                } else { // Valid player
                     if (response.uuid) {
                         responseEmbed
                             .setThumbnail(`https://vzge.me/bust/512/${response.uuid}.png`);
@@ -139,34 +134,27 @@ module.exports = {
                         const reason = response.unableToPromote;
 
                         switch (reason) {
-                            case 'error':
-                                // Something went wrong
+                            case 'error': // Some kind of error
                                 responseEmbed
                                     .setDescription('An error occured whilst checking for promotion progress.');
                                 break;
-                            case 'missing': {
-                                // Some values are missing for promotions
+                            case 'missing': // Not enough requirements given for the required count
                                 responseEmbed
                                     .setDescription('Missing values for promotions. Configuration has not been set up fully.');
-                                break;
-                            }
-                            case 'guild':
-                                // Not in guild
+                                    break;
+                            case 'guild': // Not in the set guild
                                 responseEmbed
                                     .setDescription(`${response.username.replaceAll('_', '\\_')} is not a member of ${guildName}.`);
                                 break;
-                            case 'owner':
-                                // Is owner
+                            case 'owner': // Owner can't be promoted
                                 responseEmbed
                                     .setDescription(`${response.username.replaceAll('_', '\\_')} is the Owner of ${guildName}. They are unable to be promoted.`);
                                 break;
-                            case 'chief':
-                                // Is chief
+                            case 'chief': // Chief can't be promoted by anyone other than owner
                                 responseEmbed
                                     .setDescription(`${response.username.replaceAll('_', '\\_')} is a Chief of ${guildName}. Only the Owner can decide if they should be promoted.`);
                                 break;
-                            default:
-                                // Exempt
+                            default: // Exempt from promotion
                                 if (response.unableToPromote === -1) {
                                     responseEmbed
                                         .setDescription(`${response.username.replaceAll('_', '\\_')} is exempt from promotions forever.`);
@@ -180,7 +168,7 @@ module.exports = {
                         responseEmbed
                             .setTitle(response.username.replaceAll('_', '\\_'))
                             .setColor(0xff0000);
-                    } else {
+                    } else { // Able to promote
                         responseEmbed
                             .setTitle(`${response.guildRank} ${response.username.replaceAll('_', '\\_')} has ${response.metRequirements}/${response.requirementsCount} requirements for ${response.nextGuildRank}`)
                             .setDescription('First Days in Guild is required, anything else is optional as long as you meet the requirement.')

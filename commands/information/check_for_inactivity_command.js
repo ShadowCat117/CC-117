@@ -48,7 +48,6 @@ module.exports = {
             const memberRoles = interaction.member.roles.cache;
             const memberOfRole = config.memberOfRole;
 
-            // If the member of role is used, it is required
             if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                 responseEmbed
                     .setTitle('Error')
@@ -58,7 +57,6 @@ module.exports = {
                 return;
             }
 
-            // Can only be ran by the owner or an admin
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 responseEmbed
                     .setTitle('Error')
@@ -136,7 +134,7 @@ module.exports = {
         const inactiveMembers = [];
 
         for (const rank in guildJson.members) {
-            if (rank === 'total' || rank === 'owner') continue;
+            if (rank === 'total' || rank === 'owner') continue; // Ignore owner
 
             const rankMembers = guildJson.members[rank];
 
@@ -204,6 +202,8 @@ module.exports = {
             }
         }
 
+        // Paginate if more than 5 members.
+        // More than 5 can be displayed but due to the large description, 5 looks better.
         if (inactiveMembers.length > 5) {
             const embeds = [];
             const row = new ActionRowBuilder();

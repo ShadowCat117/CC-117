@@ -43,7 +43,6 @@ module.exports = {
 
                 const guildUuid = config.guild;
 
-                // Guild set required
                 if (!guildUuid) {
                     responseEmbed
                             .setTitle('No Guild Set')
@@ -89,11 +88,9 @@ module.exports = {
             return;
         }
 
-        // Call verify
         const response = await verify(interaction);
 
-        if (response.playerUuids !== undefined) {
-            // Multiselector
+        if (response.playerUuids !== undefined) { // Multiselector
             responseEmbed
                 .setTitle('Multiple players found')
                 .setDescription(`More than 1 player has the identifier ${username}. Pick the intended player from the following.`)
@@ -138,14 +135,12 @@ module.exports = {
 
             return;
         } else {
-            if (response.username === '') {
-                // Unknown player
+            if (response.username === '') { // Unknown player
                 responseEmbed
                     .setTitle('Invalid username')
                     .setDescription(`Unable to find a player using the name '${username}', try again using the exact player name.`)
                     .setColor(0xff0000);
-            } else if (response.updates.length > 0 || response.errors.length > 0) {
-                // Valid player, with changes
+            } else if (response.updates.length > 0 || response.errors.length > 0) { // Valid player, with changes
                 responseEmbed
                     .setTitle(`Verified as ${response.username}`)
                     .setColor(0x00ffff);
@@ -161,7 +156,7 @@ module.exports = {
                 }
 
                 responseEmbed.setDescription(appliedChanges);
-            } else {
+            } else { // Valid player, no changes
                 responseEmbed
                     .setTitle(`Verified as ${response.username}`)
                     .setDescription('No changes.')
@@ -171,6 +166,7 @@ module.exports = {
 
         await interaction.editReply({ embeds: [responseEmbed] });
 
+        // If changes were made, send to the log channel if that feature is enabled, else return
         if (!response.updates || !response.errors) return;
 
         if (response.updates.length > 0 || response.errors.length > 0 && config.logMessages && config.logChannel) {

@@ -59,7 +59,6 @@ module.exports = {
 
             const guildName = (await database.findGuild(guildUuid, true)).name;
 
-            // If the member of role is used, check the user has it to let them run the command
             if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                 const errorEmbed = new EmbedBuilder()
                     .setTitle('Error')
@@ -69,7 +68,6 @@ module.exports = {
                 return;
             }
 
-            // Can only be ran by the owner or an admin
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 const errorEmbed = new EmbedBuilder()
                     .setTitle('Error')
@@ -79,24 +77,20 @@ module.exports = {
                 return;
             }
 
-            // Call verified
             const response = await verified(guildUuid, interaction);
 
             const embeds = [];
             const row = new ActionRowBuilder();
 
-            if (response.guildName === '') {
-                const responseEmbed = new EmbedBuilder();
-
-                // Unknown guild
-                responseEmbed
+            if (response.guildName === '') { // Failed to get guild info from API
+                const responseEmbed = new EmbedBuilder()
                     .setTitle('Error')
                     .setDescription('Failed to fetch guild information from the API, it may be down.')
                     .setColor(0xff0000);
 
                 embeds.push(responseEmbed);
-            } else {
-                // Found guild, if more than 25 players we need to make pages for the embed, otherwise 1 page will work
+            } else { // Found guild
+                // Paginate if more than 25 members
                 if (response.verifiedMembers.length > 25) {
                     const pages = [];
                     for (let i = 0; i < response.verifiedMembers.length; i += 25) {

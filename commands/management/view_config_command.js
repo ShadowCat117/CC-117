@@ -59,10 +59,13 @@ module.exports = {
                 return;
             }
 
-            const guildName = (await database.findGuild(guildUuid, true)).name;
+            let guildName;
 
-            // If the member of role is used, check the user has it to let them run the command
-            if (memberOfRoleId && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRoleId))) {
+            if (guildUuid) {
+                guildName = (await database.findGuild(guildUuid, true)).name;
+            }
+
+            if (guildName && memberOfRoleId && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRoleId))) {
                 const errorEmbed = new EmbedBuilder()
                     .setTitle('Error')
                     .setDescription(`You must be a member of ${guildName} to run this command.`)

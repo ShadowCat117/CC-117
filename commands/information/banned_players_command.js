@@ -48,7 +48,6 @@ module.exports = {
 
             const guildUuid = config.guild;
 
-            // Command can only be ran if the server has a guild set
             if (!guildUuid) {
                 responseEmbed
                     .setTitle('Error')
@@ -61,7 +60,6 @@ module.exports = {
 
             const guildName = (await database.findGuild(guildUuid, true)).name;
 
-            // If the member of role is used, check the user has it to let them run the command
             if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                 responseEmbed
                     .setTitle('Error')
@@ -71,7 +69,6 @@ module.exports = {
                 return;
             }
 
-            // No players are on the banned list
             if (!config['bannedPlayers'] || Object.keys(config['bannedPlayers']).length === 0) {
                 responseEmbed
                     .setTitle('Error')
@@ -81,6 +78,7 @@ module.exports = {
                 return;
             }
 
+            // Paginate the response if there are more than 25 banned players
             if (Object.keys(config['bannedPlayers']).length > 25) {
                 const embeds = [];
                 const row = new ActionRowBuilder();

@@ -73,7 +73,6 @@ module.exports = {
             const memberRoles = interaction.member.roles.cache;
             const memberOfRole = config.memberOfRole;
 
-            // If the member of role is used, it is required
             if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                 responseEmbed
                     .setDescription('You do not have the required permissions to run this command.')
@@ -82,7 +81,6 @@ module.exports = {
                 return;
             }
 
-            // Can only be ran by the owner or an admin
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 responseEmbed
                     .setDescription('You do not have the required permissions to run this command.')
@@ -100,6 +98,7 @@ module.exports = {
             return;
         }
 
+        // Cap the message at 1000 characters
         if (message.length > 1000) {
             responseEmbed
                 .setTitle('Message exceeds length')
@@ -110,7 +109,6 @@ module.exports = {
         }
 
         try {
-            // Save the option to the config
             switch (option) {
                 case 'joinMessage':
                 case 'leaveMessage':

@@ -68,11 +68,9 @@ module.exports = {
         const response = await trackGuild(interaction);
 
         const row = new ActionRowBuilder();
+        const responseEmbed = new EmbedBuilder();
 
-        if (response.guildUuids !== undefined) {
-            const responseEmbed = new EmbedBuilder();
-
-            // Multiselector
+        if (response.guildUuids !== undefined) { // Multiselector
             responseEmbed
                 .setTitle('Multiple guilds found')
                 .setDescription(`More than 1 guild has the identifier ${interaction.options.getString('guild_name')}. Pick the intended guild from the following.`)
@@ -99,10 +97,7 @@ module.exports = {
             });
 
             return;
-        } else if (response.error) {
-            // Error
-            const responseEmbed = new EmbedBuilder();
-
+        } else if (response.error) { // Error whilst tracking guild
             responseEmbed
                 .setTitle('Error')
                 .setDescription(`${response.error}`)
@@ -110,16 +105,12 @@ module.exports = {
 
             await interaction.editReply({ embeds: [responseEmbed] });
         } else {
-            const responseEmbed = new EmbedBuilder();
-
-            if (response.guildName === '') {
-                // Unknown guild
+            if (response.guildName === '') { // Unknown guild
                 responseEmbed
                     .setTitle('Invalid guild')
                     .setDescription(`Unable to find a guild using the name/prefix '${interaction.options.getString('guild_name')}', try again using the exact guild name.`)
                     .setColor(0xff0000);
-            } else {
-                // Valid guild
+            } else { // Valid guild
                 responseEmbed
                     .setTitle('Successfully tracked guild')
                     .setDescription(`${response.guildName} is now being tracked.`)

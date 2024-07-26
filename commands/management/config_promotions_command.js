@@ -118,7 +118,6 @@ module.exports = {
             const memberRoles = interaction.member.roles.cache;
             const memberOfRole = config.memberOfRole;
 
-            // If the member of role is used, it is required
             if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                 responseEmbed
                     .setDescription('You do not have the required permissions to run this command.')
@@ -127,7 +126,6 @@ module.exports = {
                 return;
             }
 
-            // Can only be ran by the owner or an admin
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 responseEmbed
                     .setDescription('You do not have the required permissions to run this command.')
@@ -148,6 +146,7 @@ module.exports = {
         const requirementStr = interaction.options.getString('requirement');
         const requirementNum = interaction.options.getInteger('requirement_number');
 
+        // Time and count requirements need requirementNum so make sure it is present
         if (option.endsWith('TimeRequirement') || (option.endsWith('RequirementsCount'))) {
             if (!requirementNum) {
                 responseEmbed
@@ -157,7 +156,7 @@ module.exports = {
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
             }
-        } else {
+        } else { // The others use requirementStr so make sure that is present
             if (!requirementStr) {
                 responseEmbed
                     .setTitle('Invalid option')
@@ -171,7 +170,6 @@ module.exports = {
         try {
             let message;
 
-            // Save the option to the config
             switch (option) {
                 case 'chiefTimeRequirement':
                 case 'chiefRequirementsCount':

@@ -29,13 +29,11 @@ module.exports = {
         const embeds = [];
         const row = new ActionRowBuilder();
 
-        // Call guildStats
         const response = await guildStats(interaction);
 
-        if (response.guildUuids !== undefined) {
+        if (response.guildUuids !== undefined) { // Multiselector
             const responseEmbed = new EmbedBuilder();
 
-            // Multiselector
             responseEmbed
                 .setTitle('Multiple guilds found')
                 .setDescription(`More than 1 guild has the identifier ${interaction.options.getString('guild_name')}. Pick the intended guild from the following.`)
@@ -63,17 +61,15 @@ module.exports = {
 
             return;
         } else {
-            if (response.guildName === '') {
-                const responseEmbed = new EmbedBuilder();
-
-                // Unknown guild
-                responseEmbed
+            if (response.guildName === '') { // Unknown guild
+                const responseEmbed = new EmbedBuilder()
                     .setTitle('Invalid guild')
                     .setDescription(`Unable to find a guild using the name/prefix '${interaction.options.getString('guild_name')}', try again using the exact guild name.`)
                     .setColor(0xff0000);
 
                 embeds.push(responseEmbed);
-            } else {
+            } else { // Valid guild
+                // If more than 5 members then paginate
                 if (response.members.length > 5) {
                     const pages = [];
                     for (let i = 0; i < response.members.length; i += 5) {

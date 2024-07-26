@@ -118,7 +118,6 @@ module.exports = {
             const memberRoles = interaction.member.roles.cache;
             const memberOfRole = config.memberOfRole;
 
-            // If the member of role is used, it is required
             if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                 responseEmbed
                     .setDescription('You do not have the required permissions to run this command.')
@@ -127,7 +126,6 @@ module.exports = {
                 return;
             }
 
-            // Can only be ran by the owner or an admin
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 responseEmbed
                     .setDescription('You do not have the required permissions to run this command.')
@@ -153,8 +151,7 @@ module.exports = {
 
             // If the bot does not have permission to give the role, let the user know
             if (botRole) {
-                if (role.comparePositionTo(botRole) > 0 && option !== 'adminRole') {
-                    // Admin role is not applied to anyone so it doesn't need permission to handle it
+                if (role.comparePositionTo(botRole) > 0 && option !== 'adminRole') { // Admin role is not applied to anyone so it doesn't need permission to handle it
                     message = `Configuration option ${option} updated successfully to ${role}.\n\nThe ${role} role is currently above the ${botRole} role in your hierarchy, this means that I will not be able to add that role to or remove that role from members, please change this so I can manage the role correctly!`;
                 } else {
                     message = `Configuration option ${option} updated successfully to ${role}.`;
@@ -163,7 +160,6 @@ module.exports = {
                 message = `Configuration option ${option} updated successfully to ${role}.\nFor some reason my role was not found on your server. Please try kicking and inviting me again to try and fix this. Your config options will be saved.`;
             }
 
-            // Save the option to the config
             switch (option) {
                 case 'adminRole':
                 case 'ownerRole':

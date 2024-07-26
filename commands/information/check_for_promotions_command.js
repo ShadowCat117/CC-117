@@ -48,7 +48,6 @@ module.exports = {
             const memberRoles = interaction.member.roles.cache;
             const memberOfRole = config.memberOfRole;
 
-            // If the member of role is used, it is required
             if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                 responseEmbed
                     .setTitle('Error')
@@ -58,7 +57,6 @@ module.exports = {
                 return;
             }
 
-            // Can only be ran by the owner or an admin
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 responseEmbed
                     .setTitle('Error')
@@ -118,6 +116,7 @@ module.exports = {
         let ignoreRecruiters = false;
         let ignoreRecruits = false;
 
+        // If rank above has no promotion requirements then that rank can be skipped
         if (Object.keys(chiefPromotionRequirement).length === 0) {
             ignoreStrategists = true;
         }
@@ -153,6 +152,8 @@ module.exports = {
             return;
         }
 
+        // Owner and chiefs can't be demoted.
+        // If there were no promotion requirements for a rank then skip that rank too.
         for (const rank in guildJson.members) {
             if (rank === 'total' || rank === 'owner' || rank === 'chief') continue;
             if (rank === 'strategist' && ignoreStrategists) continue;
@@ -224,6 +225,7 @@ module.exports = {
 
         eligibleMembers = eligibleMembers.filter(player => player.promote);
 
+        // Paginate if more than 10 players eligible for promotion
         if (eligibleMembers.length > 10) {
             const embeds = [];
             const row = new ActionRowBuilder();

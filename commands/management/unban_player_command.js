@@ -51,7 +51,6 @@ module.exports = {
             const memberRoles = interaction.member.roles.cache;
             const guildUuid = config.guild;
 
-            // Command can only be ran by owners or admins
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 errorEmbed
                     .setTitle('Error')
@@ -61,7 +60,6 @@ module.exports = {
                 return;
             }
 
-            // Need a set guild to run this command 
             if (!guildUuid) {      
                 errorEmbed
                     .setTitle('Error')
@@ -72,13 +70,11 @@ module.exports = {
                 return;
             }
         
-            // Call unbanPlayer
             const response = await unbanPlayer(interaction);
 
             const responseEmbed = new EmbedBuilder();
 
-            if (response.playerUuids !== undefined) {
-                // Multiselector
+            if (response.playerUuids !== undefined) { // Multiselector
                 responseEmbed
                     .setTitle('Multiple players found')
                     .setDescription(`More than 1 player has the identifier ${username}. Pick the intended player from the following.`)
@@ -122,7 +118,7 @@ module.exports = {
                 });
 
                 return;
-            } else if (response.error) {
+            } else if (response.error) { // Error whilst trying to unban player
                 errorEmbed
                     .setTitle('Error')
                     .setDescription(`Unable to unban player: ${response.error}`)
@@ -131,15 +127,13 @@ module.exports = {
                 await interaction.editReply({ embeds: [errorEmbed] });
                 return;
             } else {
-                if (response.username === '') {
-                    // Unknown player
+                if (response.username === '') { // Unknown player
                     responseEmbed
                         .setTitle('Invalid username')
                         .setDescription(`Unable to find a player using the name '${username}', try again using the exact player name.`)
                         .setColor(0xff0000);
-                } else {
+                } else { // Valid player
                     const guildName = (await database.findGuild(guildUuid, true)).name;
-                    // Valid player
                     responseEmbed
                         .setTitle(`${response.username} has been unbanned from ${guildName}`)
                         .setColor(0x00ffff);

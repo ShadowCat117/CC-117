@@ -131,6 +131,7 @@ module.exports = {
         }
 
         if (option === 'memberThreshold') {
+            // memberThreshold is a percentage so must be 1-100
             if (value < 1 || value > 100) {
                 responseEmbed
                     .setDescription('Member threshold must be between 1-100.')
@@ -139,9 +140,10 @@ module.exports = {
                 return;
             }
         } else if (option === 'extraTimeIncrease') {
+            // Extra time must be positive
             if (value < 0) {
                 responseEmbed
-                    .setDescription('Extra time multiplier must be above 0.')
+                    .setDescription('Extra time increase must be above 0.')
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
@@ -149,7 +151,6 @@ module.exports = {
         }
 
         try {
-            // Save the option to the config
             switch (option) {
                 case 'chiefUpperThreshold':
                 case 'chiefLowerThreshold':

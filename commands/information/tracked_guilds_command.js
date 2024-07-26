@@ -43,7 +43,6 @@ module.exports = {
                 config = JSON.parse(fileData);
             }
 
-            // No tracked guilds
             if (!config['trackedGuilds'] || Object.keys(config['trackedGuilds']).length === 0) {
                 responseEmbed
                     .setTitle('Error')
@@ -55,6 +54,7 @@ module.exports = {
 
             const trackedGuilds = await database.getGuildActivities(config['trackedGuilds']);
 
+            // Paginate if more than 10 tracked guilds have data
             if (trackedGuilds.length > 10) {
                 const embeds = [];
                 const row = new ActionRowBuilder();

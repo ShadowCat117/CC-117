@@ -49,7 +49,6 @@ module.exports = {
 
             const guildUuid = config.guild;
 
-            // Command can only be ran if the server has a guild set
             if (!guildUuid) {
                 responseEmbed
                     .setTitle('Error')
@@ -62,7 +61,6 @@ module.exports = {
 
             const guildName = (await database.findGuild(guildUuid, true)).name;
 
-            // If the member of role is used, check the user has it to let them run the command
             if (memberOfRole && (interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(memberOfRole))) {
                 responseEmbed
                     .setTitle('Error')
@@ -72,7 +70,6 @@ module.exports = {
                 return;
             }
 
-            // Can only be ran by the owner or an admin
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 responseEmbed
                     .setTitle('Error')
@@ -82,7 +79,6 @@ module.exports = {
                 return;
             }
 
-            // No players are exempt from promotion
             if (!config['promotionExceptions'] || Object.keys(config['promotionExceptions']).length === 0) {
                 responseEmbed
                     .setTitle('Error')
@@ -92,6 +88,7 @@ module.exports = {
                 return;
             }
 
+            // Paginate if more than 25 players with promotion exceptions
             if (Object.keys(config['promotionExceptions']).length > 25) {
                 const embeds = [];
                 const row = new ActionRowBuilder();

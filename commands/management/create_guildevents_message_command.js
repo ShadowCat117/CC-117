@@ -55,7 +55,6 @@ module.exports = {
         const adminRoleId = config.adminRole;
         const memberRoles = interaction.member.roles.cache;
 
-        // Only owners and admins can run command
         if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
             responseEmbed
                 .setTitle('Error')
@@ -67,7 +66,6 @@ module.exports = {
 
         const message = config['guildEventsMessage'];
 
-        // If no events message, tell the user to set one
         if (!message) {
             responseEmbed
                 .setTitle('Error')
@@ -77,7 +75,6 @@ module.exports = {
             return;
         }
 
-        // Check if the giveaway role exists and if not tell the user to set it
         if (!config['giveawayRole']) {
             responseEmbed
                 .setTitle('Error')
@@ -87,7 +84,6 @@ module.exports = {
             return;
         }
 
-        // Same for the events role
         if (!config['eventsRole']) {
             responseEmbed
                 .setTitle('Error')
@@ -97,7 +93,6 @@ module.exports = {
             return;
         }
 
-        // Add giveaway and events button
         const giveawayButton = new ButtonBuilder()
             .setCustomId('giveaway')
             .setStyle(ButtonStyle.Success)

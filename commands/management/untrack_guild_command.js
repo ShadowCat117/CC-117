@@ -45,7 +45,6 @@ module.exports = {
             const adminRoleId = config.adminRole;
             const memberRoles = interaction.member.roles.cache;
 
-            // Command can only be ran by owners or admins
             if ((interaction.member.id !== interaction.member.guild.ownerId) && (!memberRoles.has(adminRoleId) && interaction.member.roles.highest.position < interaction.guild.roles.cache.get(adminRoleId).position)) {
                 const errorEmbed = new EmbedBuilder()
                     .setTitle('Error')
@@ -64,15 +63,12 @@ module.exports = {
                 return;
         }
 
-        // Call untrackGuild
         const response = await untrackGuild(interaction);
 
         const row = new ActionRowBuilder();
+        const responseEmbed = new EmbedBuilder();
 
-        if (response.guildUuids !== undefined) {
-            const responseEmbed = new EmbedBuilder();
-
-            // Multiselector
+        if (response.guildUuids !== undefined) { // Multiselector          
             responseEmbed
                 .setTitle('Multiple guilds found')
                 .setDescription(`More than 1 guild has the identifier ${interaction.options.getString('guild_name')}. Pick the intended guild from the following.`)
@@ -99,10 +95,7 @@ module.exports = {
             });
 
             return;
-        } else if (response.error) {
-            // Error
-            const responseEmbed = new EmbedBuilder();
-
+        } else if (response.error) { // Errpr whilst trying to untrack guild
             responseEmbed
                 .setTitle('Error')
                 .setDescription(`${response.error}`)
@@ -110,16 +103,12 @@ module.exports = {
 
             await interaction.editReply({ embeds: [responseEmbed] });
         } else {
-            const responseEmbed = new EmbedBuilder();
-
-            if (response.guildName === '') {
-                // Unknown guild
+            if (response.guildName === '') { // Unknown guild
                 responseEmbed
                     .setTitle('Invalid guild')
                     .setDescription(`Unable to find a guild using the name/prefix '${interaction.options.getString('guild_name')}', try again using the exact guild name.`)
                     .setColor(0xff0000);
-            } else {
-                // Valid guild
+            } else { // Valid guild
                 responseEmbed
                     .setTitle('Successfully untracked guild')
                     .setDescription(`${response.guildName} is no longer being tracked.`)

@@ -41,7 +41,6 @@ module.exports = {
 
                 const guildUuid = config.guild;
 
-                // Guild set required
                 if (!guildUuid) {
                     const responseEmbed = new EmbedBuilder()
                             .setTitle('No Guild Set')
@@ -96,7 +95,6 @@ module.exports = {
             return;
         }
 
-        // Call updateRoles
         const response = await updateRoles(interaction.guild);
 
         if (response.length === 0) {
@@ -106,7 +104,7 @@ module.exports = {
                 .setColor(0x999999);
 
             embeds.push(responseEmbed);
-        } else if (response.length > 5) {
+        } else if (response.length > 5) { // Paginate if more than 5 members updated
             const pages = [];
             for (let i = 0; i < response.length; i += 5) {
                 pages.push(response.slice(i, i + 5));
