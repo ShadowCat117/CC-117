@@ -141,7 +141,7 @@ module.exports = {
                             case 'missing': // Not enough requirements given for the required count
                                 responseEmbed
                                     .setDescription('Missing values for promotions. Configuration has not been set up fully.');
-                                    break;
+                                break;
                             case 'guild': // Not in the set guild
                                 responseEmbed
                                     .setDescription(`${response.username.replaceAll('_', '\\_')} is not a member of ${guildName}.`);

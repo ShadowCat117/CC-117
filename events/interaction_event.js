@@ -64,7 +64,6 @@ module.exports = {
 
             let config = {};
 
-            // Get the config file for the server
             if (fs.existsSync(filePath)) {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
@@ -183,7 +182,6 @@ module.exports = {
                                 const timezoneRow = new ActionRowBuilder();
                                 const sortRow = new ActionRowBuilder();
 
-                                // Create string select menu with all timezone options
                                 const timezoneSelection = new StringSelectMenuBuilder()
                                     .setCustomId('timezone')
                                     .setPlaceholder('Select timezone!')
@@ -318,32 +316,18 @@ module.exports = {
 
                             const response = await addAlly(interaction, true);
 
-                            if (response.error) {
-                                // Error
-                                const responseEmbed = new EmbedBuilder();
-                    
-                                responseEmbed
+                            if (response.error) { // Failed to add ally
+                                const responseEmbed = new EmbedBuilder()
                                     .setTitle('Error')
                                     .setDescription(`${response.error}`)
                                     .setColor(0xff0000);
                     
                                 await interaction.editReply({ embeds: [responseEmbed] });
                             } else {
-                                const responseEmbed = new EmbedBuilder();
-                    
-                                if (response.guildName === '') {
-                                    // Unknown guild
-                                    responseEmbed
-                                        .setTitle('Invalid guild')
-                                        .setDescription(`Unable to find a guild using the name/prefix '${interaction.options.getString('guild_name')}', try again using the exact guild name.`)
-                                        .setColor(0xff0000);
-                                } else {
-                                    // Valid guild
-                                    responseEmbed
-                                        .setTitle('Successfully added ally')
-                                        .setDescription(`${response.guildName} is now an allied guild.`)
-                                        .setColor(0x00ffff);
-                                }
+                                const responseEmbed = new EmbedBuilder()
+                                    .setTitle('Successfully added ally')
+                                    .setDescription(`${response.guildName} is now an allied guild.`)
+                                    .setColor(0x00ffff);
                     
                                 await interaction.editReply({ embeds: [responseEmbed] });
                             }
@@ -364,33 +348,24 @@ module.exports = {
 
                             const responseEmbed = new EmbedBuilder();
 
-                            if (response.error) {
+                            if (response.error) { // Failed to add demotion exception
                                 responseEmbed
                                     .setTitle('Error')
                                     .setDescription(`Unable to add demotion exception: ${response.error}`)
                                     .setColor(0xff0000);
                             } else {
-                                if (response.username === '') {
-                                    // Unknown player
-                                    responseEmbed
-                                        .setTitle('Invalid username')
-                                        .setDescription(`Unable to find a player using the name '${interaction.options.getString('username')}', try again using the exact player name.`)
-                                        .setColor(0xff0000);
+                                let duration;
+
+                                if (response.duration === -1) {
+                                    duration = 'Exempt from demotions forever';
                                 } else {
-                                    // Valid player
-                                    let duration;
-
-                                    if (response.duration === -1) {
-                                        duration = 'Exempt from demotions forever';
-                                    } else {
-                                        duration = `Exempt from demotions for ${response.duration} day${response.duration > 1 ? 's' : ''}`;
-                                    }
-
-                                    responseEmbed
-                                        .setTitle(`${response.username} is now exempt from demotions`)
-                                        .addFields({ name: 'Duration', value: `${duration}` })
-                                        .setColor(0x00ffff);
+                                    duration = `Exempt from demotions for ${response.duration} day${response.duration > 1 ? 's' : ''}`;
                                 }
+
+                                responseEmbed
+                                    .setTitle(`${response.username} is now exempt from demotions`)
+                                    .addFields({ name: 'Duration', value: `${duration}` })
+                                    .setColor(0x00ffff);
                             }
                 
                             await interaction.editReply({ embeds: [responseEmbed] });
@@ -411,33 +386,24 @@ module.exports = {
 
                             const responseEmbed = new EmbedBuilder();
 
-                            if (response.error) {
+                            if (response.error) { // Failed to add inactivity exception
                                 responseEmbed
                                     .setTitle('Error')
                                     .setDescription(`Unable to add inactivity exception: ${response.error}`)
                                     .setColor(0xff0000);
                             } else {
-                                if (response.username === '') {
-                                    // Unknown player
-                                    responseEmbed
-                                        .setTitle('Invalid username')
-                                        .setDescription(`Unable to find a player using the name '${interaction.options.getString('username')}', try again using the exact player name.`)
-                                        .setColor(0xff0000);
+                                let duration;
+
+                                if (response.duration === -1) {
+                                    duration = 'Exempt from inactivity forever';
                                 } else {
-                                    // Valid player
-                                    let duration;
-
-                                    if (response.duration === -1) {
-                                        duration = 'Exempt from inactivity forever';
-                                    } else {
-                                        duration = `Allowed to be inactive for ${response.duration} day${response.duration > 1 ? 's' : ''}`;
-                                    }
-
-                                    responseEmbed
-                                        .setTitle(`${response.username} now has a custom inactivity threshold`)
-                                        .addFields({ name: 'Duration', value: `${duration}` })
-                                        .setColor(0x00ffff);
+                                    duration = `Allowed to be inactive for ${response.duration} day${response.duration > 1 ? 's' : ''}`;
                                 }
+
+                                responseEmbed
+                                    .setTitle(`${response.username} now has a custom inactivity threshold`)
+                                    .addFields({ name: 'Duration', value: `${duration}` })
+                                    .setColor(0x00ffff);
                             }
                 
                             await interaction.editReply({ embeds: [responseEmbed] });
@@ -458,33 +424,24 @@ module.exports = {
 
                             const responseEmbed = new EmbedBuilder();
 
-                            if (response.error) {
+                            if (response.error) { // Failed to add promotion exception
                                 responseEmbed
                                     .setTitle('Error')
                                     .setDescription(`Unable to add promotion exception: ${response.error}`)
                                     .setColor(0xff0000);
                             } else {
-                                if (response.username === '') {
-                                    // Unknown player
-                                    responseEmbed
-                                        .setTitle('Invalid username')
-                                        .setDescription(`Unable to find a player using the name '${interaction.options.getString('username')}', try again using the exact player name.`)
-                                        .setColor(0xff0000);
-                                } else {
-                                    // Valid player
-                                    let duration;
+                                let duration;
 
-                                    if (response.duration === -1) {
-                                        duration = 'Exempt from promotions forever';
-                                    } else {
-                                        duration = `Exempt from promotions for ${response.duration} day${response.duration > 1 ? 's' : ''}`;
-                                    }
-                
-                                    responseEmbed
-                                        .setTitle(`${response.username} is now exempt from promotions`)
-                                        .addFields({ name: 'Duration', value: `${duration}` })
-                                        .setColor(0x00ffff);
+                                if (response.duration === -1) {
+                                    duration = 'Exempt from promotions forever';
+                                } else {
+                                    duration = `Exempt from promotions for ${response.duration} day${response.duration > 1 ? 's' : ''}`;
                                 }
+            
+                                responseEmbed
+                                    .setTitle(`${response.username} is now exempt from promotions`)
+                                    .addFields({ name: 'Duration', value: `${duration}` })
+                                    .setColor(0x00ffff);
                             }
                 
                             await interaction.editReply({ embeds: [responseEmbed] });
@@ -505,25 +462,16 @@ module.exports = {
 
                             const responseEmbed = new EmbedBuilder();
 
-                            if (response.error) {
+                            if (response.error) { // Failed to ban player
                                 responseEmbed
                                     .setTitle('Error')
                                     .setDescription(`Unable to ban player: ${response.error}`)
                                     .setColor(0xff0000);
                             } else {
-                                if (response.username === '') {
-                                    // Unknown player
-                                    responseEmbed
-                                        .setTitle('Invalid username')
-                                        .setDescription(`Unable to find a player using the name '${interaction.options.getString('username')}', try again using the exact player name.`)
-                                        .setColor(0xff0000);
-                                } else {
-                                    // Valid player
-                                    responseEmbed
-                                        .setTitle(`${response.username} has been banned from your guild`)
-                                        .addFields({ name: 'Reason', value: `${response.reason}` })
-                                        .setColor(0x00ffff);
-                                }
+                                responseEmbed
+                                    .setTitle(`${response.username} has been banned from your guild`)
+                                    .addFields({ name: 'Reason', value: `${response.reason}` })
+                                    .setColor(0x00ffff);
                             }
                 
                             await interaction.editReply({ embeds: [responseEmbed] });
@@ -545,6 +493,7 @@ module.exports = {
                             const embeds = [];
                             const row = new ActionRowBuilder();
 
+                            // Paginate if more than 5 members
                             if (response.members.length > 5) {
                                 const pages = [];
                                 for (let i = 0; i < response.members.length; i += 5) {
@@ -660,6 +609,7 @@ module.exports = {
                             const embeds = [];
                             const row = new ActionRowBuilder();
 
+                            // Paginate if more than 20 members
                             if (response.playerLastLogins.length > 20) {
                                 const pages = [];
                                 for (let i = 0; i < response.playerLastLogins.length; i += 20) {
@@ -766,6 +716,7 @@ module.exports = {
                             const embeds = [];
                             const row = new ActionRowBuilder();
 
+                            // Paginate if more than 20 players online
                             if (response.onlinePlayers.length > 20) {
                                 const pages = [];
                                 for (let i = 0; i < response.onlinePlayers.length; i += 20) {
@@ -978,28 +929,27 @@ module.exports = {
                                 const guildName = await database.findGuild(config.guild, true);
         
                                 switch (reason) {
-                                    case 'error':
-                                        // Something went wrong
+                                    case 'error': // Some kind of error
                                         responseEmbed
                                             .setDescription('An error occured whilst checking for promotion progress.');
                                         break;
-                                    case 'guild':
-                                        // Not in guild
+                                    case 'missing': // Not enough requirements given for the required count
+                                        responseEmbed
+                                            .setDescription('Missing values for promotions. Configuration has not been set up fully.');
+                                        break;
+                                    case 'guild': // Not in the set guild
                                         responseEmbed
                                             .setDescription(`${response.username} is not a member of ${guildName}.`);
                                         break;
-                                    case 'owner':
-                                        // Is owner
+                                    case 'owner': // Owner can't be promoted
                                         responseEmbed
                                             .setDescription(`${response.username} is the Owner of ${guildName}. They are unable to be promoted.`);
                                         break;
-                                    case 'chief':
-                                        // Is chief
+                                    case 'chief': // Chief can't be promoted by anyone other than owner
                                         responseEmbed
                                             .setDescription(`${response.username} is a Chief of ${guildName}. Only the Owner can decide if they should be promoted.`);
                                         break;
-                                    default:
-                                        // Exempt
+                                    default: // Exempt from promotion
                                         if (response.unableToPromote === -1) {
                                             responseEmbed
                                                 .setDescription(`${response.username} is exempt from promotions forever.`);
@@ -1084,10 +1034,9 @@ module.exports = {
 
                             const response = await removeAlly(interaction, true);
 
-                            if (response.error) {
-                                // Error
-                                const responseEmbed = new EmbedBuilder();
+                            const responseEmbed = new EmbedBuilder();
 
+                            if (response.error) { // Error whilst removing ally
                                 responseEmbed
                                     .setTitle('Error')
                                     .setDescription(`${response.error}`)
@@ -1095,21 +1044,10 @@ module.exports = {
                     
                                 await interaction.editReply({ embeds: [responseEmbed] });
                             } else {
-                                const responseEmbed = new EmbedBuilder();
-                    
-                                if (response.guildName === '') {
-                                    // Unknown guild
-                                    responseEmbed
-                                        .setTitle('Invalid guild')
-                                        .setDescription(`Unable to find a guild using the name/prefix '${interaction.options.getString('guild_name')}', try again using the exact guild name.`)
-                                        .setColor(0xff0000);
-                                } else {
-                                    // Valid guild
-                                    responseEmbed
+                                responseEmbed
                                     .setTitle('Successfully removed ally')
                                     .setDescription(`${response.guildName} is no longer an allied guild.`)
                                     .setColor(0x00ffff);
-                                }
                     
                                 await interaction.editReply({ embeds: [responseEmbed] });
                             }
@@ -1130,24 +1068,15 @@ module.exports = {
 
                             const responseEmbed = new EmbedBuilder();
 
-                            if (response.error) {
+                            if (response.error) { // Error whilst removing demotion exception
                                 responseEmbed
                                     .setTitle('Error')
                                     .setDescription(`Unable to remove demotion exception: ${response.error}`)
                                     .setColor(0xff0000);
                             } else {
-                                if (response.username === '') {
-                                    // Unknown player
-                                    responseEmbed
-                                        .setTitle('Invalid username')
-                                        .setDescription(`Unable to find a player using the name '${interaction.options.getString('username')}', try again using the exact player name.`)
-                                        .setColor(0xff0000);
-                                } else {
-                                    // Valid player
-                                    responseEmbed
-                                        .setTitle(`${response.username} is no longer exempt from demotion.`)
-                                        .setColor(0x00ffff);
-                                }
+                                responseEmbed
+                                    .setTitle(`${response.username} is no longer exempt from demotion.`)
+                                    .setColor(0x00ffff);
                             }
                 
                             await interaction.editReply({ embeds: [responseEmbed] });
@@ -1168,24 +1097,15 @@ module.exports = {
 
                             const responseEmbed = new EmbedBuilder();
 
-                            if (response.error) {
+                            if (response.error) { // Error removing inactivity exception
                                 responseEmbed
                                     .setTitle('Error')
                                     .setDescription(`Unable to remove inactivity exception: ${response.error}`)
                                     .setColor(0xff0000);
                             } else {
-                                if (response.username === '') {
-                                    // Unknown player
-                                    responseEmbed
-                                        .setTitle('Invalid username')
-                                        .setDescription(`Unable to find a player using the name '${interaction.options.getString('username')}', try again using the exact player name.`)
-                                        .setColor(0xff0000);
-                                } else {
-                                    // Valid player
-                                    responseEmbed
-                                        .setTitle(`${response.username} is no longer exempt from inactivity.`)
-                                        .setColor(0x00ffff);
-                                }
+                                responseEmbed
+                                    .setTitle(`${response.username} is no longer exempt from inactivity.`)
+                                    .setColor(0x00ffff);
                             }
                 
                             await interaction.editReply({ embeds: [responseEmbed] });
@@ -1206,24 +1126,15 @@ module.exports = {
 
                             const responseEmbed = new EmbedBuilder();
 
-                            if (response.error) {
+                            if (response.error) { // Error removing promotion exception
                                 responseEmbed
                                     .setTitle('Error')
                                     .setDescription(`Unable to remove promotion exception: ${response.error}`)
                                     .setColor(0xff0000);
                             } else {
-                                if (response.username === '') {
-                                    // Unknown player
-                                    responseEmbed
-                                        .setTitle('Invalid username')
-                                        .setDescription(`Unable to find a player using the name '${interaction.options.getString('username')}', try again using the exact player name.`)
-                                        .setColor(0xff0000);
-                                } else {
-                                    // Valid player
-                                    responseEmbed
-                                        .setTitle(`${response.username} is no longer exempt from promotion.`)
-                                        .setColor(0x00ffff);
-                                }
+                                responseEmbed
+                                    .setTitle(`${response.username} is no longer exempt from promotion.`)
+                                    .setColor(0x00ffff);
                             }
                 
                             await interaction.editReply({ embeds: [responseEmbed] });
@@ -1241,33 +1152,20 @@ module.exports = {
                             });
 
                             const response = await setGuild(interaction, true);
+                            const responseEmbed = new EmbedBuilder();
 
-                            if (response.error) {
-                                // Error
-                                const responseEmbed = new EmbedBuilder();
-                    
+                            if (response.error) { // Error setting guild
                                 responseEmbed
                                     .setTitle('Error')
                                     .setDescription(`${response.error}`)
                                     .setColor(0xff0000);
                     
                                 await interaction.editReply({ embeds: [responseEmbed] });
-                            } else {
-                                const responseEmbed = new EmbedBuilder();
-                    
-                                if (response.guildName === '') {
-                                    // Unknown guild
-                                    responseEmbed
-                                        .setTitle('Invalid guild')
-                                        .setDescription(`Unable to find a guild using the name/prefix '${interaction.options.getString('guild_name')}', try again using the exact guild name.`)
-                                        .setColor(0xff0000);
-                                } else {
-                                    // Valid guild
-                                    responseEmbed
-                                        .setTitle('Successfully set guild')
-                                        .setDescription(`You are now representing ${response.guildName}`)
-                                        .setColor(0x00ffff);
-                                }
+                            } else {                    
+                                responseEmbed
+                                    .setTitle('Successfully set guild')
+                                    .setDescription(`You are now representing ${response.guildName}`)
+                                    .setColor(0x00ffff);
                     
                                 await interaction.editReply({ embeds: [responseEmbed] });
                             }
@@ -1288,7 +1186,6 @@ module.exports = {
 
                             const publicProfileValue = `${response.username} has a ${response.publicProfile ? 'public' : 'private'} profile`;
 
-                            // Valid player
                             const responseEmbed = new EmbedBuilder()
                                 .setTitle(`Suspiciousness of ${response.username}: ${response.overallSusValue}%`)
                                 .setDescription('This is calculated from the following stats')
@@ -1322,11 +1219,9 @@ module.exports = {
                             });
 
                             const response = await trackGuild(interaction, true);
+                            const responseEmbed = new EmbedBuilder();
 
-                            if (response.error) {
-                                // Error
-                                const responseEmbed = new EmbedBuilder();
-                    
+                            if (response.error) { // Error tracking guild                    
                                 responseEmbed
                                     .setTitle('Error')
                                     .setDescription(`${response.error}`)
@@ -1334,21 +1229,10 @@ module.exports = {
                     
                                 await interaction.editReply({ embeds: [responseEmbed] });
                             } else {
-                                const responseEmbed = new EmbedBuilder();
-                    
-                                if (response.guildName === '') {
-                                    // Unknown guild
-                                    responseEmbed
-                                        .setTitle('Invalid guild')
-                                        .setDescription(`Unable to find a guild using the name/prefix '${interaction.options.getString('guild_name')}', try again using the exact guild name.`)
-                                        .setColor(0xff0000);
-                                } else {
-                                    // Valid guild
-                                    responseEmbed
-                                        .setTitle('Successfully tracked guild')
-                                        .setDescription(`${response.guildName} is now being tracked.`)
-                                        .setColor(0x00ffff);
-                                }
+                                responseEmbed
+                                    .setTitle('Successfully tracked guild')
+                                    .setDescription(`${response.guildName} is now being tracked.`)
+                                    .setColor(0x00ffff);
                     
                                 await interaction.editReply({ embeds: [responseEmbed] });
                             }
@@ -1369,24 +1253,15 @@ module.exports = {
 
                             const responseEmbed = new EmbedBuilder();
 
-                            if (response.error) {
+                            if (response.error) { // Error unbanning player
                                 responseEmbed
                                     .setTitle('Error')
                                     .setDescription(`Unable to unban player: ${response.error}`)
                                     .setColor(0xff0000);
                             } else {
-                                if (response.username === '') {
-                                    // Unknown player
-                                    responseEmbed
-                                        .setTitle('Invalid username')
-                                        .setDescription(`Unable to find a player using the name '${interaction.options.getString('username')}', try again using the exact player name.`)
-                                        .setColor(0xff0000);
-                                } else {
-                                    // Valid player
-                                    responseEmbed
-                                        .setTitle(`${response.username} has been unbanned from your guild`)
-                                        .setColor(0x00ffff);
-                                }
+                                responseEmbed
+                                    .setTitle(`${response.username} has been unbanned from your guild`)
+                                    .setColor(0x00ffff);
                             }
                 
                             await interaction.editReply({ embeds: [responseEmbed] });
@@ -1404,11 +1279,9 @@ module.exports = {
                             });
 
                             const response = await untrackGuild(interaction, true);
+                            const responseEmbed = new EmbedBuilder();
 
-                            if (response.error) {
-                                // Error
-                                const responseEmbed = new EmbedBuilder();
-
+                            if (response.error) { // Error untracking guild
                                 responseEmbed
                                     .setTitle('Error')
                                     .setDescription(`${response.error}`)
@@ -1416,7 +1289,7 @@ module.exports = {
                     
                                 await interaction.editReply({ embeds: [responseEmbed] });
                             } else {
-                                const responseEmbed = new EmbedBuilder()
+                                responseEmbed
                                     .setTitle('Successfully untracked guild')
                                     .setDescription(`${response.guildName} is no longer being tracked.`)
                                     .setColor(0x00ffff);
@@ -1436,7 +1309,6 @@ module.exports = {
                                 embeds: [loadingEmbed],
                             });
 
-                            // Call updateGuildMembers
                             const response = await updateGuildMembers(interaction, true);
 
                             const responseEmbed = new EmbedBuilder()
@@ -1459,7 +1331,6 @@ module.exports = {
                                 embeds: [loadingEmbed],
                             });
 
-                            // Call updateGuildMembers
                             const response = await updatePlayer(interaction, true);
 
                             const responseEmbed = new EmbedBuilder()
@@ -1485,8 +1356,7 @@ module.exports = {
 
                             const responseEmbed = new EmbedBuilder();
 
-                            if (response.updates.length > 0 || response.errors.length > 0) {
-                                // Valid player, with changes
+                            if (response.updates.length > 0 || response.errors.length > 0) { // Changes made
                                 responseEmbed
                                     .setTitle(`Verified as ${response.username}`)
                                     .setColor(0x00ffff);
@@ -1502,7 +1372,7 @@ module.exports = {
                                 }
         
                                 responseEmbed.setDescription(appliedChanges);
-                            } else {
+                            } else { // No changes
                                 responseEmbed
                                     .setTitle(`Verified as ${response.username}`)
                                     .setDescription('No changes')
@@ -1514,6 +1384,7 @@ module.exports = {
                                 embeds: [responseEmbed],
                             });
 
+                            // If changes made and log channel feature enabled then send message there
                             if (response.updates.length > 0 || response.errors.length > 0 && config.logMessages && config.logChannel) {
                                 responseEmbed
                                     .setTitle(`${interaction.member.user.username} has verified as ${response.username}`)
@@ -1525,7 +1396,7 @@ module.exports = {
                                     try {
                                         await channel.send({ embeds: [responseEmbed] });
                                     } catch (error) {
-                                        console.log(`Failed to send verification message to channel ${config.logChannel} in guild ${interaction.guild.id}`);
+                                        console.error(`Failed to send verification message to channel ${config.logChannel} in guild ${interaction.guild.id}`);
                                     }
                                 } else {
                                     console.log(`${config.logChannel} not found for guild ${interaction.guild.id}`);
@@ -1537,7 +1408,6 @@ module.exports = {
                         default: {
                             // Here we expect functionToRun to be one of the interactions with the war, class, giveaway or events buttons
                             if (interaction.customId === 'war') {
-                                // Get the member of guild role and level requirement for getting war roles
                                 const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
                                 const levelRequirement = config['warLevelRequirement'];
             
@@ -1562,10 +1432,7 @@ module.exports = {
                                     }
                                 }
             
-                                // If the member has both the memer of guild role and is a valid level
-                                // allow them to get war roles.
                                 if (memberOfRole && memberRoles.has(memberOfRole.id) && validLevel) {
-                                    // Get the war role
                                     const warRole = interaction.guild.roles.cache.get(config['warRole']);
             
                                     // Add war role if they don't already have it
@@ -1579,7 +1446,6 @@ module.exports = {
                                             });
                                     }
             
-                                    // Create the buttons to be displayed on response button
                                     const tankButton = new ButtonBuilder()
                                         .setCustomId('tank')
                                         .setStyle(ButtonStyle.Secondary)
@@ -1615,14 +1481,11 @@ module.exports = {
                                         .setStyle(ButtonStyle.Danger)
                                         .setLabel('Remove');
                     
-                                    // Add the buttons to rows
                                     const rolesRow = new ActionRowBuilder().addComponents(tankButton, healerButton, damageButton, soloButton, ecoButton);
                                     const removeRow = new ActionRowBuilder().addComponents(warPingButton, removeButton);
                     
-                                    // Get the war message
                                     const warMessage = config['warClassMessage'].replace(/\\n/g, '\n');
                     
-                                    // Send a followup with the war message and buttons
                                     await interaction.followUp({
                                         content: warMessage,
                                         ephemeral: true,
@@ -1630,14 +1493,12 @@ module.exports = {
                                     });
                                 } else {
                                     const guildName = (await database.findGuild(config['guild'], true)).name;
-                                    // Tell the user they need to be a guild member and meet a level requirement to gain war roles
                                     await interaction.followUp({
                                         content: `Sorry, you need to be a member of ${guildName} to use this and be at least level ${levelRequirement}.`,
                                         ephemeral: true,
                                     });
                                 }
                             } else if (interaction.customId === 'tank') {
-                                // Get the member of guild role and level requirement for getting war roles
                                 const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
                                 const levelRequirement = config['warLevelRequirement'];
             
@@ -1662,13 +1523,9 @@ module.exports = {
                                     }
                                 }
             
-                                // If the member has both the memer of guild role and is a valid level
-                                // allow them to get war roles.
                                 if (memberOfRole && memberRoles.has(memberOfRole.id) && validLevel) {
-                                    // Get tank role
                                     const tankRole = interaction.guild.roles.cache.get(config['tankRole']);
                 
-                                    // Get war role
                                     const warRole = interaction.guild.roles.cache.get(config['warRole']);
                 
                                     // Add warRole role if they don't already have
@@ -1713,14 +1570,12 @@ module.exports = {
                                     });
                                 } else {
                                     const guildName = (await database.findGuild(config['guild'], true)).name;
-                                    // Tell the user they need to be a guild member and meet a level requirement to gain war roles
                                     await interaction.followUp({
                                         content: `Sorry, you need to be a member of ${guildName} to use this and be at least level ${levelRequirement}.`,
                                         ephemeral: true,
                                     });
                                 }
                             } else if (interaction.customId === 'healer') {
-                                // Get the member of guild role and level requirement for getting war roles
                                 const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
                                 const levelRequirement = config['warLevelRequirement'];
             
@@ -1745,13 +1600,9 @@ module.exports = {
                                     }
                                 }
             
-                                // If the member has both the memer of guild role and is a valid level
-                                // allow them to get war roles.
                                 if (memberOfRole && memberRoles.has(memberOfRole.id) && validLevel) {
-                                    // Get healer role
                                     const healerRole = interaction.guild.roles.cache.get(config['healerRole']);
                 
-                                    // Get war role
                                     const warRole = interaction.guild.roles.cache.get(config['warRole']);
                 
                                     // Add war role if they don't already have it
@@ -1796,14 +1647,12 @@ module.exports = {
                                     });
                                 } else {
                                     const guildName = (await database.findGuild(config['guild'], true)).name;
-                                    // Tell the user they need to be a guild member and meet a level requirement to gain war roles
                                     await interaction.followUp({
                                         content: `Sorry, you need to be a member of ${guildName} to use this and be at least level ${levelRequirement}.`,
                                         ephemeral: true,
                                     });
                                 }
                             } else if (interaction.customId === 'damage') {
-                                // Get the member of guild role and level requirement for getting war roles
                                 const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
                                 const levelRequirement = config['warLevelRequirement'];
             
@@ -1828,10 +1677,7 @@ module.exports = {
                                     }
                                 }
             
-                                // If the member has both the memer of guild role and is a valid level
-                                // allow them to get war roles.
                                 if (memberOfRole && memberRoles.has(memberOfRole.id) && validLevel) {
-                                    // Get damage role
                                     const damageRole = interaction.guild.roles.cache.get(config['damageRole']);
                 
                                     // Get war role
@@ -1879,14 +1725,12 @@ module.exports = {
                                     });
                                 } else {
                                     const guildName = (await database.findGuild(config['guild'], true)).name;
-                                    // Tell the user they need to be a guild member and meet a level requirement to gain war roles
                                     await interaction.followUp({
                                         content: `Sorry, you need to be a member of ${guildName} to use this and be at least level ${levelRequirement}.`,
                                         ephemeral: true,
                                     });
                                 }
                             } else if (interaction.customId === 'solo') {
-                                // Get the member of guild role and level requirement for getting war roles
                                 const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
                                 const levelRequirement = config['warLevelRequirement'];
             
@@ -1911,13 +1755,9 @@ module.exports = {
                                     }
                                 }
             
-                                // If the member has both the memer of guild role and is a valid level
-                                // allow them to get war roles.
                                 if (memberOfRole && memberRoles.has(memberOfRole.id) && validLevel) {
-                                    // Get solo role
                                     const soloRole = interaction.guild.roles.cache.get(config['soloRole']);
                 
-                                    // Get war role
                                     const warRole = interaction.guild.roles.cache.get(config['warRole']);
                 
                                     // Add war role if they don't already have it
@@ -1962,14 +1802,12 @@ module.exports = {
                                     });
                                 } else {
                                     const guildName = (await database.findGuild(config['guild'], true)).name;
-                                    // Tell the user they need to be a guild member and meet a level requirement to gain war roles
                                     await interaction.followUp({
                                         content: `Sorry, you need to be a member of ${guildName} to use this and be at least level ${levelRequirement}.`,
                                         ephemeral: true,
                                     });
                                 }
                             } else if (interaction.customId === 'eco') {
-                                // Get the member of guild role and level requirement for getting war roles
                                 const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
                                 const levelRequirement = config['warLevelRequirement'];
             
@@ -1994,10 +1832,7 @@ module.exports = {
                                     }
                                 }
             
-                                // If the member has both the memer of guild role and is a valid level
-                                // allow them to get war roles.
                                 if (memberOfRole && memberRoles.has(memberOfRole.id) && validLevel) {
-                                    // Get war role
                                     const warRole = interaction.guild.roles.cache.get(config['warRole']);
                 
                                     // Add war role if they don't already have it
@@ -2011,7 +1846,6 @@ module.exports = {
                                             });
                                     }
                                     
-                                    // Get eco role
                                     const ecoRole = interaction.guild.roles.cache.get(config['ecoRole']);
                 
                                     let replyMessage;
@@ -2045,14 +1879,12 @@ module.exports = {
                                     });
                                 } else {
                                     const guildName = (await database.findGuild(config['guild'], true)).name;
-                                    // Tell the user they need to be a guild member and meet a level requirement to gain war roles
                                     await interaction.followUp({
                                         content: `Sorry, you need to be a member of ${guildName} to use this and be at least level ${levelRequirement}.`,
                                         ephemeral: true,
                                     });
                                 }
                             } else if (interaction.customId === 'warping') {
-                                // Get the member of guild role and level requirement for getting war roles
                                 const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
                                 const levelRequirement = config['warLevelRequirement'];
             
@@ -2077,12 +1909,8 @@ module.exports = {
                                     }
                                 }
             
-                                // If the member has both the memer of guild role and is a valid level
-                                // allow them to get war roles.
                                 if (memberOfRole && memberRoles.has(memberOfRole.id) && validLevel) {
-                                    // Get war role
                                     const warRole = interaction.guild.roles.cache.get(config['warRole']);
-                                    // Get warPing role
                                     const warPingRole = interaction.guild.roles.cache.get(config['warPingRole']);
                 
                                     // Add warRole role if they didn't have it
@@ -2126,20 +1954,17 @@ module.exports = {
                                     }
                                 } else {
                                     const guildName = (await database.findGuild(config['guild'], true)).name;
-                                    // Tell the user they need to be a guild member and meet a level requirement to gain war roles
                                     await interaction.followUp({
                                         content: `Sorry, you need to be a member of ${guildName} to use this and be at least level ${levelRequirement}.`,
                                         ephemeral: true,
                                     });
                                 }
                             } else if (interaction.customId === 'removewar') {
-                                // Get member roles
                                 const memberRoles = await interaction.member.roles.cache;
             
-                                // Get war role
                                 const warRole = interaction.guild.roles.cache.get(config['warRole']);
             
-                                // If they have the warPing role then remove all war related roles
+                                // If they have the war role then remove all war related roles
                                 if (memberRoles.has(warRole.id)) {
                                     const tankRole = interaction.guild.roles.cache.get(config['tankRole']);
                                     const healerRole = interaction.guild.roles.cache.get(config['healerRole']);
@@ -2176,7 +2001,6 @@ module.exports = {
                                     });
                                 }
                             } else if (interaction.customId === 'warrior') {
-                                // Create buttons for warrior archetypes
                                 const fallenButton = new ButtonBuilder()
                                     .setCustomId('fallen')
                                     .setStyle(ButtonStyle.Danger)
@@ -2192,7 +2016,6 @@ module.exports = {
                                     .setStyle(ButtonStyle.Primary)
                                     .setLabel('PALADIN');
             
-                                // Add buttons to row
                                 const row = new ActionRowBuilder().addComponents(fallenButton, battleMonkButton, paladinButton);
             
                                 const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
@@ -2203,7 +2026,6 @@ module.exports = {
                                     components: [row],
                                 });
                             } else if (interaction.customId === 'mage') {
-                                // Create buttons for mage archetypes
                                 const riftwalkerButton = new ButtonBuilder()
                                     .setCustomId('riftwalker')
                                     .setStyle(ButtonStyle.Primary)
@@ -2219,7 +2041,6 @@ module.exports = {
                                     .setStyle(ButtonStyle.Danger)
                                     .setLabel('ARCANIST');
             
-                                // Add buttons to row
                                 const row = new ActionRowBuilder().addComponents(riftwalkerButton, lightBenderButton, arcanistButton);
             
                                 const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
@@ -2230,7 +2051,6 @@ module.exports = {
                                     components: [row],
                                 });
                             } else if (interaction.customId === 'archer') {
-                                // Create buttons for archer archetypes
                                 const sharpshooterButton = new ButtonBuilder()
                                     .setCustomId('sharpshooter')
                                     .setStyle(ButtonStyle.Primary)
@@ -2246,7 +2066,6 @@ module.exports = {
                                     .setStyle(ButtonStyle.Success)
                                     .setLabel('BOLTSLINGER');
             
-                                // Add buttons to row
                                 const row = new ActionRowBuilder().addComponents(sharpshooterButton, trapperButton, boltslingerButton);
             
                                 const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
@@ -2257,7 +2076,6 @@ module.exports = {
                                     components: [row],
                                 });
                             } else if (interaction.customId === 'shaman') {
-                                // Create buttons for shaman archetypes
                                 const ritualistButton = new ButtonBuilder()
                                     .setCustomId('ritualist')
                                     .setStyle(ButtonStyle.Primary)
@@ -2273,7 +2091,6 @@ module.exports = {
                                     .setStyle(ButtonStyle.Danger)
                                     .setLabel('ACOLYTE');
             
-                                // Add buttons to row
                                 const row = new ActionRowBuilder().addComponents(ritualistButton, summonerButton, acolyteButton);
             
                                 const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
@@ -2284,7 +2101,6 @@ module.exports = {
                                     components: [row],
                                 });
                             } else if (interaction.customId === 'assassin') {
-                                // Create buttons for assassin archetypes
                                 const acrobatButton = new ButtonBuilder()
                                     .setCustomId('acrobat')
                                     .setStyle(ButtonStyle.Danger)
@@ -2300,7 +2116,6 @@ module.exports = {
                                     .setStyle(ButtonStyle.Success)
                                     .setLabel('TRICKSTER');
             
-                                // Add buttons to row
                                 const row = new ActionRowBuilder().addComponents(acrobatButton, shadestepperButton, tricksterButton);
             
                                 const archetypeMessage = config['classArchetypeMessage'].replace(/\\n/g, '\n');
@@ -2311,10 +2126,8 @@ module.exports = {
                                     components: [row],
                                 });
                             } else if (archetypes.includes(interaction.customId)) {
-                                // Get member roles
                                 const memberRoles = await interaction.member.roles.cache;
             
-                                // Get class roles
                                 const warriorRole = interaction.guild.roles.cache.get(config['warriorRole']);
                                 const mageRole = interaction.guild.roles.cache.get(config['mageRole']);
                                 const archerRole = interaction.guild.roles.cache.get(config['archerRole']);
@@ -2383,12 +2196,9 @@ module.exports = {
                                     ephemeral: true,
                                 });
                             } else if (interaction.customId === 'giveaway') {
-                                // Get giveaway role
                                 const giveawayRole = interaction.guild.roles.cache.get(config['giveawayRole']);
-                                // Get member of guild role
                                 const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
             
-                                // Get member roles
                                 const memberRoles = await interaction.member.roles.cache;
             
                                 let replyMessage;
@@ -2424,19 +2234,15 @@ module.exports = {
                                     });
                                 } else {
                                     const guildName = (await database.findGuild(config['guild'], true)).name;
-                                    // Tell user they must be a guild member to get the giveaway role
                                     await interaction.followUp({
                                         content: `Sorry, you need to be a member of ${guildName} to use this.`,
                                         ephemeral: true,
                                     });
                                 }
                             } else if (interaction.customId === 'events') {
-                                // Get events role
                                 const eventsRole = interaction.guild.roles.cache.get(config['eventsRole']);
-                                // Get member of guild role
                                 const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
             
-                                // Get member roles
                                 const memberRoles = await interaction.member.roles.cache;
             
                                 let replyMessage;
@@ -2472,7 +2278,6 @@ module.exports = {
                                     });
                                 } else {
                                     const guildName = (await database.findGuild(config['guild'], true)).name;
-                                    // Tell user they must be a guild member to get the events role
                                     await interaction.followUp({
                                         content: `Sorry, you need to be a member of ${guildName} to use this.`,
                                         ephemeral: true,
@@ -2529,7 +2334,6 @@ module.exports = {
                                 const timezoneRow = new ActionRowBuilder();
                                 const sortRow = new ActionRowBuilder();
 
-                                // Create string select menu with all timezone options
                                 const timezoneSelection = new StringSelectMenuBuilder()
                                     .setCustomId('timezone')
                                     .setPlaceholder('Select timezone!')
