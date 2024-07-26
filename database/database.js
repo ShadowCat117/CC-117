@@ -187,25 +187,23 @@ async function findPlayer(input, force, guildUuid) {
     }
 }
 
+// Set all online players
 async function handleOnlinePlayers(onlinePlayers) {
     try {
         const now = new Date();
         const uuids = Object.keys(onlinePlayers);
 
         for (const uuid of uuids) {
-            // Check if the UUID exists in the players table
             const existingPlayer = await getAsync('SELECT * FROM players WHERE uuid = ?', [uuid]);
 
             if (existingPlayer) {
-                // If the player is already online, we don't need to change anything
-                if (existingPlayer.online === 0) {
-                    // Update existing player, set online to true and lastLogin to current date
-                    await runAsync('UPDATE players SET online = true, lastLogin = ?, sessionStart = ? WHERE uuid = ?', [now.toISOString(), now.toISOString(), uuid]);
-                }
+                // Update existing player, set online to true and lastLogin to current date
+                await runAsync('UPDATE players SET online = true, lastLogin = ?, sessionStart = ? WHERE uuid = ?', [now.toISOString(), now.toISOString(), uuid]);
             } else {
                 // Insert new player with available details
                 await runAsync('INSERT INTO players (uuid, username, guildUuid, guildRank, online, lastLogin, serverRank, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, null, null, null, true, ?, null, -1, -1, ?, 0, -1, 0)', [uuid, now.toISOString(), now.toISOString()]);
                 
+                // Add to priority so their other details are updated
                 if (!priorityPlayers.includes(uuid)) {
                     priorityPlayers.push(uuid);
                 }
@@ -220,16 +218,17 @@ async function handleOnlinePlayers(onlinePlayers) {
     }
 }
 
+// Set previously online players as offline
 async function handleOfflinePlayers(onlinePlayers) {
     try {
         const now = new Date();
 
         const placeholders = onlinePlayers.map(() => '?').join(', ');
 
-        // Get all offline players
+        // Get all offline players who are online in database
         const offlinePlayers = await allAsync(`SELECT uuid, weeklyPlaytime, sessionStart FROM players WHERE uuid NOT IN (${placeholders}) AND online = 1`, onlinePlayers);
 
-        // Calculate the session duration for each offline player and set them as offline
+        // Calculate the session duration for each player and set them as offline
         for (const player of offlinePlayers) {
             const sessionStart = new Date(player.sessionStart);
             const sessionDurationHours = (now - sessionStart) / (1000 * 60 * 60);
@@ -244,6 +243,7 @@ async function handleOfflinePlayers(onlinePlayers) {
     }
 }
 
+// Update the list of all known guilds
 async function updateGuildList(guildList) {
     const currentGuildsQuery = 'SELECT uuid FROM guilds';
     const currentGuilds = await allAsync(currentGuildsQuery);
@@ -252,6 +252,7 @@ async function updateGuildList(guildList) {
     for (const uuid in guildList) {
         const { name, prefix } = guildList[uuid];
 
+        // If the guild is in the table remove them from the list so they won't be deleted
         if (guildsInTable.includes(uuid)) {
             const index = guildsInTable.indexOf(uuid);
             guildsInTable.splice(index, 1);
@@ -260,10 +261,10 @@ async function updateGuildList(guildList) {
         const existingQuery = 'SELECT uuid, name, prefix FROM guilds WHERE uuid = ?';
         const existing = await getAsync(existingQuery, [uuid]);
 
-        if (existing && (existing.name !== name || existing.prefix !== prefix)) {
+        if (existing && (existing.name !== name || existing.prefix !== prefix)) { // Update the name and prefix if it's different
             const updateQuery = 'UPDATE guilds SET name = ?, prefix = ? WHERE uuid = ?';
             await runAsync(updateQuery, [name, prefix, uuid]);
-        } else if (!existing) {
+        } else if (!existing) { // Add new guild
             const insertQuery = 'INSERT INTO guilds (uuid, name, prefix, average00, captains00, averageCount00, average01, captains01, averageCount01, average02, captains02, averageCount02, average03, captains03, averageCount03, average04, captains04, averageCount04, average05, captains05, averageCount05, average06, captains06, averageCount06, average07, captains07, averageCount07, average08, captains08, averageCount08, average09, captains09, averageCount09, average10, captains10, averageCount10, average11, captains11, averageCount11, average12, captains12, averageCount12, average13, captains13, averageCount13, average14, captains14, averageCount14, average15, captains15, averageCount15, average16, captains16, averageCount16, average17, captains17, averageCount17, average18, captains18, averageCount18, average19, captains19, averageCount19, average20, captains20, averageCount20, average21, captains21, averageCount21, average22, captains22, averageCount22, average23, captains23, averageCount23) VALUES (?, ?, ?, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);';
             await runAsync(insertQuery, [uuid, name, prefix]);
         }
@@ -332,6 +333,7 @@ async function updateGuildActivity(currentHour, currentMinute) {
     }
 }
 
+// Update the average activity of every player at the end of the week
 async function updatePlayerActivity() {
     try {
         const now = new Date();
@@ -380,6 +382,8 @@ async function updatePlayerActivity() {
     }
 }
 
+// Add priority guilds from config files.
+// Set guilds, allies and tracked guilds can all be updated since we know bot users use them.
 async function setPriorityGuilds() {
     const configsPath = path.join(__dirname, '..', 'configs');
 
@@ -393,18 +397,21 @@ async function setPriorityGuilds() {
             const data = await fs.readFile(configFilePath, 'utf8');
             const config = JSON.parse(data);
 
+            // Add set guilds
             if (config.guild) {
                 if (!priorityGuilds.includes(config.guild)) {
                     priorityGuilds.push(config.guild);
                 }
             }
 
+            // Add any allies
             for (const guild of config.allies) {
                 if (!priorityGuilds.includes(guild)) {
                     priorityGuilds.push(guild);
                 }
             }
 
+            // Add any tracked guilds
             for (const guild of config.trackedGuilds) {
                 if (!priorityGuilds.includes(guild)) {
                     priorityGuilds.push(guild);
@@ -416,6 +423,9 @@ async function setPriorityGuilds() {
     }
 }
 
+// Add every player that does not have a username in the database to the priority list.
+// If a player was added from the online list they won't have a username but do get added to the priority
+// automatically there, however the bot may be restarted before they are updated.
 async function setPriorityPlayers() {
     const players = await allAsync('SELECT uuid FROM players WHERE username IS NULL');
 
@@ -426,6 +436,7 @@ async function setPriorityPlayers() {
     }
 }
 
+// Update up to 20 priority guilds
 async function updatePriorityGuilds() {
     if (priorityGuilds.length === 0) return;
     console.log('Updating 20 priority guilds');
@@ -481,6 +492,7 @@ async function updatePriorityGuilds() {
     console.log(`Updated ${updated} priority guilds.`);
 }
 
+// Update up to 20 priority players
 async function updatePriorityPlayers() {
     if (priorityPlayers.length === 0) return;
     console.log('Updating 20 priority players');
@@ -541,6 +553,7 @@ async function updatePriorityPlayers() {
     console.log(`Updated ${updated} priority players.`);
 }
 
+// Delete guilds from the table and remove all references to them in any config files.
 async function deleteGuilds(guilds) {
     const deleteQuery = 'DELETE FROM guilds WHERE uuid = ?';
     const configsPath = path.join(__dirname, '..', 'configs');
@@ -633,6 +646,9 @@ async function updateGuildMembers(uuid, guildMembers) {
     }
 }
 
+// Checks for banned players in a guild
+// players: Banned players
+// guild: Guild UUID to check
 async function checkForPlayers(players, guild) {
     const placeholders = players.map(() => '?').join(', ');
 
@@ -643,6 +659,8 @@ async function checkForPlayers(players, guild) {
     return bannedPlayersInGuild.map(player => player.username);
 }
 
+// Gets the guild members of a given guild
+// guild: Guild UUID
 async function getGuildMembers(guild) {
     const query = 'SELECT uuid FROM players WHERE guildUuid = ?';
 
@@ -654,6 +672,7 @@ async function getGuildMembers(guild) {
 // Get the information for last login timestamps for each member of a guild.
 // First call the API to update the list of guild members to ensure the database is up to date and then 
 // return the information
+// guild: Guild UUID
 async function getLastLogins(guild) {
     await utilities.waitForRateLimit();
 
@@ -923,6 +942,8 @@ async function getGuildActivity(guild) {
     return averageOnline;
 }
 
+// Gets all of the online members in a guild
+// guild: Guild UUID
 async function getOnlineGuildMembers(guild) {
     const query = 'SELECT guildRank FROM players WHERE online = 1 AND guildUuid = ?';
 
@@ -937,6 +958,7 @@ async function getAllPlayerInfo() {
 }
 
 // Returns player info that is relevant to promotions
+// guild: Guild UUID
 async function getPromotionInfo(guild) {
     const query = 'SELECT uuid, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime FROM players WHERE guildUuid = ?';
 
@@ -956,6 +978,9 @@ async function createDatabaseBackup(backupFilename) {
     }
 }
 
+// Runs the online player check every 10 seconds.
+// Separate to runUpdateFunctions as we don't want this slowed down by any
+// long operations in that function.
 async function runOnlinePlayerFunction() {
     await utilities.waitForRateLimit();
 
@@ -983,6 +1008,7 @@ async function runOnlinePlayerFunction() {
     setTimeout(runOnlinePlayerFunction, remainingSeconds * 1000);
 }
 
+// Calls various update functions every minute. (Or more if an operation takes too long)
 async function runUpdateFunctions() {
     let now = new Date();
     await updatePriorityGuilds();
