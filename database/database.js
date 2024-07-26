@@ -197,8 +197,9 @@ async function handleOnlinePlayers(onlinePlayers) {
             const existingPlayer = await getAsync('SELECT * FROM players WHERE uuid = ?', [uuid]);
 
             if (existingPlayer) {
+                const sessionStart = existingPlayer.online ? existingPlayer.sessionStart : now.toISOString();
                 // Update existing player, set online to true and lastLogin to current date
-                await runAsync('UPDATE players SET online = true, lastLogin = ?, sessionStart = ? WHERE uuid = ?', [now.toISOString(), now.toISOString(), uuid]);
+                await runAsync('UPDATE players SET online = true, lastLogin = ?, sessionStart = ? WHERE uuid = ?', [now.toISOString(), sessionStart, uuid]);
             } else {
                 // Insert new player with available details
                 await runAsync('INSERT INTO players (uuid, username, guildUuid, guildRank, online, lastLogin, serverRank, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, null, null, null, true, ?, null, -1, -1, ?, 0, -1, 0)', [uuid, now.toISOString(), now.toISOString()]);
