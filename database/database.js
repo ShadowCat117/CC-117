@@ -763,6 +763,14 @@ async function getLastLogin(player) {
     }
 }
 
+// Returns the most recently seen offline players in a guild.
+// Only returns the x most recent where x is determined by the count parameter
+async function getRecentPlayers(guild, count) {
+    const row = await allAsync('SELECT username, lastLogin FROM players WHERE guildUuid = ? AND online = 0 ORDER BY lastLogin DESC LIMIT ?', [guild, count]);
+
+    return row;
+}
+
 // Returns the number of wars a player has participated in as part of the guild.
 // Note, currently the database stores all wars not guild specific. This may or may not be changed.
 async function getWars(player) {
@@ -1087,6 +1095,7 @@ module.exports = {
     getLastLogins,
     getActiveHours,
     getLastLogin,
+    getRecentPlayers,
     getWars,
     getAveragePlaytime,
     getGuildActivities,
