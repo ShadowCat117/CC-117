@@ -1637,285 +1637,484 @@ module.exports = {
                                     });
                                 }
                             } else if (interaction.customId === 'tank') {
-                                // Get tank role
-                                const tankRole = interaction.guild.roles.cache.get(config['tankRole']);
+                                // Get the member of guild role and level requirement for getting war roles
+                                const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
+                                const levelRequirement = config['warLevelRequirement'];
             
-                                // Get member roles
-                                const memberRoles = interaction.member.roles.cache;
-            
-                                // Get warrer role
-                                const warPingRole = interaction.guild.roles.cache.get(config['warPingRole']);
-            
-                                // Add warrer role if they don't already have
-                                if (!memberRoles.has(warPingRole.id)) {
-                                    await interaction.member.roles.add(warPingRole)
-                                        .then(() => {
-                                            console.log(`Added war role to ${interaction.member.user.username}`);
-                                        })
-                                        .catch(() => {
-                                            console.log(`Failed to add warrer role to ${interaction.member.username}`);
-                                        });
-                                }
-            
-                                let replyMessage;
-            
-                                // If they have the tank role, remove it, otherwise add it
-                                if (memberRoles.has(tankRole.id)) {
-                                    await interaction.member.roles.remove(tankRole)
-                                        .then(() => {
-                                            console.log(`Removed tank role from ${interaction.member.user.username}`);
-                                        })
-                                        .catch(() => {
-                                            console.log(`Failed to remove tank role from ${interaction.member.username}`);
-                                        });
-            
-                                    replyMessage = `You no longer have the ${tankRole} role`;
-                                } else {
-                                    await interaction.member.roles.add(tankRole)
-                                        .then(() => {
-                                            console.log(`Added tank role to ${interaction.member.user.username}`);
-                                        })
-                                        .catch(() => {
-                                            console.log(`Failed to add tank role to ${interaction.member.username}`);
-                                        });
-            
-                                    replyMessage = `You now have the ${tankRole} role`;
-                                }
-            
-                                await interaction.followUp({
-                                    content: replyMessage,
-                                    ephemeral: true,
-                                });
-                            } else if (interaction.customId === 'healer') {
-                                // Get healer role
-                                const healerRole = interaction.guild.roles.cache.get(config['healerRole']);
-            
-                                // Get member roles
-                                const memberRoles = interaction.member.roles.cache;
-            
-                                // Get warrer role
-                                const warPingRole = interaction.guild.roles.cache.get(config['warPingRole']);
-            
-                                // Add warrer role if they don't already have it
-                                if (!memberRoles.has(warPingRole.id)) {
-                                    await interaction.member.roles.add(warPingRole)
-                                        .then(() => {
-                                            console.log(`Added war role to ${interaction.member.user.username}`);
-                                        })
-                                        .catch(() => {
-                                            console.log(`Failed to add warrer role to ${interaction.member.username}`);
-                                        });
-                                }
-            
-                                let replyMessage;
-            
-                                // Add healer role or remove if they already have it
-                                if (memberRoles.has(healerRole.id)) {
-                                    await interaction.member.roles.remove(healerRole)
-                                        .then(() => {
-                                            console.log(`Removed healer role from ${interaction.member.user.username}`);
-                                        })
-                                        .catch(() => {
-                                            console.log(`Failed to remove healer role from ${interaction.member.username}`);
-                                        });
-            
-                                    replyMessage = `You no longer have the ${healerRole} role`;
-                                } else {
-                                    await interaction.member.roles.add(healerRole)
-                                        .then(() => {
-                                            console.log(`Added healer role to ${interaction.member.user.username}`);
-                                        })
-                                        .catch(() => {
-                                            console.log(`Failed to add healer role to ${interaction.member.username}`);
-                                        });
-            
-                                    replyMessage = `You now have the ${healerRole} role`;
-                                }
-            
-                                await interaction.followUp({
-                                    content: replyMessage,
-                                    ephemeral: true,
-                                });
-                            } else if (interaction.customId === 'damage') {
-                                // Get damage role
-                                const damageRole = interaction.guild.roles.cache.get(config['damageRole']);
-            
-                                // Get member roles
-                                const memberRoles = interaction.member.roles.cache;
-            
-                                // Get warrer role
-                                const warPingRole = interaction.guild.roles.cache.get(config['warPingRole']);
-            
-                                // Add warrer role if they don't already have it
-                                if (!memberRoles.has(warPingRole.id)) {
-                                    await interaction.member.roles.add(warPingRole)
-                                        .then(() => {
-                                            console.log(`Added war role to ${interaction.member.user.username}`);
-                                        })
-                                        .catch(() => {
-                                            console.log(`Failed to add warrer role to ${interaction.member.username}`);
-                                        });
-                                }
-            
-                                let replyMessage;
-            
-                                // Remove damage role if they have it, otherwise add it
-                                if (memberRoles.has(damageRole.id)) {
-                                    await interaction.member.roles.remove(damageRole)
-                                        .then(() => {
-                                            console.log(`Removed damage role from ${interaction.member.user.username}`);
-                                        })
-                                        .catch(() => {
-                                            console.log(`Failed to remove damage role from ${interaction.member.username}`);
-                                        });
-            
-                                    replyMessage = `You no longer have the ${damageRole} role`;
-                                } else {
-                                    await interaction.member.roles.add(damageRole)
-                                        .then(() => {
-                                            console.log(`Added damage role to ${interaction.member.user.username}`);
-                                        })
-                                        .catch(() => {
-                                            console.log(`Failed to add damage role to ${interaction.member.username}`);
-                                        });
-            
-                                    replyMessage = `You now have the ${damageRole} role`;
-                                }
-            
-                                await interaction.followUp({
-                                    content: replyMessage,
-                                    ephemeral: true,
-                                });
-                            } else if (interaction.customId === 'solo') {
-                                // Get solo role
-                                const soloRole = interaction.guild.roles.cache.get(config['soloRole']);
-            
-                                // Get member roles
-                                const memberRoles = interaction.member.roles.cache;
-            
-                                // Get warrer role
-                                const warPingRole = interaction.guild.roles.cache.get(config['warPingRole']);
-            
-                                // Add warrer role if they don't already have it
-                                if (!memberRoles.has(warPingRole.id)) {
-                                    await interaction.member.roles.add(warPingRole)
-                                        .then(() => {
-                                            console.log(`Added war role to ${interaction.member.user.username}`);
-                                        })
-                                        .catch(() => {
-                                            console.log(`Failed to add warrer role to ${interaction.member.username}`);
-                                        });
-                                }
-            
-                                let replyMessage;
-            
-                                // Add solo role if they don't have it, otherwise remove it
-                                if (memberRoles.has(soloRole.id)) {
-                                    await interaction.member.roles.remove(soloRole)
-                                        .then(() => {
-                                            console.log(`Removed solo role from ${interaction.member.user.username}`);
-                                        })
-                                        .catch(() => {
-                                            console.log(`Failed to remove solo role from ${interaction.member.username}`);
-                                        });
-            
-                                    replyMessage = `You no longer have the ${soloRole} role`;
-                                } else {
-                                    await interaction.member.roles.add(soloRole)
-                                        .then(() => {
-                                            console.log(`Added solo role to ${interaction.member.user.username}`);
-                                        })
-                                        .catch(() => {
-                                            console.log(`Failed to add solo role to ${interaction.member.username}`);
-                                        });
-            
-                                    replyMessage = `You now have the ${soloRole} role`;
-                                }
-            
-                                await interaction.followUp({
-                                    content: replyMessage,
-                                    ephemeral: true,
-                                });
-                            } else if (interaction.customId === 'eco') {
-                                // Get eco role
-                                const ecoRole = interaction.guild.roles.cache.get(config['ecoRole']);
-            
-                                // Get member roles
-                                const memberRoles = interaction.member.roles.cache;
-            
-                                let replyMessage;
-            
-                                // Remove eco role if they have it, otherwise add it
-                                if (memberRoles.has(ecoRole.id)) {
-                                    await interaction.member.roles.remove(ecoRole)
-                                        .then(() => {
-                                            console.log(`Removed eco role from ${interaction.member.user.username}`);
-                                        })
-                                        .catch(() => {
-                                            console.log(`Failed to remove eco role from ${interaction.member.username}`);
-                                        });
-            
-                                    replyMessage = `You no longer have the ${ecoRole} role`;
-                                } else {
-                                    await interaction.member.roles.add(ecoRole)
-                                        .then(() => {
-                                            console.log(`Added eco role to ${interaction.member.user.username}`);
-                                        })
-                                        .catch(() => {
-                                            console.log(`Failed to add eco role to ${interaction.member.username}`);
-                                        });
-            
-                                    replyMessage = `You now have the ${ecoRole} role`;
-                                }
-            
-                                await interaction.followUp({
-                                    content: replyMessage,
-                                    ephemeral: true,
-                                });
-                            } else if (interaction.customId === 'warping') {
-                                // Get member roles
                                 const memberRoles = await interaction.member.roles.cache;
-                                // Get war role
-                                const warRole = interaction.guild.roles.cache.get(config['warRole']);
-                                // Get warrer role
-                                const warPingRole = interaction.guild.roles.cache.get(config['warPingRole']);
-            
-                                // Add warrer role if they didn't have it
-                                if (!memberRoles.has(warPingRole.id)) {
-                                    await interaction.member.roles.add(warPingRole)
-                                        .then(() => {
-                                            console.log(`Added warrer role to ${interaction.member.user.username}`);
-                                        })
-                                        .catch(() => {
-                                            console.log(`Failed to add warrer role to ${interaction.member.username}`);
-                                        });
+                        
+                                const validLevelRoles = [];
+
+                                for (const level of Object.keys(config['levelRoles'])) {
+                                    if (level >= levelRequirement) {
+                                        validLevelRoles.push(interaction.guild.roles.cache.get(config['levelRoles'][level]));
+                                    }
                                 }
             
-                                // Add war role if they didn't have, otherwise remove the role
-                                if (!memberRoles.has(warRole.id)) {
-                                    await interaction.member.roles.add(warRole)
-                                        .then(() => {
-                                            console.log(`Added war role to ${interaction.member.user.username}`);
-                                        })
-                                        .catch(() => {
-                                            console.log(`Failed to add war role to ${interaction.member.username}`);
-                                        });
+                                let validLevel = false;
             
+                                // Check all roles above minimum requirement and if the member has them
+                                // they are the valid level for getting war roles.
+                                for (const levelRole of validLevelRoles) {
+                                    if (memberRoles.has(levelRole.id)) {
+                                        validLevel = true;
+                                        break;
+                                    }
+                                }
+            
+                                // If the member has both the memer of guild role and is a valid level
+                                // allow them to get war roles.
+                                if (memberOfRole && memberRoles.has(memberOfRole.id) && validLevel) {
+                                    // Get tank role
+                                    const tankRole = interaction.guild.roles.cache.get(config['tankRole']);
+                
+                                    // Get warrer role
+                                    const warPingRole = interaction.guild.roles.cache.get(config['warPingRole']);
+                
+                                    // Add warrer role if they don't already have
+                                    if (!memberRoles.has(warPingRole.id)) {
+                                        await interaction.member.roles.add(warPingRole)
+                                            .then(() => {
+                                                console.log(`Added war role to ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to add warrer role to ${interaction.member.username}`);
+                                            });
+                                    }
+                
+                                    let replyMessage;
+                
+                                    // If they have the tank role, remove it, otherwise add it
+                                    if (memberRoles.has(tankRole.id)) {
+                                        await interaction.member.roles.remove(tankRole)
+                                            .then(() => {
+                                                console.log(`Removed tank role from ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to remove tank role from ${interaction.member.username}`);
+                                            });
+                
+                                        replyMessage = `You no longer have the ${tankRole} role`;
+                                    } else {
+                                        await interaction.member.roles.add(tankRole)
+                                            .then(() => {
+                                                console.log(`Added tank role to ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to add tank role to ${interaction.member.username}`);
+                                            });
+                
+                                        replyMessage = `You now have the ${tankRole} role`;
+                                    }
+                
+                                    await interaction.followUp({
+                                        content: replyMessage,
+                                        ephemeral: true,
+                                    });
+                                } else {
+                                    const guildName = (await database.findGuild(config['guild'], true)).name;
+                                    // Tell the user they need to be a guild member and meet a level requirement to gain war roles
+                                    await interaction.followUp({
+                                        content: `Sorry, you need to be a member of ${guildName} to use this and be at least level ${levelRequirement}.`,
+                                        ephemeral: true,
+                                    });
+                                }
+                            } else if (interaction.customId === 'healer') {
+                                // Get the member of guild role and level requirement for getting war roles
+                                const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
+                                const levelRequirement = config['warLevelRequirement'];
+            
+                                const memberRoles = await interaction.member.roles.cache;
+                        
+                                const validLevelRoles = [];
+
+                                for (const level of Object.keys(config['levelRoles'])) {
+                                    if (level >= levelRequirement) {
+                                        validLevelRoles.push(interaction.guild.roles.cache.get(config['levelRoles'][level]));
+                                    }
+                                }
+            
+                                let validLevel = false;
+            
+                                // Check all roles above minimum requirement and if the member has them
+                                // they are the valid level for getting war roles.
+                                for (const levelRole of validLevelRoles) {
+                                    if (memberRoles.has(levelRole.id)) {
+                                        validLevel = true;
+                                        break;
+                                    }
+                                }
+            
+                                // If the member has both the memer of guild role and is a valid level
+                                // allow them to get war roles.
+                                if (memberOfRole && memberRoles.has(memberOfRole.id) && validLevel) {
+                                    // Get healer role
+                                    const healerRole = interaction.guild.roles.cache.get(config['healerRole']);
+                
+                                    // Get warrer role
+                                    const warPingRole = interaction.guild.roles.cache.get(config['warPingRole']);
+                
+                                    // Add warrer role if they don't already have it
+                                    if (!memberRoles.has(warPingRole.id)) {
+                                        await interaction.member.roles.add(warPingRole)
+                                            .then(() => {
+                                                console.log(`Added war role to ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to add warrer role to ${interaction.member.username}`);
+                                            });
+                                    }
+                
+                                    let replyMessage;
+                
+                                    // Add healer role or remove if they already have it
+                                    if (memberRoles.has(healerRole.id)) {
+                                        await interaction.member.roles.remove(healerRole)
+                                            .then(() => {
+                                                console.log(`Removed healer role from ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to remove healer role from ${interaction.member.username}`);
+                                            });
+                
+                                        replyMessage = `You no longer have the ${healerRole} role`;
+                                    } else {
+                                        await interaction.member.roles.add(healerRole)
+                                            .then(() => {
+                                                console.log(`Added healer role to ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to add healer role to ${interaction.member.username}`);
+                                            });
+                
+                                        replyMessage = `You now have the ${healerRole} role`;
+                                    }
+                
+                                    await interaction.followUp({
+                                        content: replyMessage,
+                                        ephemeral: true,
+                                    });
+                                } else {
+                                    const guildName = (await database.findGuild(config['guild'], true)).name;
+                                    // Tell the user they need to be a guild member and meet a level requirement to gain war roles
+                                    await interaction.followUp({
+                                        content: `Sorry, you need to be a member of ${guildName} to use this and be at least level ${levelRequirement}.`,
+                                        ephemeral: true,
+                                    });
+                                }
+                            } else if (interaction.customId === 'damage') {
+                                // Get the member of guild role and level requirement for getting war roles
+                                const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
+                                const levelRequirement = config['warLevelRequirement'];
+            
+                                const memberRoles = await interaction.member.roles.cache;
+                        
+                                const validLevelRoles = [];
+
+                                for (const level of Object.keys(config['levelRoles'])) {
+                                    if (level >= levelRequirement) {
+                                        validLevelRoles.push(interaction.guild.roles.cache.get(config['levelRoles'][level]));
+                                    }
+                                }
+            
+                                let validLevel = false;
+            
+                                // Check all roles above minimum requirement and if the member has them
+                                // they are the valid level for getting war roles.
+                                for (const levelRole of validLevelRoles) {
+                                    if (memberRoles.has(levelRole.id)) {
+                                        validLevel = true;
+                                        break;
+                                    }
+                                }
+            
+                                // If the member has both the memer of guild role and is a valid level
+                                // allow them to get war roles.
+                                if (memberOfRole && memberRoles.has(memberOfRole.id) && validLevel) {
+                                    // Get damage role
+                                    const damageRole = interaction.guild.roles.cache.get(config['damageRole']);
+                
+                                    // Get warrer role
+                                    const warPingRole = interaction.guild.roles.cache.get(config['warPingRole']);
+                
+                                    // Add warrer role if they don't already have it
+                                    if (!memberRoles.has(warPingRole.id)) {
+                                        await interaction.member.roles.add(warPingRole)
+                                            .then(() => {
+                                                console.log(`Added war role to ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to add warrer role to ${interaction.member.username}`);
+                                            });
+                                    }
+                
+                                    let replyMessage;
+                
+                                    // Remove damage role if they have it, otherwise add it
+                                    if (memberRoles.has(damageRole.id)) {
+                                        await interaction.member.roles.remove(damageRole)
+                                            .then(() => {
+                                                console.log(`Removed damage role from ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to remove damage role from ${interaction.member.username}`);
+                                            });
+                
+                                        replyMessage = `You no longer have the ${damageRole} role`;
+                                    } else {
+                                        await interaction.member.roles.add(damageRole)
+                                            .then(() => {
+                                                console.log(`Added damage role to ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to add damage role to ${interaction.member.username}`);
+                                            });
+                
+                                        replyMessage = `You now have the ${damageRole} role`;
+                                    }
+                
+                                    await interaction.followUp({
+                                        content: replyMessage,
+                                        ephemeral: true,
+                                    });
+                                } else {
+                                    const guildName = (await database.findGuild(config['guild'], true)).name;
+                                    // Tell the user they need to be a guild member and meet a level requirement to gain war roles
+                                    await interaction.followUp({
+                                        content: `Sorry, you need to be a member of ${guildName} to use this and be at least level ${levelRequirement}.`,
+                                        ephemeral: true,
+                                    });
+                                }
+                            } else if (interaction.customId === 'solo') {
+                                // Get the member of guild role and level requirement for getting war roles
+                                const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
+                                const levelRequirement = config['warLevelRequirement'];
+            
+                                const memberRoles = await interaction.member.roles.cache;
+                        
+                                const validLevelRoles = [];
+
+                                for (const level of Object.keys(config['levelRoles'])) {
+                                    if (level >= levelRequirement) {
+                                        validLevelRoles.push(interaction.guild.roles.cache.get(config['levelRoles'][level]));
+                                    }
+                                }
+            
+                                let validLevel = false;
+            
+                                // Check all roles above minimum requirement and if the member has them
+                                // they are the valid level for getting war roles.
+                                for (const levelRole of validLevelRoles) {
+                                    if (memberRoles.has(levelRole.id)) {
+                                        validLevel = true;
+                                        break;
+                                    }
+                                }
+            
+                                // If the member has both the memer of guild role and is a valid level
+                                // allow them to get war roles.
+                                if (memberOfRole && memberRoles.has(memberOfRole.id) && validLevel) {
+                                    // Get solo role
+                                    const soloRole = interaction.guild.roles.cache.get(config['soloRole']);
+                
+                                    // Get warrer role
+                                    const warPingRole = interaction.guild.roles.cache.get(config['warPingRole']);
+                
+                                    // Add warrer role if they don't already have it
+                                    if (!memberRoles.has(warPingRole.id)) {
+                                        await interaction.member.roles.add(warPingRole)
+                                            .then(() => {
+                                                console.log(`Added war role to ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to add warrer role to ${interaction.member.username}`);
+                                            });
+                                    }
+                
+                                    let replyMessage;
+                
+                                    // Add solo role if they don't have it, otherwise remove it
+                                    if (memberRoles.has(soloRole.id)) {
+                                        await interaction.member.roles.remove(soloRole)
+                                            .then(() => {
+                                                console.log(`Removed solo role from ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to remove solo role from ${interaction.member.username}`);
+                                            });
+                
+                                        replyMessage = `You no longer have the ${soloRole} role`;
+                                    } else {
+                                        await interaction.member.roles.add(soloRole)
+                                            .then(() => {
+                                                console.log(`Added solo role to ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to add solo role to ${interaction.member.username}`);
+                                            });
+                
+                                        replyMessage = `You now have the ${soloRole} role`;
+                                    }
+                
+                                    await interaction.followUp({
+                                        content: replyMessage,
+                                        ephemeral: true,
+                                    });
+                                } else {
+                                    const guildName = (await database.findGuild(config['guild'], true)).name;
+                                    // Tell the user they need to be a guild member and meet a level requirement to gain war roles
+                                    await interaction.followUp({
+                                        content: `Sorry, you need to be a member of ${guildName} to use this and be at least level ${levelRequirement}.`,
+                                        ephemeral: true,
+                                    });
+                                }
+                            } else if (interaction.customId === 'eco') {
+                                // Get the member of guild role and level requirement for getting war roles
+                                const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
+                                const levelRequirement = config['warLevelRequirement'];
+            
+                                const memberRoles = await interaction.member.roles.cache;
+                        
+                                const validLevelRoles = [];
+
+                                for (const level of Object.keys(config['levelRoles'])) {
+                                    if (level >= levelRequirement) {
+                                        validLevelRoles.push(interaction.guild.roles.cache.get(config['levelRoles'][level]));
+                                    }
+                                }
+            
+                                let validLevel = false;
+            
+                                // Check all roles above minimum requirement and if the member has them
+                                // they are the valid level for getting war roles.
+                                for (const levelRole of validLevelRoles) {
+                                    if (memberRoles.has(levelRole.id)) {
+                                        validLevel = true;
+                                        break;
+                                    }
+                                }
+            
+                                // If the member has both the memer of guild role and is a valid level
+                                // allow them to get war roles.
+                                if (memberOfRole && memberRoles.has(memberOfRole.id) && validLevel) {
+                                    // Get eco role
+                                    const ecoRole = interaction.guild.roles.cache.get(config['ecoRole']);
+                
+                                    let replyMessage;
+                
+                                    // Remove eco role if they have it, otherwise add it
+                                    if (memberRoles.has(ecoRole.id)) {
+                                        await interaction.member.roles.remove(ecoRole)
+                                            .then(() => {
+                                                console.log(`Removed eco role from ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to remove eco role from ${interaction.member.username}`);
+                                            });
+                
+                                        replyMessage = `You no longer have the ${ecoRole} role`;
+                                    } else {
+                                        await interaction.member.roles.add(ecoRole)
+                                            .then(() => {
+                                                console.log(`Added eco role to ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to add eco role to ${interaction.member.username}`);
+                                            });
+                
+                                        replyMessage = `You now have the ${ecoRole} role`;
+                                    }
+                
+                                    await interaction.followUp({
+                                        content: replyMessage,
+                                        ephemeral: true,
+                                    });
+                                } else {
+                                    const guildName = (await database.findGuild(config['guild'], true)).name;
+                                    // Tell the user they need to be a guild member and meet a level requirement to gain war roles
+                                    await interaction.followUp({
+                                        content: `Sorry, you need to be a member of ${guildName} to use this and be at least level ${levelRequirement}.`,
+                                        ephemeral: true,
+                                    });
+                                }
+                            } else if (interaction.customId === 'warping') {
+                                // Get the member of guild role and level requirement for getting war roles
+                                const memberOfRole = interaction.guild.roles.cache.get(config['memberOfRole']);
+                                const levelRequirement = config['warLevelRequirement'];
+            
+                                const memberRoles = await interaction.member.roles.cache;
+                        
+                                const validLevelRoles = [];
+
+                                for (const level of Object.keys(config['levelRoles'])) {
+                                    if (level >= levelRequirement) {
+                                        validLevelRoles.push(interaction.guild.roles.cache.get(config['levelRoles'][level]));
+                                    }
+                                }
+            
+                                let validLevel = false;
+            
+                                // Check all roles above minimum requirement and if the member has them
+                                // they are the valid level for getting war roles.
+                                for (const levelRole of validLevelRoles) {
+                                    if (memberRoles.has(levelRole.id)) {
+                                        validLevel = true;
+                                        break;
+                                    }
+                                }
+            
+                                // If the member has both the memer of guild role and is a valid level
+                                // allow them to get war roles.
+                                if (memberOfRole && memberRoles.has(memberOfRole.id) && validLevel) {
+                                    // Get war role
+                                    const warRole = interaction.guild.roles.cache.get(config['warRole']);
+                                    // Get warrer role
+                                    const warPingRole = interaction.guild.roles.cache.get(config['warPingRole']);
+                
+                                    // Add warrer role if they didn't have it
+                                    if (!memberRoles.has(warPingRole.id)) {
+                                        await interaction.member.roles.add(warPingRole)
+                                            .then(() => {
+                                                console.log(`Added warrer role to ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to add warrer role to ${interaction.member.username}`);
+                                            });
+                                    }
+                
+                                    // Add war role if they didn't have, otherwise remove the role
+                                    if (!memberRoles.has(warRole.id)) {
+                                        await interaction.member.roles.add(warRole)
+                                            .then(() => {
+                                                console.log(`Added war role to ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to add war role to ${interaction.member.username}`);
+                                            });
+                
+                                            await interaction.followUp({
+                                                content: `You now have the ${warRole} role.`,
+                                                ephemeral: true,
+                                            });
+                                    } else {
+                                        await interaction.member.roles.remove(warRole)
+                                            .then(() => {
+                                                console.log(`Removed war role from ${interaction.member.user.username}`);
+                                            })
+                                            .catch(() => {
+                                                console.log(`Failed to remove war role from ${interaction.member.username}`);
+                                            });
+                
                                         await interaction.followUp({
-                                            content: `You now have the ${warRole} role.`,
+                                            content:`You no longer have the ${warRole} role.`,
                                             ephemeral: true,
                                         });
+                                    }
                                 } else {
-                                    await interaction.member.roles.remove(warRole)
-                                        .then(() => {
-                                            console.log(`Removed war role from ${interaction.member.user.username}`);
-                                        })
-                                        .catch(() => {
-                                            console.log(`Failed to remove war role from ${interaction.member.username}`);
-                                        });
-            
+                                    const guildName = (await database.findGuild(config['guild'], true)).name;
+                                    // Tell the user they need to be a guild member and meet a level requirement to gain war roles
                                     await interaction.followUp({
-                                        content:`You no longer have the ${warRole} role.`,
+                                        content: `Sorry, you need to be a member of ${guildName} to use this and be at least level ${levelRequirement}.`,
                                         ephemeral: true,
                                     });
                                 }
