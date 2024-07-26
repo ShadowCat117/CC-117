@@ -90,7 +90,7 @@ async function createConfig(client, guildId) {
                 recruitUpperThreshold: 20,
                 recruitLowerThreshold: 10,
                 levelRequirement: 100,
-                extraTimeIncrease: 1,
+                extraTimeIncrease: 0,
                 averageRequirement: 5,
                 newPlayerMinimumTime: 14,
                 newPlayerThreshold: 5,

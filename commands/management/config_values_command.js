@@ -143,7 +143,7 @@ module.exports = {
             // Extra time must be positive
             if (value < 0) {
                 responseEmbed
-                    .setDescription('Extra time increase must be above 0.')
+                    .setDescription('Extra time increase must be positive.')
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
                 return;
