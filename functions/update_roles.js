@@ -20,55 +20,41 @@ async function updateRoles(guild) {
             nickname = serverMember.nickname.split(' [')[0];
         }
 
-        let hasUpdated = false;
-
         // Temporary, remove if Wynn ever fixes the name changing guild bug
         if (serverMember.user.id === '753700961364738158') {
-            for (let i = 0; i < playerInfo.length; i++) {
-                const player = playerInfo[i];
+            const player = playerInfo.get('Owen_Rocks_3')
 
-                if (player.username === 'Owen_Rocks_3') {
-                    player.username = 'Amber_Rocks_3';
+            if (player) {
+                player.username = 'Amber_Rocks_3'
 
-                    playerInfo.splice(i, 1);
+                const response = await applyRoles(
+                    guild,
+                    serverMember,
+                    player,
+                );
 
-                    const response = await applyRoles(
-                        guild,
-                        serverMember,
-                        player,
+                if (
+                    response.updates.length > 0 ||
+                    response.errors.length > 0
+                ) {
+                    updates.push(
+                        new UpdatedUser(
+                            response.username,
+                            serverMember,
+                            response.updates,
+                            response.errors,
+                        ),
                     );
-
-                    if (
-                        response.updates.length > 0 ||
-                        response.errors.length > 0
-                    ) {
-                        updates.push(
-                            new UpdatedUser(
-                                response.username,
-                                serverMember,
-                                response.updates,
-                                response.errors,
-                            ),
-                        );
-                    }
-
-                    hasUpdated = true;
-
-                    break;
                 }
-            }
 
-            continue;
+                continue;
+            }
         }
 
-        for (let i = 0; i < playerInfo.length; i++) {
-            const player = playerInfo[i];
+        if (nickname) {
+            const player = playerInfo.get(nickname)
 
-            if (
-                (nickname && player.username === nickname) ||
-                (globalName && player.username === globalName) ||
-                player.username === username
-            ) {
+            if (player) {
                 const response = await applyRoles(guild, serverMember, player);
 
                 if (response.updates.length > 0 || response.errors.length > 0) {
@@ -82,26 +68,63 @@ async function updateRoles(guild) {
                     );
                 }
 
-                hasUpdated = true;
-
-                playerInfo.splice(i, 1);
-                break;
+                continue;
             }
         }
 
-        if (!hasUpdated) {
-            const response = await applyRoles(guild, serverMember, null);
+        if (globalName) {
+            const player = playerInfo.get(globalName)
 
-            if (response.updates.length > 0 || response.errors.length > 0) {
-                updates.push(
-                    new UpdatedUser(
-                        response.username,
-                        serverMember,
-                        response.updates,
-                        response.errors,
-                    ),
-                );
+            if (player) {
+                const response = await applyRoles(guild, serverMember, player);
+
+                if (response.updates.length > 0 || response.errors.length > 0) {
+                    updates.push(
+                        new UpdatedUser(
+                            response.username,
+                            serverMember,
+                            response.updates,
+                            response.errors,
+                        ),
+                    );
+                }
+
+                continue;
             }
+        }
+
+        if (username) {
+            const player = playerInfo.get(username)
+
+            if (player) {
+                const response = await applyRoles(guild, serverMember, player);
+
+                if (response.updates.length > 0 || response.errors.length > 0) {
+                    updates.push(
+                        new UpdatedUser(
+                            response.username,
+                            serverMember,
+                            response.updates,
+                            response.errors,
+                        ),
+                    );
+                }
+
+                continue;
+            }
+        }
+
+        const response = await applyRoles(guild, serverMember, null);
+
+        if (response.updates.length > 0 || response.errors.length > 0) {
+            updates.push(
+                new UpdatedUser(
+                    response.username,
+                    serverMember,
+                    response.updates,
+                    response.errors,
+                ),
+            );
         }
     }
 

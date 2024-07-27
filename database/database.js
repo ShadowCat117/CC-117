@@ -1240,10 +1240,21 @@ async function getOnlineGuildMembers(guild) {
 
 // Returns all the player info that is used in updating roles
 async function getAllPlayerInfo() {
-    const query =
-        'SELECT username, guildUuid, guildRank, supportRank, veteran, serverRank, highestCharacterLevel FROM players';
+    const query = `
+        SELECT p.username, p.guildUuid, p.guildRank, p.supportRank, p.veteran, p.serverRank, p.highestCharacterLevel, g.prefix
+        FROM players p
+        LEFT JOIN guilds g ON p.guildUuid = g.uuid;
+        `;
 
-    return await allAsync(query);
+    const results = await allAsync(query);
+
+    const playerInfoMap = new Map();
+    results.forEach((row) => {
+        const { username, guildUuid, guildRank, supportRank, veteran, serverRank, highestCharacterLevel, prefix } = row;
+        playerInfoMap.set(username, ({ username: username, guildUuid: guildUuid, guildRank: guildRank, guildPrefix: prefix, supportRank: supportRank, veteran: veteran, serverRank: serverRank, highestCharacterLevel: highestCharacterLevel }));
+    });
+
+    return playerInfoMap;
 }
 
 // Returns player info that is relevant to promotions
