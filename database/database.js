@@ -228,7 +228,7 @@ async function handleOnlinePlayers(onlinePlayers) {
             } else {
                 // Insert new player with available details
                 await runAsync(
-                    'INSERT INTO players (uuid, username, guildUuid, guildRank, online, lastLogin, supportRank, veteran, serverRank, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, null, null, null, true, ?, null, null, null, -1, -1, ?, 0, -1, 0)',
+                    'INSERT INTO players (uuid, username, guildUuid, guildRank, online, lastLogin, supportRank, veteran, serverRank, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, null, null, null, true, ?, null, null, null, 0, 1, ?, 0, -1, 0)',
                     [uuid, now.toISOString(), now.toISOString()],
                 );
 
