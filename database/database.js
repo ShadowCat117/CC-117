@@ -416,7 +416,7 @@ async function updatePlayerActivity() {
 
         // Get all players and their weekly playtimes
         const players = await allAsync(
-            'SELECT uuid, sessionStart, weeklyPlaytime, averagePlaytime, averageCount FROM players',
+            'SELECT uuid, sessionStart, weeklyPlaytime, averagePlaytime, averageCount FROM players WHERE sessionStart IS NOT NULL OR weeklyPlaytime > 0',
         );
 
         for (const player of players) {
