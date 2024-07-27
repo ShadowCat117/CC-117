@@ -334,8 +334,8 @@ async function promotionProgress(interaction, force = false) {
             requirements.push(
                 new PromotionRequirement(
                     PromotionValue.XP,
-                    contributedGuildXP,
-                    XPRequirement,
+                    contributedGuildXP.toLocaleString(),
+                    XPRequirement.toLocaleString(),
                 ),
             );
 
@@ -418,7 +418,7 @@ async function promotionProgress(interaction, force = false) {
             requirements.push(
                 new PromotionRequirement(
                     PromotionValue.PLAYTIME,
-                    memberPlaytime,
+                    memberPlaytime.toFixed(2),
                     weeklyPlaytimeRequirement,
                 ),
             );
