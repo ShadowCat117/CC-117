@@ -603,9 +603,16 @@ async function updatePriorityPlayers() {
 
         await utilities.waitForRateLimit();
 
-        const response = await axios.get(
-            `https://api.wynncraft.com/v3/player/${player}?fullResult=True`,
-        );
+        let response;
+
+        try {
+            response = await axios.get(
+                `https://api.wynncraft.com/v3/player/${player}?fullResult=True`,
+            );
+        } catch (error) {
+            console.error(error);
+            continue;
+        }
 
         utilities.updateRateLimit(
             response.headers['ratelimit-remaining'],
