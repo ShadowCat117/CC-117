@@ -116,7 +116,11 @@ async function createConfig(client, guildId) {
                 warLevelRequirement: 100,
             };
 
-            await fs.writeFile(filePath, JSON.stringify(defaultData, null, 2));
+            fs.writeFileSync(
+                filePath,
+                JSON.stringify(defaultData, null, 2),
+                'utf-8',
+            );
             console.log(`Created config file for guild ${guildId}`);
         } catch (err) {
             console.error(
