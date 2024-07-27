@@ -1372,7 +1372,7 @@ async function runUpdateFunctions() {
     }
 
     // Update weekly
-    if (now.getUTCDay() === 6) {
+    if (now.getUTCDay() === 1 && now.getUTCHours() === 0 && now.getUTCMinutes() === 0) {
         console.log('Updating all player activity');
 
         pausePlayerUpdates = true;
