@@ -1439,7 +1439,7 @@ async function runPlayerActivityFunction() {
         (now.getUTCSeconds() * 1000 + now.getUTCMilliseconds());
 
     // Run this function again at the next hour
-    setTimeout(runUpdateFunctions, timeUntilNextHour);
+    setTimeout(runPlayerActivityFunction, timeUntilNextHour);
 }
 
 // Setup the two tables
