@@ -1250,8 +1250,26 @@ async function getAllPlayerInfo() {
 
     const playerInfoMap = new Map();
     results.forEach((row) => {
-        const { username, guildUuid, guildRank, supportRank, veteran, serverRank, highestCharacterLevel, prefix } = row;
-        playerInfoMap.set(username, ({ username: username, guildUuid: guildUuid, guildRank: guildRank, guildPrefix: prefix, supportRank: supportRank, veteran: veteran, serverRank: serverRank, highestCharacterLevel: highestCharacterLevel }));
+        const {
+            username,
+            guildUuid,
+            guildRank,
+            supportRank,
+            veteran,
+            serverRank,
+            highestCharacterLevel,
+            prefix,
+        } = row;
+        playerInfoMap.set(username, {
+            username: username,
+            guildUuid: guildUuid,
+            guildRank: guildRank,
+            guildPrefix: prefix,
+            supportRank: supportRank,
+            veteran: veteran,
+            serverRank: serverRank,
+            highestCharacterLevel: highestCharacterLevel,
+        });
     });
 
     return playerInfoMap;
@@ -1394,7 +1412,11 @@ async function runPlayerActivityFunction() {
     let now = new Date();
 
     // Update weekly
-    if (now.getUTCDay() === 1 && now.getUTCHours() === 0 && now.getUTCMinutes() === 0) {
+    if (
+        now.getUTCDay() === 1 &&
+        now.getUTCHours() === 0 &&
+        now.getUTCMinutes() === 0
+    ) {
         console.log('Updating all player activity');
 
         pausePlayerUpdates = true;
@@ -1406,8 +1428,8 @@ async function runPlayerActivityFunction() {
 
     now = new Date();
     const timeUntilNextHour =
-            (60 - now.getUTCMinutes()) * 60 * 1000 -
-            (now.getUTCSeconds() * 1000 + now.getUTCMilliseconds());
+        (60 - now.getUTCMinutes()) * 60 * 1000 -
+        (now.getUTCSeconds() * 1000 + now.getUTCMilliseconds());
 
     // Run this function again at the next hour
     setTimeout(runUpdateFunctions, timeUntilNextHour);

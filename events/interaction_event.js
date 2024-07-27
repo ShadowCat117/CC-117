@@ -87,24 +87,56 @@ module.exports = {
 
                     switch (functionToRun) {
                         case 'previous': {
-                            await interaction.editReply({
-                                embeds: [
-                                    messages
-                                        .getMessage(interaction.message.id)
-                                        .getPreviousPage(),
-                                ],
-                            });
+                            const message = messages.getMessage(
+                                interaction.message.id,
+                            );
+
+                            if (message) {
+                                await interaction.editReply({
+                                    embeds: [
+                                        messages
+                                            .getMessage(interaction.message.id)
+                                            .getPreviousPage(),
+                                    ],
+                                });
+                            } else {
+                                const expiredEmbed = new EmbedBuilder()
+                                    .setTitle('Data expired')
+                                    .setDescription(
+                                        'Please run this command again.',
+                                    );
+
+                                await interaction.editReply({
+                                    embeds: [expiredEmbed],
+                                });
+                            }
 
                             break;
                         }
                         case 'next': {
-                            await interaction.editReply({
-                                embeds: [
-                                    messages
-                                        .getMessage(interaction.message.id)
-                                        .getNextPage(),
-                                ],
-                            });
+                            const message = messages.getMessage(
+                                interaction.message.id,
+                            );
+
+                            if (message) {
+                                await interaction.editReply({
+                                    embeds: [
+                                        messages
+                                            .getMessage(interaction.message.id)
+                                            .getNextPage(),
+                                    ],
+                                });
+                            } else {
+                                const expiredEmbed = new EmbedBuilder()
+                                    .setTitle('Data expired')
+                                    .setDescription(
+                                        'Please run this command again.',
+                                    );
+
+                                await interaction.editReply({
+                                    embeds: [expiredEmbed],
+                                });
+                            }
 
                             break;
                         }

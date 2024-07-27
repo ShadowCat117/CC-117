@@ -22,21 +22,14 @@ async function updateRoles(guild) {
 
         // Temporary, remove if Wynn ever fixes the name changing guild bug
         if (serverMember.user.id === '753700961364738158') {
-            const player = playerInfo.get('Owen_Rocks_3')
+            const player = playerInfo.get('Owen_Rocks_3');
 
             if (player) {
-                player.username = 'Amber_Rocks_3'
+                player.username = 'Amber_Rocks_3';
 
-                const response = await applyRoles(
-                    guild,
-                    serverMember,
-                    player,
-                );
+                const response = await applyRoles(guild, serverMember, player);
 
-                if (
-                    response.updates.length > 0 ||
-                    response.errors.length > 0
-                ) {
+                if (response.updates.length > 0 || response.errors.length > 0) {
                     updates.push(
                         new UpdatedUser(
                             response.username,
@@ -52,7 +45,7 @@ async function updateRoles(guild) {
         }
 
         if (nickname) {
-            const player = playerInfo.get(nickname)
+            const player = playerInfo.get(nickname);
 
             if (player) {
                 const response = await applyRoles(guild, serverMember, player);
@@ -73,7 +66,7 @@ async function updateRoles(guild) {
         }
 
         if (globalName) {
-            const player = playerInfo.get(globalName)
+            const player = playerInfo.get(globalName);
 
             if (player) {
                 const response = await applyRoles(guild, serverMember, player);
@@ -94,7 +87,7 @@ async function updateRoles(guild) {
         }
 
         if (username) {
-            const player = playerInfo.get(username)
+            const player = playerInfo.get(username);
 
             if (player) {
                 const response = await applyRoles(guild, serverMember, player);
