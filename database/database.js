@@ -1371,6 +1371,17 @@ async function runUpdateFunctions() {
         console.log(`Created database backup ${dayOfWeek}`);
     }
 
+    now = new Date();
+    const secondsToNextMinute = 60 - now.getUTCSeconds();
+
+    // Run this function again at the next minute
+    setTimeout(runUpdateFunctions, secondsToNextMinute * 1000);
+}
+
+// Runs the update player activity function weekly
+async function runPlayerActivityFunction() {
+    let now = new Date();
+
     // Update weekly
     if (now.getUTCDay() === 1 && now.getUTCHours() === 0 && now.getUTCMinutes() === 0) {
         console.log('Updating all player activity');
@@ -1383,10 +1394,12 @@ async function runUpdateFunctions() {
     }
 
     now = new Date();
-    const secondsToNextMinute = 60 - now.getUTCSeconds();
+    const timeUntilNextHour =
+            (60 - now.getUTCMinutes()) * 60 * 1000 -
+            (now.getUTCSeconds() * 1000 + now.getUTCMilliseconds());
 
-    // Run this function again at the next minute
-    setTimeout(runUpdateFunctions, secondsToNextMinute * 1000);
+    // Run this function again at the next hour
+    setTimeout(runUpdateFunctions, timeUntilNextHour);
 }
 
 // Setup the two tables
@@ -1422,6 +1435,7 @@ async function setup() {
 
     runOnlinePlayerFunction();
     runUpdateFunctions();
+    runPlayerActivityFunction();
 }
 
 module.exports = {
