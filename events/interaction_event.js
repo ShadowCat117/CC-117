@@ -1391,7 +1391,7 @@ module.exports = {
                                         case PromotionValue.XP:
                                             responseEmbed.addFields({
                                                 name: `${requirementColour} XP Contributed`,
-                                                value: `${requirement.current}/${requirement.required}`,
+                                                value: `${requirement.current.toLocaleString()}/${requirement.required.toLocaleString()}`,
                                             });
                                             break;
                                         case PromotionValue.LEVEL:

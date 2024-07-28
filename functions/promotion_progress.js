@@ -334,8 +334,8 @@ async function promotionProgress(interaction, force = false) {
             requirements.push(
                 new PromotionRequirement(
                     PromotionValue.XP,
-                    contributedGuildXP.toLocaleString(),
-                    XPRequirement.toLocaleString(),
+                    contributedGuildXP,
+                    XPRequirement,
                 ),
             );
 
