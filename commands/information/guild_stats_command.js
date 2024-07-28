@@ -118,7 +118,7 @@ module.exports = {
                         for (const member of page) {
                             let memberDetails = `${member.getOnlineStatus()}\n`;
                             memberDetails += `Joined ${utilities.getTimeSince(member.joinDate)} ago\n`;
-                            memberDetails += `${member.localeContributed} (${utilities.getFormattedXPPerDay(member.contributed, member.joinDate)})\n`;
+                            memberDetails += `${member.localeContributed} XP (${utilities.getFormattedXPPerDay(member.contributed, member.joinDate)})\n`;
                             memberDetails += `${member.wars} war${member.wars !== 1 ? 's' : ''}\n`;
                             memberDetails += `${member.averagePlaytime} hours per week`;
 
