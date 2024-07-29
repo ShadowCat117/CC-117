@@ -296,6 +296,7 @@ module.exports = {
                             hasBuildRole,
                             averagePlaytime,
                             hasEcoRole,
+                            hasVerifiedRole,
                             promotionRequirements,
                             timeRequirements,
                             requirementsCount,
