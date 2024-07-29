@@ -215,10 +215,17 @@ module.exports = {
                             .setTitle(
                                 `${response.guildRank} ${response.username.replaceAll('_', '\\_')} has ${response.metRequirements}/${response.requirementsCount} requirements for ${response.nextGuildRank}`,
                             )
-                            .setDescription(
-                                'First Days in Guild is required, anything else is optional as long as you meet the requirement.',
-                            )
                             .setColor(0x00ffff);
+
+                        let description =
+                            'First Days in Guild is required, anything else is optional as long as you meet the requirement.';
+
+                        if (response.verifiedRequirement) {
+                            description +=
+                                '\nYou must also be verified in this server to recieve this promotion.';
+                        }
+
+                        responseEmbed.setDescription(description);
 
                         const daysInGuildColour =
                             response.daysInGuild >= response.timeRequirement
@@ -229,6 +236,17 @@ module.exports = {
                             name: `${daysInGuildColour} Days in Guild`,
                             value: `${response.daysInGuild}/${response.timeRequirement}`,
                         });
+
+                        if (response.verifiedRequirement) {
+                            const verifiedColour = response.hasVerifiedRole
+                                ? '🟢'
+                                : '🔴';
+
+                            responseEmbed.addFields({
+                                name: `${verifiedColour} Verified`,
+                                value: `${response.hasVerifiedRole ? 'Is verified' : 'Is not verified'}`,
+                            });
+                        }
 
                         for (const requirement of response.requirements) {
                             let requirementColour =

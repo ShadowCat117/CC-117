@@ -8,6 +8,7 @@
 // BUILD: Has a war build (checked by if they have a war role in the server)
 // PLAYTIME: Average weekly playtime (hours)
 // ECO: Willing to learn/help with eco (checked by if they have the eco role in the server)
+// VERIFIED: If they have the verified role in the server
 const PromotionValue = {
     NONE: 'NONE',
     XP: 'XP',
@@ -18,6 +19,7 @@ const PromotionValue = {
     BUILD: 'BUILD',
     PLAYTIME: 'PLAYTIME',
     ECO: 'ECO',
+    VERIFIED: 'VERIFIED',
 };
 
 module.exports = PromotionValue;

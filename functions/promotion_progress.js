@@ -179,6 +179,9 @@ async function promotionProgress(interaction, force = false) {
             highestCharcterLevel: highestCharcterLevel,
         });
 
+        const verifiedRole = interaction.guild.roles.cache.get(
+            config['verifiedRole'],
+        );
         const tankRole = interaction.guild.roles.cache.get(config['tankRole']);
         const healerRole = interaction.guild.roles.cache.get(
             config['healerRole'],
@@ -208,18 +211,21 @@ async function promotionProgress(interaction, force = false) {
 
         let hasBuildRole = false;
         let hasEcoRole = false;
+        let hasVerifiedRole = false;
 
         if (serverMember) {
             const serverMemberRoles = serverMember.roles.cache;
 
             for (const role of serverMemberRoles.values()) {
-                if (role === ecoRole) {
+                if (role == verifiedRole) {
+                    hasVerifiedRole = true;
+                } else if (role === ecoRole) {
                     hasEcoRole = true;
                 } else if (warBuildRoles.includes(role)) {
                     hasBuildRole = true;
                 }
 
-                if (hasBuildRole && hasEcoRole) {
+                if (hasVerifiedRole && hasBuildRole && hasEcoRole) {
                     break;
                 }
             }
@@ -227,6 +233,7 @@ async function promotionProgress(interaction, force = false) {
 
         let promotionRequirements;
         let timeRequirement;
+        let verifiedRequirement;
         let requirementsCount;
 
         let XPRequirement;
@@ -253,6 +260,8 @@ async function promotionProgress(interaction, force = false) {
         } else if (guildRank === 'strategist') {
             promotionRequirements = config.chiefPromotionRequirement;
             timeRequirement = config.chiefTimeRequirement;
+            verifiedRequirement =
+                promotionRequirements[PromotionValue.VERIFIED];
             requirementsCount = config.chiefRequirementsCount;
 
             XPRequirement = promotionRequirements[PromotionValue.XP];
@@ -268,6 +277,8 @@ async function promotionProgress(interaction, force = false) {
         } else if (guildRank === 'captain') {
             promotionRequirements = config.strategistPromotionRequirement;
             timeRequirement = config.strategistTimeRequirement;
+            verifiedRequirement =
+                promotionRequirements[PromotionValue.VERIFIED];
             requirementsCount = config.strategistRequirementsCount;
 
             XPRequirement = promotionRequirements[PromotionValue.XP];
@@ -283,6 +294,8 @@ async function promotionProgress(interaction, force = false) {
         } else if (guildRank === 'recruiter') {
             promotionRequirements = config.captainPromotionRequirement;
             timeRequirement = config.captainTimeRequirement;
+            verifiedRequirement =
+                promotionRequirements[PromotionValue.VERIFIED];
             requirementsCount = config.captainRequirementsCount;
 
             XPRequirement = promotionRequirements[PromotionValue.XP];
@@ -298,6 +311,8 @@ async function promotionProgress(interaction, force = false) {
         } else if (guildRank === 'recruit') {
             promotionRequirements = config.recruiterPromotionRequirement;
             timeRequirement = config.recruiterTimeRequirement;
+            verifiedRequirement =
+                promotionRequirements[PromotionValue.VERIFIED];
             requirementsCount = config.recruiterRequirementsCount;
 
             XPRequirement = promotionRequirements[PromotionValue.XP];
@@ -322,9 +337,18 @@ async function promotionProgress(interaction, force = false) {
         // Add one extra for the forced time requirement
         requirementsCount += 1;
 
+        // If the verified requirement is enabled then add an extra
+        if (verifiedRequirement) {
+            requirementsCount += 1;
+        }
+
         let metRequirements = 0;
 
         if (daysInGuild >= timeRequirement) {
+            metRequirements++;
+        }
+
+        if (verifiedRequirement && hasVerifiedRole) {
             metRequirements++;
         }
 
@@ -450,6 +474,8 @@ async function promotionProgress(interaction, force = false) {
             requirementsCount: requirementsCount,
             metRequirements: metRequirements,
             daysInGuild: daysInGuild,
+            verifiedRequirement: verifiedRequirement,
+            hasVerifiedRole: hasVerifiedRole,
             timeRequirement: timeRequirement,
             requirements: requirements,
         };

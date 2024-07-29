@@ -10,6 +10,7 @@ class GuildMemberDemotion {
     // hasBuildRole: Does the player have one of the war build roles in the Discord server
     // playtime: How many hours per week does the player play on average
     // hasEcoRole: Does the player have the eco role in the Discord server
+    // hasVerifiedRole: Does the player have the verified role in the Discord server
     // promotionRequirements: The promotion requirements for each rank.
     // timeRequirements: How long you have to be in the guild to be eligible for this rank.
     // requirementsCount: How many requirements must be met to get this promotion
@@ -24,6 +25,7 @@ class GuildMemberDemotion {
         hasBuildRole,
         playtime,
         hasEcoRole,
+        hasVerifiedRole,
         promotionRequirements,
         timeRequirements,
         requirementsCount,
@@ -38,6 +40,7 @@ class GuildMemberDemotion {
         this.hasBuildRole = hasBuildRole;
         this.playtime = playtime;
         this.hasEcoRole = hasEcoRole;
+        this.hasVerifiedRole = hasVerifiedRole;
 
         this.checkForDemotion(
             promotionRequirements,
@@ -150,6 +153,16 @@ class GuildMemberDemotion {
 
         if (this.daysInGuild < timeRequirement) {
             reasons.push(`Has not been in guild for ${timeRequirement} days.`);
+            this.demote = true;
+            this.reasons = reasons;
+            this.rankToDemote =
+                rankToDemote.charAt(0).toUpperCase() + rankToDemote.slice(1);
+            return;
+        }
+
+        // Verified is a hard requirement if it has been set
+        if (promotionRequirements['VERIFIED'] && !this.hasVerifiedRole) {
+            reasons.push('Is not verified');
             this.demote = true;
             this.reasons = reasons;
             this.rankToDemote =

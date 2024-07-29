@@ -106,6 +106,10 @@ module.exports = {
                         name: 'Eco Requirement',
                         value: 'ECO',
                     },
+                    {
+                        name: 'Verified Requirement',
+                        value: 'VERIFIED',
+                    },
                 ),
         )
         .addIntegerOption((option) =>
@@ -242,7 +246,8 @@ module.exports = {
                 case 'recruiterPromotionRequirement':
                     if (
                         requirementStr === 'BUILD' ||
-                        requirementStr === 'ECO'
+                        requirementStr === 'ECO' ||
+                        requirementStr === 'VERIFIED'
                     ) {
                         // As these are technically boolean requirements, just add a 1 and if the key doesn't exist, and if it does then remove it.
                         if (config[option][requirementStr]) {

@@ -123,6 +123,9 @@ module.exports = {
             config.recruiterPromotionRequirement;
         const recruiterTimeRequirement = config.recruiterTimeRequirement;
         const recruiterRequirementsCount = config.recruiterRequirementsCount;
+        const verifiedRole = interaction.guild.roles.cache.get(
+            config['verifiedRole'],
+        );
         const tankRole = interaction.guild.roles.cache.get(config['tankRole']);
         const healerRole = interaction.guild.roles.cache.get(
             config['healerRole'],
@@ -226,6 +229,7 @@ module.exports = {
                         member,
                     );
 
+                    let hasVerifiedRole = false;
                     let hasBuildRole = false;
                     let hasEcoRole = false;
 
@@ -233,13 +237,15 @@ module.exports = {
                         const memberRoles = serverMember.roles.cache;
 
                         for (const role of memberRoles.values()) {
-                            if (role === ecoRole) {
+                            if (role === verifiedRole) {
+                                hasVerifiedRole = true;
+                            } else if (role === ecoRole) {
                                 hasEcoRole = true;
                             } else if (warBuildRoles.includes(role)) {
                                 hasBuildRole = true;
                             }
 
-                            if (hasBuildRole && hasEcoRole) {
+                            if (hasVerifiedRole && hasBuildRole && hasEcoRole) {
                                 break;
                             }
                         }
