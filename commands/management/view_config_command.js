@@ -554,6 +554,10 @@ module.exports = {
                         chiefPromotionRequirements += '\nKnows eco';
                         break;
                     }
+                    case 'VERIFIED': {
+                        chiefPromotionRequirements += '\nIs verified';
+                        break;
+                    }
                 }
             }
 
@@ -607,6 +611,10 @@ module.exports = {
                     }
                     case 'ECO': {
                         strategistPromotionRequirements += '\nKnows eco';
+                        break;
+                    }
+                    case 'VERIFIED': {
+                        strategistPromotionRequirements += '\nIs verified';
                         break;
                     }
                 }
@@ -664,6 +672,10 @@ module.exports = {
                         captainPromotionRequirements += '\nKnows eco';
                         break;
                     }
+                    case 'VERIFIED': {
+                        captainPromotionRequirements += '\nIs verified';
+                        break;
+                    }
                 }
             }
 
@@ -717,6 +729,10 @@ module.exports = {
                     }
                     case 'ECO': {
                         recruiterPromotionRequirements += '\nKnows eco';
+                        break;
+                    }
+                    case 'VERIFIED': {
+                        recruiterPromotionRequirements += '\nIs verified';
                         break;
                     }
                 }
