@@ -39,9 +39,8 @@ module.exports = {
                     config['joinLeaveChannel'],
                 );
 
-                // member.user seems to work, if it ends up not working change to member.user.username
                 await channel.send(
-                    `${config['leaveMessage'].replace(/\\n/g, '\n').replace('$user$', member.user)}`,
+                    `${config['leaveMessage'].replace(/\\n/g, '\n').replace('$user$', member.user.username)}`,
                 );
             }
         } catch (error) {
