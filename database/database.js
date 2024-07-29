@@ -545,6 +545,8 @@ async function updatePriorityGuilds() {
         const guildJson = response.data;
 
         if (guildJson && guildJson.name) {
+            const memberUuids = [];
+
             for (const rank in guildJson.members) {
                 if (rank === 'total') continue;
 
@@ -552,6 +554,8 @@ async function updatePriorityGuilds() {
 
                 for (const member in rankMembers) {
                     const guildMember = rankMembers[member];
+
+                    memberUuids.push(guildMember.uuid);
 
                     // Check if the UUID exists in the players table
                     const existingPlayer = await getAsync(
@@ -578,6 +582,8 @@ async function updatePriorityGuilds() {
                     }
                 }
             }
+
+            await removeGuildMembers(guildJson.uuid, memberUuids);
 
             updated++;
         } else {
@@ -765,6 +771,17 @@ async function deleteGuilds(guilds) {
     }
 }
 
+// Removes players from their guild if they are no longer in the member list
+// guild: The UUID of the guild
+// members: The UUID's of all the guilds current members
+async function removeGuildMembers(guild, members) {
+    const placeholders = members.map(() => '?').join(', ');
+
+    const query = `UPDATE players SET guildUuid = NULL, guildRank = NULL WHERE guildUuid = '${guild}' AND uuid NOT IN (${placeholders})`;
+
+    await runAsync(query, members);
+}
+
 // When the bot calls the api for player info, we can update the database
 // information for that player
 // player: The details of the player to update
@@ -857,6 +874,10 @@ async function updateGuildMembers(uuid, guildMembers) {
             priorityPlayers.push(guildMember.uuid);
         }
     }
+
+    const memberUuids = guildMembers.map((member) => member.uuid);
+
+    await removeGuildMembers(uuid, memberUuids);
 }
 
 // Checks for banned players in a guild
