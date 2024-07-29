@@ -167,7 +167,7 @@ module.exports = {
                             let streamers = '';
 
                             for (const streamer of likelyStreamers) {
-                                streamers += `\n${streamer.username} last seen ${utilities.getTimeSince(streamer.lastLogin)}`;
+                                streamers += `\n${streamer.username.replaceAll('_', '\\_').replaceAll('_', '\\_')} last seen ${utilities.getTimeSince(streamer.lastLogin)}`;
                             }
 
                             pageEmbed.addFields({
@@ -236,7 +236,7 @@ module.exports = {
                         let streamers = '';
 
                         for (const streamer of likelyStreamers) {
-                            streamers += `\n${streamer.username} last seen ${utilities.getTimeSince(streamer.lastLogin)}`;
+                            streamers += `\n${streamer.username.replaceAll('_', '\\_')} last seen ${utilities.getTimeSince(streamer.lastLogin)}`;
                         }
 
                         responseEmbed.addFields({
@@ -328,7 +328,7 @@ module.exports = {
                         let streamers = '';
 
                         for (const streamer of likelyStreamers) {
-                            streamers += `\n${streamer.username} last seen ${utilities.getTimeSince(streamer.lastLogin)}`;
+                            streamers += `\n${streamer.username.replaceAll('_', '\\_')} last seen ${utilities.getTimeSince(streamer.lastLogin)}`;
                         }
 
                         responseEmbed.addFields({
