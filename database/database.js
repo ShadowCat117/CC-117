@@ -533,9 +533,16 @@ async function updatePriorityGuilds() {
 
         await utilities.waitForRateLimit();
 
-        const response = await axios.get(
-            `https://api.wynncraft.com/v3/guild/uuid/${guild}`,
-        );
+        let response;
+
+        try {
+            response = await axios.get(
+                `https://api.wynncraft.com/v3/guild/uuid/${guild}`,
+            );
+        } catch (error) {
+            console.error(error);
+            continue;
+        }
 
         utilities.updateRateLimit(
             response.headers['ratelimit-remaining'],
@@ -910,14 +917,21 @@ async function getGuildMembers(guild) {
 async function getLastLogins(guild) {
     await utilities.waitForRateLimit();
 
-    const response = await axios.get(
-        `https://api.wynncraft.com/v3/guild/uuid/${guild}`,
-    );
+    let response;
+
+    try {
+        response = await axios.get(
+            `https://api.wynncraft.com/v3/guild/uuid/${guild}`,
+        );
+    } catch (error) {
+        console.error(error);
+    }
 
     utilities.updateRateLimit(
         response.headers['ratelimit-remaining'],
         response.headers['ratelimit-reset'],
     );
+
     const guildJson = response.data;
 
     // If we got a valid response, then update the members of the guild
@@ -943,14 +957,22 @@ async function getLastLogins(guild) {
                 } else {
                     await utilities.waitForRateLimit();
 
-                    const playerResponse = await axios.get(
-                        `https://api.wynncraft.com/v3/player/${guildMember.uuid}?fullResult=True`,
-                    );
+                    let playerResponse;
+
+                    try {
+                        playerResponse = await axios.get(
+                            `https://api.wynncraft.com/v3/player/${guildMember.uuid}?fullResult=True`,
+                        );
+                    } catch (error) {
+                        console.error(error);
+                        continue;
+                    }
 
                     utilities.updateRateLimit(
                         response.headers['ratelimit-remaining'],
                         response.headers['ratelimit-reset'],
                     );
+
                     const playerJson = playerResponse.data;
 
                     if (playerJson && playerJson.username) {
@@ -1336,9 +1358,16 @@ async function runOnlinePlayerFunction() {
         console.log('Updating online players');
 
         // Get all of the online players by UUID
-        const response = await axios.get(
-            'https://api.wynncraft.com/v3/player?identifier=uuid',
-        );
+        let response;
+
+        try {
+            response = await axios.get(
+                'https://api.wynncraft.com/v3/player?identifier=uuid',
+            );
+        } catch (error) {
+            console.error(error);
+            return;
+        }
 
         utilities.updateRateLimit(
             response.headers['ratelimit-remaining'],
@@ -1398,9 +1427,16 @@ async function runUpdateFunctions() {
         console.log('Updating list of all guilds');
 
         // Get all guilds
-        const response = await axios.get(
-            'https://api.wynncraft.com/v3/guild/list/guild?identifier=uuid',
-        );
+        let response;
+
+        try {
+            response = await axios.get(
+                'https://api.wynncraft.com/v3/guild/list/guild?identifier=uuid',
+            );
+        } catch (error) {
+            console.error(error);
+            return;
+        }
 
         utilities.updateRateLimit(
             response.headers['ratelimit-remaining'],

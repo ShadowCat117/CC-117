@@ -130,9 +130,23 @@ module.exports = {
         const exemptUuids = Object.keys(inactivityExceptions);
 
         await utilities.waitForRateLimit();
-        const response = await axios.get(
-            `https://api.wynncraft.com/v3/guild/uuid/${config.guild}`,
-        );
+
+        let response;
+
+        try {
+            response = await axios.get(
+                `https://api.wynncraft.com/v3/guild/uuid/${config.guild}`,
+            );
+        } catch (error) {
+            responseEmbed
+                .setTitle('Error')
+                .setDescription(
+                    'Failed to fetch guild information from the API, it may be down.',
+                )
+                .setColor(0xff0000);
+            await interaction.editReply({ embeds: [responseEmbed] });
+            return;
+        }
 
         utilities.updateRateLimit(
             response.headers['ratelimit-remaining'],

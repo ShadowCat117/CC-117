@@ -4,14 +4,23 @@ const VerifiedMember = require('../message_objects/VerifiedMember');
 
 async function verified(guildUuid, interaction) {
     await utilities.waitForRateLimit();
-    const response = await axios.get(
-        `https://api.wynncraft.com/v3/guild/uuid/${guildUuid}`,
-    );
+
+    let response;
+
+    try {
+        response = await axios.get(
+            `https://api.wynncraft.com/v3/guild/uuid/${guildUuid}`,
+        );
+    } catch (error) {
+        console.error(error);
+        return { guildName: '', guildPrefix: '', verifiedMembers: [] };
+    }
 
     utilities.updateRateLimit(
         response.headers['ratelimit-remaining'],
         response.headers['ratelimit-reset'],
     );
+
     const guildJson = response.data;
 
     if (!guildJson || !guildJson.name) {

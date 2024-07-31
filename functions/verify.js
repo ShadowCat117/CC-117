@@ -27,40 +27,38 @@ async function verify(interaction, force = false) {
 
     await utilities.waitForRateLimit();
 
-    let playerJson;
+    let response;
 
     // If a player was found, look for UUID to get guaranteed results, otherwise look for the name input
     if (player) {
-        const response = await axios.get(
-            `https://api.wynncraft.com/v3/player/${player.uuid}?fullResult=True`,
-        );
-        utilities.updateRateLimit(
-            response.headers['ratelimit-remaining'],
-            response.headers['ratelimit-reset'],
-        );
-        playerJson = response.data;
+        try {
+            response = await axios.get(
+                `https://api.wynncraft.com/v3/player/${player.uuid}?fullResult=True`,
+            );
+        } catch (error) {
+            console.error(error);
+            return { username: '' };
+        }
     } else {
         try {
-            const response = await axios.get(
+            response = await axios.get(
                 `https://api.wynncraft.com/v3/player/${nameToSearch}?fullResult=True`,
             );
-            utilities.updateRateLimit(
-                response.headers['ratelimit-remaining'],
-                response.headers['ratelimit-reset'],
-            );
-            playerJson = response.data;
-        } catch (err) {
+        } catch (error) {
             // 300 indicates a multi selector
-            if (err.response.status === 300) {
+            if (error.response.status === 300) {
                 return {
-                    playerUuids: Object.keys(err.response.data),
-                    playerUsernames: Object.values(err.response.data).map(
+                    playerUuids: Object.keys(error.response.data),
+                    playerUsernames: Object.values(error.response.data).map(
                         (entry) => entry.storedName,
                     ),
                     playerRanks: [],
                     playerGuildRanks: [],
                     playerGuildNames: [],
                 };
+            } else {
+                console.error(error);
+                return { username: '' };
             }
         }
     }
@@ -112,7 +110,7 @@ async function verify(interaction, force = false) {
         highestCharacterLevel,
     );
 
-    const response = await applyRoles(
+    const roleResponse = await applyRoles(
         interaction.guild,
         interaction.member,
         playerInfo,
@@ -134,8 +132,8 @@ async function verify(interaction, force = false) {
 
     return {
         username: playerInfo.username,
-        updates: response.updates,
-        errors: response.errors,
+        updates: roleResponse.updates,
+        errors: roleResponse.errors,
     };
 }
 

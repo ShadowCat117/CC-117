@@ -22,30 +22,49 @@ async function online(interaction, force = false) {
         };
     }
 
-    let guildJson;
+    let response;
 
     await utilities.waitForRateLimit();
 
     // If a guild was found, look for UUID to get guaranteed results, otherwise look for the name input
     if (guild) {
-        const response = await axios.get(
-            `https://api.wynncraft.com/v3/guild/uuid/${guild.uuid}`,
-        );
-        utilities.updateRateLimit(
-            response.headers['ratelimit-remaining'],
-            response.headers['ratelimit-reset'],
-        );
-        guildJson = response.data;
+        try {
+            response = await axios.get(
+                `https://api.wynncraft.com/v3/guild/uuid/${guild.uuid}`,
+            );
+        } catch (error) {
+            return {
+                guildName: '',
+                guildPrefix: '',
+                guildUuid: '',
+                onlinePlayers: [],
+                onlineCount: -1,
+                totalMembers: -1,
+            };
+        }
     } else {
-        const response = await axios.get(
-            `https://api.wynncraft.com/v3/guild/${nameToSearch}`,
-        );
-        utilities.updateRateLimit(
-            response.headers['ratelimit-remaining'],
-            response.headers['ratelimit-reset'],
-        );
-        guildJson = response.data;
+        try {
+            response = await axios.get(
+                `https://api.wynncraft.com/v3/guild/${nameToSearch}`,
+            );
+        } catch (error) {
+            return {
+                guildName: '',
+                guildPrefix: '',
+                guildUuid: '',
+                onlinePlayers: [],
+                onlineCount: -1,
+                totalMembers: -1,
+            };
+        }
     }
+
+    utilities.updateRateLimit(
+        response.headers['ratelimit-remaining'],
+        response.headers['ratelimit-reset'],
+    );
+
+    guildJson = response.data;
 
     if (!guildJson || !guildJson.name) {
         return {
