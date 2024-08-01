@@ -12,7 +12,7 @@ async function updateRoles(guild) {
         if (serverMember.user.bot) continue;
 
         const username = serverMember.user.username;
-        const globalName = serverMember.user.username;
+        const globalName = serverMember.user.globalName;
         let nickname = undefined;
 
         // If they have a nickname, remove the guild tag suffix
