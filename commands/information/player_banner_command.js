@@ -97,10 +97,18 @@ module.exports = {
 
                 await interaction.editReply({ embeds: [responseEmbed] });
             } else if (response.banner) {
-                await interaction.editReply({
-                    embeds: [],
-                    files: [response.banner],
-                });
+                if (response.hasAvatar) {
+                    await interaction.editReply({
+                        embeds: [],
+                        files: [response.banner],
+                    });
+                } else {
+                    await interaction.editReply({
+                        content: 'Failed to get avatar',
+                        embeds: [],
+                        files: [response.banner],
+                    });
+                }
             } else {
                 const responseEmbed = new EmbedBuilder()
                     .setTitle('Error')

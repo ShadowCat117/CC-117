@@ -126,10 +126,18 @@ async function playerBanner(interaction, force = false) {
     const background = await loadImage(imagePath);
     context.drawImage(background, 0, 0, canvas.width, canvas.height);
 
-    const avatar = await axios.get(
-        `https://vzge.me/bust/200/${playerJson.uuid}.png?`,
-        { headers, responseType: 'arraybuffer' },
-    );
+    let avatar;
+    let hasAvatar = true;
+
+    try {
+        avatar = await axios.get(
+            `https://vzge.me/bust/200/${playerJson.uuid}.png?`,
+            { headers, responseType: 'arraybuffer' },
+        );
+    } catch (error) {
+        console.error('Failed to get avatar: ', error);
+        hasAvatar = false;
+    }
 
     if (avatar) {
         const avatarImage = await loadImage(avatar.data);
@@ -192,14 +200,22 @@ async function playerBanner(interaction, force = false) {
     context.fillText('Total Level', 30, 430);
 
     context.fillStyle = '#ffffff';
-    context.fillText(`${playerJson.globalData.totalLevel.toLocaleString()}`, 30, 460);
+    context.fillText(
+        `${playerJson.globalData.totalLevel.toLocaleString()}`,
+        30,
+        460,
+    );
 
     context.fillStyle = '#000000';
     context.textAlign = 'end';
     context.fillText('Wars', 370, 340);
 
     context.fillStyle = '#ffffff';
-    context.fillText(`${playerJson.globalData.wars.toLocaleString()}`, 370, 370);
+    context.fillText(
+        `${playerJson.globalData.wars.toLocaleString()}`,
+        370,
+        370,
+    );
 
     context.fillStyle = '#000000';
     context.fillText('Playtime', 370, 430);
@@ -214,6 +230,7 @@ async function playerBanner(interaction, force = false) {
     return {
         username: playerJson.username.replaceAll('_', '\\_'),
         banner: banner,
+        hasAvatar: hasAvatar,
     };
 }
 
