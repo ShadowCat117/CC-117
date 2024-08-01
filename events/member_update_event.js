@@ -16,11 +16,15 @@ module.exports = {
         );
 
         if (!validChange) {
-            const oldNicknameValid = await utilities.checkValidUsername(
-                newMember,
-                newMember.guild,
-                oldMember.nickname,
-            );
+            let oldNicknameValid = false;
+
+            if (oldMember.nickname) {
+                oldNicknameValid = await utilities.checkValidUsername(
+                    newMember,
+                    newMember.guild,
+                    oldMember.nickname,
+                );
+            }
 
             try {
                 if (oldNicknameValid) {
