@@ -199,13 +199,13 @@ async function playerBanner(interaction, force = false) {
     context.fillText('Wars', 370, 340);
 
     context.fillStyle = '#ffffff';
-    context.fillText(`${playerJson.globalData.wars}`, 370, 370);
+    context.fillText(`${playerJson.globalData.wars.toLocaleString()}`, 370, 370);
 
     context.fillStyle = '#000000';
     context.fillText('Playtime', 370, 430);
 
     context.fillStyle = '#ffffff';
-    context.fillText(`${playerJson.playtime} hrs`, 370, 460);
+    context.fillText(`${playerJson.playtime.toLocaleString()} hrs`, 370, 460);
 
     const banner = new AttachmentBuilder(await canvas.encode('png'), {
         name: 'banner.png',
