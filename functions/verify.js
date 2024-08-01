@@ -63,6 +63,8 @@ async function verify(interaction, force = false) {
         }
     }
 
+    const playerJson = response.data;
+
     if (!playerJson || !playerJson.username) {
         return { username: '' };
     }
