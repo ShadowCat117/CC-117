@@ -37,6 +37,7 @@ const banPlayer = require('../functions/ban_player');
 const unbanPlayer = require('../functions/unban_player');
 const messages = require('../functions/messages');
 const database = require('../database/database');
+const playerBanner = require('../functions/player_banner');
 
 const warriorArchetypes = ['fallen', 'battleMonk', 'paladin'];
 const mageArchetypes = ['riftwalker', 'lightBender', 'arcanist'];
@@ -1274,6 +1275,43 @@ module.exports = {
                             } else {
                                 await interaction.editReply({
                                     embeds: [embeds[0]],
+                                });
+                            }
+
+                            break;
+                        }
+                        case 'player_banner': {
+                            const loadingEmbed = new EmbedBuilder()
+                                .setDescription(
+                                    'Generating banner for selected player',
+                                )
+                                .setColor(0x00ff00);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [loadingEmbed],
+                            });
+
+                            const response = await playerBanner(
+                                interaction,
+                                true,
+                            );
+
+                            if (response.banner) {
+                                await interaction.editReply({
+                                    embeds: [],
+                                    files: [response.banner],
+                                });
+                            } else {
+                                const responseEmbed = new EmbedBuilder()
+                                    .setTitle('Error')
+                                    .setDescription(
+                                        'Failed to generate a banner. Try again later',
+                                    )
+                                    .setColor(0xff0000);
+
+                                await interaction.editReply({
+                                    embeds: [responseEmbed],
                                 });
                             }
 

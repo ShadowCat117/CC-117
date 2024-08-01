@@ -92,7 +92,7 @@ async function sus(interaction, force = false) {
         response.headers['ratelimit-reset'],
     );
 
-    playerJson = response.data;
+    const playerJson = response.data;
 
     if (!playerJson || !playerJson.username) {
         return {

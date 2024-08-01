@@ -10,6 +10,7 @@
   "author": "Jamie Callan (ShadowCat117)",
   "license": "MIT",
   "dependencies": {
+    "@napi-rs/canvas": "^0.1.53",
     "axios": "^1.6.2",
     "discord.js": "^14.15.3",
     "husky": "^9.1.2",

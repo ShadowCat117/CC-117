@@ -50,7 +50,7 @@ async function guildStats(interaction, force = false) {
         response.headers['ratelimit-reset'],
     );
 
-    guildJson = response.data;
+    const guildJson = response.data;
 
     if (!guildJson || !guildJson.name) {
         return { guildName: '', guildPrefix: '', members: [] };
