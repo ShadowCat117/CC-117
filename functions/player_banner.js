@@ -166,7 +166,13 @@ async function playerBanner(interaction, force = false) {
         guildText = `${playerJson.guild.rank.charAt(0).toUpperCase()}${playerJson.guild.rank.slice(1).toLowerCase()} of ${playerJson.guild.name}`;
     }
 
-    context.font = '24px Wynn';
+    let guildFontSize = 24;
+
+    do {
+        guildFontSize -= 1;
+        context.font = `${guildFontSize}px Wynn`;
+    } while (context.measureText(guildText).width > canvas.width - 60);
+
     context.fillStyle = '#02D8E9';
     context.textAlign = 'center';
     context.fillText(guildText, 200, 290);
@@ -190,38 +196,47 @@ async function playerBanner(interaction, force = false) {
 
     context.font = '24px Wynn';
     context.fillStyle = '#000000';
-    context.textAlign = 'start';
-    context.fillText('Rank', 30, 340);
+    context.textAlign = 'center';
+    context.fillText('Rank', 109, 340);
 
     context.fillStyle = supportRankColor;
-    context.fillText(supportRank, 30, 370);
+    context.fillText(supportRank, 109, 370);
 
     context.fillStyle = '#000000';
-    context.fillText('Total Level', 30, 430);
+    context.fillText('Total Level', 109, 430);
 
     context.fillStyle = '#ffffff';
     context.fillText(
         `${playerJson.globalData.totalLevel.toLocaleString()}`,
-        30,
+        109,
         460,
     );
 
     context.fillStyle = '#000000';
-    context.textAlign = 'end';
-    context.fillText('Wars', 370, 340);
+    context.fillText('Wars', 291, 340);
 
     context.fillStyle = '#ffffff';
     context.fillText(
         `${playerJson.globalData.wars.toLocaleString()}`,
-        370,
+        291,
         370,
     );
 
     context.fillStyle = '#000000';
-    context.fillText('Playtime', 370, 430);
+    context.fillText('Playtime', 291, 430);
 
     context.fillStyle = '#ffffff';
-    context.fillText(`${playerJson.playtime.toLocaleString()} hrs`, 370, 460);
+
+    const playtimeText = `${playerJson.playtime.toLocaleString()} hrs`;
+
+    let playtimeFontSize = 24;
+
+    do {
+        playtimeFontSize -= 1;
+        context.font = `${playtimeFontSize}px Wynn`;
+    } while (context.measureText(playtimeText).width > 163);
+
+    context.fillText(playtimeText, 291, 460);
 
     const banner = new AttachmentBuilder(await canvas.encode('png'), {
         name: 'banner.png',
