@@ -405,7 +405,7 @@ async function applyRoles(guild, member, playerInfo) {
                                 );
                                 errors.push(`Failed to remove ${role}.`);
                             });
-                    } else if (role === memberOfRole && config.memberOf) {
+                    } else if (memberOfRole && role === memberOfRole) {
                         await member.roles
                             .remove(role)
                             .then(() => {
