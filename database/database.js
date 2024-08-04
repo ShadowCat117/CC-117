@@ -356,7 +356,7 @@ async function updateGuildActivity(currentHour, currentMinute) {
                 'SELECT COUNT(*) as count FROM players WHERE guildUuid = ? AND online = 1 AND guildRank IN (' +
                 captainRanks.map(() => '?').join(',') +
                 ')';
-            const captainResult = await getAsync(captainQuery, [guildUuid]);
+            const captainResult = await getAsync(captainQuery, [guildUuid, ...captainRanks]);
             const captainsOnline = captainResult.count;
 
             let newAverage;
