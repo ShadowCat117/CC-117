@@ -1366,7 +1366,6 @@ async function runOnlinePlayerFunction() {
             );
         } catch (error) {
             console.error(error);
-            return;
         }
 
         utilities.updateRateLimit(
