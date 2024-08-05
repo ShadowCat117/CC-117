@@ -1372,12 +1372,15 @@ async function runOnlinePlayerFunction() {
             response.headers['ratelimit-remaining'],
             response.headers['ratelimit-reset'],
         );
-        const onlinePlayers = response.data;
 
-        if (onlinePlayers) {
-            await handleOnlinePlayers(onlinePlayers.players);
+        if (response) {
+            const onlinePlayers = response.data;
+
+            if (onlinePlayers) {
+                await handleOnlinePlayers(onlinePlayers.players);
+            }
         }
-
+        
         console.log('Updated online players');
     }
 
