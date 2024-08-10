@@ -41,9 +41,9 @@ module.exports = {
             `${guildId}.json`,
         );
 
-        try {
-            let config = {};
+        let config = {};
 
+        try {
             if (fs.existsSync(filePath)) {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
@@ -148,6 +148,36 @@ module.exports = {
             }
 
             await interaction.editReply({ embeds: [responseEmbed] });
+
+            if (response.guildName === '') return;
+
+            if (config.logMessages && config.logChannel) {
+                const logEmbed = new EmbedBuilder()
+                    .setTitle(`${response.guildName} has been added as an ally`)
+                    .setColor(0x00ffff)
+                    .addFields({
+                        name: 'Added by',
+                        value: `${interaction.member}`,
+                    });
+
+                const channel = interaction.guild.channels.cache.get(
+                    config.logChannel,
+                );
+
+                if (channel) {
+                    try {
+                        await channel.send({ embeds: [logEmbed] });
+                    } catch (error) {
+                        console.error(
+                            `Failed to send added ally message to channel ${config.logChannel} in guild ${interaction.guild.id}`,
+                        );
+                    }
+                } else {
+                    console.log(
+                        `${config.logChannel} not found for guild ${interaction.guild.id}`,
+                    );
+                }
+            }
         }
     },
 };
