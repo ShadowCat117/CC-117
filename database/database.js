@@ -930,87 +930,91 @@ async function getLastLogins(guild) {
         console.error(error);
     }
 
-    utilities.updateRateLimit(
-        response.headers['ratelimit-remaining'],
-        response.headers['ratelimit-reset'],
-    );
+    if (response) {
+        utilities.updateRateLimit(
+            response.headers['ratelimit-remaining'],
+            response.headers['ratelimit-reset'],
+        );
 
-    const guildJson = response.data;
+        const guildJson = response.data;
 
-    // If we got a valid response, then update the members of the guild
-    if (guildJson && guildJson.name) {
-        for (const rank in guildJson.members) {
-            if (rank === 'total') continue;
+        // If we got a valid response, then update the members of the guild
+        if (guildJson && guildJson.name) {
+            for (const rank in guildJson.members) {
+                if (rank === 'total') continue;
 
-            const rankMembers = guildJson.members[rank];
+                const rankMembers = guildJson.members[rank];
 
-            for (const member in rankMembers) {
-                const guildMember = rankMembers[member];
+                for (const member in rankMembers) {
+                    const guildMember = rankMembers[member];
 
-                const existingPlayer = await getAsync(
-                    'SELECT * FROM players WHERE uuid = ?',
-                    [guildMember.uuid],
-                );
-
-                if (existingPlayer) {
-                    await runAsync(
-                        'UPDATE players SET username = ?, guildUuid = ?, guildRank = ? WHERE uuid = ?',
-                        [member, guild, rank, guildMember.uuid],
+                    const existingPlayer = await getAsync(
+                        'SELECT * FROM players WHERE uuid = ?',
+                        [guildMember.uuid],
                     );
-                } else {
-                    await utilities.waitForRateLimit();
 
-                    let playerResponse;
-
-                    try {
-                        playerResponse = await axios.get(
-                            `https://api.wynncraft.com/v3/player/${guildMember.uuid}?fullResult=True`,
+                    if (existingPlayer) {
+                        await runAsync(
+                            'UPDATE players SET username = ?, guildUuid = ?, guildRank = ? WHERE uuid = ?',
+                            [member, guild, rank, guildMember.uuid],
                         );
-                    } catch (error) {
-                        console.error(error);
-                        continue;
-                    }
+                    } else {
+                        await utilities.waitForRateLimit();
 
-                    utilities.updateRateLimit(
-                        response.headers['ratelimit-remaining'],
-                        response.headers['ratelimit-reset'],
-                    );
+                        let playerResponse;
 
-                    const playerJson = playerResponse.data;
-
-                    if (playerJson && playerJson.username) {
-                        let highestCharcterLevel = 0;
-
-                        for (const character in playerJson.characters) {
-                            const characterJson =
-                                playerJson.characters[character];
-
-                            // If character level is higher than current tracked highest, set as new highest
-                            if (characterJson.level > highestCharcterLevel) {
-                                highestCharcterLevel = characterJson.level;
-                            }
+                        try {
+                            playerResponse = await axios.get(
+                                `https://api.wynncraft.com/v3/player/${guildMember.uuid}?fullResult=True`,
+                            );
+                        } catch (error) {
+                            console.error(error);
+                            continue;
                         }
 
-                        const veteran = playerJson.veteran
-                            ? playerJson.veteran
-                            : false;
-
-                        await runAsync(
-                            'INSERT INTO players (uuid, username, guildUuid, guildRank, online, lastLogin, supportRank, veteran, serverRank, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, 0, -1, 0)',
-                            [
-                                playerJson.uuid,
-                                playerJson.username,
-                                guild,
-                                rank,
-                                playerJson.online,
-                                playerJson.lastJoin,
-                                playerJson.supportRank,
-                                veteran,
-                                playerJson.rank,
-                                playerJson.globalData.wars,
-                                highestCharcterLevel,
-                            ],
+                        utilities.updateRateLimit(
+                            response.headers['ratelimit-remaining'],
+                            response.headers['ratelimit-reset'],
                         );
+
+                        const playerJson = playerResponse.data;
+
+                        if (playerJson && playerJson.username) {
+                            let highestCharcterLevel = 0;
+
+                            for (const character in playerJson.characters) {
+                                const characterJson =
+                                    playerJson.characters[character];
+
+                                // If character level is higher than current tracked highest, set as new highest
+                                if (
+                                    characterJson.level > highestCharcterLevel
+                                ) {
+                                    highestCharcterLevel = characterJson.level;
+                                }
+                            }
+
+                            const veteran = playerJson.veteran
+                                ? playerJson.veteran
+                                : false;
+
+                            await runAsync(
+                                'INSERT INTO players (uuid, username, guildUuid, guildRank, online, lastLogin, supportRank, veteran, serverRank, wars, highestCharacterLevel, sessionStart, weeklyPlaytime, averagePlaytime, averageCount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, 0, -1, 0)',
+                                [
+                                    playerJson.uuid,
+                                    playerJson.username,
+                                    guild,
+                                    rank,
+                                    playerJson.online,
+                                    playerJson.lastJoin,
+                                    playerJson.supportRank,
+                                    veteran,
+                                    playerJson.rank,
+                                    playerJson.globalData.wars,
+                                    highestCharcterLevel,
+                                ],
+                            );
+                        }
                     }
                 }
             }
@@ -1371,12 +1375,12 @@ async function runOnlinePlayerFunction() {
             console.error(error);
         }
 
-        utilities.updateRateLimit(
-            response.headers['ratelimit-remaining'],
-            response.headers['ratelimit-reset'],
-        );
-
         if (response) {
+            utilities.updateRateLimit(
+                response.headers['ratelimit-remaining'],
+                response.headers['ratelimit-reset'],
+            );
+
             const onlinePlayers = response.data;
 
             if (onlinePlayers) {
@@ -1440,18 +1444,20 @@ async function runUpdateFunctions() {
             );
         } catch (error) {
             console.error(error);
-            return;
         }
 
-        utilities.updateRateLimit(
-            response.headers['ratelimit-remaining'],
-            response.headers['ratelimit-reset'],
-        );
-        const guildList = response.data;
+        if (response) {
+            utilities.updateRateLimit(
+                response.headers['ratelimit-remaining'],
+                response.headers['ratelimit-reset'],
+            );
 
-        // Make sure there are guilds, once the API returned no guilds so don't want it to delete all guilds
-        if (guildList && Object.keys(guildList).length !== 0) {
-            await updateGuildList(guildList);
+            const guildList = response.data;
+
+            // Make sure there are guilds, once the API returned no guilds so don't want it to delete all guilds
+            if (guildList && Object.keys(guildList).length !== 0) {
+                await updateGuildList(guildList);
+            }
         }
 
         console.log('Updated guild list');

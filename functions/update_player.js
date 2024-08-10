@@ -89,14 +89,23 @@ async function updatePlayer(interaction, force = false) {
 
     if (playerJson.guild) {
         await utilities.waitForRateLimit();
-        const response = await axios.get(
-            `https://api.wynncraft.com/v3/guild/uuid/${playerJson.guild.uuid}?identifier=uuid`,
-        );
+        try {
+            response = await axios.get(
+                `https://api.wynncraft.com/v3/guild/uuid/${playerJson.guild.uuid}?identifier=uuid`,
+            );
+        } catch (error) {
+            console.error(error);
+            return {
+                username: playerJson.username,
+                error: 'Failed to retrieve guild info',
+            };
+        }
 
         utilities.updateRateLimit(
             response.headers['ratelimit-remaining'],
             response.headers['ratelimit-reset'],
         );
+
         const guildJson = response.data;
 
         if (!guildJson || !guildJson.name) {
