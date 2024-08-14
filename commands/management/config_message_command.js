@@ -38,8 +38,8 @@ module.exports = {
                         value: 'classArchetypeMessage',
                     },
                     {
-                        name: 'Guild Events Message',
-                        value: 'guildEventsMessage',
+                        name: 'Roles Message',
+                        value: 'roleMessage',
                     },
                 ),
         )
@@ -147,7 +147,7 @@ module.exports = {
                 case 'warClassMessage':
                 case 'classMessage':
                 case 'classArchetypeMessage':
-                case 'guildEventsMessage':
+                case 'roleMessage':
                     config[option] = message;
                     break;
             }

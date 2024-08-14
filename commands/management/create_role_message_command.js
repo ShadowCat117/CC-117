@@ -11,14 +11,12 @@ const createConfig = require('../../functions/create_config');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('createguildeventsmessage')
-        .setDescription(
-            'Sends a message with buttons to get the giveaways and events roles.',
-        ),
+        .setName('createrolemessage')
+        .setDescription('Sends a message with buttons to get certain roles.'),
     ephemeral: true,
     async execute(interaction) {
         const loadingEmbed = new EmbedBuilder()
-            .setDescription('Creating guild events message.')
+            .setDescription('Creating roles message.')
             .setColor(0x00ff00);
 
         await interaction.editReply({ embeds: [loadingEmbed] });
@@ -46,7 +44,7 @@ module.exports = {
                 responseEmbed
                     .setTitle('Error')
                     .setDescription(
-                        'Failed to read config or you have not setup the guild events message configs. Do so with /config_messages and /config_roles.',
+                        'Failed to read config or you have not setup the roles message configs. Do so with /config_messages and /config_roles.',
                     )
                     .setColor(0xff0000);
                 await interaction.editReply({ embeds: [responseEmbed] });
@@ -81,54 +79,70 @@ module.exports = {
             return;
         }
 
-        const message = config['guildEventsMessage'];
+        const message = config['roleMessage'];
 
         if (!message) {
             responseEmbed
                 .setTitle('Error')
                 .setDescription(
-                    'You have not set a guild events message with /config_messages guildEventsMessage.',
+                    'You have not set a roles message with /config_messages roleMessage.',
                 )
                 .setColor(0xff0000);
             await interaction.editReply({ embeds: [responseEmbed] });
             return;
         }
 
-        if (!config['giveawayRole']) {
-            responseEmbed
-                .setTitle('Error')
-                .setDescription('You have not set a giveaway role.')
-                .setColor(0xff0000);
-            await interaction.editReply({ embeds: [responseEmbed] });
-            return;
+        const row = new ActionRowBuilder();
+
+        if (config['giveawayRole']) {
+            const giveawayButton = new ButtonBuilder()
+                .setCustomId('giveaway')
+                .setStyle(ButtonStyle.Success)
+                .setLabel('GIVEAWAY');
+
+            row.addComponents(giveawayButton);
         }
 
-        if (!config['eventsRole']) {
-            responseEmbed
-                .setTitle('Error')
-                .setDescription('You have not set an events role.')
-                .setColor(0xff0000);
-            await interaction.editReply({ embeds: [responseEmbed] });
-            return;
+        if (config['eventsRole']) {
+            const eventsButton = new ButtonBuilder()
+                .setCustomId('events')
+                .setStyle(ButtonStyle.Success)
+                .setLabel('EVENTS');
+
+            row.addComponents(eventsButton);
         }
 
-        const giveawayButton = new ButtonBuilder()
-            .setCustomId('giveaway')
-            .setStyle(ButtonStyle.Success)
-            .setLabel('GIVEAWAY');
+        if (config['bombBellRole']) {
+            const bombBellButton = new ButtonBuilder()
+                .setCustomId('bombbell')
+                .setStyle(ButtonStyle.Success)
+                .setLabel('BOMB BELL');
 
-        const eventsButton = new ButtonBuilder()
-            .setCustomId('events')
-            .setStyle(ButtonStyle.Success)
-            .setLabel('EVENTS');
+            row.addComponents(bombBellButton);
+        }
 
-        const row = new ActionRowBuilder().addComponents(
-            giveawayButton,
-            eventsButton,
-        );
+        if (config['guildRaidRole']) {
+            const guildRaidButton = new ButtonBuilder()
+                .setCustomId('guildraid')
+                .setStyle(ButtonStyle.Success)
+                .setLabel('GUILD RAID');
+
+            row.addComponents(guildRaidButton);
+        }
+
+        if (config['annihilationRole']) {
+            const annihilationButton = new ButtonBuilder()
+                .setCustomId('annihilation')
+                .setStyle(ButtonStyle.Success)
+                .setLabel('ANNIHILATION');
+
+            row.addComponents(annihilationButton);
+        }
+
         const channel = interaction.guild.channels.cache.get(
             interaction.channelId,
         );
+
         const formattedMessage = message.replace(/\\n/g, '\n');
 
         if (channel) {
@@ -139,13 +153,11 @@ module.exports = {
                 });
 
                 responseEmbed
-                    .setDescription(
-                        'Guild events message created successfully.',
-                    )
+                    .setDescription('Roles message created successfully.')
                     .setColor(0x00ffff);
             } catch (error) {
                 console.error(
-                    `Failed to send guild events message to channel ${interaction.channelId} in guild ${interaction.guild.id}`,
+                    `Failed to send roles message to channel ${interaction.channelId} in guild ${interaction.guild.id}`,
                 );
                 responseEmbed
                     .setDescription(

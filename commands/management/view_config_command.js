@@ -193,6 +193,15 @@ module.exports = {
             const eventsRole = interaction.guild.roles.cache.get(
                 config['eventsRole'],
             );
+            const bombBellRole = interaction.guild.roles.cache.get(
+                config['bombBellRole'],
+            );
+            const guildRaidRole = interaction.guild.roles.cache.get(
+                config['guildRaidRole'],
+            );
+            const annihilationRole = interaction.guild.roles.cache.get(
+                config['annihilationRole'],
+            );
 
             pageEmbed = new EmbedBuilder()
                 .setTitle(`${title}`)
@@ -221,6 +230,9 @@ module.exports = {
                     Unverified Role: ${unverifiedRole}
                     Giveaway Role: ${giveawayRole}
                     Events Role: ${eventsRole}
+                    Bomb Bell Role: ${bombBellRole}
+                    Guild Raid Role: ${guildRaidRole}
+                    Annihilation Role: ${annihilationRole}
                     `,
                 );
 
@@ -484,7 +496,7 @@ module.exports = {
                 .setDescription(
                     `
                     Guild Events Message:
-                    ${config['guildEventsMessage'].replace(/\\n/g, '\n')}
+                    ${config['roleMessage'].replace(/\\n/g, '\n')}
                     `,
                 );
 

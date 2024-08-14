@@ -101,6 +101,18 @@ module.exports = {
                         name: 'Events Role',
                         value: 'eventsRole',
                     },
+                    {
+                        name: 'Bomb Bell Role',
+                        value: 'bombBellRole',
+                    },
+                    {
+                        name: 'Guild Raids Role',
+                        value: 'guildRaidRole',
+                    },
+                    {
+                        name: 'Annihilation Role',
+                        value: 'annihilationRole',
+                    },
                 ),
         )
         .addRoleOption((option) =>
@@ -233,6 +245,9 @@ module.exports = {
                 case 'contentTeamRole':
                 case 'giveawayRole':
                 case 'eventsRole':
+                case 'bombBellRole':
+                case 'guildRaidRole':
+                case 'annihilationRole':
                     config[option] = role.id;
                     break;
             }

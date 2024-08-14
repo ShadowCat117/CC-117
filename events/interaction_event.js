@@ -3499,6 +3499,170 @@ module.exports = {
                                         ephemeral: true,
                                     });
                                 }
+                            } else if (interaction.customId === 'bombbell') {
+                                const bombBellRole =
+                                    interaction.guild.roles.cache.get(
+                                        config['bombBellRole'],
+                                    );
+
+                                const memberRoles =
+                                    await interaction.member.roles.cache;
+
+                                let replyMessage;
+
+                                // Remove bomb bell role if they have it already, otherwise add it
+                                if (memberRoles.has(bombBellRole.id)) {
+                                    await interaction.member.roles
+                                        .remove(bombBellRole)
+                                        .then(() => {
+                                            console.log(
+                                                `Removed bomb bell role from ${interaction.member.user.username}`,
+                                            );
+                                        })
+                                        .catch(() => {
+                                            console.log(
+                                                `Failed to remove bomb bell role from ${interaction.member.username}`,
+                                            );
+                                        });
+
+                                    replyMessage = `You no longer have the ${bombBellRole} role`;
+                                } else {
+                                    await interaction.member.roles
+                                        .add(bombBellRole)
+                                        .then(() => {
+                                            console.log(
+                                                `Added bomb bell role to ${interaction.member.user.username}`,
+                                            );
+                                        })
+                                        .catch(() => {
+                                            console.log(
+                                                `Failed to add bomb bell role to ${interaction.member.username}`,
+                                            );
+                                        });
+
+                                    replyMessage = `You now have the ${bombBellRole} role`;
+                                }
+
+                                await interaction.followUp({
+                                    content: replyMessage,
+                                    ephemeral: true,
+                                });
+                            } else if (interaction.customId === 'guildraid') {
+                                const guildRaidRole =
+                                    interaction.guild.roles.cache.get(
+                                        config['guildRaidRole'],
+                                    );
+                                const memberOfRole =
+                                    interaction.guild.roles.cache.get(
+                                        config['memberOfRole'],
+                                    );
+
+                                const memberRoles =
+                                    await interaction.member.roles.cache;
+
+                                let replyMessage;
+
+                                // If they have the guild member role
+                                if (memberRoles.has(memberOfRole.id)) {
+                                    // Remove guild raid role if they have it already, otherwise add it
+                                    if (memberRoles.has(guildRaidRole.id)) {
+                                        await interaction.member.roles
+                                            .remove(guildRaidRole)
+                                            .then(() => {
+                                                console.log(
+                                                    `Removed guild raid role from ${interaction.member.user.username}`,
+                                                );
+                                            })
+                                            .catch(() => {
+                                                console.log(
+                                                    `Failed to remove guild raid role from ${interaction.member.username}`,
+                                                );
+                                            });
+
+                                        replyMessage = `You no longer have the ${guildRaidRole} role`;
+                                    } else {
+                                        await interaction.member.roles
+                                            .add(guildRaidRole)
+                                            .then(() => {
+                                                console.log(
+                                                    `Added guild raid role to ${interaction.member.user.username}`,
+                                                );
+                                            })
+                                            .catch(() => {
+                                                console.log(
+                                                    `Failed to add guild raid role to ${interaction.member.username}`,
+                                                );
+                                            });
+
+                                        replyMessage = `You now have the ${guildRaidRole} role`;
+                                    }
+
+                                    await interaction.followUp({
+                                        content: replyMessage,
+                                        ephemeral: true,
+                                    });
+                                } else {
+                                    const guildName = (
+                                        await database.findGuild(
+                                            config['guild'],
+                                            true,
+                                        )
+                                    ).name;
+                                    await interaction.followUp({
+                                        content: `Sorry, you need to be a member of ${guildName} to use this.`,
+                                        ephemeral: true,
+                                    });
+                                }
+                            } else if (
+                                interaction.customId === 'annihilation'
+                            ) {
+                                const annihilationRole =
+                                    interaction.guild.roles.cache.get(
+                                        config['annihilationRole'],
+                                    );
+
+                                const memberRoles =
+                                    await interaction.member.roles.cache;
+
+                                let replyMessage;
+
+                                // Remove annihilation role if they have it already, otherwise add it
+                                if (memberRoles.has(annihilationRole.id)) {
+                                    await interaction.member.roles
+                                        .remove(annihilationRole)
+                                        .then(() => {
+                                            console.log(
+                                                `Removed annihilation role from ${interaction.member.user.username}`,
+                                            );
+                                        })
+                                        .catch(() => {
+                                            console.log(
+                                                `Failed to remove annihilation role from ${interaction.member.username}`,
+                                            );
+                                        });
+
+                                    replyMessage = `You no longer have the ${annihilationRole} role`;
+                                } else {
+                                    await interaction.member.roles
+                                        .add(annihilationRole)
+                                        .then(() => {
+                                            console.log(
+                                                `Added annihilation role to ${interaction.member.user.username}`,
+                                            );
+                                        })
+                                        .catch(() => {
+                                            console.log(
+                                                `Failed to add annihilation role to ${interaction.member.username}`,
+                                            );
+                                        });
+
+                                    replyMessage = `You now have the ${annihilationRole} role`;
+                                }
+
+                                await interaction.followUp({
+                                    content: replyMessage,
+                                    ephemeral: true,
+                                });
                             }
                         }
                     }
