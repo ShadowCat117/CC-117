@@ -54,6 +54,7 @@ async function applyRoles(guild, member, playerInfo) {
         const warPingRole = guild.roles.cache.get(config['warPingRole']);
         const giveawayRole = guild.roles.cache.get(config['giveawayRole']);
         const eventsRole = guild.roles.cache.get(config['eventsRole']);
+        const guildRaidRole = guild.roles.cache.get(config['guildRaidRole']);
         const levelRoles = [];
 
         for (const levelRole in config['levelRoles']) {
@@ -264,6 +265,24 @@ async function applyRoles(guild, member, playerInfo) {
                             );
                             errors.push(`Failed to remove ${role}.`);
                         });
+                } else if (
+                    role === guildRaidRole &&
+                    memberRoles.has(guildRaidRole.id)
+                ) {
+                    await member.roles
+                        .remove(guildRaidRole)
+                        .then(() => {
+                            console.log(
+                                `Removed guild raid role ${role.name} from ${member.user.username}`,
+                            );
+                            updates.push(`Removed ${role}.`);
+                        })
+                        .catch(() => {
+                            console.error(
+                                `Failed to remove guild raid role ${role.name} from ${member.user.username}`,
+                            );
+                            errors.push(`Failed to remove ${role}.`);
+                        });
                 }
             }
 
@@ -471,6 +490,24 @@ async function applyRoles(guild, member, playerInfo) {
                             .catch(() => {
                                 console.error(
                                     `Failed to remove events role ${role.name} from ${member.user.username}`,
+                                );
+                                errors.push(`Failed to remove ${role}.`);
+                            });
+                    } else if (
+                        role === guildRaidRole &&
+                        memberRoles.has(guildRaidRole.id)
+                    ) {
+                        await member.roles
+                            .remove(guildRaidRole)
+                            .then(() => {
+                                console.log(
+                                    `Removed guild raid role ${role.name} from ${member.user.username}`,
+                                );
+                                updates.push(`Removed ${role}.`);
+                            })
+                            .catch(() => {
+                                console.error(
+                                    `Failed to remove guild raid role ${role.name} from ${member.user.username}`,
                                 );
                                 errors.push(`Failed to remove ${role}.`);
                             });
