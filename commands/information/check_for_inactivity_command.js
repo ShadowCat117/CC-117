@@ -171,27 +171,27 @@ module.exports = {
 
         const chiefThreshold =
             averageOnline < averageRequirement ||
-            guildJson.members.total >= (memberThreshold / 100) * memberSlots
+            guildJson.members.total < (memberThreshold / 100) * memberSlots
                 ? chiefLowerThreshold
                 : chiefUpperThreshold;
         const strategistThreshold =
             averageOnline < averageRequirement ||
-            guildJson.members.total >= (memberThreshold / 100) * memberSlots
+            guildJson.members.total < (memberThreshold / 100) * memberSlots
                 ? strategistLowerThreshold
                 : strategistUpperThreshold;
         const captainThreshold =
             averageOnline < averageRequirement ||
-            guildJson.members.total >= (memberThreshold / 100) * memberSlots
+            guildJson.members.total < (memberThreshold / 100) * memberSlots
                 ? captainLowerThreshold
                 : captainUpperThreshold;
         const recruiterThreshold =
             averageOnline < averageRequirement ||
-            guildJson.members.total >= (memberThreshold / 100) * memberSlots
+            guildJson.members.total < (memberThreshold / 100) * memberSlots
                 ? recruiterLowerThreshold
                 : recruiterUpperThreshold;
         const recruitThreshold =
             averageOnline < averageRequirement ||
-            guildJson.members.total >= (memberThreshold / 100) * memberSlots
+            guildJson.members.total < (memberThreshold / 100) * memberSlots
                 ? recruitLowerThreshold
                 : recruitUpperThreshold;
 
