@@ -120,7 +120,7 @@ module.exports = {
                             memberDetails += `Joined ${utilities.getTimeSince(member.joinDate)} ago\n`;
                             memberDetails += `${member.localeContributed} XP (${utilities.getFormattedXPPerDay(member.contributed, member.joinDate)})\n`;
                             memberDetails += `${member.wars} war${member.wars !== 1 ? 's' : ''}\n`;
-                            memberDetails += `${member.averagePlaytime} hours per week`;
+                            memberDetails += `${member.averagePlaytime} hours per week (${member.weeklyPlaytime})`;
 
                             responseEmbed.addFields({
                                 name: `${member.contributionRank}. ${member.username} (${member.guildRank})`,
@@ -176,7 +176,7 @@ module.exports = {
                         memberDetails += `Joined ${utilities.getTimeSince(member.joinDate)} ago\n`;
                         memberDetails += `${member.localeContributed} XP (${utilities.getFormattedXPPerDay(member.contributed, member.joinDate)})\n`;
                         memberDetails += `${member.wars} war${member.wars !== 1 ? 's' : ''}\n`;
-                        memberDetails += `${member.averagePlaytime} hours per week`;
+                        memberDetails += `${member.averagePlaytime} hours per week (${member.weeklyPlaytime})`;
 
                         responseEmbed.addFields({
                             name: `${member.username} (${member.guildRank})`,

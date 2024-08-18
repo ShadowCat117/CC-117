@@ -1160,6 +1160,20 @@ async function getAveragePlaytime(player) {
     }
 }
 
+// Returns the amount of hours played in the current week for the requested player
+async function getWeeklyPlaytime(player) {
+    const row = await getAsync(
+        'SELECT weeklyPlaytime FROM players WHERE uuid = ?',
+        [player],
+    );
+
+    if (!row) {
+        return 0;
+    } else {
+        return row.weeklyPlaytime;
+    }
+}
+
 // Returns a list of TrackedGuild objects, for every guild passed in.
 async function getGuildActivities(guilds) {
     const trackedGuilds = [];
@@ -1559,6 +1573,7 @@ module.exports = {
     getRecentPlayers,
     getWars,
     getAveragePlaytime,
+    getWeeklyPlaytime,
     getGuildActivities,
     getGuildActivity,
     getAllPlayerInfo,

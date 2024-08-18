@@ -12,6 +12,7 @@ class GuildMember {
     // joinDate: When did they join the guild
     // wars: How many wars have they participated in
     // averagePlaytime: How many hours per week does the player play
+    // weeklyPlaytime: How many hours the players has played in the current week
     constructor(
         username,
         guildRank,
@@ -23,6 +24,7 @@ class GuildMember {
         joinDate,
         wars,
         averagePlaytime,
+        weeklyPlaytime,
     ) {
         // Temporary, remove if Wynn ever fixes the name changing guild bug
         if (username === 'Owen_Rocks_3') {
@@ -40,6 +42,7 @@ class GuildMember {
         this.joinDate = joinDate;
         this.wars = wars.toLocaleString();
         this.averagePlaytime = parseFloat(averagePlaytime.toFixed(2));
+        this.weeklyPlaytime = parseFloat(weeklyPlaytime.toFixed(2));
     }
 
     // Return a string of if the player is online and what world they are on or offline and time since last login
