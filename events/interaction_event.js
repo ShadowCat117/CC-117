@@ -872,18 +872,18 @@ module.exports = {
                             const embeds = [];
                             const row = new ActionRowBuilder();
 
-                            // Paginate if more than 20 members
-                            if (response.playerLastLogins.length > 20) {
+                            // Paginate if more than 16 members
+                            if (response.playerLastLogins.length > 16) {
                                 const pages = [];
                                 for (
                                     let i = 0;
                                     i < response.playerLastLogins.length;
-                                    i += 20
+                                    i += 16
                                 ) {
                                     pages.push(
                                         response.playerLastLogins.slice(
                                             i,
-                                            i + 20,
+                                            i + 16,
                                         ),
                                     );
                                 }
@@ -893,11 +893,13 @@ module.exports = {
                                         .setTitle(
                                             `[${response.guildPrefix}] ${response.guildName} Last Logins`,
                                         )
-                                        .setDescription('Players marked with a * are exempt from inactivity')
+                                        .setDescription(
+                                            'Players marked with a * are exempt from inactivity',
+                                        )
                                         .setColor(0x00ffff);
 
                                     let logins =
-                                        '```     Username    ┃    Rank    ┃ Last Login\n━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━\n';
+                                        '```     Username    ┃    Rank    ┃ Level ┃ Last Login\n━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━╋━━━━━━━━━━━━━━\n';
 
                                     for (const player of page) {
                                         let lastLoginValue;
@@ -911,7 +913,7 @@ module.exports = {
                                                 ) + ' ago';
                                         }
 
-                                        logins += `${player.username.padEnd(16)} ┃ ${player.guildRank.padEnd(10)} ┃ ${lastLoginValue}\n`;
+                                        logins += `${player.username.padEnd(16)} ┃ ${player.guildRank.padEnd(10)} ┃  ${player.highestCharacterLevel.toString().padEnd(3)}  ┃ ${lastLoginValue}\n`;
                                     }
 
                                     logins += '```';
@@ -948,12 +950,14 @@ module.exports = {
                                     .setTitle(
                                         `[${response.guildPrefix}] ${response.guildName} Last Logins`,
                                     )
-                                    .setDescription('Players marked with a * are exempt from inactivity')
+                                    .setDescription(
+                                        'Players marked with a * are exempt from inactivity',
+                                    )
                                     .setColor(0x00ffff);
 
                                 if (response.playerLastLogins.length > 0) {
                                     let logins =
-                                        '```     Username    ┃    Rank    ┃ Last Login\n━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━\n';
+                                        '```     Username    ┃    Rank    ┃ Level ┃ Last Login\n━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━╋━━━━━━━━━━━━━━\n';
 
                                     for (const player of response.playerLastLogins) {
                                         let lastLoginValue;
@@ -967,7 +971,7 @@ module.exports = {
                                                 ) + ' ago';
                                         }
 
-                                        logins += `${player.username.padEnd(16)} ┃ ${player.guildRank.padEnd(10)} ┃ ${lastLoginValue}\n`;
+                                        logins += `${player.username.padEnd(16)} ┃ ${player.guildRank.padEnd(10)} ┃  ${player.highestCharacterLevel.toString().padEnd(3)}  ┃ ${lastLoginValue}\n`;
                                     }
 
                                     logins += '```';
