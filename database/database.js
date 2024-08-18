@@ -917,7 +917,8 @@ async function getGuildMembers(guild) {
 // First call the API to update the list of guild members to ensure the database is up to date and then
 // return the information
 // guild: Guild UUID
-async function getLastLogins(guild) {
+// exemptUuids: List of players who are exempt from inactivity
+async function getLastLogins(guild, exemptUuids) {
     await utilities.waitForRateLimit();
 
     let response;
@@ -1029,12 +1030,17 @@ async function getLastLogins(guild) {
     const playerLastLogins = rows.map((row) => {
         const {
             uuid,
-            username,
             guildRank,
             online,
             lastLogin,
             highestCharacterLevel,
         } = row;
+
+        let username = row.username;
+
+        if (exemptUuids.includes(uuid)) {
+            username += '*';
+        }
 
         return new PlayerLastLogin(
             uuid,

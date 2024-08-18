@@ -96,11 +96,11 @@ module.exports = {
                     }
 
                     for (const page of pages) {
-                        const responseEmbed = new EmbedBuilder();
-                        responseEmbed
+                        const responseEmbed = new EmbedBuilder()
                             .setTitle(
                                 `[${response.guildPrefix}] ${response.guildName} Last Logins`,
                             )
+                            .setDescription('Players marked with a * are exempt from inactivity')
                             .setColor(0x00ffff);
 
                         let logins =
@@ -147,12 +147,11 @@ module.exports = {
 
                     row.addComponents(previousPage, nextPage);
                 } else {
-                    const responseEmbed = new EmbedBuilder();
-
-                    responseEmbed
+                    const responseEmbed = new EmbedBuilder()
                         .setTitle(
                             `[${response.guildPrefix}] ${response.guildName} Last Logins`,
                         )
+                        .setDescription('Players marked with a * are exempt from inactivity')
                         .setColor(0x00ffff);
 
                     if (response.playerLastLogins.length > 0) {
