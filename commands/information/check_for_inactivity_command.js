@@ -123,9 +123,11 @@ module.exports = {
         const newPlayerMinimumTime = config.newPlayerMinimumTime;
         const newPlayerThreshold = config.newPlayerThreshold;
         const memberThreshold = config.memberThreshold;
+        const averageActivityRequirement = config.averageActivityRequirement;
+        const memberActivityThreshold = config.memberActivityThreshold;
         const inactivityExceptions = config.inactivityExceptions;
 
-        const playerLastLogins = await database.getLastLogins(config.guild);
+        const playerLastLogins = await database.getLastLogins(config.guild, []);
 
         const exemptUuids = Object.keys(inactivityExceptions);
 
@@ -135,7 +137,7 @@ module.exports = {
 
         try {
             response = await axios.get(
-                `https://api.wynncraft.com/v3/guild/uuid/${config.guild}`,
+                `https://beta-api.wynncraft.com/v3/guild/uuid/${config.guild}`,
             );
         } catch (error) {
             responseEmbed
@@ -265,12 +267,28 @@ module.exports = {
                             inactivityThreshold = newPlayerThreshold;
                         }
 
+                        const averagePlaytime = await database.getAveragePlaytime(guildMember.uuid);
+                        const weeklyPlaytime = await database.getWeeklyPlaytime(guildMember.uuid);
+
                         if (daysSinceLastLogin > inactivityThreshold) {
                             inactiveMembers.push(
                                 new InactiveMember(
                                     member,
                                     rank,
                                     daysSinceLastLogin,
+                                    averagePlaytime,
+                                    weeklyPlaytime,
+                                    inactivityExceptions[guildMember.uuid],
+                                ),
+                            );
+                        } else if (daysInGuild >= memberActivityThreshold && averagePlaytime < averageActivityRequirement) {
+                            inactiveMembers.push(
+                                new InactiveMember(
+                                    member,
+                                    rank,
+                                    daysSinceLastLogin,
+                                    averagePlaytime,
+                                    weeklyPlaytime,
                                     inactivityExceptions[guildMember.uuid],
                                 ),
                             );
@@ -299,7 +317,7 @@ module.exports = {
                 pageEmbed
                     .setTitle(`${inactiveMembers.length} Inactive Players`)
                     .setDescription(
-                        `Chiefs are inactive after ${chiefThreshold} day${chiefThreshold !== 1 ? 's' : ''}.\nStrategists are inactive after ${strategistThreshold} day${strategistThreshold !== 1 ? 's' : ''}.\nCaptains are inactive after ${captainThreshold} day${captainThreshold !== 1 ? 's' : ''}.\nRecruiters are inactive after ${recruiterThreshold} day${recruiterThreshold !== 1 ? 's' : ''}.\nRecruits are inactive after ${recruitThreshold} day${recruitThreshold !== 1 ? 's' : ''}.\n\nThese values change based on if the average guild activity is above or below ${averageRequirement} player${averageRequirement !== 1 ? 's' : ''} or if less than ${memberThreshold}% of the member slots are used.\nIndividual players can have their threshold adjusted by having a character over level ${levelRequirement} for a ${extraTimeIncrease}% increase.\n\nPlayers in the guild for less than ${newPlayerMinimumTime} day${newPlayerMinimumTime !== 1 ? 's' : ''} get a threshold of ${newPlayerThreshold} day${newPlayerThreshold !== 1 ? 's' : ''}.`,
+                        `Chiefs are inactive after ${chiefThreshold} day${chiefThreshold !== 1 ? 's' : ''}.\nStrategists are inactive after ${strategistThreshold} day${strategistThreshold !== 1 ? 's' : ''}.\nCaptains are inactive after ${captainThreshold} day${captainThreshold !== 1 ? 's' : ''}.\nRecruiters are inactive after ${recruiterThreshold} day${recruiterThreshold !== 1 ? 's' : ''}.\nRecruits are inactive after ${recruitThreshold} day${recruitThreshold !== 1 ? 's' : ''}.\n\nPlayers who have been in the guild for more than ${memberActivityThreshold} day${memberActivityThreshold !== 1 ? 's' : ''} must have an average weekly playtime of at least ${averageActivityRequirement} hour${averageActivityRequirement !== 1 ? 's' : ''} to not be marked as inactive.\n\nThese values change based on if the average guild activity is above or below ${averageRequirement} player${averageRequirement !== 1 ? 's' : ''} or if less than ${memberThreshold}% of the member slots are used.\nIndividual players can have their threshold adjusted by having a character over level ${levelRequirement} for a ${extraTimeIncrease}% increase.\n\nPlayers in the guild for less than ${newPlayerMinimumTime} day${newPlayerMinimumTime !== 1 ? 's' : ''} get a threshold of ${newPlayerThreshold} day${newPlayerThreshold !== 1 ? 's' : ''}.`,
                     )
                     .setColor(0x00ffff);
 
@@ -314,7 +332,7 @@ module.exports = {
 
                     pageEmbed.addFields({
                         name: `${username}`,
-                        value: `${inactivePlayer.guildRank}\nInactive for ${inactivePlayer.daysSinceLastLogin} day${inactivePlayer.daysSinceLastLogin !== 1 ? 's' : ''}`,
+                        value: `${inactivePlayer.guildRank}\nInactive for ${inactivePlayer.daysSinceLastLogin} day${inactivePlayer.daysSinceLastLogin !== 1 ? 's' : ''}\nAverage weekly playtime: ${inactivePlayer.averagePlaytime} hour${inactivePlayer.averagePlaytime !== 1 ? 's' : ''}\nCurrent week playtime: ${inactivePlayer.weeklyPlaytime} hour${inactivePlayer.weeklyPlaytime !== 1 ? 's' : ''}`,
                     });
                 }
 
@@ -343,7 +361,7 @@ module.exports = {
             responseEmbed
                 .setTitle(`${inactiveMembers.length} Inactive players`)
                 .setDescription(
-                    `Chiefs are inactive after ${chiefThreshold} day${chiefThreshold !== 1 ? 's' : ''}.\nStrategists are inactive after ${strategistThreshold} day${strategistThreshold !== 1 ? 's' : ''}.\nCaptains are inactive after ${captainThreshold} day${captainThreshold !== 1 ? 's' : ''}.\nRecruiters are inactive after ${recruiterThreshold} day${recruiterThreshold !== 1 ? 's' : ''}.\nRecruits are inactive after ${recruitThreshold} day${recruitThreshold !== 1 ? 's' : ''}.\n\nThese values change based on if the average guild activity is above or below ${averageRequirement} player${averageRequirement !== 1 ? 's' : ''} or if less than ${memberThreshold}% of the member slots are used.\nIndividual players can have their threshold adjusted by having a character over level ${levelRequirement} for a ${extraTimeIncrease}% increase.\n\nPlayers in the guild for less than ${newPlayerMinimumTime} day${newPlayerMinimumTime !== 1 ? 's' : ''} get a threshold of ${newPlayerThreshold} day${newPlayerThreshold !== 1 ? 's' : ''}.`,
+                    `Chiefs are inactive after ${chiefThreshold} day${chiefThreshold !== 1 ? 's' : ''}.\nStrategists are inactive after ${strategistThreshold} day${strategistThreshold !== 1 ? 's' : ''}.\nCaptains are inactive after ${captainThreshold} day${captainThreshold !== 1 ? 's' : ''}.\nRecruiters are inactive after ${recruiterThreshold} day${recruiterThreshold !== 1 ? 's' : ''}.\nRecruits are inactive after ${recruitThreshold} day${recruitThreshold !== 1 ? 's' : ''}.\n\nPlayers who have been in the guild for more than ${memberActivityThreshold} day${memberActivityThreshold !== 1 ? 's' : ''} must have an average weekly playtime of at least ${averageActivityRequirement} hour${averageActivityRequirement !== 1 ? 's' : ''} to not be marked as inactive.\n\nThese values change based on if the average guild activity is above or below ${averageRequirement} player${averageRequirement !== 1 ? 's' : ''} or if less than ${memberThreshold}% of the member slots are used.\nIndividual players can have their threshold adjusted by having a character over level ${levelRequirement} for a ${extraTimeIncrease}% increase.\n\nPlayers in the guild for less than ${newPlayerMinimumTime} day${newPlayerMinimumTime !== 1 ? 's' : ''} get a threshold of ${newPlayerThreshold} day${newPlayerThreshold !== 1 ? 's' : ''}.`,
                 )
                 .setColor(0x00ffff);
 
@@ -358,7 +376,7 @@ module.exports = {
 
                 responseEmbed.addFields({
                     name: `${username}`,
-                    value: `${inactivePlayer.guildRank}\nInactive for ${inactivePlayer.daysSinceLastLogin} day${inactivePlayer.daysSinceLastLogin !== 1 ? 's' : ''}`,
+                    value: `${inactivePlayer.guildRank}\nInactive for ${inactivePlayer.daysSinceLastLogin} day${inactivePlayer.daysSinceLastLogin !== 1 ? 's' : ''}\nAverage weekly playtime: ${inactivePlayer.averagePlaytime} hour${inactivePlayer.averagePlaytime !== 1 ? 's' : ''}\nCurrent week playtime: ${inactivePlayer.weeklyPlaytime} hour${inactivePlayer.weeklyPlaytime !== 1 ? 's' : ''}`,
                 });
             }
 

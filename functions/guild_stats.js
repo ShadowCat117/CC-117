@@ -101,7 +101,9 @@ async function guildStats(interaction, force = false) {
             let averagePlaytime = await database.getAveragePlaytime(
                 guildMember.uuid,
             );
-            const weeklyPlaytime = await database.getWeeklyPlaytime(guildMember.uuid);
+            const weeklyPlaytime = await database.getWeeklyPlaytime(
+                guildMember.uuid,
+            );
 
             if (averagePlaytime === -1) {
                 averagePlaytime = 0;

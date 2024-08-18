@@ -1028,13 +1028,8 @@ async function getLastLogins(guild, exemptUuids) {
     );
 
     const playerLastLogins = rows.map((row) => {
-        const {
-            uuid,
-            guildRank,
-            online,
-            lastLogin,
-            highestCharacterLevel,
-        } = row;
+        const { uuid, guildRank, online, lastLogin, highestCharacterLevel } =
+            row;
 
         let username = row.username;
 

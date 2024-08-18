@@ -78,6 +78,14 @@ module.exports = {
                         value: 'memberThreshold',
                     },
                     {
+                        name: 'Average Activity Requirement',
+                        value: 'averageActivityRequirement'
+                    },
+                    {
+                        name: 'Member Activity Threshold',
+                        value: 'memberActivityThreshold'
+                    },
+                    {
                         name: 'War Level Requirement',
                         value: 'warLevelRequirement',
                     },
@@ -205,6 +213,8 @@ module.exports = {
                 case 'newPlayerMinimumTime':
                 case 'newPlayerThreshold':
                 case 'memberThreshold':
+                case 'averageActivityRequirement':
+                case 'memberActivityThreshold':
                 case 'warLevelRequirement':
                     config[option] = value;
                     break;

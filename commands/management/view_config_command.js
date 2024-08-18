@@ -523,6 +523,8 @@ module.exports = {
                     Extra Time % Increase: ${config['extraTimeIncrease']}
                     New Player Qualification: ${config['newPlayerMinimumTime']}
                     New Player Threshold: ${config['newPlayerThreshold']}
+                    Average Activity Requirement: ${config['averageActivityRequirement']}
+                    Member Activity Threshold: ${config['memberActivityThreshold']}
                     `,
                 );
 
