@@ -137,7 +137,7 @@ module.exports = {
 
         try {
             response = await axios.get(
-                `https://beta-api.wynncraft.com/v3/guild/uuid/${config.guild}`,
+                `https://api.wynncraft.com/v3/guild/uuid/${config.guild}`,
             );
         } catch (error) {
             responseEmbed
