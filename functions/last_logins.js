@@ -40,9 +40,7 @@ async function lastLogins(interaction, force = false) {
                 const config = JSON.parse(fileData);
 
                 const inactivityExceptions = config['inactivityExceptions'];
-                exemptUuids = Object.keys(inactivityExceptions).filter(
-                    (uuid) => inactivityExceptions[uuid] === -1,
-                );
+                exemptUuids = Object.keys(inactivityExceptions);
             } else {
                 await createConfig(interaction.client, guildId);
             }

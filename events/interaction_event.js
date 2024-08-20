@@ -894,7 +894,7 @@ module.exports = {
                                             `[${response.guildPrefix}] ${response.guildName} Last Logins`,
                                         )
                                         .setDescription(
-                                            'Players marked with a * are exempt from inactivity',
+                                            'Players marPlayers marked with a * have a custom inactivity thresholdrom inactivity',
                                         )
                                         .setColor(0x00ffff);
 
@@ -951,7 +951,7 @@ module.exports = {
                                         `[${response.guildPrefix}] ${response.guildName} Last Logins`,
                                     )
                                     .setDescription(
-                                        'Players marked with a * are exempt from inactivity',
+                                        'Players marPlayers marked with a * have a custom inactivity thresholdrom inactivity',
                                     )
                                     .setColor(0x00ffff);
 
