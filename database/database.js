@@ -19,8 +19,6 @@ const DAYS_OF_WEEK = [
 const priorityGuilds = [];
 const priorityPlayers = [];
 
-let pausePlayerUpdates = false;
-
 // Call run queries on the database with promises
 async function runAsync(query, params) {
     return new Promise((resolve, reject) => {
@@ -1375,39 +1373,51 @@ async function createDatabaseBackup(backupFilename) {
 async function runOnlinePlayerFunction() {
     await utilities.waitForRateLimit();
 
-    // If the player weekly activity is being updated, don't update the online players list
-    if (!pausePlayerUpdates) {
-        console.log('Updating online players');
+    console.log('Updating online players');
 
-        // Get all of the online players by UUID
-        let response;
+    // Get all of the online players by UUID
+    let response;
 
-        try {
-            response = await axios.get(
-                'https://api.wynncraft.com/v3/player?identifier=uuid',
-            );
-        } catch (error) {
-            console.error(error);
+    try {
+        response = await axios.get(
+            'https://api.wynncraft.com/v3/player?identifier=uuid',
+        );
+    } catch (error) {
+        console.error(error);
+    }
+
+    if (response) {
+        utilities.updateRateLimit(
+            response.headers['ratelimit-remaining'],
+            response.headers['ratelimit-reset'],
+        );
+
+        const onlinePlayers = response.data;
+
+        if (onlinePlayers) {
+            await handleOnlinePlayers(onlinePlayers.players);
         }
+    }
 
-        if (response) {
-            utilities.updateRateLimit(
-                response.headers['ratelimit-remaining'],
-                response.headers['ratelimit-reset'],
-            );
+    console.log('Updated online players');
 
-            const onlinePlayers = response.data;
+    let now = new Date();
 
-            if (onlinePlayers) {
-                await handleOnlinePlayers(onlinePlayers.players);
-            }
-        }
+    // Update weekly
+    if (
+        now.getUTCDay() === 1 &&
+        now.getUTCHours() === 0 &&
+        now.getUTCMinutes() === 0
+    ) {
+        console.log('Updating all player activity');
 
-        console.log('Updated online players');
+        await updatePlayerActivity();
+
+        console.log('Updated all player activity');
     }
 
     // Run the function every 10 seconds
-    const now = new Date();
+    now = new Date();
     const remainingSeconds = 10 - (now.getUTCSeconds() % 10);
 
     setTimeout(runOnlinePlayerFunction, remainingSeconds * 1000);
@@ -1497,34 +1507,6 @@ async function runUpdateFunctions() {
     setTimeout(runUpdateFunctions, secondsToNextMinute * 1000);
 }
 
-// Runs the update player activity function weekly
-async function runPlayerActivityFunction() {
-    let now = new Date();
-
-    // Update weekly
-    if (
-        now.getUTCDay() === 1 &&
-        now.getUTCHours() === 0 &&
-        now.getUTCMinutes() === 0
-    ) {
-        console.log('Updating all player activity');
-
-        pausePlayerUpdates = true;
-        await updatePlayerActivity();
-        pausePlayerUpdates = false;
-
-        console.log('Updated all player activity');
-    }
-
-    now = new Date();
-    const timeUntilNextHour =
-        (60 - now.getUTCMinutes()) * 60 * 1000 -
-        (now.getUTCSeconds() * 1000 + now.getUTCMilliseconds());
-
-    // Run this function again at the next hour
-    setTimeout(runPlayerActivityFunction, timeUntilNextHour);
-}
-
 // Setup the two tables
 async function setup() {
     // If the guilds table does not exist, create it
@@ -1558,7 +1540,6 @@ async function setup() {
 
     runOnlinePlayerFunction();
     runUpdateFunctions();
-    runPlayerActivityFunction();
 }
 
 module.exports = {
