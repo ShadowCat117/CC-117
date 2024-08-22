@@ -19,6 +19,8 @@ const DAYS_OF_WEEK = [
 const priorityGuilds = [];
 const priorityPlayers = [];
 
+let updatedPlayerActivity = false;
+
 // Call run queries on the database with promises
 async function runAsync(query, params) {
     return new Promise((resolve, reject) => {
@@ -1403,15 +1405,27 @@ async function runOnlinePlayerFunction() {
 
     let now = new Date();
 
+    if (
+        updatedPlayerActivity &&
+        now.getUTCDay() !== 1 &&
+        now.getUTCHours() !== 0 &&
+        now.getUTCMinutes() !== 0
+    ) {
+        updatedPlayerActivity = false;
+    }
+
     // Update weekly
     if (
         now.getUTCDay() === 1 &&
         now.getUTCHours() === 0 &&
-        now.getUTCMinutes() === 0
+        now.getUTCMinutes() === 0 &&
+        !updatedPlayerActivity
     ) {
         console.log('Updating all player activity');
 
         await updatePlayerActivity();
+
+        updatedPlayerActivity = true;
 
         console.log('Updated all player activity');
     }
