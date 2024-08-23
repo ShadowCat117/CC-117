@@ -14,8 +14,9 @@ module.exports = {
 
         const responseEmbed = new EmbedBuilder()
             .setTitle('CC-117 Help')
+            .setURL('https://github.com/ShadowCat117/CC-117/wiki')
             .setDescription(
-                "Manual has not been updated for the new version, just message <@237296939245240330> if you need help until it's done.",
+                "Visit the CC-117 wiki page via the above link for any assistance with the bot.",
             )
             .setColor(0x00ffff);
 
