@@ -2,11 +2,9 @@
 
 This is a Discord bot primarily focused around guild management for Wynncraft but also displays helpful information such as active hours for other guilds and basic stats about them and their members.
 
-## Commands
+## How to use
 
-The bot currently features 48 commands.
-
-TODO
+The [wiki](https://github.com/ShadowCat117/CC-117/wiki) contains all the information needed to run the bot including a [quick start guide](https://github.com/ShadowCat117/CC-117/wiki/Quick-Start), a [list of features](https://github.com/ShadowCat117/CC-117/wiki/Features), all of the [available commands](https://github.com/ShadowCat117/CC-117/wiki/Available-Commands) and some [extra details on certain configs](https://github.com/ShadowCat117/CC-117/wiki/Configs)
 
 ## Database
 
