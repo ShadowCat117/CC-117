@@ -3,7 +3,7 @@ const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('help')
-        .setDescription('Sends a link to the bot manual.'),
+        .setDescription('Sends a link to the CC-117 wiki.'),
     ephemeral: true,
     async execute(interaction) {
         const loadingEmbed = new EmbedBuilder()
@@ -16,7 +16,7 @@ module.exports = {
             .setTitle('CC-117 Help')
             .setURL('https://github.com/ShadowCat117/CC-117/wiki')
             .setDescription(
-                "Visit the CC-117 wiki page via the above link for any assistance with the bot.",
+                "Click the above title to visit the CC-117 wiki.",
             )
             .setColor(0x00ffff);
 
