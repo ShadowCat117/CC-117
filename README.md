@@ -4,7 +4,10 @@ This is a Discord bot primarily focused around guild management for Wynncraft bu
 
 ## How to use
 
-The [wiki](https://github.com/ShadowCat117/CC-117/wiki) contains all the information needed to run the bot including a [quick start guide](https://github.com/ShadowCat117/CC-117/wiki/Quick-Start), a [list of features](https://github.com/ShadowCat117/CC-117/wiki/Features), all of the [available commands](https://github.com/ShadowCat117/CC-117/wiki/Available-Commands) and some [extra details on certain configs](https://github.com/ShadowCat117/CC-117/wiki/Configs)
+[Invite the bot to your server](https://discord.com/oauth2/authorize?client_id=1061055822425247854).
+
+
+The [wiki](https://github.com/ShadowCat117/CC-117/wiki) contains all the information needed to run the bot including a [quick start guide](https://github.com/ShadowCat117/CC-117/wiki/Quick-Start), a [list of features](https://github.com/ShadowCat117/CC-117/wiki/Features), all of the [available commands](https://github.com/ShadowCat117/CC-117/wiki/Available-Commands) and some [extra details on certain configs](https://github.com/ShadowCat117/CC-117/wiki/Configs).
 
 ## Database
 
