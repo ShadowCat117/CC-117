@@ -184,7 +184,9 @@ async function findPlayer(input, force, guildUuid) {
             for (const row of players) {
                 const guildQuery = 'SELECT name FROM guilds WHERE uuid = ?';
                 const guild = await getAsync(guildQuery, [row.guildUuid]);
-                playerGuildNames.push(guild.name);
+                if (guild) {
+                    playerGuildNames.push(guild.name);
+                }
             }
 
             return {
