@@ -38,6 +38,7 @@ const unbanPlayer = require('../functions/unban_player');
 const messages = require('../functions/messages');
 const database = require('../database/database');
 const playerBanner = require('../functions/player_banner');
+const playerStats = require('../functions/player_stats');
 
 const warriorArchetypes = ['fallen', 'battleMonk', 'paladin'];
 const mageArchetypes = ['riftwalker', 'lightBender', 'arcanist'];
@@ -1358,6 +1359,54 @@ module.exports = {
                                     embeds: [responseEmbed],
                                 });
                             }
+
+                            break;
+                        }
+                        case 'player_stats': {
+                            const loadingEmbed = new EmbedBuilder()
+                                .setDescription(
+                                    'Fetching stats for selected player',
+                                )
+                                .setColor(0x00ff00);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [loadingEmbed],
+                            });
+
+                            const response = await playerStats(
+                                interaction,
+                                true,
+                            );
+
+                            const responseEmbed = new EmbedBuilder()
+                                .setTitle(`${response.username}'${response.username.endsWith('s') ? '' : 's'} Stats`)
+                                .setColor(0x00ffff)
+                                .setThumbnail(
+                                    `https://vzge.me/bust/512/${response.uuid}.png`,
+                                )
+
+                            let description = `Rank: ${response.supportRank}\n`;
+                            description += `Last Seen: ${response.lastSeen}\n`;
+                            description += `Wars: ${response.wars}\n`;
+                            description += `Total Level: ${response.totalLevel}\n`;
+                            description += `Total Playtime: ${response.totalPlaytime}\n`;
+                            description += `Average Weekly Playtime: ${response.weeklyPlaytime}\n`;
+                            description += `Current Week Playtime: ${response.currentWeekPlaytime}\n\n`;
+
+                            if (response.guild) {
+                                description += `${response.guild}\n`
+                                description += `Rank: ${response.guildRank}\n`;
+                                description += `Contribution Rank: ${response.contributionPosition}\n`;
+                                description += `Contributed: ${response.contributedXp} XP\n`;
+                                description += `Member for: ${response.timeInGuild}`;
+                            } else {
+                                description += 'No guild';
+                            }
+
+                            responseEmbed.setDescription(description);
+
+                            await interaction.editReply({ embeds: [responseEmbed] });
 
                             break;
                         }
