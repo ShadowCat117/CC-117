@@ -945,7 +945,7 @@ async function applyRoles(guild, member, playerInfo) {
                         console.error(ex);
                         errors.push(`Failed to remove ${member}'s nickname.`);
                     }
-                } else if (!validNickname) {
+                } else if (!validNickname && !validGlobalName) {
                     try {
                         await member.setNickname(nickname);
                         updates.push(`Changed nickname to ${nickname}.`);
