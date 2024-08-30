@@ -937,7 +937,15 @@ async function applyRoles(guild, member, playerInfo) {
                 const validGlobalName = member.user.globalName === nickname;
                 const validNickname = member.nickname === nickname;
 
-                if (!validGlobalName && !validNickname) {
+                if (validGlobalName) {
+                    try {
+                        await member.setNickname(null);
+                        updates.push('Removed nickname');
+                    } catch (ex) {
+                        console.error(ex);
+                        errors.push(`Failed to remove ${member}'s nickname.`);
+                    }
+                } else if (!validNickname) {
                     try {
                         await member.setNickname(nickname);
                         updates.push(`Changed nickname to ${nickname}.`);
