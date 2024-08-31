@@ -146,7 +146,7 @@ async function playerStats(interaction, force = false) {
         uuid: playerJson.uuid,
         username: playerJson.username,
         guildUuid: guildUuid,
-        guildRank: guildRank,
+        guildRank: guildRank.toLocaleLowerCase(),
         online: playerJson.online,
         lastLogin: playerJson.lastJoin,
         supportRank: playerJson.supportRank,
