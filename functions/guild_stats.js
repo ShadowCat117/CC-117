@@ -62,7 +62,7 @@ async function guildStats(interaction, force = false) {
     const level = guildJson.level;
     const xpPercent = guildJson.xpPercent;
     const territories = guildJson.territories;
-    const wars = guildJson.wars.toLocaleString();
+    const wars = guildJson.wars ? guildJson.wars.toLocaleString() : 0;
     let previousRating = -1;
     let currentRating = -1;
 
