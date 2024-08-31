@@ -267,8 +267,11 @@ module.exports = {
                             inactivityThreshold = newPlayerThreshold;
                         }
 
-                        const averagePlaytime = await database.getAveragePlaytime(guildMember.uuid);
-                        const weeklyPlaytime = await database.getWeeklyPlaytime(guildMember.uuid);
+                        const averagePlaytime =
+                            await database.getAveragePlaytime(guildMember.uuid);
+                        const weeklyPlaytime = await database.getWeeklyPlaytime(
+                            guildMember.uuid,
+                        );
 
                         if (daysSinceLastLogin > inactivityThreshold) {
                             inactiveMembers.push(
@@ -281,7 +284,10 @@ module.exports = {
                                     inactivityExceptions[guildMember.uuid],
                                 ),
                             );
-                        } else if (daysInGuild >= memberActivityThreshold && averagePlaytime < averageActivityRequirement) {
+                        } else if (
+                            daysInGuild >= memberActivityThreshold &&
+                            averagePlaytime < averageActivityRequirement
+                        ) {
                             inactiveMembers.push(
                                 new InactiveMember(
                                     member,

@@ -14,9 +14,11 @@ module.exports = {
 
         const responseEmbed = new EmbedBuilder()
             .setTitle('CC-117 Invite')
-            .setURL('https://discord.com/oauth2/authorize?client_id=1061055822425247854')
+            .setURL(
+                'https://discord.com/oauth2/authorize?client_id=1061055822425247854',
+            )
             .setDescription(
-                "Click the title above to invite CC-117 to your Discord server.",
+                'Click the title above to invite CC-117 to your Discord server.',
             )
             .setColor(0x00ffff);
 

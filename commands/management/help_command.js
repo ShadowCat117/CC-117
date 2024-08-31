@@ -15,9 +15,7 @@ module.exports = {
         const responseEmbed = new EmbedBuilder()
             .setTitle('CC-117 Help')
             .setURL('https://github.com/ShadowCat117/CC-117/wiki')
-            .setDescription(
-                "Click the above title to visit the CC-117 wiki.",
-            )
+            .setDescription('Click the above title to visit the CC-117 wiki.')
             .setColor(0x00ffff);
 
         await interaction.editReply({ embeds: [responseEmbed] });

@@ -79,11 +79,11 @@ module.exports = {
                     },
                     {
                         name: 'Average Activity Requirement',
-                        value: 'averageActivityRequirement'
+                        value: 'averageActivityRequirement',
                     },
                     {
                         name: 'Member Activity Threshold',
-                        value: 'memberActivityThreshold'
+                        value: 'memberActivityThreshold',
                     },
                     {
                         name: 'War Level Requirement',

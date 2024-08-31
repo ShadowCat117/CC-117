@@ -98,25 +98,28 @@ async function playerStats(interaction, force = false) {
                 response.headers['ratelimit-remaining'],
                 response.headers['ratelimit-reset'],
             );
-    
+
             const guildJson = response.data;
-    
+
             if (guildJson && guildJson.name) {
                 guild = `[${playerJson.guild.prefix}] ${playerJson.guild.name} Lvl ${guildJson.level}`;
 
                 for (const rank in guildJson.members) {
                     if (rank === 'total') continue;
-        
+
                     const rankMembers = guildJson.members[rank];
-        
+
                     for (const member in rankMembers) {
                         const guildMember = rankMembers[member];
 
                         if (member === playerJson.uuid) {
                             guildRank = `${rank.charAt(0).toUpperCase()}${rank.slice(1).toLowerCase()}`;
                             contributionPosition = guildMember.contributionRank;
-                            contributedXp = guildMember.contributed.toLocaleString();
-                            timeInGuild = utilities.getTimeSince(guildMember.joined);
+                            contributedXp =
+                                guildMember.contributed.toLocaleString();
+                            timeInGuild = utilities.getTimeSince(
+                                guildMember.joined,
+                            );
                             break;
                         }
                     }
@@ -187,8 +190,12 @@ async function playerStats(interaction, force = false) {
     }
 
     const totalPlaytime = `${playerJson.playtime} hours`;
-    const weeklyPlaytimeCount = await database.getAveragePlaytime(playerJson.uuid);
-    const currentWeekPlaytimeCount = await database.getWeeklyPlaytime(playerJson.uuid);
+    const weeklyPlaytimeCount = await database.getAveragePlaytime(
+        playerJson.uuid,
+    );
+    const currentWeekPlaytimeCount = await database.getWeeklyPlaytime(
+        playerJson.uuid,
+    );
     const weeklyPlaytime = `${weeklyPlaytimeCount.toFixed(2)} hours`;
     const currentWeekPlaytime = `${currentWeekPlaytimeCount.toFixed(2)} hours`;
 

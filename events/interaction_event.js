@@ -1380,11 +1380,13 @@ module.exports = {
                             );
 
                             const responseEmbed = new EmbedBuilder()
-                                .setTitle(`${response.username}'${response.username.endsWith('s') ? '' : 's'} Stats`)
+                                .setTitle(
+                                    `${response.username}'${response.username.endsWith('s') ? '' : 's'} Stats`,
+                                )
                                 .setColor(0x00ffff)
                                 .setThumbnail(
                                     `https://vzge.me/bust/512/${response.uuid}.png`,
-                                )
+                                );
 
                             let description = `Rank: ${response.supportRank}\n`;
                             description += `Last Seen: ${response.lastSeen}\n`;
@@ -1395,7 +1397,7 @@ module.exports = {
                             description += `Current Week Playtime: ${response.currentWeekPlaytime}\n\n`;
 
                             if (response.guild) {
-                                description += `${response.guild}\n`
+                                description += `${response.guild}\n`;
                                 description += `Rank: ${response.guildRank}\n`;
                                 description += `Contribution Rank: ${response.contributionPosition}\n`;
                                 description += `Contributed: ${response.contributedXp} XP\n`;
@@ -1406,7 +1408,9 @@ module.exports = {
 
                             responseEmbed.setDescription(description);
 
-                            await interaction.editReply({ embeds: [responseEmbed] });
+                            await interaction.editReply({
+                                embeds: [responseEmbed],
+                            });
 
                             break;
                         }

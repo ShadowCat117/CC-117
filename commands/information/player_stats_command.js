@@ -14,9 +14,7 @@ module.exports = {
         .addStringOption((option) =>
             option
                 .setName('username')
-                .setDescription(
-                    'The name of who you want to see stats for.',
-                )
+                .setDescription('The name of who you want to see stats for.')
                 .setRequired(true),
         ),
     ephemeral: false,
@@ -98,11 +96,13 @@ module.exports = {
                 await interaction.editReply({ embeds: [responseEmbed] });
             } else {
                 const responseEmbed = new EmbedBuilder()
-                    .setTitle(`${response.username}'${response.username.endsWith('s') ? '' : 's'} Stats`)
+                    .setTitle(
+                        `${response.username}'${response.username.endsWith('s') ? '' : 's'} Stats`,
+                    )
                     .setColor(0x00ffff)
                     .setThumbnail(
                         `https://vzge.me/bust/512/${response.uuid}.png`,
-                    )
+                    );
 
                 let description = `Rank: ${response.supportRank}\n`;
                 description += `Last Seen: ${response.lastSeen}\n`;
@@ -113,7 +113,7 @@ module.exports = {
                 description += `Current Week Playtime: ${response.currentWeekPlaytime}\n\n`;
 
                 if (response.guild) {
-                    description += `${response.guild}\n`
+                    description += `${response.guild}\n`;
                     description += `Rank: ${response.guildRank}\n`;
                     description += `Contribution Rank: ${response.contributionPosition}\n`;
                     description += `Contributed: ${response.contributedXp} XP\n`;
