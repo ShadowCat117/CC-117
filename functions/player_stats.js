@@ -149,7 +149,7 @@ async function playerStats(interaction, force = false) {
         uuid: playerJson.uuid,
         username: playerJson.username,
         guildUuid: guildUuid,
-        guildRank: guildRank.toLocaleLowerCase(),
+        guildRank: guildRank ? guildRank.toLocaleLowerCase() : null,
         online: playerJson.online,
         lastLogin: playerJson.lastJoin,
         supportRank: playerJson.supportRank,
