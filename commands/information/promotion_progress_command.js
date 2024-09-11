@@ -309,7 +309,7 @@ module.exports = {
                                         requirement.current === 1 ? '🟢' : '🔴';
                                     responseEmbed.addFields({
                                         name: `${requirementColour} Eco`,
-                                        value: `${requirement.current === 1 ? 'Knows/is learning eco' : 'Does not know/is not not learning eco'}`,
+                                        value: `${requirement.current === 1 ? 'Knows/is learning eco' : 'Does not know/is not learning eco'}`,
                                     });
                                     break;
                                 default:
