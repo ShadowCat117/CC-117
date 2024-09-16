@@ -348,22 +348,23 @@ async function promotionProgress(interaction, force = false) {
             };
         }
 
-        // Add one extra for the forced time requirement
-        requirementsCount += 1;
+        let forcedRequirementsCount;
 
-        // If the verified requirement is enabled then add an extra
         if (verifiedRequirement) {
-            requirementsCount += 1;
+            forcedRequirementsCount = 2;
+        } else {
+            forcedRequirementsCount = 1;
         }
 
+        let metForcedRequirements = 0;
         let metRequirements = 0;
 
         if (daysInGuild >= timeRequirement) {
-            metRequirements++;
+            metForcedRequirements++;
         }
 
         if (verifiedRequirement && hasVerifiedRole) {
-            metRequirements++;
+            metForcedRequirements++;
         }
 
         const requirements = [];
@@ -485,7 +486,9 @@ async function promotionProgress(interaction, force = false) {
             username: playerJson.username,
             guildRank: guildRank.charAt(0).toUpperCase() + guildRank.slice(1),
             nextGuildRank: nextGuildRank,
+            forcedRequirementsCount: forcedRequirementsCount,
             requirementsCount: requirementsCount,
+            metForcedRequirements: metForcedRequirements,
             metRequirements: metRequirements,
             daysInGuild: daysInGuild,
             verifiedRequirement: verifiedRequirement,

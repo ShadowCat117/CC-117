@@ -213,19 +213,14 @@ module.exports = {
                         // Able to promote
                         responseEmbed
                             .setTitle(
-                                `${response.guildRank} ${response.username.replaceAll('_', '\\_')} has ${response.metRequirements}/${response.requirementsCount} requirements for ${response.nextGuildRank}`,
+                                `${response.guildRank} ${response.username.replaceAll('_', '\\_')} has ${response.metForcedRequirements}/${response.forcedRequirementsCount} mandatory requirements and ${response.metRequirements}/${response.requirementsCount} optional requirements for ${response.nextGuildRank}`,
                             )
                             .setColor(0x00ffff);
 
-                        let description =
-                            'First Days in Guild is required, anything else is optional as long as you meet the requirement.';
-
-                        if (response.verifiedRequirement) {
-                            description +=
-                                '\nYou must also be verified in this server to recieve this promotion.';
-                        }
-
-                        responseEmbed.setDescription(description);
+                        responseEmbed.addFields({
+                            name: 'Mandatory Requirements',
+                            value: 'You must meet these to be eligible for this promotion.',
+                        });
 
                         const daysInGuildColour =
                             response.daysInGuild >= response.timeRequirement
@@ -247,6 +242,11 @@ module.exports = {
                                 value: `${response.hasVerifiedRole ? 'Is verified' : 'Is not verified'}`,
                             });
                         }
+
+                        responseEmbed.addFields({
+                            name: 'Optional Requirements',
+                            value: `You must meet ${response.requirementsCount} of these to be eligible for this promotion.`,
+                        });
 
                         for (const requirement of response.requirements) {
                             let requirementColour =
