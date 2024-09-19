@@ -88,7 +88,7 @@ module.exports = {
         const alreadyVerified = await utilities.checkValidUsername(
             interaction.member,
             interaction.guild,
-            username,
+            interaction.options.getString('username'),
         );
 
         // If someone already has the nickname they want, let them know
