@@ -940,7 +940,7 @@ async function applyRoles(guild, member, playerInfo) {
                 if (validGlobalName && member.nickname) {
                     try {
                         await member.setNickname(null);
-                        updates.push('Removed nickname');
+                        updates.push(`Removed nickname (${member.nickname.replaceAll('_', '\\_')})`);
                     } catch (ex) {
                         console.error(ex);
                         errors.push(`Failed to remove ${member}'s nickname.`);
@@ -948,11 +948,11 @@ async function applyRoles(guild, member, playerInfo) {
                 } else if (!validNickname && !validGlobalName) {
                     try {
                         await member.setNickname(nickname);
-                        updates.push(`Changed nickname to ${nickname}.`);
+                        updates.push(`Changed nickname from ${member.nickname.replaceAll('_', '\\_')} to ${nickname.replaceAll('_', '\\_')}.`);
                     } catch (ex) {
                         console.error(ex);
                         errors.push(
-                            `Failed to change ${member}'s nickname to ${nickname}.`,
+                            `Failed to change ${member}'s nickname to ${nickname.replaceAll('_', '\\_')}.`,
                         );
                     }
                 }

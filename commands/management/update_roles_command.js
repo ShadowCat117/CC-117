@@ -165,7 +165,7 @@ module.exports = {
                     }
 
                     responseEmbed.addFields({
-                        name: `${name}`,
+                        name: `${name.replaceAll('_', '\\_')}`,
                         value: `${appliedChanges}`,
                     });
                 }
@@ -215,7 +215,7 @@ module.exports = {
                 }
 
                 responseEmbed.addFields({
-                    name: `${name}`,
+                    name: `${name.replaceAll('_', '\\_')}`,
                     value: `${appliedChanges}`,
                 });
             }

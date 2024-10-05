@@ -95,7 +95,7 @@ async function hourlyTasks() {
                                     }
 
                                     responseEmbed.addFields({
-                                        name: `${name}`,
+                                        name: `${name.replaceAll('_', '\\_')}`,
                                         value: `${appliedChanges}`,
                                     });
                                 }
@@ -143,7 +143,7 @@ async function hourlyTasks() {
                                 }
 
                                 responseEmbed.addFields({
-                                    name: `${name}`,
+                                    name: `${name.replaceAll('_', '\\_')}`,
                                     value: `${appliedChanges}`,
                                 });
                             }
