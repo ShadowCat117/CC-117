@@ -219,7 +219,7 @@ async function handleOnlinePlayers(onlinePlayers) {
             );
 
             if (existingPlayer) {
-                const sessionStart = existingPlayer.online
+                const sessionStart = existingPlayer.online && existingPlayer.sessionStart
                     ? existingPlayer.sessionStart
                     : now.toISOString();
                 // Update existing player, set online to true and lastLogin to current date
@@ -666,19 +666,15 @@ async function updatePriorityPlayers() {
             );
 
             if (existingPlayer) {
-                const online = existingPlayer.online
-                    ? existingPlayer.online
-                    : false;
                 const lastLogin = existingPlayer.lastLogin
                     ? existingPlayer.lastLogin
                     : playerJson.lastJoin;
                 await runAsync(
-                    'UPDATE players SET username = ?, guildUuid = ?, guildRank = ?, online = ?, lastLogin = ?, supportRank = ?, veteran = ?, serverRank = ?, wars = ?, highestCharacterLevel = ? WHERE uuid = ?',
+                    'UPDATE players SET username = ?, guildUuid = ?, guildRank = ?, lastLogin = ?, supportRank = ?, veteran = ?, serverRank = ?, wars = ?, highestCharacterLevel = ? WHERE uuid = ?',
                     [
                         playerJson.username,
                         guildUuid,
                         guildRank,
-                        online,
                         lastLogin,
                         playerJson.supportRank,
                         veteran,
@@ -805,20 +801,16 @@ async function updatePlayer(player) {
     );
 
     if (existingPlayer) {
-        const online = existingPlayer.online
-            ? existingPlayer.online
-            : player.online;
         const lastLogin = existingPlayer.lastLogin
             ? existingPlayer.lastLogin
             : player.lastJoin;
 
         await runAsync(
-            'UPDATE players SET username = ?, guildUuid = ?, guildRank = ?, online = ?, lastLogin = ?, supportRank = ?, veteran = ?, serverRank = ?, wars = ?, highestCharacterLevel = ? WHERE uuid = ?',
+            'UPDATE players SET username = ?, guildUuid = ?, guildRank = ?, lastLogin = ?, supportRank = ?, veteran = ?, serverRank = ?, wars = ?, highestCharacterLevel = ? WHERE uuid = ?',
             [
                 player.username,
                 player.guildUuid,
                 player.guildRank,
-                online,
                 lastLogin,
                 player.supportRank,
                 player.veteran,
