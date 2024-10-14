@@ -5,6 +5,7 @@ const {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
+    time,
 } = require('discord.js');
 const updateRoles = require('../functions/update_roles');
 const database = require('../database/database');
@@ -22,7 +23,7 @@ async function hourlyTasks() {
     if (now.getUTCMinutes() == 0) {
         // Update members of each server the bot is in
         for (const guild of client.guilds.cache.values()) {
-            await guild.members.fetch();
+            await guild.members.fetch({ time: 6000 });
         }
 
         // Remove buttons from old message buttons.
@@ -353,7 +354,7 @@ module.exports = {
 
         // Update members of each server the bot is in
         for (const guild of client.guilds.cache.values()) {
-            await guild.members.fetch();
+            await guild.members.fetch({ time: 6000 });
         }
 
         // Calculate time to run first hourly task at
