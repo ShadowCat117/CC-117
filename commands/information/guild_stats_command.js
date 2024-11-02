@@ -179,7 +179,7 @@ module.exports = {
                         memberDetails += `${member.averagePlaytime} hours per week (${member.weeklyPlaytime})`;
 
                         responseEmbed.addFields({
-                            name: `${member.username} (${member.guildRank})`,
+                            name: `${member.contributionRank}. ${member.username} (${member.guildRank})`,
                             value: `${memberDetails}`,
                         });
                     }
