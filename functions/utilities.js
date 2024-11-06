@@ -1,6 +1,6 @@
 const GuildMemberSlots = require('../values/GuildMemberSlots');
 
-const RATE_LIMIT = 180;
+const RATE_LIMIT = 120;
 let remainingRateLimit = RATE_LIMIT;
 let rateLimitReset;
 
