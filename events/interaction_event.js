@@ -3972,19 +3972,9 @@ module.exports = {
                 }
             } catch (err) {
                 console.log(err);
-                await interaction.editReply({
-                    content: 'Bad interaction :(',
-                    components: [],
-                    embeds: [],
-                });
             }
         } catch (err) {
             console.error('Failed to read config file', err);
-            await interaction.editReply({
-                content: 'Bad interaction :(',
-                components: [],
-                embeds: [],
-            });
         }
     },
 };
