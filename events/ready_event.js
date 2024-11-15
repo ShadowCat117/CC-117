@@ -355,6 +355,11 @@ module.exports = {
         // Update members of each server the bot is in
         for (const guild of client.guilds.cache.values()) {
             await guild.members.fetch({ time: 6000 });
+
+            const guildOwner = await guild.fetchOwner();
+            console.log(
+                `I am in the server ${guild} owned by ${guildOwner.user.username}`,
+            );
         }
 
         // Calculate time to run first hourly task at

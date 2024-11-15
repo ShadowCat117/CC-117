@@ -18,13 +18,7 @@ class PlayerInfo {
         serverRank,
         highestCharacterLevel,
     ) {
-        // Temporary, remove if Wynn ever fixes the name changing guild bug
-        if (username === 'Owen_Rocks_3') {
-            this.username = 'Amber_Rocks_3';
-        } else {
-            this.username = username;
-        }
-
+        this.username = username;
         this.guildUuid = guildUuid;
         this.guildPrefix = guildPrefix;
         this.guildRank = guildRank;

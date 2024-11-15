@@ -15,13 +15,7 @@ class PlayerLastLogin {
         highestCharacterLevel,
     ) {
         this.uuid = uuid;
-
-        // Temporary, remove if Wynn ever fixes the name changing guild bug
-        if (username === 'Owen_Rocks_3') {
-            this.username = 'Amber_Rocks_3';
-        } else {
-            this.username = username;
-        }
+        this.username = username;
 
         // Capitalise the first letter as the database stores full lower case
         this.guildRank = guildRank.charAt(0).toUpperCase() + guildRank.slice(1);

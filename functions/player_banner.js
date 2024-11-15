@@ -151,14 +151,7 @@ async function playerBanner(interaction, force = false) {
     context.fillStyle = '#ffffff';
     context.textAlign = 'center';
 
-    // Temporary, remove if Wynn ever fixes the name changing guild bug
-    let username = playerJson.username;
-
-    if (username === 'Owen_Rocks_3') {
-        username = 'Amber_Rocks_3';
-    }
-
-    context.fillText(`${username}`, 200, 250);
+    context.fillText(`${playerJson.username}`, 200, 250);
 
     let guildText = 'Guildless';
 

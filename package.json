@@ -1,29 +1,29 @@
 {
-  "name": "cc-117",
-  "version": "2.0.0",
-  "description": "This is a Discord bot primarily focused around guild management for Wynncraft but also displays helpful information such as active hours for other guilds and basic stats about them and their members.",
-  "main": "index.js",
-  "scripts": {
-    "format": "prettier --write \"commands/**/*.js\" \"database/**/*.js\" \"events/**/*.js\" \"functions/**/*.js\" \"message_objects/**/*.js\" \"values/**/*.js\""
-  },
-  "keywords": [],
-  "author": "Jamie Callan (ShadowCat117)",
-  "license": "MIT",
-  "dependencies": {
-    "@napi-rs/canvas": "^0.1.53",
-    "axios": "^1.6.2",
-    "discord.js": "^14.15.3",
-    "husky": "^9.1.2",
-    "pretty-quick": "^4.0.0",
-    "sqlite3": "^5.1.6"
-  },
-  "devDependencies": {
-    "eslint": "^8.41.0",
-    "prettier": "^3.3.2"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "pretty-quick --staged"
+    "name": "cc-117",
+    "version": "2.0.0",
+    "description": "This is a Discord bot primarily focused around guild management for Wynncraft but also displays helpful information such as active hours for other guilds and basic stats about them and their members.",
+    "main": "index.js",
+    "scripts": {
+        "format": "prettier --write \"commands/**/*.js\" \"database/**/*.js\" \"events/**/*.js\" \"functions/**/*.js\" \"message_objects/**/*.js\" \"values/**/*.js\""
+    },
+    "keywords": [],
+    "author": "Jamie Callan (ShadowCat117)",
+    "license": "MIT",
+    "dependencies": {
+        "@napi-rs/canvas": "^0.1.53",
+        "axios": "^1.6.2",
+        "discord.js": "^14.15.3",
+        "husky": "^9.1.2",
+        "pretty-quick": "^4.0.0",
+        "sqlite3": "^5.1.6"
+    },
+    "devDependencies": {
+        "eslint": "^8.41.0",
+        "prettier": "^3.3.2"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "pretty-quick --staged"
+        }
     }
-  }
 }

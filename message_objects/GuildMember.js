@@ -26,12 +26,7 @@ class GuildMember {
         averagePlaytime,
         weeklyPlaytime,
     ) {
-        // Temporary, remove if Wynn ever fixes the name changing guild bug
-        if (username === 'Owen_Rocks_3') {
-            this.username = 'Amber\\_Rocks\\_3';
-        } else {
-            this.username = username.replaceAll('_', '\\_');
-        }
+        this.username = username.replaceAll('_', '\\_');
         this.guildRank = guildRank.charAt(0).toUpperCase() + guildRank.slice(1);
         this.lastLogin = lastJoin;
         this.online = online;

@@ -219,9 +219,10 @@ async function handleOnlinePlayers(onlinePlayers) {
             );
 
             if (existingPlayer) {
-                const sessionStart = existingPlayer.online && existingPlayer.sessionStart
-                    ? existingPlayer.sessionStart
-                    : now.toISOString();
+                const sessionStart =
+                    existingPlayer.online && existingPlayer.sessionStart
+                        ? existingPlayer.sessionStart
+                        : now.toISOString();
                 // Update existing player, set online to true and lastLogin to current date
                 await runAsync(
                     'UPDATE players SET online = true, lastLogin = ?, sessionStart = ? WHERE uuid = ?',

@@ -941,7 +941,9 @@ async function applyRoles(guild, member, playerInfo) {
                     try {
                         let originalNickname = member.nickname;
                         await member.setNickname(null);
-                        updates.push(`Removed nickname (${originalNickname.replaceAll('_', '\\_')})`);
+                        updates.push(
+                            `Removed nickname (${originalNickname.replaceAll('_', '\\_')})`,
+                        );
                     } catch (ex) {
                         console.error(ex);
                         errors.push(`Failed to remove ${member}'s nickname.`);
@@ -952,9 +954,13 @@ async function applyRoles(guild, member, playerInfo) {
                         await member.setNickname(nickname);
 
                         if (originalNickname) {
-                            updates.push(`Changed nickname from ${originalNickname.replaceAll('_', '\\_')} to ${nickname.replaceAll('_', '\\_')}.`);
+                            updates.push(
+                                `Changed nickname from ${originalNickname.replaceAll('_', '\\_')} to ${nickname.replaceAll('_', '\\_')}.`,
+                            );
                         } else {
-                            updates.push(`Set nickname to ${nickname.replaceAll('_', '\\_')}.`);
+                            updates.push(
+                                `Set nickname to ${nickname.replaceAll('_', '\\_')}.`,
+                            );
                         }
                     } catch (ex) {
                         console.error(ex);

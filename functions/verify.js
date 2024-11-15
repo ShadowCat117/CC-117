@@ -94,12 +94,7 @@ async function verify(interaction, force = false) {
         }
     }
 
-    let username = playerJson.username;
-
-    // Temporary, remove if Wynn ever fixes the name changing guild bug
-    if (username === 'Owen_Rocks_3') {
-        username = 'Amber_Rocks_3';
-    }
+    const username = playerJson.username;
 
     const playerInfo = new PlayerInfo(
         username,

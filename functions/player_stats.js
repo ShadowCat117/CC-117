@@ -159,13 +159,6 @@ async function playerStats(interaction, force = false) {
         highestCharcterLevel: highestCharcterLevel,
     });
 
-    // Temporary, remove if Wynn ever fixes the name changing guild bug
-    let username = playerJson.username;
-
-    if (username === 'Owen_Rocks_3') {
-        username = 'Amber_Rocks_3';
-    }
-
     let supportRank = 'None';
 
     if (playerJson.supportRank) {
@@ -201,7 +194,7 @@ async function playerStats(interaction, force = false) {
 
     return {
         uuid: playerJson.uuid,
-        username: username.replaceAll('_', '\\_'),
+        username: playerJson.username.replaceAll('_', '\\_'),
         supportRank: supportRank,
         lastSeen: lastSeen,
         wars: playerJson.globalData.wars.toLocaleString(),

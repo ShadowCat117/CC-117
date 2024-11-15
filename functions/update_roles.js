@@ -20,30 +20,6 @@ async function updateRoles(guild) {
             nickname = serverMember.nickname.split(' [')[0];
         }
 
-        // Temporary, remove if Wynn ever fixes the name changing guild bug
-        if (serverMember.user.id === '753700961364738158') {
-            const player = playerInfo.get('Owen_Rocks_3');
-
-            if (player) {
-                player.username = 'Amber_Rocks_3';
-
-                const response = await applyRoles(guild, serverMember, player);
-
-                if (response.updates.length > 0 || response.errors.length > 0) {
-                    updates.push(
-                        new UpdatedUser(
-                            response.username,
-                            serverMember,
-                            response.updates,
-                            response.errors,
-                        ),
-                    );
-                }
-
-                continue;
-            }
-        }
-
         if (nickname) {
             const player = playerInfo.get(nickname);
 
