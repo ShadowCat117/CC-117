@@ -23,7 +23,11 @@ async function hourlyTasks() {
     if (now.getUTCMinutes() == 0) {
         // Update members of each server the bot is in
         for (const guild of client.guilds.cache.values()) {
-            await guild.members.fetch({ time: 6000 });
+            try {
+                await guild.members.fetch({ time: 30000 });
+            } catch (error) {
+                console.error('Failed to fetch guild members: ' + error);
+            }
         }
 
         // Remove buttons from old message buttons.
@@ -354,7 +358,11 @@ module.exports = {
 
         // Update members of each server the bot is in
         for (const guild of client.guilds.cache.values()) {
-            await guild.members.fetch({ time: 6000 });
+            try {
+                await guild.members.fetch({ time: 30000 });
+            } catch (error) {
+                console.error('Failed to fetch guild members: ' + error);
+            }
 
             const guildOwner = await guild.fetchOwner();
             console.log(
