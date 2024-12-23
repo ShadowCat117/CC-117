@@ -30,8 +30,8 @@ class OnlineGuildMember {
         } else if (thisRankIndex > otherRankIndex) {
             return 1;
         } else {
-            const worldNumber = parseInt(this.server.split('WC')[1], 10);
-            const otherWorldNumber = parseInt(other.server.split('WC')[1], 10);
+            const worldNumber = parseInt(this.server.substring(2), 10);
+            const otherWorldNumber = parseInt(other.server.substring(2), 10);
 
             if (worldNumber < otherWorldNumber) {
                 return -1;
