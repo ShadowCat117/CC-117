@@ -150,6 +150,10 @@ async function playerBanner(interaction, force = false) {
     context.font = '42px Wynn';
     context.fillStyle = '#ffffff';
     context.textAlign = 'center';
+    context.shadowColor = '#000000';
+    context.shadowOffsetX = 3;
+    context.shadowOffsetY = 3;
+    context.shadowBlur = 1;
 
     context.fillText(`${playerJson.username}`, 200, 250);
 
@@ -188,14 +192,14 @@ async function playerBanner(interaction, force = false) {
     }
 
     context.font = '24px Wynn';
-    context.fillStyle = '#000000';
+    context.fillStyle = '#aaaaaa';
     context.textAlign = 'center';
     context.fillText('Rank', 109, 340);
 
     context.fillStyle = supportRankColor;
     context.fillText(supportRank, 109, 370);
 
-    context.fillStyle = '#000000';
+    context.fillStyle = '#aaaaaa';
     context.fillText('Total Level', 109, 430);
 
     context.fillStyle = '#ffffff';
@@ -205,7 +209,7 @@ async function playerBanner(interaction, force = false) {
         460,
     );
 
-    context.fillStyle = '#000000';
+    context.fillStyle = '#aaaaaa';
     context.fillText('Wars', 291, 340);
 
     context.fillStyle = '#ffffff';
@@ -215,7 +219,7 @@ async function playerBanner(interaction, force = false) {
         370,
     );
 
-    context.fillStyle = '#000000';
+    context.fillStyle = '#aaaaaa';
     context.fillText('Playtime', 291, 430);
 
     context.fillStyle = '#ffffff';
