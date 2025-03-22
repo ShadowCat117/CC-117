@@ -118,8 +118,9 @@ module.exports = {
         .addRoleOption((option) =>
             option
                 .setName('role')
-                .setDescription('The role to set for the configuration option')
-                .setRequired(true),
+                .setDescription(
+                    'The role to set for the configuration option. Do not select anything to remove that role',
+                ),
         ),
     ephemeral: true,
     async execute(interaction) {
@@ -210,11 +211,14 @@ module.exports = {
             // If the bot does not have permission to give the role, let the user know
             if (botRole) {
                 if (
+                    role &&
                     role.comparePositionTo(botRole) > 0 &&
                     option !== 'adminRole'
                 ) {
                     // Admin role is not applied to anyone so it doesn't need permission to handle it
                     message = `Configuration option ${option} updated successfully to ${role}.\n\nThe ${role} role is currently above the ${botRole} role in your hierarchy, this means that I will not be able to add that role to or remove that role from members, please change this so I can manage the role correctly!`;
+                } else if (!role) {
+                    message = `Removed ${option}.`;
                 } else {
                     message = `Configuration option ${option} updated successfully to ${role}.`;
                 }
@@ -222,8 +226,18 @@ module.exports = {
                 message = `Configuration option ${option} updated successfully to ${role}.\nFor some reason my role was not found on your server. Please try kicking and inviting me again to try and fix this. Your config options will be saved.`;
             }
 
+            const value = !role ? null : role.id;
+            let admin = false;
+
             switch (option) {
                 case 'adminRole':
+                    if (!role) {
+                        admin = true;
+                        break;
+                    } else {
+                        config[option] = value;
+                        break;
+                    }
                 case 'ownerRole':
                 case 'chiefRole':
                 case 'strategistRole':
@@ -248,7 +262,7 @@ module.exports = {
                 case 'bombBellRole':
                 case 'guildRaidRole':
                 case 'annihilationRole':
-                    config[option] = role.id;
+                    config[option] = value;
                     break;
             }
 
@@ -258,7 +272,13 @@ module.exports = {
                 'utf-8',
             );
 
-            responseEmbed.setDescription(`${message}`).setColor(0x00ffff);
+            if (admin) {
+                responseEmbed
+                    .setDescription('Cannot remove admin role.')
+                    .setColor(0x00ffff);
+            } else {
+                responseEmbed.setDescription(`${message}`).setColor(0x00ffff);
+            }
         } catch (error) {
             console.error(`Error updating configuration option: ${error}`);
             responseEmbed

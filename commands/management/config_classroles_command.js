@@ -99,9 +99,8 @@ module.exports = {
             option
                 .setName('role')
                 .setDescription(
-                    'The role value to set for the configuration option',
-                )
-                .setRequired(true),
+                    'The role value to set for the configuration option. Do not select anything to remove that role',
+                ),
         ),
     ephemeral: true,
     async execute(interaction) {
@@ -191,14 +190,18 @@ module.exports = {
 
             // If the bot does not have permission to give the role, let the user know
             if (botRole) {
-                if (role.comparePositionTo(botRole) > 0) {
+                if (role && role.comparePositionTo(botRole) > 0) {
                     message = `Configuration option ${option} updated successfully to ${role}.\n\nThe ${role} role is currently above the ${botRole} role in your hierarchy, this means that I will not be able to add that role to members, please change this so I can add the role correctly!`;
+                } else if (!role) {
+                    message = `Removed ${option}.`;
                 } else {
                     message = `Configuration option ${option} updated successfully to ${role}.`;
                 }
             } else {
                 message = `Configuration option ${option} updated successfully to ${role}.\nFor some reason my role was not found on your server. Please try kicking and inviting me again to try and fix this. Your config options will be saved.`;
             }
+
+            const value = !role ? null : role.id;
 
             switch (option) {
                 case 'warriorRole':
@@ -221,7 +224,7 @@ module.exports = {
                 case 'acrobatRole':
                 case 'shadestepperRole':
                 case 'tricksterRole':
-                    config[option] = role.id;
+                    config[option] = value;
                     break;
             }
 

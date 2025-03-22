@@ -17,9 +17,8 @@ module.exports = {
             option
                 .setName('role')
                 .setDescription(
-                    'The role for the given level to be associated with.',
-                )
-                .setRequired(true),
+                    'The role for the given level to be associated with. Do not select anything to remove that role',
+                ),
         ),
     ephemeral: true,
     async execute(interaction) {
@@ -111,17 +110,31 @@ module.exports = {
         }
 
         try {
-            config['levelRoles'][level] = role.id;
+            if (!role) {
+                delete config['levelRoles'][level];
 
-            fs.writeFileSync(
-                filePath,
-                JSON.stringify(config, null, 2),
-                'utf-8',
-            );
+                fs.writeFileSync(
+                    filePath,
+                    JSON.stringify(config, null, 2),
+                    'utf-8',
+                );
 
-            responseEmbed
-                .setDescription(`Level ${level} role set to ${role}.`)
-                .setColor(0x00ffff);
+                responseEmbed
+                    .setDescription(`Removed level ${level} role.`)
+                    .setColor(0x00ffff);
+            } else {
+                config['levelRoles'][level] = role.id;
+
+                fs.writeFileSync(
+                    filePath,
+                    JSON.stringify(config, null, 2),
+                    'utf-8',
+                );
+
+                responseEmbed
+                    .setDescription(`Level ${level} role set to ${role}.`)
+                    .setColor(0x00ffff);
+            }
         } catch (error) {
             console.error(`Error updating configuration option: ${error}`);
             responseEmbed
