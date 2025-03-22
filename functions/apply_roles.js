@@ -361,7 +361,7 @@ async function applyRoles(guild, member, playerInfo) {
                             );
                             errors.push(`Failed to add ${guildRankRole}.`);
                         });
-                } else if (!guildRankRole) {
+                } else if (!guildRankRole && config[guildRank + 'Role']) {
                     errors.push(
                         `Guild rank role ${guildRank}  is not defined in the config or is invalid.`,
                     );
@@ -382,7 +382,7 @@ async function applyRoles(guild, member, playerInfo) {
                             );
                             errors.push(`Failed to add ${memberOfRole}.`);
                         });
-                } else if (!memberOfRole) {
+                } else if (!memberOfRole && config['memberOfRole']) {
                     errors.push(
                         'Member of role is not defined in the config or is invalid.',
                     );
@@ -533,7 +533,7 @@ async function applyRoles(guild, member, playerInfo) {
                                 );
                                 errors.push(`Failed to add ${allyOwnerRole}.`);
                             });
-                    } else if (!allyOwnerRole) {
+                    } else if (!allyOwnerRole && config['allyOwnerRole']) {
                         errors.push(
                             'Ally owner role is not defined in the config or is invalid.',
                         );
@@ -556,7 +556,7 @@ async function applyRoles(guild, member, playerInfo) {
                                     `Failed to remove ${allyOwnerRole}.`,
                                 );
                             });
-                    } else if (!allyOwnerRole) {
+                    } else if (!allyOwnerRole && config['allyOwnerRole']) {
                         errors.push(
                             'Ally owner role is not defined in the config or is invalid.',
                         );
@@ -578,7 +578,7 @@ async function applyRoles(guild, member, playerInfo) {
                             );
                             errors.push(`Failed to add ${allyRole}.`);
                         });
-                } else if (!allyRole) {
+                } else if (!allyRole && config['allyRole']) {
                     errors.push(
                         'Ally role is not defined in the config or is invalid.',
                     );
@@ -600,7 +600,7 @@ async function applyRoles(guild, member, playerInfo) {
                             );
                             errors.push(`Failed to remove ${allyOwnerRole}.`);
                         });
-                } else if (!allyOwnerRole) {
+                } else if (!allyOwnerRole && config['allyOwnerRole']) {
                     errors.push(
                         'Ally owner role is not defined in the config or is invalid.',
                     );
@@ -621,7 +621,7 @@ async function applyRoles(guild, member, playerInfo) {
                             );
                             errors.push(`Failed to remove ${allyRole}.`);
                         });
-                } else if (!allyRole) {
+                } else if (!allyRole && config['allyRole']) {
                     errors.push(
                         'Ally role is not defined in the config or is invalid.',
                     );
@@ -656,7 +656,7 @@ async function applyRoles(guild, member, playerInfo) {
                             );
                             errors.push(`Failed to add ${supportRankRole}.`);
                         });
-                } else if (!supportRankRole) {
+                } else if (!supportRankRole && config[supportRank + 'Role']) {
                     errors.push(
                         `Rank role ${supportRank} is not defined in the config or is invalid.`,
                     );
@@ -896,7 +896,7 @@ async function applyRoles(guild, member, playerInfo) {
                         );
                         errors.push(`Failed to remove ${unverifiedRole}.`);
                     });
-            } else if (!unverifiedRole) {
+            } else if (!unverifiedRole && config['unverifiedRole']) {
                 errors.push(
                     'Unverified role is not defined in the config or is invalid.',
                 );
@@ -917,7 +917,7 @@ async function applyRoles(guild, member, playerInfo) {
                         );
                         errors.push(`Failed to add ${verifiedRole}.`);
                     });
-            } else if (!verifiedRole) {
+            } else if (!verifiedRole && config['verifiedRole']) {
                 errors.push(
                     'Verified role is not defined in the config or is invalid.',
                 );
