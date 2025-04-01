@@ -83,6 +83,7 @@ async function checkValidUsername(memberToCheck, guild, nameToCheck) {
         }
 
         let nicknameToCheck = member[1].nickname;
+        const displayNameToCheck = member[1].user.globalName;
         const usernameToCheck = member[1].user.username;
 
         // If nickname given, remove guild prefix if there is one
@@ -95,6 +96,8 @@ async function checkValidUsername(memberToCheck, guild, nameToCheck) {
             nameToCheck &&
             (nameToCheck.toLowerCase() ===
                 (nicknameToCheck || '').toLowerCase() ||
+                nameToCheck.toLowerCase() ===
+                    (displayNameToCheck || '').toLowerCase() ||
                 nameToCheck.toLowerCase() === usernameToCheck.toLowerCase())
         ) {
             return false;
