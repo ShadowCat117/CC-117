@@ -1449,7 +1449,7 @@ module.exports = {
                                 switch (reason) {
                                     case 'error': // Some kind of error
                                         responseEmbed.setDescription(
-                                            'An error occured whilst checking for promotion progress.',
+                                            'An error occurred whilst checking for promotion progress.',
                                         );
                                         break;
                                     case 'missing': // Not enough requirements given for the required count

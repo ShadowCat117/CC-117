@@ -98,7 +98,7 @@ module.exports = {
                 const responseEmbed = new EmbedBuilder()
                     .setTitle('Error')
                     .setDescription(
-                        'The config file for this server was not found, either an error has occured or verification has not been setup.',
+                        'The config file for this server was not found, either an error has occurred or verification has not been setup.',
                     )
                     .setColor(0xff0000);
 
@@ -110,7 +110,7 @@ module.exports = {
             const responseEmbed = new EmbedBuilder()
                 .setTitle('Error')
                 .setDescription(
-                    'An error occured whilst trying to update roles, please try again later.',
+                    'An error occurred whilst trying to update roles, please try again later.',
                 )
                 .setColor(0xff0000);
 

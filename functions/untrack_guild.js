@@ -81,7 +81,7 @@ async function untrackGuild(interaction, force = false) {
             return { guildName: guild.name };
         } catch (error) {
             console.error(error);
-            return { error: 'An error occured whilst untracking guild.' };
+            return { error: 'An error occurred whilst untracking guild.' };
         }
     } else {
         return { guildName: '' };

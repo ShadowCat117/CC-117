@@ -53,7 +53,7 @@ async function setGuild(interaction, force = false) {
             return { guildName: guild.name };
         } catch (error) {
             console.error(error);
-            return { error: 'An error occured whilst setting guild.' };
+            return { error: 'An error occurred whilst setting guild.' };
         }
     } else {
         return { guildName: '' };

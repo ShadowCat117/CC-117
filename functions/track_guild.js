@@ -80,7 +80,7 @@ async function trackGuild(interaction, force = false) {
             return { guildName: guild.name };
         } catch (error) {
             console.error(error);
-            return { error: 'An error occured whilst tracking guild.' };
+            return { error: 'An error occurred whilst tracking guild.' };
         }
     } else {
         return { guildName: '' };

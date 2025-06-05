@@ -3,7 +3,7 @@ class UpdatedUser {
     // username: Username of the updated player
     // member: Discord member that was updated
     // updates: The completed updates made to the user
-    // errors: Any errors that occured whilst updating the user
+    // errors: Any errors that occurred whilst updating the user
     constructor(username, member, updates, errors) {
         this.username = username;
         this.member = member;

@@ -79,7 +79,7 @@ async function removeAlly(interaction, force = false) {
             return { guildName: guild.name };
         } catch (error) {
             console.error(error);
-            return { error: 'An error occured whilst removing ally.' };
+            return { error: 'An error occurred whilst removing ally.' };
         }
     } else {
         return { guildName: '' };

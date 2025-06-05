@@ -64,7 +64,7 @@ module.exports = {
                 responseEmbed
                     .setTitle('Unable to find config')
                     .setDescription(
-                        'The config file for this server was not found, either an error has occured or verification has not been setup.',
+                        'The config file for this server was not found, either an error has occurred or verification has not been setup.',
                     )
                     .setColor(0xff0000);
 
@@ -76,7 +76,7 @@ module.exports = {
             responseEmbed
                 .setTitle('Unable to verify')
                 .setDescription(
-                    'An error occured whilst trying to verify, please try again later.',
+                    'An error occurred whilst trying to verify, please try again later.',
                 )
                 .setColor(0xff0000);
 

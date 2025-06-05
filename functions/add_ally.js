@@ -83,7 +83,7 @@ async function addAlly(interaction, force = false) {
             return { guildName: guild.name };
         } catch (error) {
             console.error(error);
-            return { error: 'An error occured whilst adding ally.' };
+            return { error: 'An error occurred whilst adding ally.' };
         }
     } else {
         return { guildName: '' };

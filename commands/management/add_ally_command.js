@@ -119,7 +119,7 @@ module.exports = {
 
             return;
         } else if (response.error) {
-            // Error occured whilst adding
+            // Error occurred whilst adding
             const responseEmbed = new EmbedBuilder()
                 .setTitle('Error')
                 .setDescription(`${response.error}`)
