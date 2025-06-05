@@ -1,15 +1,40 @@
 const applyRoles = require('./apply_roles');
 const database = require('../database/database');
+const fs = require('fs');
+const path = require('path');
 const UpdatedUser = require('../message_objects/UpdatedUser');
 
 async function updateRoles(guild) {
     const playerInfo = await database.getAllPlayerInfo();
 
     const updates = [];
+    let ignoredUsers = [];
+
+    try {
+        // Get the config file for the server
+        let config = {};
+
+        const directoryPath = path.join(__dirname, '..', 'configs');
+        const filePath = path.join(directoryPath, `${guild.id}.json`);
+
+        if (fs.existsSync(filePath)) {
+            const fileData = fs.readFileSync(filePath, 'utf-8');
+            config = JSON.parse(fileData);
+
+            // Set the ignored users if there are any
+            if (config.ignoredUsers) {
+                ignoredUsers = config.ignoredUsers;
+            }
+        }
+    } catch (error) {
+        console.log(error);
+        return updates;
+    }
 
     for (const serverMember of guild.members.cache.values()) {
-        // Ignore bots
+        // Ignore bots and ignored users
         if (serverMember.user.bot) continue;
+        if (ignoredUsers.includes(serverMember.user.id)) continue;
 
         const username = serverMember.user.username;
         const globalName = serverMember.user.globalName;

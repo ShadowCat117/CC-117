@@ -72,6 +72,7 @@ async function createConfig(client, guildId) {
                 guild: null,
                 allies: [],
                 trackedGuilds: [],
+                ignoredUsers: [],
                 updateRoles: false,
                 logMessages: false,
                 sendJoinLeaveMessages: false,
