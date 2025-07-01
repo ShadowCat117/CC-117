@@ -25,6 +25,10 @@ module.exports = {
                         name: 'Join/Leave Channel',
                         value: 'joinLeaveChannel',
                     },
+                    {
+                        name: 'Verification Channel',
+                        value: 'verificationChannel',
+                    },
                 ),
         )
         .addChannelOption((option) =>
@@ -115,6 +119,7 @@ module.exports = {
             switch (option) {
                 case 'logChannel':
                 case 'joinLeaveChannel':
+                case 'verificationChannel':
                     config[option] = channel.id;
                     break;
             }
