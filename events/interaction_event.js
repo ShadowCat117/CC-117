@@ -23,7 +23,7 @@ const activeHours = require('../functions/active_hours');
 const updateGuildMembers = require('../functions/update_guild_members');
 const fs = require('fs');
 const path = require('path');
-const createConfig = require('../functions/create_config');
+const configUtils = require('../functions/config_utils');
 const promotionProgress = require('../functions/promotion_progress');
 const verify = require('../functions/verify');
 const addDemotionException = require('../functions/add_demotion_exception');
@@ -75,7 +75,7 @@ module.exports = {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
             } else {
-                await createConfig(interaction.client, guildId);
+                await configUtils.createConfig(interaction.client, guildId);
 
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);

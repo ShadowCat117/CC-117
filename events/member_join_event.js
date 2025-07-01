@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { Events } = require('discord.js');
-const createConfig = require('../functions/create_config');
+const configUtils = require('../functions/config_utils');
 
 module.exports = {
     name: Events.GuildMemberAdd,
@@ -23,7 +23,7 @@ module.exports = {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
             } else {
-                await createConfig(member.client, guildId);
+                await configUtils.createConfig(member.client, guildId);
                 return;
             }
 

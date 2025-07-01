@@ -69,11 +69,13 @@ async function createConfig(client, guildId) {
                 annihilationRole: null,
                 logChannel: null,
                 joinLeaveChannel: null,
+                verificationChannel: null,
                 guild: null,
                 allies: [],
                 trackedGuilds: [],
                 ignoredUsers: [],
                 updateRoles: false,
+                doubleVerification: false,
                 logMessages: false,
                 sendJoinLeaveMessages: false,
                 addGuildPrefixes: true,
@@ -138,4 +140,37 @@ async function createConfig(client, guildId) {
     }
 }
 
-module.exports = createConfig;
+async function addNewConfigs(client, guildId) {
+    const directoryPath = path.join(__dirname, '..', 'configs');
+    const filePath = path.join(directoryPath, `${guildId}.json`);
+
+    if (fs.existsSync(filePath)) {
+        try {
+            const fileData = fs.readFileSync(filePath, 'utf-8');
+            const config = JSON.parse(fileData);
+
+            if (!config.hasOwnProperty('doubleVerification')) {
+                config['doubleVerification'] = false;
+            }
+            if (!config.hasOwnProperty('verificationChannel')) {
+                config['verificationChannel'] = null;
+            }
+
+            fs.writeFileSync(
+                filePath,
+                JSON.stringify(config, null, 2),
+                'utf-8',
+            );
+        } catch (err) {
+            console.error(`Error applying new config fields: ${err}`);
+        }
+    } else {
+        console.log('Config does not exist, creating');
+        await createConfig(client, guildId);
+    }
+}
+
+module.exports = {
+    createConfig,
+    addNewConfigs,
+};

@@ -10,7 +10,7 @@ const path = require('path');
 const verified = require('../../functions/verified');
 const messages = require('../../functions/messages');
 const database = require('../../database/database');
-const createConfig = require('../../functions/create_config');
+const configUtils = require('../../functions/config_utils');
 const PagedMessage = require('../../message_objects/PagedMessage');
 
 module.exports = {
@@ -41,7 +41,7 @@ module.exports = {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
             } else {
-                await createConfig(interaction.client, guildId);
+                await configUtils.createConfig(interaction.client, guildId);
 
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);

@@ -1,5 +1,5 @@
 const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
-const createConfig = require('../../functions/create_config');
+const configUtils = require('../../functions/config_utils');
 const fs = require('fs');
 const path = require('path');
 
@@ -33,7 +33,7 @@ module.exports = {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
             } else {
-                await createConfig(interaction.client, guildId);
+                await configUtils.createConfig(interaction.client, guildId);
 
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);

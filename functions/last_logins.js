@@ -1,5 +1,5 @@
 const database = require('../database/database');
-const createConfig = require('./create_config');
+const configUtils = require('./config_utils');
 const fs = require('fs');
 const path = require('path');
 
@@ -42,7 +42,7 @@ async function lastLogins(interaction, force = false) {
                 const inactivityExceptions = config['inactivityExceptions'];
                 exemptUuids = Object.keys(inactivityExceptions);
             } else {
-                await createConfig(interaction.client, guildId);
+                await configUtils.createConfig(interaction.client, guildId);
             }
         } catch (error) {
             console.error(error);

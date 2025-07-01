@@ -12,7 +12,7 @@ const database = require('../database/database');
 const messages = require('../functions/messages');
 const fs = require('fs');
 const path = require('path');
-const createConfig = require('../functions/create_config');
+const configUtils = require('../functions/config_utils');
 const PagedMessage = require('../message_objects/PagedMessage');
 let client;
 
@@ -47,7 +47,7 @@ async function hourlyTasks() {
                     const fileData = fs.readFileSync(filePath, 'utf-8');
                     config = JSON.parse(fileData);
                 } else {
-                    await createConfig(client, guild.id);
+                    await configUtils.createConfig(client, guild.id);
                     continue;
                 }
 
@@ -211,7 +211,7 @@ async function hourlyTasks() {
                     const fileData = fs.readFileSync(filePath, 'utf-8');
                     config = JSON.parse(fileData);
                 } else {
-                    await createConfig(client, guild.id);
+                    await configUtils(client, guild.id);
                     continue;
                 }
 
@@ -368,6 +368,7 @@ module.exports = {
             console.log(
                 `I am in the server ${guild} owned by ${guildOwner.user.username}`,
             );
+            await configUtils.addNewConfigs(client, guild.id);
         }
 
         // Calculate time to run first hourly task at

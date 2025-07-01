@@ -1,7 +1,7 @@
 const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
-const createConfig = require('../../functions/create_config');
+const configUtils = require('../../functions/config_utils');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -16,6 +16,10 @@ module.exports = {
                     {
                         name: 'Update Roles',
                         value: 'updateRoles',
+                    },
+                    {
+                        name: 'Double Layer Verification',
+                        value: 'doubleVerification',
                     },
                     {
                         name: 'Add Guild Prefixes',
@@ -69,7 +73,7 @@ module.exports = {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
             } else {
-                await createConfig(interaction.client, guildId);
+                await configUtils.createConfig(interaction.client, guildId);
 
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
@@ -121,6 +125,7 @@ module.exports = {
             switch (option) {
                 case 'updateRoles':
                 case 'addGuildPrefixes':
+                case 'doubleVerification':
                 case 'logMessages':
                 case 'sendJoinLeaveMessages':
                 case 'checkBannedPlayers':

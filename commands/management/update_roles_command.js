@@ -7,7 +7,7 @@ const {
 } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
-const createConfig = require('../../functions/create_config');
+const configUtils = require('../../functions/config_utils');
 const updateRoles = require('../../functions/update_roles');
 const messages = require('../../functions/messages');
 const database = require('../../database/database');
@@ -93,7 +93,7 @@ module.exports = {
                     return;
                 }
             } else {
-                await createConfig(interaction.client, guildId);
+                await configUtils.createConfig(interaction.client, guildId);
 
                 const responseEmbed = new EmbedBuilder()
                     .setTitle('Error')

@@ -6,7 +6,7 @@ const {
     SlashCommandBuilder,
 } = require('discord.js');
 const axios = require('axios');
-const createConfig = require('../../functions/create_config');
+const configUtils = require('../../functions/config_utils');
 const fs = require('fs');
 const path = require('path');
 const database = require('../../database/database');
@@ -48,7 +48,7 @@ module.exports = {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
             } else {
-                await createConfig(interaction.client, guildId);
+                await configUtils.createConfig(interaction.client, guildId);
 
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);

@@ -7,7 +7,7 @@ const {
 } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
-const createConfig = require('../../functions/create_config');
+const configUtils = require('../../functions/config_utils');
 const warRoles = ['war', 'tank', 'healer', 'damage', 'solo', 'warPing', 'eco'];
 
 module.exports = {
@@ -42,7 +42,7 @@ module.exports = {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
             } else {
-                await createConfig(interaction.client, guildId);
+                await configUtils.createConfig(interaction.client, guildId);
 
                 responseEmbed
                     .setTitle('Error')

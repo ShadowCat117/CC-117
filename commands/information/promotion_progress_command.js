@@ -9,7 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const promotionProgress = require('../../functions/promotion_progress');
 const database = require('../../database/database');
-const createConfig = require('../../functions/create_config');
+const configUtils = require('../../functions/config_utils');
 const PromotionValue = require('../../values/PromotionValue');
 
 module.exports = {
@@ -54,7 +54,7 @@ module.exports = {
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);
             } else {
-                await createConfig(interaction.client, guildId);
+                await configUtils.createConfig(interaction.client, guildId);
 
                 const fileData = fs.readFileSync(filePath, 'utf-8');
                 config = JSON.parse(fileData);

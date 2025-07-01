@@ -7,7 +7,7 @@ const {
 } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
-const createConfig = require('../../functions/create_config');
+const configUtils = require('../../functions/config_utils');
 const verify = require('../../functions/verify');
 const utilities = require('../../functions/utilities');
 
@@ -59,7 +59,7 @@ module.exports = {
                     return;
                 }
             } else {
-                await createConfig(interaction.client, guildId);
+                await configUtils.createConfig(interaction.client, guildId);
 
                 responseEmbed
                     .setTitle('Unable to find config')
