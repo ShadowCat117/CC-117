@@ -39,6 +39,7 @@ module.exports = {
         const responseEmbed = new EmbedBuilder();
 
         let config = {};
+        let doubleVerification = false;
 
         try {
             if (fs.existsSync(filePath)) {
@@ -58,6 +59,8 @@ module.exports = {
                     await interaction.editReply({ embeds: [responseEmbed] });
                     return;
                 }
+
+                doubleVerification = config.doubleVerification;
             } else {
                 await configUtils.createConfig(interaction.client, guildId);
 
@@ -102,7 +105,7 @@ module.exports = {
             return;
         }
 
-        const response = await verify(interaction);
+        const response = await verify(interaction, doubleVerification);
 
         if (response.playerUuids !== undefined) {
             // Multiselector
@@ -154,6 +157,57 @@ module.exports = {
                 components: [row],
                 embeds: [responseEmbed],
             });
+
+            return;
+        } else if (config.doubleVerification) {
+            const channel = interaction.guild.channels.cache.get(
+                config.verificationChannel,
+            );
+            responseEmbed
+                .setTitle('Verification Pending')
+                .setDescription(
+                    'This server has double verification enabled, your roles will be set after a member has approved your verification.',
+                )
+                .setColor(0x999999);
+
+            await interaction.editReply({ embeds: [responseEmbed] });
+
+            if (channel) {
+                const verificationEmbed = new EmbedBuilder()
+                    .setTitle(`Verification request for ${response.username}`)
+                    .setURL(
+                        `https://wynncraft.com/stats/player/${response.uuid}`,
+                    )
+                    .setDescription(
+                        `User ${interaction.user} wants to verify as ${response.username}.\n\nClick the title link to open their stats page.`,
+                    )
+                    .setColor(0xfff500);
+
+                const acceptButton = new ButtonBuilder()
+                    .setCustomId(
+                        `accept_verify:${response.uuid}:${interaction.user.id}`,
+                    )
+                    .setStyle(ButtonStyle.Success)
+                    .setLabel('Accept');
+                const denyButton = new ButtonBuilder()
+                    .setCustomId(`deny_verify`)
+                    .setStyle(ButtonStyle.Danger)
+                    .setLabel('Deny');
+
+                const row = new ActionRowBuilder().addComponents(
+                    acceptButton,
+                    denyButton,
+                );
+
+                await channel.send({
+                    embeds: [verificationEmbed],
+                    components: [row],
+                });
+            } else {
+                console.warn(
+                    `Server ${guildId} has no valid verification channel.`,
+                );
+            }
 
             return;
         } else {

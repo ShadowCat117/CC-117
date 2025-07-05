@@ -39,6 +39,9 @@ const messages = require('../functions/messages');
 const database = require('../database/database');
 const playerBanner = require('../functions/player_banner');
 const playerStats = require('../functions/player_stats');
+const applyRoles = require('../functions/apply_roles');
+const axios = require('axios');
+const PlayerInfo = require('../message_objects/PlayerInfo');
 
 const warriorArchetypes = ['fallen', 'battleMonk', 'paladin'];
 const mageArchetypes = ['riftwalker', 'lightBender', 'arcanist'];
@@ -139,6 +142,171 @@ module.exports = {
                                     embeds: [expiredEmbed],
                                 });
                             }
+
+                            break;
+                        }
+                        case 'accept_verify': {
+                            const uuid = parts[1];
+                            const userId = parts[2];
+
+                            const original = interaction.message.embeds[0];
+                            const firstLine =
+                                original.description.split('\n')[0];
+                            const modifiedEmbed = EmbedBuilder.from(original)
+                                .setTitle('Verification request accepted')
+                                .setDescription(
+                                    `${firstLine}\n\n${interaction.user} accepted verification.`,
+                                )
+                                .setColor(0x00ffff);
+
+                            const loadingEmbed = new EmbedBuilder()
+                                .setDescription('Verifying user.')
+                                .setColor(0x00ff00);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [loadingEmbed],
+                            });
+
+                            const member =
+                                interaction.guild.members.cache.get(userId);
+                            let response;
+
+                            try {
+                                response = await axios.get(
+                                    `https://api.wynncraft.com/v3/player/${uuid}?fullResult=True`,
+                                );
+                            } catch (error) {
+                                console.error(error);
+                            }
+
+                            const playerJson = response.data;
+
+                            if (!playerJson || !playerJson.username) {
+                                return;
+                            }
+
+                            let guildUuid = null;
+                            let guildPrefix = null;
+                            let guildRank = null;
+
+                            if (playerJson.guild) {
+                                guildUuid = playerJson.guild.uuid;
+                                guildPrefix = playerJson.guild.prefix;
+                                guildRank = playerJson.guild.rank.toLowerCase();
+                            }
+
+                            const supportRank = playerJson.supportRank;
+                            const veteran = playerJson.veteran
+                                ? playerJson.veteran
+                                : false;
+                            const serverRank = playerJson.rank;
+
+                            let highestCharacterLevel = 0;
+
+                            for (const character in playerJson.characters) {
+                                const characterJson =
+                                    playerJson.characters[character];
+
+                                // If character level is higher than current tracked highest, set as new highest
+                                if (
+                                    characterJson.level > highestCharacterLevel
+                                ) {
+                                    highestCharacterLevel = characterJson.level;
+                                }
+                            }
+
+                            const username = playerJson.username;
+
+                            const playerInfo = new PlayerInfo(
+                                username,
+                                guildUuid,
+                                guildPrefix,
+                                guildRank,
+                                supportRank,
+                                veteran,
+                                serverRank,
+                                highestCharacterLevel,
+                            );
+
+                            database.updatePlayer({
+                                uuid: playerJson.uuid,
+                                username: playerJson.username,
+                                guildUuid: guildUuid,
+                                guildRank: guildRank,
+                                online: playerJson.online,
+                                lastLogin: playerJson.lastJoin,
+                                supportRank: supportRank,
+                                veteran: veteran,
+                                serverRank: serverRank,
+                                wars: playerJson.globalData.wars,
+                                highestCharcterLevel: highestCharacterLevel,
+                            });
+
+                            const applyRolesResponse = await applyRoles(
+                                interaction.guild,
+                                member,
+                                playerInfo,
+                            );
+
+                            if (
+                                !applyRolesResponse.updates ||
+                                !applyRolesResponse.errors
+                            )
+                                return;
+
+                            if (
+                                applyRolesResponse.updates.length > 0 ||
+                                (applyRolesResponse.errors.length > 0 &&
+                                    config.logMessages &&
+                                    config.logChannel)
+                            ) {
+                                let appliedChanges = 'Applied changes: \n';
+
+                                for (const update of applyRolesResponse.updates) {
+                                    appliedChanges += `${update}\n`;
+                                }
+
+                                for (const error of applyRolesResponse.errors) {
+                                    appliedChanges += `${error}\n`;
+                                }
+
+                                const responseEmbed = new EmbedBuilder()
+                                    .setTitle(
+                                        `${member.user.username} has verified as ${applyRolesResponse.username}`,
+                                    )
+                                    .setDescription(appliedChanges)
+                                    .addFields({
+                                        name: 'User',
+                                        value: `${member}`,
+                                    });
+
+                                const channel =
+                                    interaction.guild.channels.cache.get(
+                                        config.logChannel,
+                                    );
+
+                                if (channel) {
+                                    try {
+                                        await channel.send({
+                                            embeds: [responseEmbed],
+                                        });
+                                    } catch (error) {
+                                        console.error(
+                                            `Failed to send verification message to channel ${config.logChannel} in guild ${interaction.guild.id}`,
+                                        );
+                                    }
+                                } else {
+                                    console.log(
+                                        `${config.logChannel} not found for guild ${interaction.guild.id}`,
+                                    );
+                                }
+                            }
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [modifiedEmbed],
+                            });
 
                             break;
                         }
@@ -708,6 +876,24 @@ module.exports = {
 
                             break;
                         }
+                        case 'deny_verify': {
+                            const original = interaction.message.embeds[0];
+                            const firstLine =
+                                original.description.split('\n')[0];
+                            const modifiedEmbed = EmbedBuilder.from(original)
+                                .setTitle('Verification request denied')
+                                .setDescription(
+                                    `${firstLine}\n\n${interaction.user} denied verification.`,
+                                )
+                                .setColor(0xff0000);
+
+                            await interaction.editReply({
+                                components: [],
+                                embeds: [modifiedEmbed],
+                            });
+
+                            break;
+                        }
                         case 'guild_stats': {
                             const loadingEmbed = new EmbedBuilder()
                                 .setDescription(
@@ -832,7 +1018,7 @@ module.exports = {
                                     memberDetails += `${member.averagePlaytime} hours per week (${member.weeklyPlaytime})`;
 
                                     responseEmbed.addFields({
-                                        name: `${member.username} (${member.guildRank})`,
+                                        name: `${member.contributionRank}. ${member.username} (${member.guildRank})`,
                                         value: `${memberDetails}`,
                                     });
                                 }
@@ -2124,9 +2310,73 @@ module.exports = {
                                 embeds: [loadingEmbed],
                             });
 
-                            const response = await verify(interaction, true);
+                            const response = await verify(
+                                interaction,
+                                config.doubleVerification,
+                                true,
+                            );
+
+                            const channel =
+                                interaction.guild.channels.cache.get(
+                                    config.verificationChannel,
+                                );
 
                             const responseEmbed = new EmbedBuilder();
+
+                            if (config.doubleVerification) {
+                                responseEmbed
+                                    .setTitle('Verification Pending')
+                                    .setDescription(
+                                        'This server has double verification enabled, your roles will be set after a member has approved your verification.',
+                                    )
+                                    .setColor(0x999999);
+
+                                await interaction.editReply({
+                                    embeds: [responseEmbed],
+                                });
+
+                                if (channel) {
+                                    const verificationEmbed = new EmbedBuilder()
+                                        .setTitle(
+                                            `Verification request for ${response.username}`,
+                                        )
+                                        .setURL(
+                                            `https://wynncraft.com/stats/player/${response.uuid}`,
+                                        )
+                                        .setDescription(
+                                            `User ${interaction.user} wants to verify as ${response.username}.\n\nClick the title link to open their stats page.`,
+                                        )
+                                        .setColor(0xfff500);
+
+                                    const acceptButton = new ButtonBuilder()
+                                        .setCustomId(
+                                            `accept_verify:${response.uuid}:${interaction.user.id}`,
+                                        )
+                                        .setStyle(ButtonStyle.Success)
+                                        .setLabel('Accept');
+                                    const denyButton = new ButtonBuilder()
+                                        .setCustomId(`deny_verify`)
+                                        .setStyle(ButtonStyle.Danger)
+                                        .setLabel('Deny');
+
+                                    const row =
+                                        new ActionRowBuilder().addComponents(
+                                            acceptButton,
+                                            denyButton,
+                                        );
+
+                                    await channel.send({
+                                        embeds: [verificationEmbed],
+                                        components: [row],
+                                    });
+                                } else {
+                                    console.warn(
+                                        `Server ${guildId} has no valid verification channel.`,
+                                    );
+                                }
+
+                                return;
+                            }
 
                             if (
                                 response.updates.length > 0 ||

@@ -4,7 +4,7 @@ const database = require('../database/database');
 const utilities = require('./utilities');
 const PlayerInfo = require('../message_objects/PlayerInfo');
 
-async function verify(interaction, force = false) {
+async function verify(interaction, doubleVerification, force = false) {
     let nameToSearch;
 
     if (interaction.options !== undefined) {
@@ -107,12 +107,6 @@ async function verify(interaction, force = false) {
         highestCharacterLevel,
     );
 
-    const roleResponse = await applyRoles(
-        interaction.guild,
-        interaction.member,
-        playerInfo,
-    );
-
     database.updatePlayer({
         uuid: playerJson.uuid,
         username: playerJson.username,
@@ -126,6 +120,19 @@ async function verify(interaction, force = false) {
         wars: playerJson.globalData.wars,
         highestCharcterLevel: highestCharacterLevel,
     });
+
+    if (doubleVerification) {
+        return {
+            username: playerInfo.username,
+            uuid: playerJson.uuid,
+        };
+    }
+
+    const roleResponse = await applyRoles(
+        interaction.guild,
+        interaction.member,
+        playerInfo,
+    );
 
     return {
         username: playerInfo.username,
