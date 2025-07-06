@@ -9,6 +9,8 @@ async function updateRoles(guild) {
 
     const updates = [];
     let ignoredUsers = [];
+    let doubleVerification = false;
+    let verifiedRole;
 
     try {
         // Get the config file for the server
@@ -25,6 +27,9 @@ async function updateRoles(guild) {
             if (config.ignoredUsers) {
                 ignoredUsers = config.ignoredUsers;
             }
+
+            doubleVerification = config.doubleVerification;
+            verifiedRole = guild.roles.cache.get(config['verifiedRole']);
         }
     } catch (error) {
         console.log(error);
@@ -35,6 +40,15 @@ async function updateRoles(guild) {
         // Ignore bots and ignored users
         if (serverMember.user.bot) continue;
         if (ignoredUsers.includes(serverMember.user.id)) continue;
+
+        // Skip if double verification is enabled and they do not have the verified role
+        if (
+            doubleVerification &&
+            verifiedRole &&
+            !serverMember.roles.cache.has(verifiedRole.id)
+        ) {
+            continue;
+        }
 
         const username = serverMember.user.username;
         const globalName = serverMember.user.globalName;
