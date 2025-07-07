@@ -211,7 +211,7 @@ async function hourlyTasks() {
                     const fileData = fs.readFileSync(filePath, 'utf-8');
                     config = JSON.parse(fileData);
                 } else {
-                    await configUtils(client, guild.id);
+                    await configUtils.createConfig(client, guild.id);
                     continue;
                 }
 
