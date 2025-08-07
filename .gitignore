@@ -6,5 +6,3 @@ configs
 database/database.db
 database/database.db-journal
 preferences.json
-deploy-commands.js
-index.js

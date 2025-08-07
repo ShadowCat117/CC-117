@@ -1,3 +1,11 @@
+# ⚠️ Deprecation Notice
+## This project is no longer maintained.
+
+To run the bot yourself, you need to run the `index.js` file using `node index.js`. Command updates can be deployed with `node deploy-commands.js`. A `config.json` in the project directory is needed with the following fields:
+- `clientId`: The client ID of your Discord bot account.
+- `token`: The auth token for your Discord bot account.
+- `userAgent`: A user agent to be used when making requests to vzge.me for generating player images.
+
 # CC-117
 
 This is a Discord bot primarily focused around guild management for Wynncraft but also displays helpful information such as active hours for other guilds and basic stats about them and their members.
